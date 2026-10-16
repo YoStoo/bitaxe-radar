@@ -19,6 +19,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+CONTACT = "contact@bitaxeradar.com"
 FROM = os.environ.get("ALERT_FROM", "Bitaxe Radar <alerts@bitaxeradar.com>")
 POSTAL = "Bitaxe Radar, mailing-address-removed"
 SITE_URL = "https://bitaxeradar.com"
@@ -179,11 +180,11 @@ def build_email(email, props, match, latest, aff, unsub_url):
 {alt_html}<p style="font-size:13px;color:#555">{html.escape(" ".join(notes))} Solo mining is a lottery, not income.</p>
 <p style="font-size:13px"><a href="{SITE_URL}">See all prices on Bitaxe Radar</a></p>
 <hr style="border:0;border-top:1px solid #ddd;margin:24px 0"><p style="font-size:12px;color:#666;line-height:1.5">{html.escape(disclosure)}<br>
-You get this because you signed up for price alerts on bitaxeradar.com.<br>{html.escape(POSTAL)}<br><a href="{html.escape(unsub_url)}">Unsubscribe</a></p></div>"""
+You get this because you signed up for price alerts on bitaxeradar.com.<br>{html.escape(POSTAL)}<br>Questions? Reply to this email or write <a href="mailto:{CONTACT}">{CONTACT}</a>.<br><a href="{html.escape(unsub_url)}">Unsubscribe</a></p></div>"""
     text_body = (f"{mname} is in stock at or under your target.\n\nSeller: {seller}\nPrice: {price_line}\nYour target: {money(target, 'USD')}\n"
                  f"Config: {best.get('config') or 'see seller page'}\nChecked: {checked_s}\n\nView at {seller}: {link}\n{alt_text}\n"
                  f"{' '.join(notes)} Solo mining is a lottery, not income.\nAll prices: {SITE_URL}\n\n--\n{disclosure}\n"
-                 f"You get this because you signed up for price alerts on bitaxeradar.com.\n{POSTAL}\nUnsubscribe: {unsub_url}\n")
+                 f"You get this because you signed up for price alerts on bitaxeradar.com.\n{POSTAL}\nQuestions? Reply to this email or write {CONTACT}\nUnsubscribe: {unsub_url}\n")
     return subject, html_body, text_body
 
 
@@ -320,7 +321,7 @@ def main():
 
     def sender(email, subject, html_body, text_body, unsub, c, price, now_):
         return client.call("POST", "/emails", {
-            "from": FROM, "to": [email], "subject": subject, "html": html_body, "text": text_body,
+            "from": FROM, "reply_to": CONTACT, "to": [email], "subject": subject, "html": html_body, "text": text_body,
             "headers": {"List-Unsubscribe": f"<{unsub}>", "List-Unsubscribe-Post": "List-Unsubscribe=One-Click"},
             "tags": [{"name": "type", "value": "price_alert"}]},
             headers={"Idempotency-Key": f"alert-{c.get('id', email)}-{price:.2f}-{now_:%Y%m%d}"[:256]})

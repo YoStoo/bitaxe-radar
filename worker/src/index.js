@@ -10,6 +10,7 @@
 
 const ALLOWED_ORIGINS = ["https://bitaxeradar.com", "https://www.bitaxeradar.com", "https://yostoo.github.io"];
 const FROM = "Bitaxe Radar <alerts@bitaxeradar.com>";
+const CONTACT = "contact@bitaxeradar.com";
 const POSTAL = "Bitaxe Radar, mailing-address-removed";
 const CONFIRM_TTL_SEC = 48 * 3600;
 const MODELS = ["any", "bitaxe-supra", "bitaxe-ultra", "bitaxe-gamma", "bitaxe-gamma-duo", "bitaxe-gt-801",
@@ -72,7 +73,7 @@ function page(title, bodyHtml, env, status = 200) {
 <meta name="robots" content="noindex"><title>${esc(title)} - Bitaxe Radar</title>
 <style>body{font:16px/1.5 system-ui,sans-serif;background:#0f1115;color:#e8ecf3;margin:0;display:grid;place-items:center;min-height:100vh}
 main{max-width:520px;padding:28px;background:#171a21;border:1px solid #2a2f3a;border-radius:12px;margin:16px}a{color:#f7931a}h1{margin-top:0;font-size:22px}</style></head>
-<body><main><h1>${esc(title)}</h1>${bodyHtml}<p><a href="${esc(site)}">&larr; Back to Bitaxe Radar</a></p></main></body></html>`;
+<body><main><h1>${esc(title)}</h1>${bodyHtml}<p><a href="${esc(site)}">&larr; Back to Bitaxe Radar</a></p><p style="font-size:13px;color:#9aa4b5">Contact: <a href="mailto:${CONTACT}">${CONTACT}</a></p></main></body></html>`;
   return new Response(html, { status, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store",
     "Referrer-Policy": "no-referrer", "X-Robots-Tag": "noindex" } });
 }
@@ -80,10 +81,10 @@ main{max-width:520px;padding:28px;background:#171a21;border:1px solid #2a2f3a;bo
 export function footerHtml(unsubUrl) {
   return `<hr style="border:0;border-top:1px solid #ddd;margin:24px 0"><p style="font-size:12px;color:#666;line-height:1.5">
 You are receiving this because this address was entered on bitaxeradar.com. Links to sellers may be affiliate links: if you buy through one, Bitaxe Radar may earn a commission at no extra cost to you.<br>
-${esc(POSTAL)}<br><a href="${esc(unsubUrl)}">Unsubscribe</a></p>`;
+${esc(POSTAL)}<br>Questions? Reply to this email or write <a href="mailto:${CONTACT}">${CONTACT}</a>.<br><a href="${esc(unsubUrl)}">Unsubscribe</a></p>`;
 }
 export function footerText(unsubUrl) {
-  return `\n--\nYou are receiving this because this address was entered on bitaxeradar.com.\nLinks to sellers may be affiliate links: if you buy through one, Bitaxe Radar may earn a commission at no extra cost to you.\n${POSTAL}\nUnsubscribe: ${unsubUrl}\n`;
+  return `\n--\nYou are receiving this because this address was entered on bitaxeradar.com.\nLinks to sellers may be affiliate links: if you buy through one, Bitaxe Radar may earn a commission at no extra cost to you.\n${POSTAL}\nQuestions? Reply to this email or write ${CONTACT}\nUnsubscribe: ${unsubUrl}\n`;
 }
 
 // ---------- validation ----------
@@ -162,7 +163,7 @@ async function handleSubscribe(request, env) {
 <p><a href="${esc(confirmUrl)}" style="background:#f7931a;color:#1a1100;padding:10px 16px;border-radius:8px;text-decoration:none;font-weight:700">Yes, send me alerts</a></p>
 <p style="font-size:13px;color:#555">This link works for 48 hours. If you did not ask for this, ignore this email and nothing will be sent.</p>${footerHtml(unsubUrl)}</div>`;
   const text = `Confirm your Bitaxe Radar price alert:\nMiner: ${label}\nAlert me at or under: $${v.price} (USD, in stock)\n\nConfirm: ${confirmUrl}\n\nThis link works for 48 hours. If you did not ask for this, ignore this email and nothing will be sent.\n${footerText(unsubUrl)}`;
-  const sent = await resend(env, "POST", "/emails", { from: FROM, to: [v.email], subject: "Confirm your Bitaxe Radar price alert", html, text,
+  const sent = await resend(env, "POST", "/emails", { from: FROM, reply_to: CONTACT, to: [v.email], subject: "Confirm your Bitaxe Radar price alert", html, text,
     headers: { "List-Unsubscribe": `<${unsubUrl}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" } });
   if (!sent.ok) { console.error("send confirm failed", sent.status, JSON.stringify(sent.data)); return fail("Could not send the confirmation email. Please try again later.", 502); }
   return wantsJson ? json({ ok: true, message: okMessage() }, 200, request) : page("Check your inbox", `<p>${esc(okMessage())}</p>`, env);
@@ -198,7 +199,7 @@ function doneConfirm(p, env) {
 
 async function handleUnsubscribe(url, env) {
   const p = await verifyToken(url.searchParams.get("t"), env.SIGNING_SECRET, "u");
-  if (!p || p.expired) return page("Invalid link", "<p>This unsubscribe link is not valid. Reply to any alert email and we will remove you by hand.</p>", env, 400);
+  if (!p || p.expired) return page("Invalid link", `<p>This unsubscribe link is not valid. Email ${CONTACT} and we will remove you by hand.</p>`, env, 400);
   const r = await resend(env, "PATCH", contactPath(p.e), { unsubscribed: true });
   if (!r.ok && r.status !== 404) { console.error("unsubscribe failed", r.status, JSON.stringify(r.data)); return page("Something went wrong", "<p>We could not process that right now. Please try the link again in a few minutes.</p>", env, 502); }
   return page("Unsubscribed", `<p><strong>${esc(p.e)}</strong> will not get any more alerts. Sorry to see you go.</p>`, env);
