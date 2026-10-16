@@ -4,7 +4,7 @@ var AFFILIATE = { powermining: "ref=bitaxeradar" };
 // TODO (before launch): deploy the Cloudflare Worker (see worker/README.md), then set all three:
 var WORKER_URL = "https://bitaxe-radar-alerts.bitaxeradar.workers.dev/subscribe";
 var TURNSTILE_SITEKEY = "0x4AAAAAAFYqcERY2Pvc1wQI";   // public site key
-var SIGNUP_ENABLED = true;                                        // TODO: flip to true once the two values above are real
+var SIGNUP_ENABLED = true;                                        
 (function () {
   "use strict";
   var R = window.RADAR;
