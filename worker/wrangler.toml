@@ -1,0 +1,26 @@
+name = "bitaxe-radar-alerts"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+workers_dev = true
+
+# TODO: after the Worker is deployed, set PUBLIC_BASE to its real public URL
+# (custom domain recommended, e.g. https://subscribe.bitaxeradar.com) and uncomment [[routes]] below.
+[vars]
+PUBLIC_BASE = "https://bitaxe-radar-alerts.bitaxeradar.workers.dev"
+SITE_URL = "https://bitaxeradar.com"
+
+# Custom domain (bitaxeradar.com must be a zone in the same Cloudflare account; see README).
+# [[routes]]
+# pattern = "subscribe.bitaxeradar.com"
+# custom_domain = true
+
+# Optional light per-IP rate limit (needs Wrangler >= 4.36). The code works without it.
+[[ratelimits]]
+name = "RATE_LIMITER"
+namespace_id = "1001"
+  [ratelimits.simple]
+  limit = 5
+  period = 60
+
+# Secrets (NOT in this file) -- set with `wrangler secret put <NAME>`:
+#   RESEND_API_KEY, SIGNING_SECRET, TURNSTILE_SECRET

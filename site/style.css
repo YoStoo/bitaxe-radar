@@ -63,3 +63,4 @@ input:focus,select:focus,button:focus,.btn:focus,a:focus{outline:2px solid var(-
 @media (max-width:640px){th,td{padding:8px 8px}.cfg{max-width:200px}nav a{margin-left:10px}}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 @media (max-width:640px){.model table{min-width:700px}.cfg{max-width:260px}}
+.signup-actions{margin-top:12px}.turnstile-slot{min-height:65px}

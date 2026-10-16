@@ -1,0 +1,6 @@
+{
+  "name": "bitaxe-radar-alerts-worker",
+  "private": true,
+  "type": "module",
+  "scripts": { "dev": "wrangler dev", "deploy": "wrangler deploy", "test": "node test/worker.test.mjs" }
+}

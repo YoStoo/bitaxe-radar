@@ -70,14 +70,19 @@
   <section id="alerts" aria-labelledby="h-alerts">
     <div class="sec-head"><h2 id="h-alerts">Free price-drop alerts</h2></div>
     <form id="signup" class="signup" novalidate>
-      <p><strong>Coming soon:</strong> get one email when a miner you care about drops in price or comes back in stock. Free, no spam, unsubscribe any time.</p>
+      <p id="signupIntro"><strong>Get one email when a miner drops to your price.</strong> Pick a miner and a target price (USD). We email you only when it is <em>in stock</em> at or under that price. Free; unsubscribe with one click.</p>
       <div class="row">
-        <label>Email <input type="email" id="email" name="email" autocomplete="email" placeholder="you@example.com" required></label>
+        <label>Email <input type="email" id="email" name="email" autocomplete="email" placeholder="you@example.com" maxlength="254" required></label>
         <label>Miner <select id="alertModel" name="model"><option value="any">Any tracked miner</option></select></label>
-        <label>Alert me under (USD, optional) <input type="number" min="0" step="1" id="alertPrice" name="target" placeholder="e.g. 100" inputmode="numeric"></label>
-        <button type="submit">Notify me</button>
+        <label>Alert me at or under (USD) <input type="number" min="1" max="100000" step="1" id="alertPrice" name="target_price" placeholder="e.g. 120" inputmode="numeric" required></label>
       </div>
-      <p class="hint" id="signupMsg" role="status" aria-live="polite">Placeholder form: signups are not connected to any email service yet. Nothing is stored or sent.</p>
+      <div style="position:absolute;left:-9999px" aria-hidden="true"><label>Website <input type="text" id="website" name="website" tabindex="-1" autocomplete="off"></label></div>
+      <div class="row signup-actions">
+        <div id="turnstile" class="turnstile-slot"></div>
+        <button type="submit" id="signupBtn">Notify me</button>
+      </div>
+      <p class="hint">Double opt-in: after you submit, we send one confirmation email, and you only start getting alerts once you click the link in it. Alerts go out at most when our checks (every ~6 hours) find a new lower price, and at most about once a week per price. Your email is only used for these alerts and is never sold. Links to sellers may be affiliate links (see disclosure below).</p>
+      <p class="hint" id="signupMsg" role="status" aria-live="polite"></p>
     </form>
   </section>
 

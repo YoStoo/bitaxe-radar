@@ -1,0 +1,212 @@
+[
+ {
+  "id": "fake-1",
+  "email": "alice@example.com",
+  "unsubscribed": false,
+  "created_at": "2026-10-10 12:00:00+00",
+  "properties": {
+   "model": {
+    "value": "any",
+    "type": "string"
+   },
+   "target_price": {
+    "value": 130,
+    "type": "number"
+   }
+  }
+ },
+ {
+  "id": "fake-2",
+  "email": "bob@example.com",
+  "unsubscribed": false,
+  "created_at": "2026-10-10 12:00:00+00",
+  "properties": {
+   "model": {
+    "value": "nerdaxe-gamma",
+    "type": "string"
+   },
+   "target_price": {
+    "value": 200,
+    "type": "number"
+   }
+  }
+ },
+ {
+  "id": "fake-3",
+  "email": "carol@example.com",
+  "unsubscribed": false,
+  "created_at": "2026-10-10 12:00:00+00",
+  "properties": {
+   "model": {
+    "value": "bitaxe-gamma",
+    "type": "string"
+   },
+   "target_price": {
+    "value": 125,
+    "type": "number"
+   }
+  }
+ },
+ {
+  "id": "fake-4",
+  "email": "dave@example.com",
+  "unsubscribed": true,
+  "created_at": "2026-10-10 12:00:00+00",
+  "properties": {
+   "model": {
+    "value": "bitaxe-gamma",
+    "type": "string"
+   },
+   "target_price": {
+    "value": 500,
+    "type": "number"
+   }
+  }
+ },
+ {
+  "id": "fake-5",
+  "email": "erin@example.com",
+  "unsubscribed": false,
+  "created_at": "2026-10-10 12:00:00+00",
+  "properties": {
+   "model": {
+    "value": "bitaxe-gamma-duo",
+    "type": "string"
+   },
+   "target_price": {
+    "value": 300,
+    "type": "number"
+   },
+   "last_alert_price": {
+    "value": 111.69,
+    "type": "number"
+   },
+   "last_alert_at": {
+    "value": "2026-10-15T16:00:00Z",
+    "type": "string"
+   }
+  }
+ },
+ {
+  "id": "fake-6",
+  "email": "frank@example.com",
+  "unsubscribed": false,
+  "created_at": "2026-10-10 12:00:00+00",
+  "properties": {
+   "model": {
+    "value": "bitaxe-gamma-duo",
+    "type": "string"
+   },
+   "target_price": {
+    "value": 300,
+    "type": "number"
+   },
+   "last_alert_price": {
+    "value": 119.99,
+    "type": "number"
+   },
+   "last_alert_at": {
+    "value": "2026-10-15T16:00:00Z",
+    "type": "string"
+   }
+  }
+ },
+ {
+  "id": "fake-7",
+  "email": "gina@example.com",
+  "unsubscribed": false,
+  "created_at": "2026-10-10 12:00:00+00",
+  "properties": {
+   "model": {
+    "value": "bitaxe-gt-801",
+    "type": "string"
+   },
+   "target_price": {
+    "value": 200,
+    "type": "number"
+   },
+   "last_alert_price": {
+    "value": 174.99,
+    "type": "number"
+   },
+   "last_alert_at": {
+    "value": "2026-10-08T12:00:00Z",
+    "type": "string"
+   }
+  }
+ },
+ {
+  "id": "fake-8",
+  "email": "hank@example.com",
+  "unsubscribed": false,
+  "created_at": "2026-10-10 12:00:00+00",
+  "properties": {
+   "model": {
+    "value": "nerdqaxe-pp",
+    "type": "string"
+   },
+   "target_price": {
+    "value": 60,
+    "type": "number"
+   }
+  }
+ },
+ {
+  "id": "fake-9",
+  "email": "ivan@example.com",
+  "unsubscribed": false,
+  "created_at": "2026-10-10 12:00:00+00",
+  "properties": {
+   "model": {
+    "value": "Nerdaxe",
+    "type": "string"
+   },
+   "target_price": {
+    "value": 500,
+    "type": "number"
+   }
+  }
+ },
+ {
+  "id": "fake-10",
+  "email": "zed@example.com",
+  "unsubscribed": false,
+  "created_at": "2026-10-10 12:00:00+00",
+  "properties": {
+   "model": {
+    "value": "foobar",
+    "type": "string"
+   },
+   "target_price": {
+    "value": 500,
+    "type": "number"
+   }
+  }
+ },
+ {
+  "id": "fake-11",
+  "email": "kim@example.com",
+  "unsubscribed": false,
+  "created_at": "2026-10-10 12:00:00+00",
+  "properties": {
+   "model": "bitaxe-ultra",
+   "target_price": 130
+  }
+ },
+ {
+  "id": "fake-12",
+  "email": "lee@example.com",
+  "unsubscribed": false,
+  "created_at": "2026-10-10 12:00:00+00",
+  "properties": {
+   "model": {
+    "value": "any",
+    "type": "string"
+   },
+   "target_price": {
+    "value": 50,
+    "type": "number"
+   }
+  }
+ }
+]

@@ -1,4 +1,10 @@
 var AFFILIATE = { powermining: "ref=bitaxeradar" };
+
+// ---- email alerts config -------------------------------------------------------------------
+// TODO (before launch): deploy the Cloudflare Worker (see worker/README.md), then set all three:
+var WORKER_URL = "https://bitaxe-radar-alerts.bitaxeradar.workers.dev/subscribe";
+var TURNSTILE_SITEKEY = "0x4AAAAAAFYqcERY2Pvc1wQI";   // public site key
+var SIGNUP_ENABLED = true;                                        // TODO: flip to true once the two values above are real
 (function () {
   "use strict";
   var R = window.RADAR;
@@ -172,14 +178,43 @@ var AFFILIATE = { powermining: "ref=bitaxeradar" };
   }
   rate.addEventListener("input", renderCost); renderCost();
 
-  // ---- signup placeholder (UI only; never sends anything)
-  document.getElementById("signup").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var email = document.getElementById("email"), msg = document.getElementById("signupMsg");
-    if (!email.value || !/^\S+@\S+\.\S+$/.test(email.value)) { msg.textContent = "Please enter a valid email address."; email.focus(); return; }
-    msg.textContent = "Thanks — but alerts aren't live yet. This is a placeholder form: your email was NOT stored or sent anywhere.";
-    email.value = "";
-  });
+  // ---- email alert signup (double opt-in; posts to the Cloudflare Worker)
+  (function () {
+    var form = document.getElementById("signup"), msg = document.getElementById("signupMsg"), btn = document.getElementById("signupBtn");
+    var email = document.getElementById("email"), price = document.getElementById("alertPrice"), model = document.getElementById("alertModel");
+    var tsHost = document.getElementById("turnstile"), tsWidget = null;
+    if (!SIGNUP_ENABLED) {
+      document.getElementById("signupIntro").appendChild(el("span", { class: "stale" }, " Alerts are launching soon: this form is not live yet and nothing you type is stored or sent."));
+      btn.disabled = true; msg.textContent = "Not live yet.";
+      [email, price, model].forEach(function (i) { i.disabled = true; });
+      return;
+    }
+    function renderTurnstile() { if (window.turnstile && !tsWidget) tsWidget = window.turnstile.render(tsHost, { sitekey: TURNSTILE_SITEKEY, theme: "dark" }); }
+    window.onTurnstileLoaded = renderTurnstile;
+    var s = document.createElement("script");
+    s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTurnstileLoaded"; s.async = true; s.defer = true;
+    document.head.appendChild(s);
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var tok = form.querySelector('[name="cf-turnstile-response"]');
+      var p = Number(price.value);
+      if (!/^\S+@\S+\.\S+$/.test(email.value)) { msg.textContent = "Please enter a valid email address."; email.focus(); return; }
+      if (!(p >= 1 && p <= 100000)) { msg.textContent = "Please enter a target price in USD (1 to 100000)."; price.focus(); return; }
+      if (!tok || !tok.value) { msg.textContent = "Please wait for the bot check to finish, then try again."; return; }
+      btn.disabled = true; msg.textContent = "Sending…";
+      fetch(WORKER_URL, {
+        method: "POST", headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({ email: email.value.trim(), model: model.value, target_price: p, website: document.getElementById("website").value, "cf-turnstile-response": tok.value })
+      }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) { return { ok: r.ok && d.ok, d: d }; }); })
+        .then(function (res) {
+          if (res.ok) { msg.textContent = res.d.message || "Check your inbox to confirm."; email.value = ""; price.value = ""; }
+          else { msg.textContent = res.d.error || "Something went wrong. Please try again."; }
+        })
+        .catch(function () { msg.textContent = "Network error. Please try again."; })
+        .then(function () { btn.disabled = false; if (window.turnstile && tsWidget != null) window.turnstile.reset(tsWidget); });
+    });
+  })();
 
   // ---- coverage
   var ts = document.getElementById("trackedSellers"), grid = el("div", { class: "sellers" });
