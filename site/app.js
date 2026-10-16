@@ -1,3 +1,4 @@
+var AFFILIATE = { powermining: "ref=the ownerthe owner" };
 (function () {
   "use strict";
   var R = window.RADAR;
@@ -70,7 +71,9 @@
         if (o.compare_at && o.compare_at > o.price) priceCell.appendChild(el("div", { class: "cfg" }, "list " + money(o.compare_at, o.currency)));
         var cfg = o.config + (o.ship_note ? " · " + o.ship_note : "") +
           (o.variants_total ? " · " + o.variants_in_stock + "/" + o.variants_total + " options in stock" : "");
-        var link = el("a", { class: "btn", href: o.url, target: "_blank", rel: "nofollow noopener sponsored" }, "View at " + sellerName(o.seller) + " ↗");
+        var aff = AFFILIATE[o.seller];
+        var href = aff ? o.url + (o.url.indexOf("?") < 0 ? "?" : "&") + aff : o.url;
+        var link = el("a", { class: "btn", href: href, target: "_blank", rel: "nofollow noopener sponsored" }, "View at " + sellerName(o.seller) + " ↗");
         tbody.appendChild(el("tr", isBest ? { class: "best" } : null,
           el("td", null, sellerName(o.seller), isBest ? el("span", { class: "tag-best" }, "Best in-stock") : null,
             o.stale ? el("div", { class: "stale" }, "stale data") : null),
@@ -78,7 +81,7 @@
           el("td", null, el("span", { class: "badge b-" + o.stock_status }, STATUS[o.stock_status] || o.stock_status)),
           el("td", { class: "cfg" }, cfg),
           el("td", { class: "cfg" }, fmtTime(o.checked_at)),
-          el("td", null, link, el("div", { class: "ph" }, "[affiliate link placeholder]"))));
+          el("td", null, link, aff ? el("div", { class: "ph" }, "affiliate link") : null)));
       });
       card.appendChild(el("div", { class: "tablewrap" }, el("table", null,
         el("thead", null, el("tr", null, el("th", null, "Seller"), el("th", { class: "num" }, "Price"), el("th", null, "Stock"),
