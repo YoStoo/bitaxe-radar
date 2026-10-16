@@ -1,4 +1,4 @@
-var AFFILIATE = { powermining: "ref=the ownerthe owner" };
+var AFFILIATE = { powermining: "ref=bitaxeradar" };
 (function () {
   "use strict";
   var R = window.RADAR;
