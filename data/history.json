@@ -128,6 +128,13 @@
    "currency": "EUR",
    "in_stock": true,
    "status": "in_stock"
+  },
+  {
+   "t": "2026-10-16T17:15:50Z",
+   "price": 139.0,
+   "currency": "EUR",
+   "in_stock": false,
+   "status": "backorder"
   }
  ],
  "bitaxede:bitaxe-gt-801": [
