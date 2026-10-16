@@ -1,8 +1,13 @@
-name: collect-prices
+name: collect-and-deploy
 on:
   schedule: [{cron: "17 */6 * * *"}]
+  push: {branches: [main], paths: ["site/**", "collector/**", "build_site.py", ".github/workflows/**"]}
   workflow_dispatch: {}
-permissions: {contents: write}
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+concurrency: {group: pages, cancel-in-progress: false}
 jobs:
   collect:
     runs-on: ubuntu-latest
@@ -14,4 +19,15 @@ jobs:
       - run: python3 build_site.py
       - run: |
           git config user.name "radar-bot"; git config user.email "radar-bot@users.noreply.github.com"
-          git add data site/data.js && (git diff --cached --quiet || git commit -m "data: update prices" && git push)
+          git add data site/data.js
+          git diff --cached --quiet || (git commit -m "data: update prices" && git push)
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with: {path: site}
+  deploy:
+    needs: collect
+    runs-on: ubuntu-latest
+    environment: {name: github-pages, url: "${{ steps.d.outputs.page_url }}"}
+    steps:
+      - id: d
+        uses: actions/deploy-pages@v4
