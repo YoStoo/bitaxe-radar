@@ -64,3 +64,18 @@ input:focus,select:focus,button:focus,.btn:focus,a:focus{outline:2px solid var(-
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 @media (max-width:640px){.model table{min-width:700px}.cfg{max-width:260px}}
 .signup-actions{margin-top:12px}.turnstile-slot{min-height:65px}
+/* ---- pre-rendered SEO pages ---- */
+.crumbs{font-size:13px;color:var(--muted);margin:14px 0 0}.crumbs a{color:var(--muted)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:14px 0}
+.kpis>div{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.kpis small{display:block;color:var(--muted);font-size:12px}.kpis b{font-size:17px}
+article section{margin:30px 0}
+article h2{font-size:21px;margin:0 0 8px}
+article p,article li{max-width:78ch}
+.offers td:first-child{white-space:nowrap}
+table.cmp th[scope=row],article table th[scope=row]{color:var(--muted);font-weight:600;font-size:13px;text-transform:none;letter-spacing:0;white-space:normal}
+details{background:var(--panel);border:1px solid var(--line);border-radius:8px;margin:8px 0;padding:8px 12px}
+details summary{cursor:pointer;font-weight:600}details p{margin:8px 0 2px;color:var(--muted)}
+.top .brand{color:var(--text);text-decoration:none}
+.foot a{color:var(--muted)}
+#summary table{margin-top:8px}
