@@ -1,0 +1,182 @@
+{
+ "bitcoinmerch:bitaxe-supra": [
+  {
+   "t": "2026-10-16T12:33:04Z",
+   "price": 119.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  }
+ ],
+ "bitcoinmerch:bitaxe-ultra": [
+  {
+   "t": "2026-10-16T12:33:04Z",
+   "price": 119.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  }
+ ],
+ "bitcoinmerch:bitaxe-gamma": [
+  {
+   "t": "2026-10-16T12:33:04Z",
+   "price": 119.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  }
+ ],
+ "bitcoinmerch:bitaxe-gamma-duo": [
+  {
+   "t": "2026-10-16T12:33:04Z",
+   "price": 239.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  }
+ ],
+ "bitcoinmerch:bitaxe-gt-801": [
+  {
+   "t": "2026-10-16T12:33:04Z",
+   "price": 174.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  }
+ ],
+ "bitcoinmerch:nerdaxe-gaia": [
+  {
+   "t": "2026-10-16T12:33:04Z",
+   "price": 399.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  }
+ ],
+ "bitcoinmerch:nerdqaxe-pp": [
+  {
+   "t": "2026-10-16T12:33:04Z",
+   "price": 249.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  }
+ ],
+ "solosatoshi:bitaxe-supra": [
+  {
+   "t": "2026-10-16T12:33:04Z",
+   "price": 69.69,
+   "currency": "USD",
+   "in_stock": false,
+   "status": "out_of_stock"
+  }
+ ],
+ "solosatoshi:bitaxe-gamma": [
+  {
+   "t": "2026-10-16T12:33:04Z",
+   "price": 67.0,
+   "currency": "USD",
+   "in_stock": false,
+   "status": "out_of_stock"
+  }
+ ],
+ "solosatoshi:bitaxe-gamma-duo": [
+  {
+   "t": "2026-10-16T12:33:04Z",
+   "price": 111.69,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  }
+ ],
+ "solosatoshi:bitaxe-gt-801": [
+  {
+   "t": "2026-10-16T12:33:04Z",
+   "price": 195.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  }
+ ],
+ "solosatoshi:nerdqaxe-pp": [
+  {
+   "t": "2026-10-16T12:33:04Z",
+   "price": 210.99,
+   "currency": "USD",
+   "in_stock": false,
+   "status": "out_of_stock"
+  }
+ ],
+ "bitaxede:bitaxe-gamma": [
+  {
+   "t": "2026-10-16T12:33:04Z",
+   "price": 139.0,
+   "currency": "EUR",
+   "in_stock": true,
+   "status": "in_stock"
+  }
+ ],
+ "bitaxede:bitaxe-gt-801": [
+  {
+   "t": "2026-10-16T12:33:04Z",
+   "price": 229.0,
+   "currency": "EUR",
+   "in_stock": false,
+   "status": "out_of_stock"
+  }
+ ],
+ "bitaxede:nerdaxe-gamma": [
+  {
+   "t": "2026-10-16T12:33:04Z",
+   "price": 159.0,
+   "currency": "EUR",
+   "in_stock": false,
+   "status": "out_of_stock"
+  }
+ ],
+ "bitaxede:nerdaxe-gaia": [
+  {
+   "t": "2026-10-16T12:33:04Z",
+   "price": 249.0,
+   "currency": "EUR",
+   "in_stock": false,
+   "status": "preorder"
+  }
+ ],
+ "bitaxede:nerdqaxe-pp": [
+  {
+   "t": "2026-10-16T12:33:04Z",
+   "price": 349.0,
+   "currency": "EUR",
+   "in_stock": false,
+   "status": "backorder"
+  }
+ ],
+ "powermining:bitaxe-gamma": [
+  {
+   "t": "2026-10-16T12:33:04Z",
+   "price": 121.0,
+   "currency": "EUR",
+   "in_stock": false,
+   "status": "preorder"
+  }
+ ],
+ "powermining:nerdaxe-gamma": [
+  {
+   "t": "2026-10-16T12:33:04Z",
+   "price": 168.19,
+   "currency": "EUR",
+   "in_stock": true,
+   "status": "in_stock"
+  }
+ ],
+ "powermining:nerdqaxe-pp": [
+  {
+   "t": "2026-10-16T12:33:04Z",
+   "price": 363.0,
+   "currency": "EUR",
+   "in_stock": true,
+   "status": "in_stock"
+  }
+ ]
+}
