@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-10-20T11:36:52Z",
+  "generated_at": "2026-10-20T17:04:35Z",
   "fx": {
-    "EUR_USD": 1.1225,
-    "date": "2026-10-19",
+    "EUR_USD": 1.1215,
+    "date": "2026-10-20",
     "source": "Frankfurter (ECB reference rates)"
   },
   "models": {
@@ -105,7 +105,7 @@
       "stock_status": "in_stock",
       "in_stock": true,
       "config": "Variant: Standard / Orange; power supply included per product title",
-      "checked_at": "2026-10-20T11:36:52Z",
+      "checked_at": "2026-10-20T17:04:35Z",
       "source_url": "https://bitcoinmerch.com/products.json",
       "stale": false,
       "compare_at": null,
@@ -122,7 +122,7 @@
       "stock_status": "in_stock",
       "in_stock": true,
       "config": "power supply included per product title",
-      "checked_at": "2026-10-20T11:36:52Z",
+      "checked_at": "2026-10-20T17:04:35Z",
       "source_url": "https://bitcoinmerch.com/products.json",
       "stale": false,
       "compare_at": null,
@@ -139,7 +139,7 @@
       "stock_status": "in_stock",
       "in_stock": true,
       "config": "Variant: Standard / Orange; power supply included per product title",
-      "checked_at": "2026-10-20T11:36:52Z",
+      "checked_at": "2026-10-20T17:04:35Z",
       "source_url": "https://bitcoinmerch.com/products.json",
       "stale": false,
       "compare_at": null,
@@ -156,7 +156,7 @@
       "stock_status": "in_stock",
       "in_stock": true,
       "config": "power supply included per product title",
-      "checked_at": "2026-10-20T11:36:52Z",
+      "checked_at": "2026-10-20T17:04:35Z",
       "source_url": "https://bitcoinmerch.com/products.json",
       "stale": false,
       "compare_at": null,
@@ -173,7 +173,7 @@
       "stock_status": "in_stock",
       "in_stock": true,
       "config": "power supply not mentioned in title (unverified)",
-      "checked_at": "2026-10-20T11:36:52Z",
+      "checked_at": "2026-10-20T17:04:35Z",
       "source_url": "https://bitcoinmerch.com/products.json",
       "stale": false,
       "compare_at": 299.99,
@@ -190,7 +190,7 @@
       "stock_status": "in_stock",
       "in_stock": true,
       "config": "power supply included per product title",
-      "checked_at": "2026-10-20T11:36:52Z",
+      "checked_at": "2026-10-20T17:04:35Z",
       "source_url": "https://bitcoinmerch.com/products.json",
       "stale": false,
       "compare_at": null,
@@ -207,7 +207,7 @@
       "stock_status": "in_stock",
       "in_stock": true,
       "config": "Variant: Black / Standard 4.8TH/s; power supply included per product title",
-      "checked_at": "2026-10-20T11:36:52Z",
+      "checked_at": "2026-10-20T17:04:35Z",
       "source_url": "https://bitcoinmerch.com/products.json",
       "stale": false,
       "compare_at": 549.99,
@@ -224,7 +224,7 @@
       "stock_status": "out_of_stock",
       "in_stock": false,
       "config": "Power Supply: North American",
-      "checked_at": "2026-10-20T11:36:52Z",
+      "checked_at": "2026-10-20T17:04:35Z",
       "source_url": "https://www.solosatoshi.com/wp-json/wc/store/v1/products?slug=bitaxe-supra",
       "stale": false,
       "variants_in_stock": 0,
@@ -243,7 +243,7 @@
       "stock_status": "out_of_stock",
       "in_stock": false,
       "config": "Stand: None, Power Supply: North America",
-      "checked_at": "2026-10-20T11:36:52Z",
+      "checked_at": "2026-10-20T17:04:35Z",
       "source_url": "https://www.solosatoshi.com/wp-json/wc/store/v1/products?slug=bitaxe-gamma",
       "stale": false,
       "variants_in_stock": 0,
@@ -262,7 +262,7 @@
       "stock_status": "in_stock",
       "in_stock": true,
       "config": "Power Supply: North America, Stand: None",
-      "checked_at": "2026-10-20T11:36:52Z",
+      "checked_at": "2026-10-20T17:04:35Z",
       "source_url": "https://www.solosatoshi.com/wp-json/wc/store/v1/products?slug=bitaxe-duo-bitcoin-solo-miner-650-model",
       "stale": false,
       "variants_in_stock": 9,
@@ -281,7 +281,7 @@
       "stock_status": "in_stock",
       "in_stock": true,
       "config": "Power Supply: North America, Stand: No",
-      "checked_at": "2026-10-20T11:36:52Z",
+      "checked_at": "2026-10-20T17:04:35Z",
       "source_url": "https://www.solosatoshi.com/wp-json/wc/store/v1/products?slug=bitaxe-gt-gamma-turbo",
       "stale": false,
       "variants_in_stock": 9,
@@ -300,7 +300,7 @@
       "stock_status": "out_of_stock",
       "in_stock": false,
       "config": "Power Supply: North America, Rear Fan: No, Stand: No",
-      "checked_at": "2026-10-20T11:36:52Z",
+      "checked_at": "2026-10-20T17:04:35Z",
       "source_url": "https://www.solosatoshi.com/wp-json/wc/store/v1/products?slug=nerdqaxe-plus-plus",
       "stale": false,
       "variants_in_stock": 0,
@@ -319,10 +319,10 @@
       "stock_status": "backorder",
       "in_stock": false,
       "config": "Base price incl. VAT (listed 'inkl. MwSt.'); shipping extra",
-      "checked_at": "2026-10-20T11:36:52Z",
+      "checked_at": "2026-10-20T17:04:35Z",
       "source_url": "https://bitaxe.de/produkt/bitaxe-gamma-601",
       "stale": false,
-      "price_usd_approx": 167.25
+      "price_usd_approx": 167.1
     },
     {
       "id": "bitaxede:bitaxe-gt-801",
@@ -335,10 +335,10 @@
       "stock_status": "out_of_stock",
       "in_stock": false,
       "config": "Base price incl. VAT (listed 'inkl. MwSt.'); shipping extra",
-      "checked_at": "2026-10-20T11:36:52Z",
+      "checked_at": "2026-10-20T17:04:35Z",
       "source_url": "https://bitaxe.de/produkt/bitaxe-gt",
       "stale": false,
-      "price_usd_approx": 257.05
+      "price_usd_approx": 256.82
     },
     {
       "id": "bitaxede:nerdaxe-gamma",
@@ -351,10 +351,10 @@
       "stock_status": "out_of_stock",
       "in_stock": false,
       "config": "Base price incl. VAT (listed 'inkl. MwSt.'); shipping extra",
-      "checked_at": "2026-10-20T11:36:52Z",
+      "checked_at": "2026-10-20T17:04:35Z",
       "source_url": "https://bitaxe.de/produkt/nerdaxe-gamma-601",
       "stale": false,
-      "price_usd_approx": 178.48
+      "price_usd_approx": 178.32
     },
     {
       "id": "bitaxede:nerdaxe-gaia",
@@ -367,10 +367,10 @@
       "stock_status": "preorder",
       "in_stock": false,
       "config": "Base price incl. VAT (listed 'inkl. MwSt.'); shipping extra",
-      "checked_at": "2026-10-20T11:36:52Z",
+      "checked_at": "2026-10-20T17:04:35Z",
       "source_url": "https://bitaxe.de/produkt/nerdaxe-gaia-bitcoin-miner",
       "stale": false,
-      "price_usd_approx": 279.5
+      "price_usd_approx": 279.25
     },
     {
       "id": "bitaxede:nerdqaxe-pp",
@@ -383,10 +383,10 @@
       "stock_status": "in_stock",
       "in_stock": true,
       "config": "Base price incl. VAT (listed 'inkl. MwSt.'); shipping extra",
-      "checked_at": "2026-10-20T11:36:52Z",
+      "checked_at": "2026-10-20T17:04:35Z",
       "source_url": "https://bitaxe.de/produkt/nerdqaxe-plus-plus-48th",
       "stale": false,
-      "price_usd_approx": 391.75
+      "price_usd_approx": 391.4
     },
     {
       "id": "powermining:bitaxe-gamma",
@@ -399,12 +399,12 @@
       "stock_status": "preorder",
       "in_stock": false,
       "config": "Variant: EU / US / UK; page lists power supply + stand in the box; EUR, tax basis not stated; shipping extra",
-      "checked_at": "2026-10-20T11:36:52Z",
+      "checked_at": "2026-10-20T17:04:35Z",
       "source_url": "https://powermining.io/products/bitaxe-gamma",
       "stale": false,
       "compare_at": 139.15,
       "ship_note": "Shipping end of October, 2026!",
-      "price_usd_approx": 135.82
+      "price_usd_approx": 135.7
     },
     {
       "id": "powermining:nerdaxe-gamma",
@@ -417,12 +417,12 @@
       "stock_status": "in_stock",
       "in_stock": true,
       "config": "Variant: US; page lists power supply + stand in the box; EUR, tax basis not stated; shipping extra",
-      "checked_at": "2026-10-20T11:36:52Z",
+      "checked_at": "2026-10-20T17:04:35Z",
       "source_url": "https://powermining.io/products/nerdaxe-gamma",
       "stale": false,
       "compare_at": null,
       "ship_note": null,
-      "price_usd_approx": 188.79
+      "price_usd_approx": 188.63
     },
     {
       "id": "powermining:nerdqaxe-pp",
@@ -435,12 +435,12 @@
       "stock_status": "in_stock",
       "in_stock": true,
       "config": "Variant: US; page lists power supply + stand in the box; EUR, tax basis not stated; shipping extra",
-      "checked_at": "2026-10-20T11:36:52Z",
+      "checked_at": "2026-10-20T17:04:35Z",
       "source_url": "https://powermining.io/products/nerdqaxe",
       "stale": false,
       "compare_at": 462.0,
       "ship_note": null,
-      "price_usd_approx": 407.47
+      "price_usd_approx": 407.1
     }
   ],
   "unmapped_products": {},
