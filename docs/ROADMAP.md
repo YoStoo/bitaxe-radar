@@ -17,7 +17,7 @@ Updated: Oct 21, 2026
 1. Room heat calculator: room size in, which heater miners fit out.
 2. $/TH leaderboard: best value miners, plus price history ("is this a good price now?").
 3. Seller facts table: where they ship from, warranty, how often "in stock" was true.
-4. Add more home miners: 79 found, 26 on the site so far.
+4. Add more home miners: 79 found, 27 on the site so far.
 5. Daily X posts and replies on @BitaxeRadar.
 6. Black Friday push in November (deals page live by about Nov 10, Black Friday is Nov 27).
 
@@ -72,12 +72,13 @@ Later:
 - Oct 21: Newsletter #1 on the site, and newsletter signup.
 - Oct 21: Affiliate signups sent to D-Central, DTV and Altair.
 - Oct 21: Electricity price calculator: your power price on miner pages, break-even price on model pages, and the guide Is home mining worth it? (/guides/is-home-mining-worth-it/).
+- Oct 21: Bitcube added (Power Mining's new cube miner, pre-order, delivery by Christmas): /models/bitcube/.
 
 ## 📊 Numbers (Oct 21)
 
 - Revenue: $0
 - Visitors: about 17 views a day
 - Subscribers: 1
-- Miners tracked: 26
+- Miners tracked: 27
 - Sellers tracked: 10
-- Pages on the site: 66
+- Pages on the site: 67

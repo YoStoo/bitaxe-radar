@@ -75,6 +75,10 @@ MODELS = {
                          "hashrate_ths": 22, "watts": 330, "note": "Seller-stated up to 22 TH/s at about 322-330 W in its high mode (11 TH/s at ~178 W in low mode)"},
     "dcentral-stealthminer": {"name": "D-Central StealthMiner", "category": "home", "kind": "Room heater miner (refurbished)", "maker": "D-Central",
                          "hashrate_ths": 26, "watts": 860, "note": "Seller-stated 26 TH/s at 860 W for the base S19 Edition (S19j Pro and S19k Pro editions state 32-38 TH/s at 900-930 W); runs on a standard 120 V outlet; recycled, tested hardware"},
+    # added 2026-10-21: Power Mining's own miner, pre-order from launch day (Bitcube Pro has no details yet, so not tracked)
+    "bitcube":          {"name": "Power Mining Bitcube", "category": "home", "kind": "Desk lottery miner with touchscreen", "maker": "Power Mining",
+                         "chip": "Avalon A3197", "hashrate_ths": 0.777, "watts": 25,
+                         "note": "Maker-stated up to 777 GH/s in Turbo (550 GH/s Quiet) at 20-25 W from the wall, USB-C powered"},
 }
 # hashrate_ths / watts above are typical VENDOR-STATED figures used only for the cost estimate.
 # They are approximate and must be labelled as such on the site.
@@ -143,6 +147,7 @@ POWERMINING = {  # Shopify handle
     "bitaxe-gamma":  "bitaxe-gamma",
     "nerdaxe-gamma": "nerdaxe-gamma",
     "nerdqaxe-pp":   "nerdqaxe",
+    "bitcube":       "bitcube",
 }
 
 ALTAIR = {  # product slug -> (variation attribute filter or None)
@@ -421,14 +426,15 @@ def collect_powermining(ts):
         # Shopify 'available' stays true for pre-orders, so read the product page text too.
         html = http_get(url)
         text = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", re.sub(r"<script.*?</script>|<style.*?</style>", "", html, flags=re.S)))
-        pre = re.search(r"you can now pre-order|coming soon[^.]{0,80}pre-order", text, flags=re.I)
-        ship = re.search(r"Shipping [^.!]{0,60}\d{4}!?", text) if pre else None
+        pre = re.search(r"you can now pre-order|coming soon[^.]{0,80}pre-order|pre-orders open", text, flags=re.I)
+        ship = (re.search(r"Shipping [^.!]{0,60}\d{4}!?", text) or re.search(r"Christmas delivery", text, flags=re.I)) if pre else None
         status = "preorder" if pre else ("in_stock" if avail else "out_of_stock")
-        cfg = f"Variant: {v['title']}; page lists power supply + stand in the box; EUR, tax basis not stated; shipping extra"
+        cfg = (f"Variant: {v['title']}; EUR incl. tax per the page; USB-C power supply and cable in the box; shipping extra" if model == "bitcube"
+               else f"Variant: {v['title']}; page lists power supply + stand in the box; EUR, tax basis not stated; shipping extra")
         out.append(offer("powermining", model, p["title"], url, v["price"], "EUR", status,
                          bool(avail) and not pre, cfg, ts, url,
                          {"compare_at": float(v["compare_at_price"]) if v.get("compare_at_price") else None,
-                          "ship_note": ship.group(0) if ship else None}))
+                          "ship_note": ("Seller says delivery by Christmas" if ship and ship.group(0).lower() == "christmas delivery" else ship.group(0) if ship else None)}))
         time.sleep(1)
     return out, missing
 

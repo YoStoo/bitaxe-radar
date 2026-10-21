@@ -192,7 +192,7 @@ SHORT = {"bitaxe-supra": "Bitaxe Supra", "bitaxe-ultra": "Bitaxe Ultra", "bitaxe
          "heatbit-maxi": "Heatbit Maxi", "heatbit-canvas": "Heatbit Canvas", "braiins-bmm-101": "Braiins Mini Miner", "hammer-bc04": "Hammer BC04",
          "bitaxe-gamma-hex": "Bitaxe Gamma Hex", "bitaxe-naja-duo": "Bitaxe Naja Duo", "nerdoctaxe": "NerdOCTaxe Gamma", "bitforge-nano": "BitForge Nano",
          "heatbit-bitair": "Heatbit Bitair", "futurebit-apollo-iii": "FutureBit Apollo III", "hammer-thor-p2": "Hammer Thor P2", "hammer-bc08": "Hammer BC08",
-         "gekko-kbox-22": "GekkoScience KBox 22", "dcentral-stealthminer": "D-Central StealthMiner"}
+         "gekko-kbox-22": "GekkoScience KBox 22", "dcentral-stealthminer": "D-Central StealthMiner", "bitcube": "Bitcube"}
 NOINDEX_MODELS = {"bitaxe-supra", "bitaxe-ultra"}   # older generations: pages exist for completeness but stay out of the index/sitemap
 
 MODEL_COPY = {
@@ -357,6 +357,12 @@ NEW_COPY = {   # added 2026-10-21 (docs/MINER_CATALOG.md). Stock settings only; 
         check=["It's refurbished, recycled hardware with a 90-day warranty.",
                "Price is in Canadian dollars and ships from Canada, so US import costs may apply.",
                "D-Central recommends a dedicated 15 A circuit."]),
+    "bitcube": dict(
+        intro="The Bitcube is Power Mining's own small home miner: a 74 mm cube with a 2.73-inch touchscreen, built on Canaan's Avalon A3197 chip. Power Mining states up to 777 GH/s in Turbo mode and 550 GH/s in Quiet mode, at about 20–25 W from the wall over USB-C. It's open source, runs on Wi-Fi, and can solo or pool mine.",
+        who="Someone who wants a cute, quiet solo lottery miner for a desk or shelf, with nothing to build.",
+        check=["It's a pre-order. Power Mining says it will deliver by Christmas.",
+               "Each order includes a free 777 GH/s of hosted solo hashrate from the order date until your Bitcube arrives.",
+               "Power Mining prices it in euros with tax included. Shipping and any import fees are extra."]),
 }
 MODEL_COPY.update(NEW_COPY)
 
@@ -448,7 +454,7 @@ NAV_SECTIONS = {"/miners/": ("/miners/", "/solo-miners/", "/pool-miners/", "/hea
 # Browse-by-type categories. Any miner can solo or pool mine; these say what each is best suited to. A miner can be in several.
 SOLO_SET = ["bitaxe-gamma", "bitaxe-gamma-duo", "bitaxe-gt-801", "nerdaxe-gamma", "nerdaxe-gaia", "nerdqaxe-pp",
             "braiins-bmm-101", "avalon-nano-3s", "hammer-bc04", "bitaxe-supra", "bitaxe-ultra",
-            "bitaxe-naja-duo", "bitforge-nano", "heatbit-bitair", "bitaxe-gamma-hex", "nerdoctaxe", "hammer-thor-p2", "hammer-bc08", "futurebit-apollo-iii"]
+            "bitaxe-naja-duo", "bitforge-nano", "heatbit-bitair", "bitaxe-gamma-hex", "nerdoctaxe", "hammer-thor-p2", "hammer-bc08", "futurebit-apollo-iii", "bitcube"]
 POOL_SET = ["avalon-nano-3s", "hammer-bc04", "heatbit-canvas", "heatbit-trio", "avalon-mini-3", "heatbit-maxi", "avalon-q",
             "bitaxe-gamma-hex", "nerdoctaxe", "hammer-thor-p2", "hammer-bc08", "futurebit-apollo-iii", "gekko-kbox-22", "dcentral-stealthminer"]
 HEAT_SET = ["avalon-nano-3s", "heatbit-canvas", "heatbit-trio", "avalon-mini-3", "heatbit-maxi", "avalon-q", "gekko-kbox-22", "dcentral-stealthminer"]
@@ -499,6 +505,7 @@ MODEL_IMG = {
     "hammer-thor-p2": (800, 706, "Hammer Miner Thor P2 desk Bitcoin miner"),
     "hammer-bc08": (800, 738, "Hammer Miner BC08 desktop Bitcoin miner with touchscreen"),
     "gekko-kbox-22": (800, 457, "GekkoScience KBox 22 all-in-one Bitcoin miner and heater"),
+    "bitcube": (800, 613, "Power Mining Bitcube cube Bitcoin miner with 777 GH/s on its touchscreen"),
 }
 MODEL_IMG = {k: v for k, v in MODEL_IMG.items() if (SITE / "img" / "models" / f"{k}.webp").exists()}
 
@@ -1391,7 +1398,7 @@ def build_black_friday():
 # HEATER & HOME MINERS hub + plain-language guides
 # ---------------------------------------------------------------------------------------------
 HEATER_GROUP = ["avalon-mini-3", "avalon-q", "heatbit-trio", "heatbit-maxi", "heatbit-canvas", "gekko-kbox-22", "dcentral-stealthminer"]
-DESK_GROUP = ["avalon-nano-3s", "hammer-bc04", "braiins-bmm-101", "heatbit-bitair", "futurebit-apollo-iii", "hammer-thor-p2", "hammer-bc08"]
+DESK_GROUP = ["avalon-nano-3s", "hammer-bc04", "braiins-bmm-101", "heatbit-bitair", "bitcube", "futurebit-apollo-iii", "hammer-thor-p2", "hammer-bc08"]
 GUIDE_UPDATED = "2026-10-21"
 NETWORK_EH_SEEN = "about 1,050 EH/s"       # mempool.space /api/v1/mining/hashrate/3d on 2026-10-21 (see docs/HOME_MINING_HUB_PLAN.md)
 
@@ -1538,7 +1545,8 @@ def hub_card(mid, heat=True, rank=None, why="", attrs=""):
         status, cls = badge("in_stock"), "card"
     elif pre:
         o = min(pre, key=usd)
-        price = money(usd(o))
+        conv = o["currency"] != "USD"
+        price = f'{"≈ " if conv else ""}{money(usd(o))}' + (f'<small>{"CA" if o["currency"] == "CAD" else "EU"} shop</small>' if conv else "")
         where = f'at {esc(sname(o["seller"]))} · not in stock yet'
         status, cls = badge(o["stock_status"]), "card"
     else:
@@ -1677,7 +1685,8 @@ def best_defs():
            ("avalon-nano-3s", "Finished box with an app, Wi-Fi and the power adapter in the box. Plug in and go."),
            ("braiins-bmm-101", "Metal case and touchscreen with Braiins OS already set up. No tinkering."),
            ("nerdaxe-gamma", "Same class as the Bitaxe Gamma, with a color screen to see what it's doing."),
-           ("heatbit-bitair", "An air purifier with a tiny miner inside. USB-C, about 25 W, nothing to build.")]
+           ("heatbit-bitair", "An air purifier with a tiny miner inside. USB-C, about 25 W, nothing to build."),
+           ("bitcube", "A small cube with a touchscreen. USB-C, about 25 W, set up in minutes. Pre-order for Christmas.")]
     d["beginners"] = dict(label="Beginners", h1="Best Bitcoin miner for beginners",
         lede="Cheap, simple, low-power miners that are easy to set up. Start small and learn how mining works.",
         picks=[x for x in beg if x[0] in TRACKED],

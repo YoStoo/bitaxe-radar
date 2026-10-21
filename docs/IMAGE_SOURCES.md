@@ -54,3 +54,9 @@ Same rules: the seller's or maker's own image for that exact model from its publ
 No photo (drawn placeholder kept):
 * **NerdOCTaxe Gamma**: Bitcoin Merch's images are lifestyle shots on a desk and D-Central's has a branded frame; neither cuts out cleanly.
 * **D-Central StealthMiner**: the only image has D-Central/partner branding in a frame.
+
+## Bitcube (added 2026-10-21)
+
+| File | Model | Seller | Product title checked | Original image URL |
+|---|---|---|---|---|
+| bitcube.webp | Power Mining Bitcube (touchscreen showing 777 GH/s) | Power Mining, the maker (Shopify `/products/bitcube.js`, first image, already transparent; trimmed) | Bitcube | https://cdn.shopify.com/s/files/1/0880/2874/1979/files/bitcube-hero-777-square.png?v=1792489005 |
