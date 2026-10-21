@@ -102,7 +102,7 @@ class SiteTests(unittest.TestCase):
             titles[p.title] = path
             d = p.meta.get("description", "")
             self.assertFalse(p.title.endswith("…"), f"{path} title was truncated")
-            if path == "/404.html":
+            if path in ("/404.html", "/home-miners/"):     # 404 and the redirect stub (canonical points at /miners/)
                 continue
             self.assertFalse(d.endswith("…"), f"{path} description was truncated")
             self.assertTrue(70 <= len(d) <= 165, f"{path} description length {len(d)}")
@@ -256,28 +256,42 @@ class SiteTests(unittest.TestCase):
         models = data["latest"]["models"]
         home_ids = [m for m, v in models.items() if v.get("category") == "home" and any(o["model"] == m for o in data["latest"]["offers"])]
         self.assertGreaterEqual(len(home_ids), 5)
-        for path in ["/home-miners/", "/guides/solo-vs-pool-mining/", "/guides/how-heater-miners-work/"]:
+        for path in ["/miners/", "/guides/solo-vs-pool-mining/", "/guides/how-heater-miners-work/"]:
             self.assertIn(path, self.pages)
             self.assertIn(BASE + path, self.sitemap)
-        hub = (SITE / "home-miners" / "index.html").read_text()
+        hub = (SITE / "miners" / "index.html").read_text()
         for mid in home_ids:
             self.assertIn(f'href="/models/{mid}/"', hub, mid)
             self.assertIn(BASE + f"/models/{mid}/", self.sitemap)
             if (SITE / "img" / "models" / f"{mid}.webp").exists():      # models without a reliable seller photo keep the drawn placeholder
-                self.assertIn(f"/img/models/{mid}.webp", hub, f"{mid} has no product photo on the hub")
-        # nav links to the hub on every page; the phone nav stays short (3 links + alerts visible)
-        home = (SITE / "index.html").read_text()
-        nav = re.search(r'<nav aria-label="Main">(.*?)</nav>', home, re.S).group(1)
-        for cat in ("/solo-miners/", "/pool-miners/", "/heater-miners/"):
-            self.assertIn(f'href="{cat}"', nav)
-        self.assertLessEqual(len(re.findall(r'<a href="[^"]+">', nav)), 4)   # Solo · Pool · Heaters · Deals (+ Alerts)
-        # home miners stay off the Bitaxe-only lists
-        for page in ["index.html", "deals/index.html", "in-stock/index.html", "bitaxe-black-friday/index.html", "where-to-buy-bitaxe/index.html"]:
+                self.assertIn(f"/img/models/{mid}.webp", hub, f"{mid} has no product photo on /miners/")
+        # old hub URL redirects to /miners/ and stays out of the sitemap
+        old = (SITE / "home-miners" / "index.html").read_text()
+        self.assertIn('url=/miners/', old)
+        self.assertIn(f'rel="canonical" href="{BASE}/miners/"', old)
+        self.assertNotIn(BASE + "/home-miners/", self.sitemap)
+        # one menu on every page: All miners · Deals · Find my miner · Guides + Alerts, no sideways scroller
+        want = ["/miners/", "/deals/", "/find-my-miner/", "/guides/", "/alerts/"]
+        for f in list(SITE.rglob("*.html")):
+            if f.parent.name == "home-miners":
+                continue
+            nav = re.search(r'<nav aria-label="Main">(.*?)</nav>', f.read_text(), re.S)
+            self.assertIsNotNone(nav, str(f))
+            self.assertEqual(re.findall(r'<a[^>]*href="([^"]+)"', nav.group(1)), want, str(f))
+        css = (SITE / "style.css").read_text()
+        self.assertNotRegex(re.search(r"\.top nav\{[^}]*\}", css).group(0), "overflow-x")
+        # Bitaxe-only home sections still exclude home miners (Deals and In stock now cover everything)
+        for page in ["bitaxe-black-friday/index.html", "where-to-buy-bitaxe/index.html"]:
             txt = (SITE / page).read_text()
             for mid in home_ids:
                 self.assertNotIn(f'href="/models/{mid}/"', txt.split('<footer')[0].split('id="alerts"')[0], f"{page} lists {mid}")
+        cards = (SITE / "index.html").read_text().split('id="miners"')[1].split("</section>")[0]
+        for mid in home_ids:
+            self.assertNotIn(f'href="/models/{mid}/"', cards, f"home Bitaxe cards list {mid}")
+        deals = (SITE / "deals" / "index.html").read_text()
+        self.assertTrue(any(f'href="/models/{m}/"' in deals for m in home_ids), "deals should cover all miners")
         # no earnings promises on the explainers
-        for g in ["guides/solo-vs-pool-mining/index.html", "guides/how-heater-miners-work/index.html", "home-miners/index.html"]:
+        for g in ["guides/solo-vs-pool-mining/index.html", "guides/how-heater-miners-work/index.html", "miners/index.html"]:
             txt = (SITE / g).read_text().lower()
             for bad in ["guaranteed income", "passive income", "pays for itself", "per day profit", "profit of $"]:
                 self.assertNotIn(bad, txt, g)
@@ -338,7 +352,7 @@ class SiteTests(unittest.TestCase):
         self.assertIn('class="earn"', (SITE / "index.html").read_text())
 
     def test_best_for_pages_and_llms(self):
-        best = sorted(p for p in self.pages if p.startswith("/best/"))
+        best = sorted(p for p in self.pages if p.startswith("/best/") and p != "/best/")
         self.assertTrue({"/best/beginners/", "/best/quiet/", "/best/heating-a-room/"} <= set(best), best)
         home = (SITE / "index.html").read_text()
         for path in best:
@@ -379,3 +393,59 @@ class SiteTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class NavBuildTests(unittest.TestCase):
+    """docs/NAV_AUDIT.md: /miners/ filters, quiz, alerts page, index pages, breadcrumbs, quick fixes."""
+
+    def read(self, path):
+        return (SITE / path.strip("/") / "index.html").read_text() if path != "/" else (SITE / "index.html").read_text()
+
+    def test_index_pages_and_quiz(self):
+        for path in ["/miners/", "/find-my-miner/", "/alerts/", "/models/", "/sellers/", "/best/", "/guides/", "/compare/"]:
+            self.assertTrue((SITE / path.strip("/") / "index.html").exists(), path)
+        q = self.read("/find-my-miner/")
+        self.assertEqual(q.count('<fieldset class="q">'), 3)
+        for name in ("budget", "goal", "place"):
+            self.assertIn(f'name="{name}"', q)
+        self.assertIn("<noscript>", q)
+        m = self.read("/miners/")
+        self.assertIn('id="mf"', m)                       # filters, hidden until JS runs; every card is in the HTML
+        for k in ("type", "price", "power", "stock", "sort"):
+            self.assertIn(f'name="{k}"', m)
+        self.assertGreaterEqual(m.count("data-price="), 20)
+        self.assertIn('id="signup"', self.read("/alerts/"))
+        home = self.read("/")
+        self.assertIn("Every home Bitcoin miner, <span", home)
+        self.assertIn('href="/find-my-miner/"', home.split("</section>")[0])
+
+    def test_breadcrumbs(self):
+        crumbs = lambda h: re.findall(r'<a href="([^"]+)">', re.search(r'<nav class="crumbs"[^>]*>(.*?)</nav>', h, re.S).group(1))
+        self.assertEqual(crumbs(self.read("/models/bitaxe-gamma/")), ["/", "/miners/", "/solo-miners/"])
+        self.assertEqual(crumbs(self.read("/models/avalon-q/")), ["/", "/miners/", "/heater-miners/"])
+        self.assertEqual(crumbs(self.read("/solo-miners/")), ["/", "/miners/"])
+        self.assertEqual(crumbs(self.read("/sellers/altair/")), ["/", "/sellers/"])
+        self.assertEqual(crumbs(self.read("/best/quiet/")), ["/", "/best/"])
+
+    def test_quick_fixes(self):
+        solo = self.read("/solo-miners/")
+        head = solo.split("<h1>")[1].split("</header>")[0]
+        self.assertEqual(head.count('class="browse"'), 1)                     # one type row (plus the best-for row)
+        cards = re.findall(r'<h3><a href="/models/([^/]+)/">', solo)
+        home = self.read("/")
+        n = int(re.search(r'class="btile" href="/solo-miners/">.*?<small>(\d+) miners</small>', home, re.S).group(1))
+        self.assertEqual(n, len(cards))                                       # tile count matches the page
+        prices = []
+        for art in re.findall(r'<article class="card">(.*?)</article>', solo, re.S):
+            if 'b-in_stock' in art:
+                prices.append(float(re.search(r'<div class="price">(?:≈ )?\$([\d,.]+)', art).group(1).replace(",", "")))
+        self.assertEqual(prices, sorted(prices))                              # cheapest first
+        foot = home.split('<footer')[1]
+        for p in ("/how-we-track/", "/advertise/", "/bitaxe-black-friday/"):
+            self.assertIn(f'href="{p}"', foot)
+        nav = re.search(r'<nav aria-label="Main">(.*?)</nav>', home, re.S).group(1)
+        for p in ("/how-we-track/", "/advertise/", "/bitaxe-black-friday/"):
+            self.assertNotIn(p, nav)
+        css = (SITE / "style.css").read_text()
+        self.assertIn(".btn.sm{padding:7px 12px;font-size:13.5px;min-height:40px}", css)
+        self.assertRegex(css, r"\.foot \.foot-cols a\{[^}]*min-height:40px")

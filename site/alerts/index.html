@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b1222">
+<title>Free price-drop alerts for home Bitcoin miners | Bitaxe Radar</title>
+<meta name="description" content="Get one email when a Bitaxe, NerdQaxe, Avalon or heater miner is in stock at or under your price. Free, no spam, one-click unsubscribe.">
+<link rel="canonical" href="https://bitaxeradar.com/alerts/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:site_name" content="Bitaxe Radar">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Free price-drop alerts for home Bitcoin miners | Bitaxe Radar">
+<meta property="og:description" content="Get one email when a Bitaxe, NerdQaxe, Avalon or heater miner is in stock at or under your price. Free, no spam, one-click unsubscribe.">
+<meta property="og:url" content="https://bitaxeradar.com/alerts/">
+<meta property="og:image" content="https://bitaxeradar.com/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="/style.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://bitaxeradar.com/"},{"@type":"ListItem","position":2,"name":"Alerts","item":"https://bitaxeradar.com/alerts/"}]}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top"><div class="wrap">
+  <a class="brand" href="/" aria-label="Bitaxe Radar home"><svg class="logo-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><circle cx="32" cy="32" r="31" fill="#0f1a2e"/><g fill="none" stroke="#5b74a6" stroke-width="3.2"><circle cx="32" cy="32" r="25"/><circle cx="32" cy="32" r="16.5"/><circle cx="32" cy="32" r="8"/></g><path d="M32 32 L40.6 8.5 A25 25 0 0 1 53.2 18.8 Z" fill="#f7931a" fill-opacity=".55"/><circle cx="45" cy="17.5" r="4" fill="#f7931a"/><circle cx="32" cy="32" r="4" fill="#f7931a"/></svg><span>Bitaxe <b>Radar</b></span></a>
+  <nav aria-label="Main"><a href="/miners/"><span class="hide-sm">All miners</span><span class="show-sm">Miners</span></a><a href="/deals/">Deals</a><a href="/find-my-miner/"><span class="hide-sm">Find my miner</span><span class="show-sm">Find</span></a><a href="/guides/">Guides</a><a class="nav-cta" href="/alerts/" aria-current="page"><span class="hide-sm">Price alerts</span><span class="show-sm">Alerts</span></a></nav>
+</div></header>
+<main class="wrap" id="main">
+<nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> › <span aria-current="page">Alerts</span></nav>
+<article>
+<header class="hero"><h1>Price-drop alerts</h1>
+<p class="lede">Tell us a miner and your price. We email you once when it's in stock at or under it.</p></header>
+<section id="alerts" aria-labelledby="h-alerts">
+<h2 id="h-alerts">Get an email when the price drops</h2>
+<p class="lede">Pick a miner and your price. We email you once it's in stock at or under it.</p>
+<form id="signup" class="signup" novalidate>
+  <div class="row">
+    <label>Email <input type="email" id="email" name="email" autocomplete="email" placeholder="you@example.com" maxlength="254" required></label>
+    <label>Miner <select id="alertModel" name="model"><option value="any">Any miner</option><option value="bitaxe-supra">Bitaxe Supra</option><option value="bitaxe-ultra">Bitaxe Ultra</option><option value="bitaxe-gamma">Bitaxe Gamma (601/602)</option><option value="bitaxe-gamma-duo">Bitaxe Gamma Duo (650)</option><option value="bitaxe-gt-801">Bitaxe GT / Gamma Turbo (801)</option><option value="nerdaxe-gamma">Nerdaxe Gamma</option><option value="nerdaxe-gaia">Nerdaxe Gaia</option><option value="nerdqaxe-pp">NerdQaxe++ (4.8 TH/s)</option><option value="avalon-nano-3s">Canaan Avalon Nano 3S</option><option value="avalon-mini-3">Canaan Avalon Mini 3</option><option value="avalon-q">Canaan Avalon Q (90 TH/s)</option><option value="heatbit-trio">Heatbit Trio</option><option value="heatbit-maxi">Heatbit Maxi</option><option value="heatbit-canvas">Heatbit Canvas</option><option value="braiins-bmm-101">Braiins Mini Miner BMM 101</option><option value="hammer-bc04">Hammer Miner BC04</option><option value="bitaxe-gamma-hex">Bitaxe Gamma Hex (1300)</option><option value="bitaxe-naja-duo">Bitaxe Naja Duo (1201)</option><option value="nerdoctaxe">NerdOCTaxe Gamma</option><option value="bitforge-nano">BitForge Nano</option><option value="heatbit-bitair">Heatbit Bitair</option><option value="futurebit-apollo-iii">FutureBit Apollo III</option><option value="hammer-thor-p2">Hammer Miner Thor P2</option><option value="hammer-bc08">Hammer Miner BC08</option><option value="gekko-kbox-22">GekkoScience KBox 22</option><option value="dcentral-stealthminer">D-Central StealthMiner</option></select></label>
+    <label>My price (USD) <input type="number" min="1" max="100000" step="1" id="alertPrice" name="target_price" placeholder="e.g. 120" inputmode="numeric" required></label>
+  </div>
+  <div style="position:absolute;left:-9999px" aria-hidden="true"><label>Website <input type="text" id="website" name="website" tabindex="-1" autocomplete="off"></label></div>
+  <div class="row signup-actions"><div id="turnstile" class="turnstile-slot"></div><button type="submit" id="signupBtn">Email me when it drops</button></div>
+  <p class="hint">Free. You'll get one email to confirm first. No spam, never sold, unsubscribe in one click.</p>
+  <p class="hint" id="signupMsg" role="status" aria-live="polite"></p>
+  <noscript><p class="hint">The sign-up form needs JavaScript for its bot check.</p></noscript>
+</form>
+</section>
+<p class="hint">Questions? <a href="mailto:contact@bitaxeradar.com">contact@bitaxeradar.com</a></p>
+</article>
+</main>
+<footer class="foot"><div class="wrap">
+  <a class="brand" href="/"><svg class="logo-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><circle cx="32" cy="32" r="31" fill="#0f1a2e"/><g fill="none" stroke="#5b74a6" stroke-width="3.2"><circle cx="32" cy="32" r="25"/><circle cx="32" cy="32" r="16.5"/><circle cx="32" cy="32" r="8"/></g><path d="M32 32 L40.6 8.5 A25 25 0 0 1 53.2 18.8 Z" fill="#f7931a" fill-opacity=".55"/><circle cx="45" cy="17.5" r="4" fill="#f7931a"/><circle cx="32" cy="32" r="4" fill="#f7931a"/></svg><span>Bitaxe <b>Radar</b></span></a>
+  <p>Prices and stock for home Bitcoin miners, from Bitaxe boards to room heaters, at US, Canadian and EU shops. Checked every 6 hours.</p>
+  <nav class="foot-cols" aria-label="Footer"><div><b>Miners</b><a href="/miners/">All miners</a><a href="/solo-miners/">Solo miners</a><a href="/pool-miners/">Pool miners</a><a href="/heater-miners/">Heater miners</a><a href="/deals/">Deals</a><a href="/in-stock/">In stock now</a><a href="/find-my-miner/">Find my miner</a></div><div><b>Help</b><a href="/guides/">Guides</a><a href="/best/">Best for…</a><a href="/compare/">Compare</a><a href="/sellers/">Shops</a><a href="/where-to-buy-bitaxe/">Where to buy</a><a href="/alerts/">Price alerts</a></div><div><b>About</b><a href="/how-we-track/">About &amp; how we track</a><a href="/advertise/">Advertise</a><a href="/bitaxe-black-friday/">Black Friday 2026</a><a href="mailto:contact@bitaxeradar.com">contact@bitaxeradar.com</a></div></nav>
+  <p><strong>Affiliate disclosure:</strong> some shop links are affiliate links (labelled "affiliate link"). If you buy through one we may earn a commission at no extra cost to you. It never changes how prices are ranked.</p>
+  <p>Solo mining is a lottery, not income. Prices can change fast, so check the shop's page before buying. Not financial advice.</p>
+  <small>Bitaxe Radar is independent and not affiliated with the Bitaxe project, Open Source Miners United or any shop listed.</small>
+</div></footer>
+<script>window.RADAR_SIGNUP={"workerUrl": "https://bitaxe-radar-alerts.bitaxeradar.workers.dev/subscribe", "sitekey": "0x4AAAAAAFYqcERY2Pvc1wQI"};</script>
+<script src="/signup.js" defer></script><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "c27e77d1efd346c6aeed5b72e1ff7b0b"}'></script>
+
+</body>
+</html>

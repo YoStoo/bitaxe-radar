@@ -22,16 +22,18 @@ img,svg{max-width:100%}
 .brand{display:inline-flex;align-items:center;gap:9px;color:var(--text);text-decoration:none;font-weight:800;font-size:19px;letter-spacing:-.02em;white-space:nowrap}
 .brand .logo-mark{width:32px;height:32px;flex:0 0 32px}
 .brand b{color:var(--accent);font-weight:800}
-.top nav{display:flex;gap:4px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+.top nav{display:flex;gap:4px;margin-left:auto}
 .top nav::-webkit-scrollbar{display:none}
-.top nav a{color:var(--muted);text-decoration:none;font-size:14px;font-weight:600;padding:7px 11px;border-radius:99px;white-space:nowrap}
+.top nav a{display:inline-flex;align-items:center;min-height:40px;color:var(--muted);text-decoration:none;font-size:14px;font-weight:600;padding:0 12px;border-radius:99px;white-space:nowrap}
+.top nav a[aria-current=page]{color:var(--text);background:var(--panel2)}
+.top nav a.nav-cta[aria-current=page]{color:var(--accent-ink);background:var(--accent)}
 .top nav a:hover{color:var(--text);background:var(--panel)}
 .top nav a.nav-cta{color:var(--accent-ink);background:var(--accent)}
 .top nav a.nav-cta:hover{background:var(--accent-2);color:var(--accent-ink)}
 @media (max-width:700px){
   .top .wrap{flex-wrap:wrap;gap:0;padding-top:8px}
   .top nav{margin:6px -18px 0;padding:0 14px 8px;width:calc(100% + 36px)}
-  .top nav a{font-size:13.5px;padding:6px 11px;background:var(--panel)}
+  .top nav a{font-size:13.5px;padding:0 10px;background:var(--panel);flex:1 1 auto;justify-content:center}
 }
 
 /* ---- type ---- */
@@ -63,7 +65,7 @@ article p,article li{max-width:72ch}
 .btn:active,button:active{transform:translateY(1px)}
 .btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
 .btn.ghost:hover{background:var(--panel2)}
-.btn.sm{padding:7px 12px;font-size:13.5px}
+.btn.sm{padding:7px 12px;font-size:13.5px;min-height:40px}
 button:disabled{opacity:.6;cursor:default}
 .ph{color:var(--faint);font-size:11px;margin-top:4px;letter-spacing:.02em}
 
@@ -222,7 +224,10 @@ details .tablewrap{margin-bottom:14px}
 .foot .brand .logo-mark{width:26px;height:26px;flex-basis:26px}
 .foot p{margin:8px 0;max-width:760px}
 .foot a{color:var(--muted)}
-.foot .foot-links{display:flex;flex-wrap:wrap;gap:6px 16px;margin:14px 0}
+.foot .foot-cols{display:grid;grid-template-columns:repeat(3,minmax(0,220px));gap:8px 24px;margin:16px 0}
+.foot .foot-cols b{display:block;color:var(--text);font-size:13px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+.foot .foot-cols a{display:flex;align-items:center;min-height:40px;color:var(--text);text-decoration:none;overflow-wrap:anywhere}
+@media (max-width:560px){.foot .foot-cols{grid-template-columns:1fr 1fr}.foot .foot-cols div:last-child{grid-column:1/-1}}
 .foot .foot-links a{color:var(--text);text-decoration:none}
 .foot small{color:var(--faint);display:block;margin-top:14px;font-size:12.5px}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.card,.btn{transition:none}}
@@ -298,3 +303,41 @@ details .tablewrap{margin-bottom:14px}
 .best-row span{flex:0 0 auto;color:var(--muted);font-size:13px;font-weight:600;margin-right:2px}
 .home-best{margin:10px 0 0}
 @media (max-width:700px){.best-row a{font-size:13px;padding:5px 10px}}
+/* ---- nav build: filters, quiz, indexes ---- */
+.crumbs a{display:inline-flex;align-items:center;min-height:32px}
+.hero-btns{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0 4px}.hero-btns .btn{min-height:48px;padding:0 20px;font-size:16px}
+.browse a{display:inline-flex;align-items:center;min-height:40px}
+.filters{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;margin:14px 0 16px}
+.filters fieldset,.quiz fieldset{border:0;margin:0 0 8px;padding:0;min-width:0}
+.filters legend{font-size:12.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;padding:0}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opts label{position:relative}
+.opts input{position:absolute;opacity:0;width:1px;height:1px}
+.opts span{display:inline-flex;align-items:center;min-height:40px;padding:0 13px;border-radius:99px;background:var(--panel2);border:1px solid var(--line);font-size:14px;font-weight:650;cursor:pointer}
+.opts input:checked+span{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.opts input:focus-visible+span{outline:2px solid var(--ring);outline-offset:2px}
+.frow{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:4px}
+.tog{display:inline-flex;align-items:center;gap:8px;min-height:40px;font-weight:650;font-size:14px}
+.tog input{width:20px;height:20px;accent-color:var(--accent)}
+.sortby{display:inline-flex;align-items:center;gap:6px;font-size:14px;color:var(--muted)}
+.sortby select{min-height:40px;background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:0 8px;font:inherit}
+.filters .meta{margin:8px 0 0}
+.card[hidden]{display:none}
+.quiz{display:grid;gap:14px;margin:16px 0}
+.quiz legend{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:750;margin-bottom:10px;padding:0}
+.quiz legend i{display:inline-flex;width:28px;height:28px;border-radius:50%;align-items:center;justify-content:center;background:rgba(247,147,26,.14);color:var(--accent);font-style:normal;font-weight:800;font-size:14px}
+.opts.col{flex-direction:column}
+.opts.col span{width:100%;min-height:48px;border-radius:12px;padding:0 16px;font-size:15px}
+.quiz .btn{min-height:52px;font-size:17px}
+#qres .cards{margin-top:10px}
+.az,.shops,.glist{list-style:none;padding:0;margin:14px 0;display:grid;gap:8px}
+.az{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.az li{display:flex;flex-direction:column;justify-content:center;min-height:48px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:6px 14px}
+.az a{font-weight:700;text-decoration:none;color:var(--text)}.az span{color:var(--muted);font-size:13px}
+.shops a,.glist a{display:flex;flex-direction:column;gap:2px;min-height:56px;justify-content:center;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px;text-decoration:none;color:var(--text)}
+.shops a:hover,.glist a:hover{border-color:var(--accent)}
+.shops span,.glist span{color:var(--muted);font-size:13.5px}
+.btiles.wide{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+@media (max-width:700px){.btiles.wide{grid-template-columns:1fr 1fr}.opts span{font-size:13.5px;padding:0 11px}.top nav a{min-height:40px}}
+.nojs[hidden]{display:none}
+#qres{scroll-margin-top:110px}

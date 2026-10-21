@@ -438,9 +438,11 @@ SELLER_COPY = {
                "Because VAT is included and shipping isn't, its dollar estimates aren't directly comparable to a US shop's pre-tax prices."]),
 }
 
-NAV = [("/solo-miners/", "Solo miners", "Solo"), ("/pool-miners/", "Pool miners", "Pool"), ("/heater-miners/", "Heater miners", "Heaters"),
-       ("/deals/", "Deals", "Deals"), ("/in-stock/", "In stock", None), ("/where-to-buy-bitaxe/", "Where to buy", None)]
-NAV_HIDE_SM = {"/in-stock/", "/where-to-buy-bitaxe/"}       # phone nav: Solo · Pool · Heaters · Deals + Alerts
+# Same menu on every page, desktop and phone (docs/NAV_AUDIT.md): All miners · Deals · Find my miner · Guides + Alerts button
+NAV = [("/miners/", "All miners", "Miners"), ("/deals/", "Deals", "Deals"), ("/find-my-miner/", "Find my miner", "Find"), ("/guides/", "Guides", "Guides")]
+NAV_SECTIONS = {"/miners/": ("/miners/", "/solo-miners/", "/pool-miners/", "/heater-miners/", "/models/", "/home-miners/"),
+                "/deals/": ("/deals/", "/in-stock/", "/bitaxe-black-friday/"), "/find-my-miner/": ("/find-my-miner/",),
+                "/guides/": ("/guides/", "/best/", "/compare/", "/how-we-track/", "/where-to-buy-bitaxe/", "/sellers/")}
 
 # Browse-by-type categories. Any miner can solo or pool mine; these say what each is best suited to. A miner can be in several.
 SOLO_SET = ["bitaxe-gamma", "bitaxe-gamma-duo", "bitaxe-gt-801", "nerdaxe-gamma", "nerdaxe-gaia", "nerdqaxe-pp",
@@ -588,6 +590,7 @@ TRACKED = [mid for mid in MODELS if STATS[mid]["offers"]]
 BITAXE_TRACKED = [m for m in TRACKED if not is_home(m)]     # Bitaxe-family + open-source boards ("board"), ranked together
 CORE_TRACKED = [m for m in TRACKED if cat(m) == "bitaxe"]   # the original Bitaxe set used by the Bitaxe-only pages
 HOME_TRACKED = [m for m in TRACKED if is_home(m)]
+LIVE_TRACKED = [m for m in TRACKED if m not in NOINDEX_MODELS]
 BITAXE_OFFERS = [o for o in OFFERS if cat(o["model"]) == "bitaxe"]
 EFF_RANK, PTH_RANK, RANK_N, PTH_N = {}, {}, {}, {}
 for _grp in (BITAXE_TRACKED, HOME_TRACKED):       # ranks are within a category (a Bitaxe is not compared with a heater)
@@ -652,10 +655,12 @@ FOOT_DISCLOSURE = ('<strong>Affiliate disclosure:</strong> some shop links are a
                    "If you buy through one we may earn a commission at no extra cost to you. It never changes how prices are ranked.")
 
 
-def header_html():
-    nav = "".join((f'<a href="{p}" class="hide-sm">{esc(n)}</a>' if p in NAV_HIDE_SM else
-                   f'<a href="{p}">' + (f'<span class="hide-sm">{esc(n)}</span><span class="show-sm">{esc(sm)}</span>' if sm != n else esc(n)) + "</a>")
-                  for p, n, sm in NAV) + '<a class="nav-cta" href="/#alerts"><span class="hide-sm">Price alerts</span><span class="show-sm">Alerts</span></a>'
+def header_html(path=""):
+    def cur(p):
+        return ' aria-current="page"' if any(path.startswith(x) for x in NAV_SECTIONS[p]) else ""
+    nav = "".join(f'<a href="{p}"{cur(p)}>' + (f'<span class="hide-sm">{esc(n)}</span><span class="show-sm">{esc(sm)}</span>' if sm != n else esc(n)) + "</a>"
+                  for p, n, sm in NAV) + ('<a class="nav-cta" href="/alerts/"' + (' aria-current="page"' if path == "/alerts/" else "")
+                                         + '><span class="hide-sm">Price alerts</span><span class="show-sm">Alerts</span></a>')
     return f"""<a class="skip" href="#main">Skip to content</a>
 <header class="top"><div class="wrap">
   <a class="brand" href="/" aria-label="Bitaxe Radar home">{WORDMARK}</a>
@@ -663,14 +668,21 @@ def header_html():
 </div></header>"""
 
 
+FOOT_GROUPS = [
+    ("Miners", [("/miners/", "All miners"), ("/solo-miners/", "Solo miners"), ("/pool-miners/", "Pool miners"), ("/heater-miners/", "Heater miners"),
+                ("/deals/", "Deals"), ("/in-stock/", "In stock now"), ("/find-my-miner/", "Find my miner")]),
+    ("Help", [("/guides/", "Guides"), ("/best/", "Best for…"), ("/compare/", "Compare"), ("/sellers/", "Shops"),
+              ("/where-to-buy-bitaxe/", "Where to buy"), ("/alerts/", "Price alerts")]),
+    ("About", [("/how-we-track/", "About & how we track"), ("/advertise/", "Advertise"), ("/bitaxe-black-friday/", "Black Friday 2026"), (f"mailto:{CONTACT}", CONTACT)]),
+]
+
+
 def footer_html(extra=""):
-    links = [("/solo-miners/", "Solo miners"), ("/pool-miners/", "Pool miners"), ("/heater-miners/", "Heater miners"), ("/#miners", "Bitaxe miners"), ("/home-miners/", "Heater & home miners"), ("/guides/solo-vs-pool-mining/", "Solo vs pool"),
-             ("/guides/how-heater-miners-work/", "How heater miners work"), ("/best/beginners/", "Best for beginners"), ("/best/quiet/", "Quietest miners"), ("/deals/", "Deals"), ("/bitaxe-black-friday/", "Black Friday 2026"), ("/in-stock/", "In stock"), ("/where-to-buy-bitaxe/", "Where to buy"),
-             ("/how-we-track/", "About & how we track"), ("/advertise/", "Advertise")]
+    cols = "".join(f'<div><b>{esc(h)}</b>' + "".join(f'<a href="{p}">{esc(n)}</a>' for p, n in links) + "</div>" for h, links in FOOT_GROUPS)
     return f"""<footer class="foot"><div class="wrap">
   <a class="brand" href="/">{WORDMARK}</a>
-  <p>The cheapest in-stock Bitaxe, NerdQaxe and Nerdaxe miners, plus heater and home miners, from US, Canadian and EU shops, checked every 6 hours.</p>
-  <nav class="foot-links" aria-label="Footer">{"".join(f'<a href="{p}">{esc(n)}</a>' for p, n in links)}<a href="mailto:{CONTACT}">{CONTACT}</a></nav>
+  <p>Prices and stock for home Bitcoin miners, from Bitaxe boards to room heaters, at US, Canadian and EU shops. Checked every 6 hours.</p>
+  <nav class="foot-cols" aria-label="Footer">{cols}</nav>
   {extra}<p>{FOOT_DISCLOSURE}</p>
   <p>Solo mining is a lottery, not income. Prices can change fast, so check the shop's page before buying. Not financial advice.</p>
   <small>Bitaxe Radar is independent and not affiliated with the Bitaxe project, Open Source Miners United or any shop listed.</small>
@@ -706,7 +718,7 @@ def layout(path, title, desc, body, *, crumbs=None, jsonld=(), noindex=False, la
 {"".join(jsonld_tag(x) for x in ld)}
 </head>
 <body>
-{header_html()}
+{header_html(path)}
 <main class="wrap" id="main">
 {crumbs_html(crumbs) if crumbs else ""}
 {body}
@@ -878,7 +890,7 @@ def build_model_page(mid):
     best, low = st["best"], st["low_any"]
     n_in = len(st["in_stock"])
     day = fmt_day(GEN)
-    trail = [("Home", "/"), ("Heater & home miners", "/home-miners/"), (short, path)] if home else [("Home", "/"), (short, path)]
+    trail = model_trail(mid, short, path)
     pre = [o for o in st["offers"] if o["stock_status"] in ("preorder", "backorder")]
 
     if not best and pre and low and low["stock_status"] in ("preorder", "backorder"):
@@ -1104,8 +1116,7 @@ def build_seller_page(sid):
     path = f"/sellers/{sid}/"
     n_in = sum(1 for o in offs if in_stock(o))
     aff = aff_param(sid)
-    trail = ([("Home", "/"), ("Heater & home miners", "/home-miners/"), (s["name"], path)] if all(is_home(o["model"]) for o in offs)
-             else [("Home", "/"), ("Where to buy", "/where-to-buy-bitaxe/"), (s["name"], path)])
+    trail = [("Home", "/"), ("Shops", "/sellers/"), (s["name"], path)]
     rows = []
     for o in offs:
         ins = sorted(STATS[o["model"]]["in_stock"], key=usd)
@@ -1143,7 +1154,7 @@ def build_seller_page(sid):
 <p class="hint">Store: <a href="{esc(s['url'])}" rel="nofollow noopener" target="_blank">{esc(s['url'].replace('https://', ''))}</a>. Prices are before shipping and tax.</p></section>
 <section aria-labelledby="h-n"><h2 id="h-n">Good to know</h2><ul>{notes}</ul>{unverified}{aff_txt}</section>
 <section aria-labelledby="h-l"><h2 id="h-l">Price log</h2><details class="more"><summary>Show price log</summary>{log}</details></section>
-<section><h2>See also</h2><ul class="links"><li><a href="/home-miners/">Heater &amp; home miners</a></li><li><a href="/where-to-buy-bitaxe/">Where to buy a Bitaxe</a></li><li><a href="/in-stock/">Everything in stock</a></li><li><a href="/deals/">Best deals</a></li></ul></section>
+<section><h2>See also</h2><ul class="links"><li><a href="/miners/">All home miners</a></li><li><a href="/where-to-buy-bitaxe/">Where to buy a Bitaxe</a></li><li><a href="/in-stock/">Everything in stock</a></li><li><a href="/deals/">Best deals</a></li></ul></section>
 </article>"""
     ld = {"@context": "https://schema.org", "@type": "WebPage", "name": f"{s['name']} prices and stock", "url": BASE + path,
           "dateModified": latest["generated_at"], "about": {"@type": "Organization", "name": s["name"], "url": s["url"]}}
@@ -1229,45 +1240,51 @@ def build_where_to_buy():
     layout(path, title, desc, body, crumbs=trail, jsonld=[itemlist("Bitaxe-class miners tracked by Bitaxe Radar", items)])
 
 
+def deal_pills(current):
+    return ('<nav class="browse" aria-label="Deals filter">' + "".join(f'<a href="{p}"' + (' aria-current="page"' if p == current else "") + f'>{l}</a>'
+            for p, l in (("/deals/", "All deals"), ("/in-stock/", "In stock only"))) + "</nav>")
+
+
 def build_in_stock():
     path = "/in-stock/"
-    trail = [("Home", "/"), ("In stock now", path)]
+    trail = [("Home", "/"), ("Deals", "/deals/"), ("In stock now", path)]
     order = {m: i for i, m in enumerate(MODELS)}
 
     def srt(lst):
         return sorted(lst, key=lambda o: (order[o["model"]], usd(o) if usd(o) is not None else 1e9))
-    ins = srt([o for o in BITAXE_OFFERS if in_stock(o)])
-    pre = srt([o for o in BITAXE_OFFERS if o["stock_status"] in ("preorder", "backorder")])
-    oos = srt([o for o in BITAXE_OFFERS if o["stock_status"] in ("out_of_stock", "unknown")])
-    none = [m for m in BITAXE_TRACKED if not STATS[m]["in_stock"]]
+    ins = srt([o for o in OFFERS if in_stock(o)])
+    pre = srt([o for o in OFFERS if o["stock_status"] in ("preorder", "backorder")])
+    oos = srt([o for o in OFFERS if o["stock_status"] in ("out_of_stock", "unknown")])
+    none = [m for m in LIVE_TRACKED if not STATS[m]["in_stock"]]
     notes = []
-    for mid in BITAXE_TRACKED:
+    for mid in LIVE_TRACKED:
         st = STATS[mid]
         if st["best"] and st["low_any"]["id"] != st["best"]["id"] and not in_stock(st["low_any"]):
             notes.append(f"The cheapest listed {esc(SHORT[mid])}, {money(usd(st['low_any']))} at {esc(sname(st['low_any']['seller']))}, is {esc(STATUS[st['low_any']['stock_status']].lower())}. Cheapest in stock: {money(usd(st['best']))} at {esc(sname(st['best']['seller']))}.")
     if none:
         notes.append("Sold out everywhere we check: " + ", ".join(f'<a href="/models/{m}/">{esc(SHORT[m])}</a>' for m in none) + ".")
     n_sellers = len({o["seller"] for o in ins})
-    title = f"Bitaxe in stock now: {len(ins)} listings at {plural(n_sellers, 'seller')} ({fmt_day(GEN)}) | Bitaxe Radar"
-    desc = f"What is in stock right now: {len(ins)} of {len(BITAXE_OFFERS)} tracked Bitaxe, Nerdaxe and NerdQaxe listings, plus {len(pre)} pre-order or backorder. Updated {fmt_day(GEN)}."
+    title = f"Home Bitcoin miners in stock now: {len(ins)} listings at {plural(n_sellers, 'seller')} ({fmt_day(GEN)}) | Bitaxe Radar"
+    desc = f"What is in stock right now: {len(ins)} of {len(OFFERS)} tracked home miner listings (Bitaxe to heaters), plus {len(pre)} pre-order or backorder. Updated {fmt_day(GEN)}."
     body = f"""<article>
-<header class="hero"><h1>Bitaxe and NerdQaxe in stock now</h1>
-<p class="lede">{len(ins)} of {len(BITAXE_OFFERS)} tracked listings are in stock at the last check. Another {len(pre)} are pre-order or backorder (not in stock yet) and {len(oos)} are sold out.</p>
+<header class="hero"><h1>Home miners in stock now</h1>
+{deal_pills("/in-stock/")}
+<p class="lede">{len(ins)} of {len(OFFERS)} tracked listings are in stock at the last check. Another {len(pre)} are pre-order or backorder (not in stock yet) and {len(oos)} are sold out.</p>
 <p class="meta">Checked {tag_time(latest['generated_at'])} · updated every 6 hours</p></header>
 <section aria-labelledby="h-n"><h2 id="h-n">What the stock picture means today</h2><ul>{"".join(f"<li>{x}</li>" for x in notes) or "<li>Nothing unusual at the last check.</li>"}</ul></section>
 <section aria-labelledby="h-i"><h2 id="h-i">In stock ({len(ins)})</h2>{offers_table(ins, show_model=True) if ins else "<p>Nothing is in stock at the tracked sellers at the last check.</p>"}</section>
 <section aria-labelledby="h-p"><h2 id="h-p">Pre-order and backorder ({len(pre)})</h2><p class="hint">Not in stock. Read the seller's shipping note before ordering.</p>{offers_table(pre, show_model=True) if pre else "<p>None right now.</p>"}</section>
 <section aria-labelledby="h-o"><h2 id="h-o">Sold out ({len(oos)})</h2>{offers_table(oos, show_model=True) if oos else "<p>None right now.</p>"}</section>
-<section><h2>Related</h2><p><a href="/where-to-buy-bitaxe/">Where to buy a Bitaxe</a> · <a href="/deals/">Best deals</a> · <a href="/home-miners/">Heater &amp; home miners</a> · <a href="/how-we-track/">How we track</a></p></section>
+<section><h2>Related</h2><p><a href="/miners/">All miners</a> · <a href="/deals/">Best deals</a> · <a href="/where-to-buy-bitaxe/">Where to buy a Bitaxe</a> · <a href="/how-we-track/">How we track</a></p></section>
 </article>"""
     items = [(f"{SHORT[o['model']]} at {sname(o['seller'])}", f"/models/{o['model']}/") for o in ins]
-    layout(path, title, desc, body, crumbs=trail, jsonld=[itemlist("Bitaxe-class miners in stock now", items)])
+    layout(path, title, desc, body, crumbs=trail, jsonld=[itemlist("Home Bitcoin miners in stock now", items)])
 
 
 def build_deals():
     path = "/deals/"
-    trail = [("Home", "/"), ("Best deals", path)]
-    cand = [m for m in BITAXE_TRACKED if STATS[m]["best"]]
+    trail = [("Home", "/"), ("Deals", path)]
+    cand = [m for m in LIVE_TRACKED if STATS[m]["best"]]
     ranked = sorted(cand, key=lambda m: STATS[m]["per_th"])
     rows = []
     for i, mid in enumerate(ranked, 1):
@@ -1276,24 +1293,24 @@ def build_deals():
                     f'<td class="num">{money(st["per_th"])}</td><td class="num">≈{jth(mid):.1f}</td><td>{offer_link(b, "View ↗")}</td></tr>')
     rank_tbl = ('<div class="tablewrap"><table><thead><tr><th class="num">#</th><th>Model</th><th class="num">Cheapest in stock</th><th>Seller</th><th class="num">$ per stated TH/s</th><th class="num">J/TH</th><th>Buy</th></tr></thead>'
                 f'<tbody>{"".join(rows)}</tbody></table></div>')
-    disc = [o for o in BITAXE_OFFERS if o.get("compare_at") and o["compare_at"] > o["price"]]
+    disc = [o for o in OFFERS if o.get("compare_at") and o["compare_at"] > o["price"]]
     disc_rows = "".join(f'<tr><td><a href="/models/{o["model"]}/">{esc(SHORT[o["model"]])}</a></td><td>{esc(sname(o["seller"]))}</td><td class="num">{money(o["price"], o["currency"])}</td>'
                         f'<td class="num">{money(o["compare_at"], o["currency"])}</td><td class="num">{(1 - o["price"] / o["compare_at"]) * 100:.0f}%</td><td>{badge(o["stock_status"])}</td></tr>' for o in disc)
     disc_html = (('<div class="tablewrap"><table><thead><tr><th>Model</th><th>Seller</th><th class="num">Price now</th><th class="num">Seller\'s compare-at price</th><th class="num">Difference</th><th>Stock</th></tr></thead>'
                   f'<tbody>{disc_rows}</tbody></table></div><p class="hint">The compare-at price is whatever the seller entered as the "was" price. We have not verified it was ever the selling price, so treat it as the seller\'s claim.</p>')
                  if disc else "<p>No tracked seller shows a compare-at (&ldquo;was&rdquo;) price at the last check.</p>")
-    ch = [c for c in price_changes(7) if not is_home(c[0]["model"])]
+    ch = price_changes(7)
     ch_rows = "".join(f'<tr><td><a href="/models/{o["model"]}/">{esc(SHORT[o["model"]])}</a></td><td>{esc(sname(o["seller"]))}</td><td class="num">{money(old, o["currency"])}</td><td class="num">{money(new, o["currency"])}</td>'
                       f'<td class="num">{(new / old - 1) * 100:+.1f}%</td><td>{esc(fmt_day(t))}</td></tr>' for o, old, new, t in ch)
     ch_html = (f'<div class="tablewrap"><table><thead><tr><th>Model</th><th>Seller</th><th class="num">Was</th><th class="num">Now</th><th class="num">Change</th><th>When</th></tr></thead><tbody>{ch_rows}</tbody></table></div>'
                if ch else "<p>No price changes in the last 7 days.</p>")
-    gaps = [(mid, STATS[mid]) for mid in BITAXE_TRACKED if STATS[mid]["best"] and STATS[mid]["low_any"]["id"] != STATS[mid]["best"]["id"] and not in_stock(STATS[mid]["low_any"])]
+    gaps = [(mid, STATS[mid]) for mid in LIVE_TRACKED if STATS[mid]["best"] and STATS[mid]["low_any"]["id"] != STATS[mid]["best"]["id"] and not in_stock(STATS[mid]["low_any"])]
     gap_rows = "".join(f'<tr><td><a href="/models/{mid}/">{esc(SHORT[mid])}</a></td><td>{esc(sname(st["low_any"]["seller"]))}</td><td class="num">{money(usd(st["low_any"]))}</td><td>{badge(st["low_any"]["stock_status"])}</td>'
                        f'<td class="num">{money(usd(st["best"]))}</td><td class="num">{money(usd(st["best"]) - usd(st["low_any"]))}</td></tr>' for mid, st in gaps)
     gap_html = (('<div class="tablewrap"><table><thead><tr><th>Model</th><th>Cheapest listing</th><th class="num">Price</th><th>Status</th><th class="num">Cheapest in stock</th><th class="num">Premium</th></tr></thead>'
                  f"<tbody>{gap_rows}</tbody></table></div>") if gaps else "<p>At the last check the cheapest listing for every model was also in stock.</p>")
     spread = []
-    for mid in BITAXE_TRACKED:
+    for mid in LIVE_TRACKED:
         ins = sorted(STATS[mid]["in_stock"], key=usd)
         if len(ins) >= 2:
             spread.append((mid, ins[0], ins[-1]))
@@ -1303,10 +1320,11 @@ def build_deals():
                     f'<tbody>{spread_rows}</tbody></table></div><p class="hint">Configurations differ (power supply, stand, region), so part of any spread is the bundle, not the seller.</p>')
                    if spread else "<p>No model has two or more in-stock sellers at the last check.</p>")
     top = ranked[0] if ranked else None
-    title = (f"Best Bitaxe deals today: {SHORT[top]} cheapest per TH/s ({fmt_day(GEN)}) | Bitaxe Radar" if top else f"Best Bitaxe deals today ({fmt_day(GEN)}) | Bitaxe Radar")
-    desc = f"Best Bitaxe deals right now: cheapest in-stock price per model ranked by cost per TH/s, seller discounts, price drops and seller price spread. Updated {fmt_day(GEN)}."
+    title = (f"Best home miner deals today: {SHORT[top]} cheapest per TH/s ({fmt_day(GEN)}) | Bitaxe Radar" if top else f"Best home miner deals today ({fmt_day(GEN)}) | Bitaxe Radar")
+    desc = f"Best home Bitcoin miner deals: cheapest in-stock price per model ranked by cost per TH/s, plus discounts and price drops. Updated {fmt_day(GEN)}."
     body = f"""<article>
-<header class="hero"><h1>Best Bitaxe deals right now</h1>
+<header class="hero"><h1>Best deals right now</h1>
+{deal_pills("/deals/")}
 <p class="lede">The cheapest in-stock price for each miner, ranked by how much hashrate you get per dollar.</p>
 <p class="meta">Data collected {tag_time(latest['generated_at'])}</p></header>
 <section aria-labelledby="h-r"><h2 id="h-r">Cheapest in stock, ranked by price per TH/s</h2>{rank_tbl}
@@ -1315,11 +1333,11 @@ def build_deals():
 <section aria-labelledby="h-c"><h2 id="h-c">Price changes in the last 7 days</h2>{ch_html}</section>
 <section aria-labelledby="h-g"><h2 id="h-g">Cheaper listings that are not in stock</h2><p>Some of the lowest prices we see are on sold-out, backorder or pre-order listings. This shows how much more the cheapest in-stock listing costs.</p>{gap_html}</section>
 <section aria-labelledby="h-s"><h2 id="h-s">Price spread between sellers (in stock)</h2>{spread_html}</section>
-<section><h2>Want a heads-up?</h2><p>Pick a model and a target price on its page and we email you once when it is in stock at or under that price: <a href="/models/bitaxe-gamma/#alerts">set an alert</a>.</p>
+<section><h2>Want a heads-up?</h2><p>Pick a model and a target price on its page and we email you once when it is in stock at or under that price: <a href="/alerts/">set an alert</a>.</p>
 <p><a href="/in-stock/">Everything in stock now</a> · <a href="/where-to-buy-bitaxe/">Where to buy</a> · <a href="/bitaxe-black-friday/">Black Friday 2026 tracker</a></p></section>
 </article>"""
     items = [(f"{SHORT[m]} {money(usd(STATS[m]['best']))}", f"/models/{m}/") for m in ranked]
-    layout(path, title, desc, body, crumbs=trail, jsonld=[itemlist("Cheapest in-stock Bitaxe-class miners by price per TH/s", items)])
+    layout(path, title, desc, body, crumbs=trail, jsonld=[itemlist("Cheapest in-stock home miners by price per TH/s", items)])
 
 
 BF_DATES = dict(bf="2026-11-27", cm="2026-11-30")   # Black Friday / Cyber Monday 2026
@@ -1437,7 +1455,7 @@ def cat_tags(mid):
 
 
 def browse_pills(current=None):
-    items = [(path, label) for key, path, label, *_ in CATS] + [("/deals/", "Deals"), ("/#alerts", "Alerts")]
+    items = [("/miners/", "All")] + [(path, label) for key, path, label, *_ in CATS]
     return ('<nav class="browse" aria-label="Browse miners">' + "".join(
         f'<a href="{p}"' + (' aria-current="page"' if p == current else "") + f'>{esc(l)}</a>' for p, l in items) + "</nav>")
 
@@ -1455,7 +1473,7 @@ def browse_tiles():
     return '<section class="browse-tiles" aria-label="Browse by type"><div class="btiles">' + "".join(tiles) + "</div></section>"
 
 
-def hub_card(mid, heat=True, rank=None, why=""):
+def hub_card(mid, heat=True, rank=None, why="", attrs=""):
     st, m = STATS[mid], MODELS[mid]
     b = st["best"]
     pre = [o for o in st["offers"] if o["stock_status"] in ("preorder", "backorder") and usd(o) is not None]
@@ -1475,7 +1493,7 @@ def hub_card(mid, heat=True, rank=None, why=""):
         price, where = "Sold out", (f'Last listed {money(usd(low))}' if low else "")
         status, cls = '<span class="badge b-out_of_stock">Sold out</span>', "card soldout"
     rib = f'<span class="ribbon rank">#{rank}</span>' if rank else ""
-    return (f'<article class="{cls}">{rib}<div class="art{" photo" if mid in MODEL_IMG else ""}">{model_img(mid)}</div><div class="body">'
+    return (f'<article class="{cls}"{attrs}>{rib}<div class="art{" photo" if mid in MODEL_IMG else ""}">{model_img(mid)}</div><div class="body">'
             f'<h3><a href="/models/{mid}/">{esc(SHORT[mid])}</a></h3>'
             + (f'<div class="why">{esc(why)}</div>' if why else "") +
             f'<div class="spec">≈{m["hashrate_ths"]:g} TH/s · ≈{m["watts"]:,g} W' + (f' · ≈{btu(hw):,.0f} BTU/h heat' if heat else "") + '</div>'
@@ -1534,7 +1552,7 @@ CAT_COPY = {
 def card_sort_key(mid):
     st = STATS[mid]
     rank = 0 if st["best"] else 1 if any(o["stock_status"] in ("preorder", "backorder") for o in st["offers"]) else 2
-    return (rank, MODELS[mid]["hashrate_ths"])
+    return (rank, show_price(mid) or 1e9, -MODELS[mid]["hashrate_ths"])   # cheapest first within in stock / pre-order / sold out
 
 
 def build_category(key):
@@ -1544,7 +1562,7 @@ def build_category(key):
     older = [m for m in members if m in TRACKED and m in NOINDEX_MODELS]
     offs = [o for m in ms for o in STATS[m]["offers"]]
     n_in = sum(1 for o in offs if in_stock(o))
-    trail = [("Home", "/"), (h1, path)]
+    trail = [("Home", "/"), ("All miners", "/miners/"), (label + (" miners" if key != "heat" else ""), path)]
     title = f"{cp['title']} ({fmt_day(GEN)}) | Bitaxe Radar"
     desc = f"Prices and stock for {cp['what']}. {n_in} of {len(offs)} listings in stock, checked every 6 hours."
     older_html = ('<p class="older">Older models: ' + " · ".join(
@@ -1561,9 +1579,10 @@ def build_category(key):
 <header class="hero"><h1>{esc(h1)}</h1>
 <p class="lede">{esc(cp['lede'])}</p>
 <p class="meta">{n_in} of {len(offs)} listings in stock · checked {tag_time(latest['generated_at'])}</p>
-{browse_pills(path)}</header>
+{browse_pills(path)}
+{best_pills()}</header>
 <section aria-label="{esc(h1)}"><div class="cards">{"".join(hub_card(m, heat=(key == "heat")) for m in ms)}</div>
-{older_html}{solo_line}</section>
+{solo_line}</section>
 <section class="guides-line"><p>New to this? {guide}</p>{earn_hint}
 <p class="hint">Hashrate and watts are the sellers' stated figures. Prices are before shipping and tax; euro and Canadian-dollar prices are converted as an estimate.</p></section>
 </article>"""
@@ -1666,7 +1685,7 @@ def best_pills(current=None):
 def build_best(slug):
     b = BEST[slug]
     path = f"/best/{slug}/"
-    trail = [("Home", "/"), (b["h1"], path)]
+    trail = [("Home", "/"), ("Best for", "/best/"), (b["label"], path)]
     title = f"{b['title']} ({fmt_day(GEN)}) | Bitaxe Radar"
     desc = shorten(f"Ranked picks: {b['what']}. Live prices and stock, updated every 6 hours.", 158)
     cards = "".join(hub_card(m, heat=b.get("heat", False), rank=i + 1, why=why) for i, (m, why) in enumerate(b["picks"]))
@@ -1682,7 +1701,7 @@ def build_best(slug):
 <section aria-label="Ranked picks"><div class="cards">{cards}</div>{hint}</section>
 {more_html}
 <section id="faq" aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{faq_html}</section>
-<section class="guides-line"><p>Browse all: <a href="/solo-miners/">Solo</a> · <a href="/pool-miners/">Pool</a> · <a href="/heater-miners/">Heaters</a> · <a href="/guides/solo-vs-pool-mining/">Solo vs pool</a></p>
+<section class="guides-line"><p>Browse: <a href="/miners/">All miners</a> · <a href="/solo-miners/">Solo</a> · <a href="/pool-miners/">Pool</a> · <a href="/heater-miners/">Heaters</a> · <a href="/guides/solo-vs-pool-mining/">Solo vs pool</a></p>
 <p class="hint">Hashrate and watts are the sellers' stated figures. Prices are before shipping and tax. Pool and power figures are estimates; {EARN_NOTE.lower()}</p></section>
 </article>"""
     items = [(SHORT[m], f"/models/{m}/") for m, _ in b["picks"]]
@@ -1720,7 +1739,9 @@ Bitaxe Radar is independent. Some shop links are affiliate links; they never cha
 
 ## Browse by type
 {cats}
-- [All heater & home miners]({BASE}/home-miners/)
+- [All miners, with filters]({BASE}/miners/)
+- [Find my miner: 3-question quiz]({BASE}/find-my-miner/)
+- [Price alerts]({BASE}/alerts/)
 - [Deals and price drops]({BASE}/deals/)
 - [Everything in stock]({BASE}/in-stock/)
 
@@ -1738,6 +1759,8 @@ Bitaxe Radar is independent. Some shop links are affiliate links; they never cha
 - [How heater miners work]({BASE}/guides/how-heater-miners-work/): a miner turns its electricity into heat like a space heater.
 - [Where to buy a Bitaxe]({BASE}/where-to-buy-bitaxe/)
 - [How we track prices]({BASE}/how-we-track/)
+- [All guides]({BASE}/guides/)
+- [All shops we check]({BASE}/sellers/)
 
 ## Optional
 - [Full details for every miner]({BASE}/llms-full.txt)
@@ -1767,7 +1790,7 @@ def guide_ld(path, headline, desc):
 
 def build_guide_heaters():
     path = "/guides/how-heater-miners-work/"
-    trail = [("Home", "/"), ("Heater & home miners", "/home-miners/"), ("How heater miners work", path)]
+    trail = [("Home", "/"), ("Guides", "/guides/"), ("How heater miners work", path)]
     title = "How a Bitcoin heater miner works (plain English) | Bitaxe Radar"
     desc = "How a Bitcoin heater miner works: why a miner heats a room like a space heater, how pool mining offsets part of the power bill, and what to check first."
     ex = [m for m in ("avalon-nano-3s", "avalon-mini-3", "heatbit-maxi") if m in HOME_TRACKED]
@@ -1803,7 +1826,7 @@ def build_guide_heaters():
 
 def build_guide_pool():
     path = "/guides/solo-vs-pool-mining/"
-    trail = [("Home", "/"), ("Heater & home miners", "/home-miners/"), ("Solo vs pool mining", path)]
+    trail = [("Home", "/"), ("Guides", "/guides/"), ("Solo vs pool mining", path)]
     title = "Solo vs pool mining, explained simply | Bitaxe Radar"
     desc = "Solo vs pool Bitcoin mining in plain words: solo is a lottery for a whole block, pool pays small steady amounts. Which suits a Bitaxe or a heater miner."
     ex = [m for m in ("bitaxe-gamma", "avalon-nano-3s", "avalon-mini-3", "avalon-q") if m in TRACKED]
@@ -1825,7 +1848,7 @@ def build_guide_pool():
 <ul><li><strong>Bitaxe and other tiny miners:</strong> usually solo. A pool would pay them very little, so the long-shot is the fun part. <a href="/solo-miners/">Best for solo mining</a>.</li>
 <li><strong>Heater miners:</strong> usually pool, so the heat you'd pay for anyway earns a little back. <a href="/pool-miners/">Best for pool mining</a> · <a href="/heater-miners/">Heater miners</a>.</li>
 <li><strong>You can switch anytime.</strong> It's a setting in the miner (the pool address), not a different device.</li></ul></section>
-<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/how-heater-miners-work/">How a heater miner works</a></li><li><a href="/home-miners/">Heater &amp; home miner prices</a></li><li><a href="/#miners">Bitaxe prices</a></li></ul>
+<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/how-heater-miners-work/">How a heater miner works</a></li><li><a href="/miners/">All miner prices</a></li><li><a href="/#miners">Bitaxe prices</a></li></ul>
 <p class="hint">Not financial advice. Mining costs electricity, and earnings aren't guaranteed.</p></section>
 </article>"""
     layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Solo vs pool mining, explained simply", desc)], lastmod=GUIDE_UPDATED, og_type="article")
@@ -1930,7 +1953,7 @@ def build_home():
     {"@type": "Organization", "@id": BASE + "/#org", "name": "Bitaxe Radar", "url": BASE + "/", "email": CONTACT},
     {"@type": "WebSite", "@id": BASE + "/#site", "name": "Bitaxe Radar", "url": BASE + "/", "publisher": {"@id": BASE + "/#org"}}]})}
 {jsonld_tag(itemlist("Bitaxe-class miners tracked by Bitaxe Radar", items))}"""
-    ins = [o for o in BITAXE_OFFERS if in_stock(o)]
+    ins = [o for o in OFFERS if in_stock(o)]
     chips = (f'<ul class="chips"><li class="live"><strong>{len(ins)}</strong> listings in stock</li>'
              f'<li><strong>{len(SELLERS)}</strong> shops checked</li>'
              f'<li>Updated <time id="freshness" datetime="{esc(latest["generated_at"])}">{esc(fmt_time(latest["generated_at"]))}</time></li></ul>')
@@ -1948,7 +1971,7 @@ def build_home():
     sellers_line = ('<p>Shops we check: ' + " · ".join(f'<a href="/sellers/{sid}/">{esc(s["name"])}</a>' for sid, s in SELLERS.items() if sid in SELLER_COPY) + "</p>\n  ")
     out = (tpl.replace("<!--HEAD-->", head).replace("<!--HEADER-->", header_html()).replace("<!--RADAR-BG-->", RADAR_BG)
            .replace("<!--HERO-CHIPS-->", chips).replace("<!--BROWSE-->", browse_tiles() + "\n" + best_pills()).replace("<!--CARDS-->", cards).replace("<!--SIGNUP-->", signup_html("any"))
-           .replace("<!--COMPARE-LINKS-->", compare_links).replace("<!--FOOTER-->", footer_html(sellers_line))
+           .replace("<!--COMPARE-LINKS-->", compare_links).replace("<!--FOOTER-->", footer_html())
            .replace('<script src="/app.js"></script>', '<script src="/app.js"></script>\n' + SIGNUP_SCRIPTS)
            .replace("</body>", ANALYTICS + "</body>"))
     assert "<!--" not in out, "unfilled placeholder in home template"
@@ -1966,7 +1989,264 @@ def write_sitemap():
     (SITE / "robots.txt").write_text(f"User-agent: *\nAllow: /\n\n# Plain-text site summary for AI assistants: {BASE}/llms.txt (full: {BASE}/llms-full.txt)\nSitemap: {BASE}/sitemap.xml\n")
 
 
+# ---------------------------------------------------------------------------------------------
+# NAVIGATION BUILD (docs/NAV_AUDIT.md): /miners/ with filters, /find-my-miner/ quiz, /alerts/,
+# index pages for /models/ /sellers/ /best/ /guides/ /compare/, and /home-miners/ -> /miners/.
+# ---------------------------------------------------------------------------------------------
+CAT_CRUMB = {"solo": ("Solo miners", "/solo-miners/"), "pool": ("Pool miners", "/pool-miners/"), "heat": ("Heater miners", "/heater-miners/")}
+
+
+def primary_cat(mid):
+    if mid in HEAT_SET and mid not in SOLO_SET:
+        return "heat"
+    if mid in SOLO_SET:
+        return "solo"
+    if mid in POOL_SET:
+        return "pool"
+    return None
+
+
+def model_trail(mid, short, path):
+    c = primary_cat(mid)
+    return [("Home", "/"), ("All miners", "/miners/")] + ([CAT_CRUMB[c]] if c else []) + [(short, path)]
+
+
+def show_price(mid):
+    """USD price a shopper would see on the card: cheapest in stock, else cheapest pre-order/backorder, else None."""
+    st = STATS[mid]
+    if st["best"]:
+        return usd(st["best"])
+    pre = [usd(o) for o in st["offers"] if o["stock_status"] in ("preorder", "backorder") and usd(o) is not None]
+    return min(pre) if pre else None
+
+
+def card_data(mid):
+    st, m = STATS[mid], MODELS[mid]
+    types = " ".join(k for k, _, _, _, members, _ in CATS if mid in members)
+    p = show_price(mid)
+    stock = 2 if st["best"] else 1 if p is not None else 0
+    noise = NOISE[mid][0] if mid in NOISE else ""
+    return (f' data-mid="{mid}" data-type="{types}" data-price="{"" if p is None else round(p, 2)}" data-w="{m["watts"]:g}" '
+            f'data-hw="{m.get("heat_watts", m["watts"]):g}" data-th="{m["hashrate_ths"]:g}" data-stock="{stock}" data-db="{noise}"')
+
+
+def miners_sorted():
+    return sorted(LIVE_TRACKED, key=card_sort_key)
+
+
+FILTERS = [("type", "Type", [("", "All"), ("solo", "Solo"), ("pool", "Pool"), ("heat", "Heater")]),
+           ("price", "Price", [("", "Any"), ("0-100", "Under $100"), ("100-300", "$100–300"), ("300-1000", "$300–1,000"), ("1000-", "$1,000+")]),
+           ("power", "Power", [("", "Any"), ("0-100", "Under 100 W"), ("100-500", "100–500 W"), ("500-", "500 W+")])]
+
+MINERS_JS = """<script>
+(function(){
+var f=document.getElementById('mf'),grid=document.getElementById('grid'),n=document.getElementById('mcount');if(!f||!grid)return;
+f.hidden=false;[].forEach.call(document.querySelectorAll('.nojs'),function(e){e.hidden=true;});var cards=[].slice.call(grid.children),q=new URLSearchParams(location.search);
+['type','price','power','sort'].forEach(function(k){var v=q.get(k);if(v===null)return;var el=f.querySelector('[name="'+k+'"][value="'+v+'"]')||(k==='sort'&&f.elements.sort);if(el){if(el.tagName==='SELECT')el.value=v;else el.checked=true;}});
+if(q.get('stock')==='1')f.elements.stock.checked=true;
+function rng(v,x){if(!v)return true;if(x==='')return false;var p=v.split('-');x=+x;return x>=+p[0]&&(p[1]===''||x<+p[1]);}
+function val(k){var el=f.querySelector('[name="'+k+'"]:checked');return el?el.value:'';}
+function run(){var t=val('type'),pr=val('price'),pw=val('power'),st=f.elements.stock.checked,so=f.elements.sort.value,shown=0;
+ cards.forEach(function(c){var d=c.dataset,ok=(!t||d.type.split(' ').indexOf(t)>-1)&&rng(pr,d.price)&&rng(pw,d.w)&&(!st||d.stock==='2');c.hidden=!ok;if(ok)shown++;});
+ var s=cards.slice().sort(function(a,b){var A=a.dataset,B=b.dataset;
+  if(so==='th')return (+B.th)-(+A.th);
+  var pa=A.price===''?1e9:+A.price,pb=B.price===''?1e9:+B.price;return (B.stock-A.stock)||(pa-pb);});
+ s.forEach(function(c){grid.appendChild(c);});
+ n.textContent='Showing '+shown+' of '+cards.length;
+ var o=new URLSearchParams();if(t)o.set('type',t);if(pr)o.set('price',pr);if(pw)o.set('power',pw);if(st)o.set('stock','1');if(so!=='price')o.set('sort',so);
+ history.replaceState(null,'',location.pathname+(o.toString()?'?'+o:''));}
+f.addEventListener('change',run);f.addEventListener('submit',function(e){e.preventDefault();});
+document.getElementById('mreset').addEventListener('click',function(){f.reset();run();});run();
+})();
+</script>"""
+
+
+def build_miners():
+    path = "/miners/"
+    ms = miners_sorted()
+    offs = [o for m in ms for o in STATS[m]["offers"]]
+    n_in = sum(1 for o in offs if in_stock(o))
+    groups = "".join(f'<fieldset><legend>{esc(lab)}</legend><div class="opts">' + "".join(
+        f'<label><input type="radio" name="{k}" value="{v}"{" checked" if v == "" else ""}><span>{esc(t)}</span></label>' for v, t in opts) + "</div></fieldset>"
+        for k, lab, opts in FILTERS)
+    form = f"""<form id="mf" class="filters" hidden aria-label="Filter miners">
+{groups}
+<div class="frow"><label class="tog"><input type="checkbox" name="stock" value="1"><span>In stock only</span></label>
+<label class="sortby">Sort <select name="sort"><option value="price">Price, low to high</option><option value="th">Hashrate, high to low</option></select></label>
+<button type="button" class="btn ghost sm" id="mreset">Reset</button></div>
+<p class="meta" id="mcount" role="status" aria-live="polite"></p>
+</form>"""
+    older = [m for m in TRACKED if m in NOINDEX_MODELS]
+    older_html = ('<p class="older">Older models: ' + " · ".join(f'<a href="/models/{m}/">{esc(SHORT[m])}</a>' for m in older) + "</p>") if older else ""
+    cards = "".join(hub_card(m, heat=(m in HEAT_SET), attrs=card_data(m)) for m in ms)
+    body = f"""<article>
+<header class="hero"><h1>All home Bitcoin miners</h1>
+<p class="lede">Every miner we track, from small Bitaxe boards to room heaters. Not sure? <a href="/find-my-miner/">Find my miner</a>.</p>
+<p class="meta">{len(ms)} miners · {n_in} of {len(offs)} listings in stock · checked {tag_time(latest['generated_at'])}</p>
+<div class="nojs">{browse_pills("/miners/")}</div>
+{best_pills()}</header>
+{form}
+<section aria-label="Miners"><div class="cards" id="grid">{cards}</div>{older_html}</section>
+<section class="guides-line"><p>By type: <a href="/solo-miners/">Solo miners</a> · <a href="/pool-miners/">Pool miners</a> · <a href="/heater-miners/">Heater miners</a></p>
+<p>New to this? <a href="/guides/solo-vs-pool-mining/">Solo vs pool</a> · <a href="/guides/how-heater-miners-work/">How heater miners work</a></p>
+<p class="hint">Hashrate and watts are the sellers' stated figures. Prices are before shipping and tax; euro and Canadian-dollar prices are converted as an estimate. Pool and power figures are estimates; {EARN_NOTE.lower()}</p></section>
+</article>"""
+    title = f"All home Bitcoin miners: prices and stock ({fmt_day(GEN)}) | Bitaxe Radar"
+    desc = f"Every home Bitcoin miner we track, Bitaxe to heaters: {len(ms)} miners, {n_in} listings in stock. Filter by type, price and power. Checked every 6 hours."
+    layout(path, title, desc, body, crumbs=[("Home", "/"), ("All miners", path)], scripts=MINERS_JS,
+           jsonld=[itemlist("Home Bitcoin miners tracked by Bitaxe Radar", [(SHORT[m], f"/models/{m}/") for m in ms])])
+
+
+def build_redirect(old, new, label):
+    out = SITE / old.strip("/") / "index.html"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(f"""<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Moved to {esc(label)} | Bitaxe Radar</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="This page moved to {esc(label)} on Bitaxe Radar.">
+<meta name="robots" content="noindex,follow"><link rel="canonical" href="{BASE}{new}">
+<meta http-equiv="refresh" content="0; url={new}"><script>location.replace("{new}"+location.search+location.hash)</script></head>
+<body><h1>This page moved</h1><p>Go to <a href="{new}">{esc(label)}</a>.</p></body></html>
+""")
+
+
+QUIZ = [("budget", "What's your budget?", [("100", "Under $100"), ("500", "$100 to $500"), ("any", "$500 or more")]),
+        ("goal", "What do you want it to do?", [("solo", "Take a lottery shot at a whole block"), ("pool", "Earn small, steady payouts"), ("heat", "Heat a room while it mines")]),
+        ("place", "Where will it live?", [("desk", "On my desk or in a bedroom (quiet)"), ("room", "A room I use (some fan noise is OK)"), ("garage", "Garage or basement (noise is fine)")])]
+
+QUIZ_JS = """<script>
+(function(){
+var f=document.getElementById('quiz'),out=document.getElementById('qres'),pool=[].slice.call(document.querySelectorAll('#qpool article'));if(!f)return;
+f.hidden=false;
+function v(k){var e=f.querySelector('[name="'+k+'"]:checked');return e?e.value:null;}
+function money(x){return '$'+Math.round(x).toLocaleString('en-US');}
+function quiet(d,place){var db=d.db===''?null:+d.db,w=+d.w;if(place==='desk')return db!==null?db<=40:w<=60;if(place==='room')return db!==null?db<=50:w<=200;return true;}
+function pick(b,g,p,relax){return pool.filter(function(c){var d=c.dataset;if(d.price==='')return false;
+  if(d.type.split(' ').indexOf(g)<0)return false;if(relax<2&&b!=='any'&&+d.price>+b)return false;if(relax<1&&!quiet(d,p))return false;return true;});}
+function score(d,g){return g==='heat'?+d.hw:+d.th;}
+function why(d,g,b,p){var s=[];
+  if(g==='solo')s.push((+d.th).toLocaleString('en-US')+' TH/s of lottery tickets for '+money(+d.price));
+  if(g==='pool')s.push('Most hashrate'+(b==='any'?'':' under '+money(+b))+': '+(+d.th).toLocaleString('en-US')+' TH/s');
+  if(g==='heat')s.push('About '+Math.round(+d.hw*3.412).toLocaleString('en-US')+' BTU/h of heat');
+  if(d.db!==''&&p!=='garage')s.push(+d.db===0?'silent, no fans':d.db+' dB stated');
+  if(d.stock!=='2')s.push('not in stock yet');return s.join(' · ');}
+f.addEventListener('submit',function(e){e.preventDefault();var b=v('budget'),g=v('goal'),p=v('place');
+  if(!b||!g||!p){out.innerHTML='<p class="hint">Pick one answer for each question.</p>';return;}
+  function rank(l,byPrice){return l.sort(function(A,B){var a=A.dataset,c=B.dataset;return (c.stock-a.stock)||(byPrice?(a.price-c.price):(score(c,g)-score(a,g)))||(a.price-c.price);});}
+  var list=rank(pick(b,g,p,0)),relax=0;
+  function add(more,byPrice){rank(more.filter(function(c){return list.indexOf(c)<0;}),byPrice).forEach(function(c){if(list.length<3)list.push(c);});}
+  if(list.length<3){relax=1;add(pick(b,g,p,1),false);}
+  if(list.length<3){relax=list.length?1:2;var nb=pick(b,g,p,2).filter(function(c){return b==='any'||+c.dataset.price>+b;});if(nb.length&&relax===1)relax=3;add(nb,true);}
+  out.innerHTML='';var h=document.createElement('h2');h.textContent='Your top '+Math.min(3,list.length);out.appendChild(h);
+  if(relax){var n=document.createElement('p');n.className='hint';n.textContent=relax===1?'Fewer than 3 matched every answer, so some picks may be louder than you asked for.':relax===2?'Nothing matched your budget, so these are the cheapest picks above it.':'Fewer than 3 matched, so we added the cheapest picks just over your budget.';out.appendChild(n);}
+  var g2=document.createElement('div');g2.className='cards';
+  list.slice(0,3).forEach(function(c,i){var k=c.cloneNode(true);var w=k.querySelector('.why');w.textContent=why(c.dataset,g,b,p);w.hidden=false;
+   var r=k.querySelector('.ribbon');r.textContent='#'+(i+1);g2.appendChild(k);});
+  out.appendChild(g2);var m=document.createElement('p');m.innerHTML='<a href="/miners/">See all miners →</a>';out.appendChild(m);
+  out.scrollIntoView({behavior:'smooth',block:'start'});});
+})();
+</script>"""
+
+
+def build_quiz():
+    path = "/find-my-miner/"
+    qs = "".join(f'<fieldset class="q"><legend><i>{i}</i>{esc(t)}</legend><div class="opts col">' + "".join(
+        f'<label><input type="radio" name="{k}" value="{v}" required><span>{esc(lab)}</span></label>' for v, lab in opts) + "</div></fieldset>"
+        for i, (k, t, opts) in enumerate(QUIZ, 1))
+    cards = "".join(hub_card(m, heat=(m in HEAT_SET), rank=1, why=" ", attrs=card_data(m)).replace('<div class="why"> </div>', '<div class="why" hidden></div>')
+                    for m in miners_sorted() if show_price(m) is not None)
+    body = f"""<article>
+<header class="hero"><h1>Find my miner</h1>
+<p class="lede">Three quick questions. We show the 3 best matches from today's prices.</p></header>
+<form id="quiz" class="quiz" hidden>{qs}<button type="submit" class="btn">Show my top 3</button></form>
+<noscript><p>The quiz needs JavaScript. Try <a href="/miners/">All miners</a> or the <a href="/best/">best-for lists</a> instead.</p></noscript>
+<section id="qres" aria-live="polite"></section>
+<div id="qpool" hidden>{cards}</div>
+<section class="guides-line"><p>Or browse: <a href="/best/beginners/">Best for beginners</a> · <a href="/best/quiet/">Quietest</a> · <a href="/heater-miners/">Heater miners</a></p>
+<p class="hint">Picks follow simple rules: your budget, the miner's type, and its stated noise or power. Prices are before shipping and tax. No miner is a sure way to earn money.</p></section>
+</article>"""
+    layout(path, "Find my miner: pick a home Bitcoin miner in 3 questions | Bitaxe Radar",
+           "Answer 3 questions (budget, goal, where it lives) and see the 3 best home Bitcoin miners for you from today's prices and stock.",
+           body, crumbs=[("Home", "/"), ("Find my miner", path)], scripts=QUIZ_JS)
+
+
+def build_alerts():
+    path = "/alerts/"
+    form = signup_html("any") or '<p>Price alerts are paused right now. Check back soon.</p>'
+    body = f"""<article>
+<header class="hero"><h1>Price-drop alerts</h1>
+<p class="lede">Tell us a miner and your price. We email you once when it's in stock at or under it.</p></header>
+{form}
+<p class="hint">Questions? <a href="mailto:{CONTACT}">{CONTACT}</a></p>
+</article>"""
+    layout(path, "Free price-drop alerts for home Bitcoin miners | Bitaxe Radar",
+           "Get one email when a Bitaxe, NerdQaxe, Avalon or heater miner is in stock at or under your price. Free, no spam, one-click unsubscribe.",
+           body, crumbs=[("Home", "/"), ("Alerts", path)], scripts=SIGNUP_SCRIPTS)
+
+
+def tile(href, mid, title, sub):
+    img = (f'<img src="/img/models/{mid}.webp" width="{MODEL_IMG[mid][0]}" height="{MODEL_IMG[mid][1]}" alt="{esc(MODEL_IMG[mid][2])}" loading="lazy" decoding="async">'
+           if mid in MODEL_IMG else miner_art(mid))
+    return f'<a class="btile" href="{href}"><span class="bimg">{img}</span><b>{esc(title)}</b><small>{esc(sub)}</small></a>'
+
+
+def build_indexes():
+    # /models/: A to Z
+    rows = "".join(f'<li><a href="/models/{m}/">{esc(SHORT[m])}</a> <span>≈{MODELS[m]["hashrate_ths"]:g} TH/s · '
+                   + (f'from {money(show_price(m))}' if show_price(m) is not None else "sold out") + "</span></li>"
+                   for m in sorted(LIVE_TRACKED, key=lambda m: SHORT[m].lower()))
+    older = " · ".join(f'<a href="/models/{m}/">{esc(SHORT[m])}</a>' for m in TRACKED if m in NOINDEX_MODELS)
+    body = f"""<article><header class="hero"><h1>Every model, A to Z</h1>
+<p class="lede">Want filters and photos? Use <a href="/miners/">All miners</a>.</p></header>
+<ul class="az">{rows}</ul>{f'<p class="older">Older models: {older}</p>' if older else ""}</article>"""
+    layout("/models/", "All home Bitcoin miner models A to Z | Bitaxe Radar", f"An A to Z list of the {len(LIVE_TRACKED)} home Bitcoin miners Bitaxe Radar tracks, with today's lowest price.",
+           body, crumbs=[("Home", "/"), ("All miners", "/miners/"), ("Models A to Z", "/models/")])
+    # /sellers/
+    shops = []
+    for sid, s in SELLERS.items():
+        if sid not in SELLER_COPY or not any(o["seller"] == sid for o in OFFERS):
+            continue
+        offs = [o for o in OFFERS if o["seller"] == sid]
+        n_in = sum(1 for o in offs if in_stock(o))
+        shops.append(f'<li><a class="shop" href="/sellers/{sid}/"><b>{esc(s["name"])}</b><span>{plural(len({o["model"] for o in offs}), "miner")} · {n_in} in stock · prices in {esc(s["currency"])}</span></a></li>')
+    body = f"""<article><header class="hero"><h1>Shops we check</h1>
+<p class="lede">{len(shops)} shops, checked every 6 hours. Tap one to see everything it sells and its shipping notes.</p></header>
+<ul class="shops">{"".join(shops)}</ul>
+<p><a href="/where-to-buy-bitaxe/">Where to buy a Bitaxe</a> · <a href="/how-we-track/">How we pick shops</a></p></article>"""
+    layout("/sellers/", "Shops we check for home Bitcoin miners | Bitaxe Radar", f"The {len(shops)} US, Canadian and EU shops Bitaxe Radar checks every 6 hours for home Bitcoin miner prices and stock.",
+           body, crumbs=[("Home", "/"), ("Shops", "/sellers/")])
+    # /best/
+    tiles = "".join(tile(f"/best/{k}/", v["picks"][0][0], v["label"], v["h1"]) for k, v in BEST.items() if v["picks"])
+    body = f"""<article><header class="hero"><h1>Best miners for…</h1>
+<p class="lede">Short ranked lists with a one-line reason for each pick.</p></header>
+<div class="btiles wide">{tiles}</div>
+<p class="older">Not sure? <a href="/find-my-miner/">Find my miner</a> asks 3 questions.</p></article>"""
+    layout("/best/", "Best home Bitcoin miners by need: beginners, quiet, cheap, heating | Bitaxe Radar",
+           "Ranked picks of home Bitcoin miners for beginners, quiet rooms, under $100 and heating a room, from today's prices.", body, crumbs=[("Home", "/"), ("Best for", "/best/")])
+    # /compare/
+    pairs = [(a, b) for a, b in COMPARE_PAIRS if STATS[a]["offers"] and STATS[b]["offers"]]
+    body = f"""<article><header class="hero"><h1>Compare miners</h1>
+<p class="lede">Side by side: price, hashrate, power and running cost.</p></header>
+<ul class="links">{"".join(f'<li><a href="{compare_url(a, b)}">{esc(compare_label(a, b))}</a></li>' for a, b in pairs)}</ul></article>"""
+    layout("/compare/", "Compare home Bitcoin miners side by side | Bitaxe Radar", "Head-to-head comparisons of popular home Bitcoin miners: price, hashrate, power use and running cost.",
+           body, crumbs=[("Home", "/"), ("Guides", "/guides/"), ("Compare", "/compare/")])
+    # /guides/
+    gl = [("/guides/solo-vs-pool-mining/", "Solo vs pool mining", "Lottery shot or small steady payouts?"),
+          ("/guides/how-heater-miners-work/", "How heater miners work", "A miner that warms the room."),
+          ("/where-to-buy-bitaxe/", "Where to buy a Bitaxe", "Every shop, ranked by today's price."),
+          ("/how-we-track/", "How we track prices", "Where the numbers come from.")]
+    body = f"""<article><header class="hero"><h1>Guides</h1>
+<p class="lede">Plain-words help for picking and running a home miner.</p></header>
+<ul class="glist">{"".join(f'<li><a href="{p}"><b>{esc(t)}</b><span>{esc(d)}</span></a></li>' for p, t, d in gl)}</ul>
+<h2>Best for</h2>{best_pills()}
+<h2>Compare</h2><ul class="links">{"".join(f'<li><a href="{compare_url(a, b)}">{esc(compare_label(a, b))}</a></li>' for a, b in pairs[:6])}<li><a href="/compare/">All comparisons →</a></li></ul>
+<h2>Shops</h2><p><a href="/sellers/">All shops we check →</a></p></article>"""
+    layout("/guides/", "Home Bitcoin mining guides | Bitaxe Radar", "Guides to home Bitcoin mining: solo vs pool, how heater miners work, where to buy a Bitaxe, best-for lists and comparisons.",
+           body, crumbs=[("Home", "/"), ("Guides", "/guides/")])
+
+
 def main():
+    BEST.update(best_defs())      # before any page that shows the best-for chips
     for mid in TRACKED:
         build_model_page(mid)
     for a, b in COMPARE_PAIRS:
@@ -1979,13 +2259,16 @@ def main():
     build_in_stock()
     build_deals()
     build_black_friday()
-    build_home_miners()
+    build_redirect("/home-miners/", "/miners/", "All miners")
+    build_miners()
+    build_quiz()
+    build_alerts()
     for c in CATS:
         build_category(c[0])
-    BEST.update(best_defs())
     for k in BEST:
         build_best(k)
     build_llms()
+    build_indexes()
     build_guide_heaters()
     build_guide_pool()
     build_method()
