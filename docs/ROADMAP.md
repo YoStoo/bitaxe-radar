@@ -14,7 +14,7 @@ Updated: Oct 21, 2026
   - Type in your power price on miner pages.
   - Each model page shows the "break-even" power price (above it, the miner loses money).
   - New guide: Is home mining worth it? (/guides/is-home-mining-worth-it/)
-  - Status: live on the site since Oct 21. Checking it works well on phones.
+  - Status: live on the site since Oct 21.
 
 ## ⏭️ Next up (in order)
 
