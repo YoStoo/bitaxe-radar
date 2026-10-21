@@ -305,6 +305,13 @@
    "currency": "USD",
    "in_stock": true,
    "status": "in_stock"
+  },
+  {
+   "t": "2026-10-21T17:12:52Z",
+   "price": 259.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
   }
  ],
  "solosatoshi:bitaxe-supra": [
@@ -1044,6 +1051,13 @@
   {
    "t": "2026-10-21T14:51:25Z",
    "price": 449.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  },
+  {
+   "t": "2026-10-21T17:12:52Z",
+   "price": 424.99,
    "currency": "USD",
    "in_stock": true,
    "status": "in_stock"
