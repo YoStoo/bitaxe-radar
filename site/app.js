@@ -6,7 +6,7 @@ var WORKER_URL = "https://bitaxe-radar-alerts.bitaxeradar.workers.dev/subscribe"
 var TURNSTILE_SITEKEY = "0x4AAAAAAFYqcERY2Pvc1wQI";   // public site key
 var SIGNUP_ENABLED = true;
 // Cloudflare Web Analytics site token (public, cookie-free). Empty = no analytics tag. build_site.py reads it.
-var CF_BEACON_TOKEN = "";
+var CF_BEACON_TOKEN = "c27e77d1efd346c6aeed5b72e1ff7b0b";
 (function () {
   "use strict";
   var R = window.RADAR;
