@@ -1192,5 +1192,14 @@
    "in_stock": false,
    "status": "backorder"
   }
+ ],
+ "powermining:bitcube": [
+  {
+   "t": "2026-10-21T16:08:13Z",
+   "price": 117.5,
+   "currency": "EUR",
+   "in_stock": false,
+   "status": "preorder"
+  }
  ]
 }
