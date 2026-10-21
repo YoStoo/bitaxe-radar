@@ -263,7 +263,8 @@ class SiteTests(unittest.TestCase):
         for mid in home_ids:
             self.assertIn(f'href="/models/{mid}/"', hub, mid)
             self.assertIn(BASE + f"/models/{mid}/", self.sitemap)
-            self.assertIn(f"/img/models/{mid}.webp", hub, f"{mid} has no product photo on the hub")
+            if (SITE / "img" / "models" / f"{mid}.webp").exists():      # models without a reliable seller photo keep the drawn placeholder
+                self.assertIn(f"/img/models/{mid}.webp", hub, f"{mid} has no product photo on the hub")
         # nav links to the hub on every page; the phone nav stays short (3 links + alerts visible)
         home = (SITE / "index.html").read_text()
         nav = re.search(r'<nav aria-label="Main">(.*?)</nav>', home, re.S).group(1)

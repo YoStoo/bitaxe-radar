@@ -188,7 +188,10 @@ SHORT = {"bitaxe-supra": "Bitaxe Supra", "bitaxe-ultra": "Bitaxe Ultra", "bitaxe
          "bitaxe-gamma-duo": "Bitaxe Gamma Duo", "bitaxe-gt-801": "Bitaxe GT 801", "nerdaxe-gamma": "Nerdaxe Gamma",
          "nerdaxe-gaia": "Nerdaxe Gaia", "nerdqaxe-pp": "NerdQaxe++",
          "avalon-nano-3s": "Avalon Nano 3S", "avalon-mini-3": "Avalon Mini 3", "avalon-q": "Avalon Q", "heatbit-trio": "Heatbit Trio",
-         "heatbit-maxi": "Heatbit Maxi", "heatbit-canvas": "Heatbit Canvas", "braiins-bmm-101": "Braiins Mini Miner", "hammer-bc04": "Hammer BC04"}
+         "heatbit-maxi": "Heatbit Maxi", "heatbit-canvas": "Heatbit Canvas", "braiins-bmm-101": "Braiins Mini Miner", "hammer-bc04": "Hammer BC04",
+         "bitaxe-gamma-hex": "Bitaxe Gamma Hex", "bitaxe-naja-duo": "Bitaxe Naja Duo", "nerdoctaxe": "NerdOCTaxe Gamma", "bitforge-nano": "BitForge Nano",
+         "heatbit-bitair": "Heatbit Bitair", "futurebit-apollo-iii": "FutureBit Apollo III", "hammer-thor-p2": "Hammer Thor P2", "hammer-bc08": "Hammer BC08",
+         "gekko-kbox-22": "GekkoScience KBox 22", "dcentral-stealthminer": "D-Central StealthMiner"}
 NOINDEX_MODELS = {"bitaxe-supra", "bitaxe-ultra"}   # older generations: pages exist for completeness but stay out of the index/sitemap
 
 MODEL_COPY = {
@@ -292,6 +295,70 @@ HOME_COPY = {
 }
 MODEL_COPY.update(HOME_COPY)
 
+NEW_COPY = {   # added 2026-10-21 (docs/MINER_CATALOG.md). Stock settings only; overclock figures are named as such.
+    "bitaxe-gamma-hex": dict(
+        intro="The Bitaxe Gamma Hex (model 1300) puts six BM1370 chips on one Bitaxe board and comes with an all-in-one liquid cooler. Solo Satoshi states about 8.4 TH/s at 140 W at stock settings. Bitcoin Merch's listing states 10.5 TH/s at the same 140 W; we use the lower figure.",
+        who="Bitaxe fans who want the most hashrate from a single open-source board and don't mind a cooler and radiator on the desk.",
+        check=["Hashrate claims differ by seller (8.4 vs 10.5 TH/s at 140 W). Higher numbers need overclocking.",
+               "Power supply: pick the North America option where offered, or check one is included.",
+               "It has RGB lighting on the cooler; Solo Satoshi notes it can't be switched off."]),
+    "bitaxe-naja-duo": dict(
+        intro="The Bitaxe Naja Duo (model 1201) uses two of Bitmain's newer BM1373 chips. Sellers state about 4.4 TH/s at roughly 42 W at stock, about the power of a GT 801 for twice the hashrate. Listings that say 8 TH/s are quoting an overclock at about 92 W.",
+        who="Bitaxe owners who want a big efficiency jump in a small, quiet board.",
+        check=["8 TH/s is an overclock, not the stock figure.",
+               "Some listings are pre-orders with multi-week shipping. Check the badge.",
+               "Power supply: pick the North America option where offered."]),
+    "nerdoctaxe": dict(
+        intro="The NerdOCTaxe Gamma is the biggest open-source board in the Nerd family: eight BM1370 chips on one board. Sellers state 9.6 TH/s as the standard setting at about 160 W (D-Central measured nearer 208 W at the wall). 12 TH/s is an overclock.",
+        who="Hobbyists who want about ten Bitaxe Gammas' worth of hashrate in one open-source box.",
+        check=["12 TH/s listings are overclocked; the standard setting is about 9.6 TH/s.",
+               "It needs a 12 V supply rated for about 216-240 W. Check one is included.",
+               "Hydro versions are a different product and are not tracked here."]),
+    "bitforge-nano": dict(
+        intro="The BitForge Nano is a compact two-chip (BM1370) miner in a fully enclosed case. Sellers state 2.6 TH/s at the factory default and about 15 J/TH, so roughly 40 W. Bitcoin Merch lists it at about 29 dB.",
+        who="Someone who wants a GT-class lottery miner in a closed, quiet case rather than a bare board.",
+        check=["The Ghost Edition is a different listing at a different price and is not tracked here.",
+               "Power supply included per the listings.",
+               "Prices are before shipping and sales tax."]),
+    "heatbit-bitair": dict(
+        intro="The Heatbit Bitair is a tabletop HEPA air purifier with a small Bitcoin miner inside. Heatbit states 1.2 TH/s and 25 W in total at max (17 W for the mining chip), USB-C powered, for rooms up to about 200 sq ft.",
+        who="Someone who wants an air purifier anyway and likes the idea of it taking a tiny solo-mining shot.",
+        check=["At 1.2 TH/s it's a solo lottery ticket. Pool payouts would be tiny.",
+               "Replacement filters are a running cost.",
+               "Some shops list it as a pre-order. Check the badge."]),
+    "futurebit-apollo-iii": dict(
+        intro="The FutureBit Apollo III is a 6-inch cube home miner designed and assembled in the USA, with a built-in power supply. FutureBit states about 10-12 TH/s in Eco mode at around 15 W per TH/s (so about 180 W), and about 16-18 TH/s in Turbo mode with more power and noise. A Full Node version adds a Bitcoin node.",
+        who="Someone who wants a polished, quiet US-made miner for a room or office, with the option of running a node.",
+        check=["It ships in several weeks; the shop says so in the listing.",
+               "We track the miner-only Standard version. The Full Node version costs more.",
+               "Turbo mode adds hashrate but also heat and noise."]),
+    "hammer-thor-p2": dict(
+        intro="The Hammer Thor P2 is a desk miner with two BM1373 chips. Sellers state about 10 TH/s at roughly 155-166 W and about 38-40 dB.",
+        who="Someone who wants about 10 TH/s on a desk without a heater-sized power draw.",
+        check=["Pick the US power supply option.",
+               "One shop lists multi-week shipping. Check the badge.",
+               "The Thor X1 is a different, smaller model."]),
+    "hammer-bc08": dict(
+        intro="The Hammer BC08 is a desktop miner with eight BM1370 chips and a 5-inch touchscreen. Altair states 12 TH/s at 210 W max and about 38 dB, with a power supply in the box.",
+        who="Someone who wants about 12 TH/s with a screen on a desk, quietly.",
+        check=["We track the air-cooled version only. The Hydro version is a different product.",
+               "At 210 W it gives off about as much heat as a small heater.",
+               "Prices are before shipping and sales tax."]),
+    "gekko-kbox-22": dict(
+        intro="The GekkoScience KBox 22 is an all-in-one miner sold as a miner and small heater, assembled in the USA. Sellers state up to 22 TH/s at about 322-330 W in its high mode, with low (11 TH/s, ~178 W) and medium (17 TH/s, ~242 W) modes and about 38-47 dB.",
+        who="Someone who wants a quiet, plug-in miner that also warms a small room.",
+        check=["Hashrate and noise depend on the power mode you pick.",
+               "One shop sells it as a pre-order with weeks of shipping. Check the badge.",
+               "At ~330 W it adds heat but won't heat a large room on its own."]),
+    "dcentral-stealthminer": dict(
+        intro="The StealthMiner from D-Central is a recycled Antminer S19-class hashboard rebuilt to run on a normal 120 V outlet, with quiet Noctua fans. D-Central states 26 TH/s at 860 W for the base S19 Edition (S19j Pro and S19k Pro editions state 32-38 TH/s at 900-930 W), under 60 dB, for about 150-200 sq ft.",
+        who="Someone heating a room in winter who wants an industrial-class hashboard tamed for a home outlet.",
+        check=["It's refurbished, recycled hardware with a 90-day warranty.",
+               "Price is in Canadian dollars and ships from Canada, so US import costs may apply.",
+               "D-Central recommends a dedicated 15 A circuit."]),
+}
+MODEL_COPY.update(NEW_COPY)
+
 COMPARE_PAIRS = [("bitaxe-gamma", "nerdqaxe-pp"), ("bitaxe-gamma", "bitaxe-gt-801"), ("bitaxe-gamma", "nerdaxe-gamma"),
                  ("bitaxe-gamma", "bitaxe-supra"), ("nerdqaxe-pp", "nerdaxe-gaia")]
 COMPARE_COPY = {
@@ -350,6 +417,14 @@ SELLER_COPY = {
         region="USD prices (sold direct)",
         about="Braiins' own hardware store (Braiins Forge), the company behind Braiins Pool and Braiins OS, selling its Mini Miner direct.",
         notes=["Prices shown are from the US version of the store.", "Prices are before shipping and sales tax."]),
+    "dtv": dict(
+        region="USD prices",
+        about="A US electronics shop that sells Bitaxe-class miners, including the BitForge Nano, priced in US dollars.",
+        notes=["Prices are before shipping and sales tax.", "Check the listing for the power-supply plug type."]),
+    "futurebit": dict(
+        region="USD prices (sold direct)",
+        about="FutureBit's own store. FutureBit designs and assembles the Apollo home miners in the USA.",
+        notes=["Some Apollo listings ship in several weeks; the listing says how long.", "Prices are before shipping and sales tax."]),
     "dcentral": dict(
         region="CAD prices (ships from Canada)",
         about="A Canadian shop that sells miners, heater builds and parts, priced in Canadian dollars.",
@@ -369,9 +444,11 @@ NAV_HIDE_SM = {"/in-stock/", "/where-to-buy-bitaxe/"}       # phone nav: Solo ·
 
 # Browse-by-type categories. Any miner can solo or pool mine; these say what each is best suited to. A miner can be in several.
 SOLO_SET = ["bitaxe-gamma", "bitaxe-gamma-duo", "bitaxe-gt-801", "nerdaxe-gamma", "nerdaxe-gaia", "nerdqaxe-pp",
-            "braiins-bmm-101", "avalon-nano-3s", "hammer-bc04", "bitaxe-supra", "bitaxe-ultra"]
-POOL_SET = ["avalon-nano-3s", "hammer-bc04", "heatbit-canvas", "heatbit-trio", "avalon-mini-3", "heatbit-maxi", "avalon-q"]
-HEAT_SET = ["avalon-nano-3s", "heatbit-canvas", "heatbit-trio", "avalon-mini-3", "heatbit-maxi", "avalon-q"]
+            "braiins-bmm-101", "avalon-nano-3s", "hammer-bc04", "bitaxe-supra", "bitaxe-ultra",
+            "bitaxe-naja-duo", "bitforge-nano", "heatbit-bitair", "bitaxe-gamma-hex", "nerdoctaxe", "hammer-thor-p2", "hammer-bc08", "futurebit-apollo-iii"]
+POOL_SET = ["avalon-nano-3s", "hammer-bc04", "heatbit-canvas", "heatbit-trio", "avalon-mini-3", "heatbit-maxi", "avalon-q",
+            "bitaxe-gamma-hex", "nerdoctaxe", "hammer-thor-p2", "hammer-bc08", "futurebit-apollo-iii", "gekko-kbox-22", "dcentral-stealthminer"]
+HEAT_SET = ["avalon-nano-3s", "heatbit-canvas", "heatbit-trio", "avalon-mini-3", "heatbit-maxi", "avalon-q", "gekko-kbox-22", "dcentral-stealthminer"]
 CATS = [  # key, path, nav/tag label, h1, set, photo for the browse tile
     ("solo", "/solo-miners/", "Solo", "Best for solo mining", SOLO_SET, "bitaxe-gamma"),
     ("pool", "/pool-miners/", "Pool", "Best for pool mining", POOL_SET, "avalon-q"),
@@ -389,7 +466,7 @@ RADAR_BG = ('<svg class="radar-bg" viewBox="0 0 200 200" aria-hidden="true" focu
             '<circle cx="100" cy="100" r="96"/><circle cx="100" cy="100" r="72"/><circle cx="100" cy="100" r="48"/><circle cx="100" cy="100" r="24"/>'
             '<path d="M100 0v200M0 100h200" stroke-opacity=".5"/></g><path d="M100 100 L132.8 9.8 A96 96 0 0 1 178.6 45 Z" fill="#f7931a" fill-opacity=".8"/></svg>')
 CHIPS = {"bitaxe-supra": 1, "bitaxe-ultra": 1, "bitaxe-gamma": 1, "bitaxe-gamma-duo": 2, "bitaxe-gt-801": 2,
-         "nerdaxe-gamma": 1, "nerdaxe-gaia": 1, "nerdqaxe-pp": 4}
+         "nerdaxe-gamma": 1, "nerdaxe-gaia": 1, "nerdqaxe-pp": 4, "nerdoctaxe": 4, "dcentral-stealthminer": 4}
 SCREEN = {"nerdaxe-gamma", "nerdaxe-gaia"}
 
 
@@ -411,6 +488,14 @@ MODEL_IMG = {
     "heatbit-canvas": (800, 714, "Heatbit Canvas wall heater Bitcoin miner panels with artwork"),
     "braiins-bmm-101": (800, 500, "Braiins Mini Miner BMM 101 with touchscreen"),
     "hammer-bc04": (565, 800, "Hammer Miner BC04 desk Bitcoin miner on its stand"),
+    "bitaxe-gamma-hex": (796, 697, "Bitaxe Gamma Hex 1300 six-chip miner with liquid cooler"),
+    "bitaxe-naja-duo": (559, 452, "Bitaxe Naja Duo 1201 dual BM1373 miner with screen"),
+    "bitforge-nano": (800, 797, "BitForge Nano enclosed two-chip Bitcoin miner"),
+    "heatbit-bitair": (459, 800, "Heatbit Bitair air purifier with built-in Bitcoin miner"),
+    "futurebit-apollo-iii": (800, 761, "FutureBit Apollo III cube home Bitcoin miner"),
+    "hammer-thor-p2": (800, 720, "Hammer Miner Thor P2 desk Bitcoin miner"),
+    "hammer-bc08": (800, 738, "Hammer Miner BC08 desktop Bitcoin miner with touchscreen"),
+    "gekko-kbox-22": (800, 457, "GekkoScience KBox 22 all-in-one Bitcoin miner and heater"),
 }
 MODEL_IMG = {k: v for k, v in MODEL_IMG.items() if (SITE / "img" / "models" / f"{k}.webp").exists()}
 
@@ -500,9 +585,10 @@ def is_home(mid):
 
 STATS = {mid: stats(mid) for mid in MODELS}
 TRACKED = [mid for mid in MODELS if STATS[mid]["offers"]]
-BITAXE_TRACKED = [m for m in TRACKED if not is_home(m)]
+BITAXE_TRACKED = [m for m in TRACKED if not is_home(m)]     # Bitaxe-family + open-source boards ("board"), ranked together
+CORE_TRACKED = [m for m in TRACKED if cat(m) == "bitaxe"]   # the original Bitaxe set used by the Bitaxe-only pages
 HOME_TRACKED = [m for m in TRACKED if is_home(m)]
-BITAXE_OFFERS = [o for o in OFFERS if not is_home(o["model"])]
+BITAXE_OFFERS = [o for o in OFFERS if cat(o["model"]) == "bitaxe"]
 EFF_RANK, PTH_RANK, RANK_N, PTH_N = {}, {}, {}, {}
 for _grp in (BITAXE_TRACKED, HOME_TRACKED):       # ranks are within a category (a Bitaxe is not compared with a heater)
     for i, mid in enumerate(sorted(_grp, key=jth)):
@@ -812,6 +898,8 @@ def build_model_page(mid):
         desc = (f"{short} at {plural(st['sellers'], 'seller')}: none has it in stock at the last check ({day}). "
                 f"Lowest listed {money(usd(low))} at {sname(low['seller'])}. Stock status, price log and price alerts.")
 
+    if len(desc) > 158:      # long names: drop the trailing sentence rather than truncate mid-word
+        desc = desc.rsplit(". ", 1)[0] + "."
     avail_note = ""
     if best and low and low["id"] != best["id"] and not in_stock(low):
         avail_note = (f'<p class="avail">Listed cheaper at {esc(sname(low["seller"]))} ({money(usd(low))}), but it\'s {esc(STATUS[low["stock_status"]].lower())}.</p>')
@@ -1086,7 +1174,7 @@ def model_summary_table(models, *, usd_only=False):
             f'<tbody>{"".join(rows)}</tbody></table></div>')
 
 
-CURRENT_MODELS = [m for m in BITAXE_TRACKED if m not in NOINDEX_MODELS]
+CURRENT_MODELS = [m for m in CORE_TRACKED if m not in NOINDEX_MODELS]
 
 
 def build_where_to_buy():
@@ -1283,8 +1371,8 @@ def build_black_friday():
 # ---------------------------------------------------------------------------------------------
 # HEATER & HOME MINERS hub + plain-language guides
 # ---------------------------------------------------------------------------------------------
-HEATER_GROUP = ["avalon-mini-3", "avalon-q", "heatbit-trio", "heatbit-maxi", "heatbit-canvas"]
-DESK_GROUP = ["avalon-nano-3s", "hammer-bc04", "braiins-bmm-101"]
+HEATER_GROUP = ["avalon-mini-3", "avalon-q", "heatbit-trio", "heatbit-maxi", "heatbit-canvas", "gekko-kbox-22", "dcentral-stealthminer"]
+DESK_GROUP = ["avalon-nano-3s", "hammer-bc04", "braiins-bmm-101", "heatbit-bitair", "futurebit-apollo-iii", "hammer-thor-p2", "hammer-bc08"]
 GUIDE_UPDATED = "2026-10-21"
 NETWORK_EH_SEEN = "about 1,050 EH/s"       # mempool.space /api/v1/mining/hashrate/3d on 2026-10-21 (see docs/HOME_MINING_HUB_PLAN.md)
 
@@ -1494,6 +1582,13 @@ NOISE = {   # (max stated dB or 0 for fanless, text, source)
     "heatbit-trio": (45, "Up to about 45 dB stated", "heatbit.com Trio FAQ"),
     "avalon-mini-3": (55, "About 33–55 dB stated, by mode", "seller listings"),
     "heatbit-maxi": (55, "About 45–55 dB stated, by mode", "heatbit.com Maxi FAQ"),
+    "bitforge-nano": (29, "About 29 dB stated", "Bitcoin Merch listing"),
+    "bitaxe-gamma-hex": (30, "About 30 dB stated (liquid-cooled)", "Solo Satoshi listing"),
+    "hammer-bc08": (38, "About 38 dB stated", "Altair Technology listing"),
+    "hammer-thor-p2": (40, "About 38–40 dB stated", "Altair / Bitcoin Merch listings"),
+    "heatbit-bitair": (44, "25–44 dB stated", "Heatbit / Altair listings"),
+    "gekko-kbox-22": (47, "About 38–47 dB stated, by mode", "Altair Technology listing"),
+    "dcentral-stealthminer": (60, "Under 60 dB stated", "D-Central listing"),
 }
 
 
@@ -1508,7 +1603,8 @@ def best_defs():
     beg = [("bitaxe-gamma", "Cheapest way in. Small, open-source, about 18 W, huge community for help."),
            ("avalon-nano-3s", "Finished box with an app, Wi-Fi and the power adapter in the box. Plug in and go."),
            ("braiins-bmm-101", "Metal case and touchscreen with Braiins OS already set up. No tinkering."),
-           ("nerdaxe-gamma", "Same class as the Bitaxe Gamma, with a color screen to see what it's doing.")]
+           ("nerdaxe-gamma", "Same class as the Bitaxe Gamma, with a color screen to see what it's doing."),
+           ("heatbit-bitair", "An air purifier with a tiny miner inside. USB-C, about 25 W, nothing to build.")]
     d["beginners"] = dict(label="Beginners", h1="Best Bitcoin miner for beginners",
         lede="Cheap, simple, low-power miners that are easy to set up. Start small and learn how mining works.",
         picks=[x for x in beg if x[0] in TRACKED],
@@ -1541,6 +1637,7 @@ def best_defs():
     heat = [("avalon-mini-3", "Built like a baseboard heater. About 800 W, enough for a medium room."),
             ("heatbit-maxi", "All 1,500 W of its heat comes from mining, plus air purifying. For a bigger room."),
             ("heatbit-trio", "Space heater and air purifier in one, up to 1,500 W. Only 400 W of that is mining."),
+            ("dcentral-stealthminer", "About 860 W through quiet Noctua fans on a normal 120 V outlet. Refurbished, ships from Canada."),
             ("avalon-q", "Most heat, about 1,674 W. Best for a garage or basement; louder at full power.")]
     d["heating-a-room"] = dict(label="Heating a room", h1="Best miners for heating a room",
         lede="Miners built to heat a whole room like a space heater while they mine.",

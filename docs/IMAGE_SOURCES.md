@@ -35,3 +35,22 @@ Same rules: the seller's or maker's own product image for that exact model, take
 Not used: Heatbit Canvas's first image (a see-through back view on a wheeled stand that doesn't read as the product at card size).
 
 These are the sellers' images. If we join a seller's affiliate program, check its brand-asset terms; otherwise ask the seller or replace them with our own photos.
+
+## Miners added 2026-10-21 (from docs/MINER_CATALOG.md)
+
+Same rules: the seller's or maker's own image for that exact model from its public store data, title checked, light backgrounds removed by edge flood fill, trimmed, max 800 px, WebP q80.
+
+| File | Model | Seller | Product title checked | Original image URL |
+|---|---|---|---|---|
+| bitaxe-gamma-hex.webp | Bitaxe Gamma Hex 1300 (AIO cooler) | Solo Satoshi (Store API `images[0].src`, already transparent) | Bitaxe Gamma Hex Bitcoin Solo Miner (1300 Model) | https://www.solosatoshi.com/wp-content/uploads/2026/07/bitaxe-hex-hydro-cooled-bitcoin-miner-rgb-aio-solo-satoshi.png |
+| bitaxe-naja-duo.webp | Bitaxe Naja Duo 1201 | Solo Satoshi (`images[0].src`, already transparent) | Bitaxe Naja Duo Bitcoin Solo Miner (1201 Model) | https://www.solosatoshi.com/wp-content/uploads/2026/08/bitaxe-naja-duo-front-view-lcd-live-hashrate-4748-ghs-41-9w-38c-dual-bm1373.png |
+| bitforge-nano.webp | BitForge Nano (standard, not Ghost) | DTV Electronics (Store API `images[0].src`; white background removed) | Bitforge Nano Solo Bitcoin Miner | https://dtvelectronics.com/wp-content/uploads/2026/01/Bitforge-Nano.webp |
+| heatbit-bitair.webp | Heatbit Bitair | Altair Technology (product JSON-LD `image[0]`; white background removed) | Heatbit Bitair – 1.2 TH/s Bitcoin Miner & Air Purifier | https://altairtech.io/wp-content/uploads/2026/10/heatbitbitair.jpg |
+| futurebit-apollo-iii.webp | FutureBit Apollo III (rear view, FutureBit logo) | FutureBit (Shopify `products.json`, Standard version image; soft shadow removed) | Apollo III - Standard Version - Miner Only | https://cdn.shopify.com/s/files/1/0006/7528/3059/files/Apollo_III_Rear_II-FIXED_2-Alt._Controller.png?v=1772089505 |
+| hammer-thor-p2.webp | Hammer Thor P2 | Altair Technology (product JSON-LD image "thorp2-no-text"; white background removed) | Thor P2 Bitcoin Miner – 10 TH/s Dual BM1373 ASIC Miner | https://altairtech.io/wp-content/uploads/2026/08/thorp2-no-text.png |
+| hammer-bc08.webp | Hammer BC08 (air-cooled, touchscreen) | Altair Technology (product JSON-LD `image[0]`; white background removed) | Hammer Miner BC08 12TH Home Bitcoin Miner | https://altairtech.io/wp-content/uploads/2026/06/jO8Do.png |
+| gekko-kbox-22.webp | GekkoScience KBox 22 | Altair Technology (product JSON-LD `image[0]`; white background removed) | GekkoScience KBox 22TH All-In-One Bitcoin Miner | https://altairtech.io/wp-content/uploads/2026/06/kbox-front.jpg |
+
+No photo (drawn placeholder kept):
+* **NerdOCTaxe Gamma**: Bitcoin Merch's images are lifestyle shots on a desk and D-Central's has a branded frame; neither cuts out cleanly.
+* **D-Central StealthMiner**: the only image has D-Central/partner branding in a frame.

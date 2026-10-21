@@ -53,6 +53,28 @@ MODELS = {
                          "hashrate_ths": 1, "watts": 40, "note": "Maker-stated 1 TH/s at about 35-40 W"},
     "hammer-bc04":      {"name": "Hammer Miner BC04", "category": "home", "kind": "Desk miner", "maker": "Hammer",
                          "hashrate_ths": 6, "watts": 96, "note": "Seller-stated 6 TH/s at 96 W"},
+    # ---- added 2026-10-21 from docs/MINER_CATALOG.md. Stock (default) settings only, never overclock figures.
+    # category "board" = open-source boards: shown on category/best-for pages, kept off the Bitaxe-only home sections.
+    "bitaxe-gamma-hex": {"name": "Bitaxe Gamma Hex (1300)", "category": "board", "chip": "6x BM1370", "hashrate_ths": 8.4, "watts": 140,
+                         "note": "Seller-stated ~8.4 TH/s at 140 W at stock settings (Solo Satoshi); sold with an AIO liquid cooler. Bitcoin Merch's listing states 10.5 TH/s at the same 140 W"},
+    "bitaxe-naja-duo":  {"name": "Bitaxe Naja Duo (1201)", "category": "board", "chip": "2x BM1373", "hashrate_ths": 4.4, "watts": 42,
+                         "note": "Seller-stated ~4.4 TH/s at ~42 W at stock settings; the 8 TH/s figure some listings quote is an overclock at ~92 W"},
+    "nerdoctaxe":       {"name": "NerdOCTaxe Gamma", "category": "board", "chip": "8x BM1370", "hashrate_ths": 9.6, "watts": 160,
+                         "note": "Seller-stated 9.6 TH/s standard at ~160 W (D-Central measured ~208 W at the wall); 12 TH/s is an overclock at ~200 W"},
+    "bitforge-nano":    {"name": "BitForge Nano", "category": "board", "chip": "2x BM1370", "hashrate_ths": 2.6, "watts": 40,
+                         "note": "Seller-stated 2.6 TH/s factory default at about 15 J/TH, so roughly 40 W"},
+    "heatbit-bitair":   {"name": "Heatbit Bitair", "category": "home", "kind": "Air purifier + miner", "maker": "Heatbit",
+                         "hashrate_ths": 1.2, "watts": 25, "note": "Maker-stated 1.2 TH/s, 25 W total at max (17 W for the mining chip), USB-C powered"},
+    "futurebit-apollo-iii": {"name": "FutureBit Apollo III", "category": "home", "kind": "Quiet home miner", "maker": "FutureBit",
+                         "hashrate_ths": 12, "watts": 180, "note": "Maker-stated ~10-12 TH/s in Eco mode at about 15 W per TH/s (so ~180 W); Turbo mode states ~16-18 TH/s at higher power and noise"},
+    "hammer-thor-p2":   {"name": "Hammer Miner Thor P2", "category": "home", "kind": "Desk miner", "maker": "Hammer",
+                         "hashrate_ths": 10, "watts": 166, "note": "Seller-stated ~10 TH/s at ~155-166 W (2x BM1373)"},
+    "hammer-bc08":      {"name": "Hammer Miner BC08", "category": "home", "kind": "Desk miner", "maker": "Hammer",
+                         "hashrate_ths": 12, "watts": 210, "note": "Seller-stated 12 TH/s at 210 W max, air-cooled version with 5-inch touchscreen"},
+    "gekko-kbox-22":    {"name": "GekkoScience KBox 22", "category": "home", "kind": "Small heater miner", "maker": "GekkoScience",
+                         "hashrate_ths": 22, "watts": 330, "note": "Seller-stated up to 22 TH/s at about 322-330 W in its high mode (11 TH/s at ~178 W in low mode)"},
+    "dcentral-stealthminer": {"name": "D-Central StealthMiner", "category": "home", "kind": "Room heater miner (refurbished)", "maker": "D-Central",
+                         "hashrate_ths": 26, "watts": 860, "note": "Seller-stated 26 TH/s at 860 W for the base S19 Edition (S19j Pro and S19k Pro editions state 32-38 TH/s at 900-930 W); runs on a standard 120 V outlet; recycled, tested hardware"},
 }
 # hashrate_ths / watts above are typical VENDOR-STATED figures used only for the cost estimate.
 # They are approximate and must be labelled as such on the site.
@@ -72,6 +94,10 @@ SELLERS = {
                      "affiliate": "5% via GoAffPro; not yet approved - plain links only"},
     "braiins":      {"name": "Braiins Forge", "url": "https://braiinsforge.com", "currency": "USD", "method": "Product-page schema.org JSON-LD",
                      "affiliate": "No store affiliate program"},
+    "dtv":          {"name": "DTV Electronics", "url": "https://dtvelectronics.com", "currency": "USD", "method": "WooCommerce Store API",
+                     "affiliate": "Applied; under review - plain links only"},
+    "futurebit":    {"name": "FutureBit", "url": "https://shop.futurebit.io", "currency": "USD", "method": "Shopify products.json",
+                     "affiliate": "None known"},
     "dcentral":     {"name": "D-Central", "url": "https://d-central.tech", "currency": "CAD", "method": "WooCommerce Store API",
                      "affiliate": "Applied Oct 21; not yet approved - plain links only"},
 }
@@ -85,6 +111,13 @@ BITCOINMERCH = {  # Shopify handle
     "bitaxe-gt-801":    "bitcoin-merch-bitaxe-801-gt-gamma-turbo-bm1370-asic-2-2th-s",
     "nerdaxe-gaia":     "bitcoin-merch®-nerdaxe-gaia-2-4th-s-bm1373-home-miner-w-power-supply",
     "nerdqaxe-pp":      ("nerdqaxe-plus-plus", "Black / Standard 4.8TH/s"),  # (handle, variant title)
+    "bitaxe-gamma-hex": "bitcoin-merch®-bitaxe-gammahex-hydro-10-5th-s-w-power-supply",
+    "bitaxe-naja-duo":  "bitcoin-merch®-bitaxe-naja-duo-bm1373-miner-w-power-supply",
+    "nerdoctaxe":       ("bitcoin-merch-nerdoctaxe-9-6th-s", "Standard 9.6TH/s"),
+    "bitforge-nano":    "bitcoin-merch®-bitforge-nano-2-6th-s-w-power-supply",
+    "heatbit-bitair":   "bitcoin-merch®-heatbit-bitair-air-purifier-bitcoin-miner",
+    "hammer-thor-p2":   "bitcoin-merch®-hammer-miner-thor-p2-10th-s-lottery-miner-w-power-supply",
+    "gekko-kbox-22":    "bitcoin-merch®-gekkoscience-kbox-22th-s-bitcoin-miner-heater",
 }
 SOLOSATOSHI = {  # WooCommerce slug
     "bitaxe-supra":     "bitaxe-supra",
@@ -95,6 +128,9 @@ SOLOSATOSHI = {  # WooCommerce slug
     "avalon-nano-3s":   "avalon-nano-3s-bitcoin-solo-miner",
     "avalon-mini-3":    "canaan-avalon-mini-3-37-5th-bitcoin-home-mining-space-heater",
     "avalon-q":         "canaan-avalon-q-90th-bitcoin-home-miner",
+    "bitaxe-gamma-hex": "bitaxe-gamma-hex",
+    "bitaxe-naja-duo":  "bitaxe-naja-duo",
+    "heatbit-bitair":   "heatbit-bitair-air-purifier-bitcoin-miner",
 }
 BITAXEDE = {  # product page slug
     "bitaxe-gamma":  "bitaxe-gamma-601",
@@ -114,25 +150,53 @@ ALTAIR = {  # product slug -> (variation attribute filter or None)
     "avalon-mini-3":  ("canaan-avalon-mini-3", None),
     "avalon-q":       ("avalon-q", ("attribute_power-plug", "USA")),
     "hammer-bc04":    ("hammer-miner-bc04-home-bitcoin-miner", None),
+    "heatbit-bitair": ("heatbit-bitair-bitcoin-miner-air-purifier", None),
+    "hammer-thor-p2": ("thor-p2-bitcoin-miner", ("attribute_power-supply", "US")),
+    "hammer-bc08":    ("hammer-miner-bc08-12th-desktop-bitcoin-miner", None),
+    "gekko-kbox-22":  ("gekkoscience-kbox-bitcoin-miner", None),
 }
 HEATBIT = {  # Shopify handle -> regex the US variant title must match
     "heatbit-trio":   ("heatbit-trio", r"/ US /"),
     "heatbit-maxi":   ("heatbit-maxi", r"/ US / Maxi$"),
     "heatbit-canvas": ("heatbit-canvas", r".*"),
+    "heatbit-bitair": ("bitair", r".*"),
 }
 BRAIINS = {"braiins-bmm-101": "bmm-101"}       # braiinsforge.com/products/<slug>
-DCENTRAL = {"avalon-mini-3": "canaan-avalon-mini-3"}  # WooCommerce slug
+DCENTRAL = {"avalon-mini-3": "canaan-avalon-mini-3", "nerdoctaxe": "the-nerdoctaxe-gamma",
+            "dcentral-stealthminer": "the-stealthminer"}  # WooCommerce slug
+DTV = {"bitforge-nano": "bitforge-nano"}             # WooCommerce slug
+FUTUREBIT = {"futurebit-apollo-iii": "apollo-iii-standard"}   # Shopify handle (miner-only version)
 # Every listing title for a home miner must contain these words (lower-case), or the listing is skipped as a possible mis-match.
 TITLE_MUST = {
     "avalon-nano-3s": ["avalon", "nano 3s"], "avalon-mini-3": ["avalon", "mini 3"], "avalon-q": ["avalon q"],
     "heatbit-trio": ["trio"], "heatbit-maxi": ["maxi"], "heatbit-canvas": ["canvas"],
     "braiins-bmm-101": ["bmm 101"], "hammer-bc04": ["hammer", "bc04"],
+    # strict title words for the 2026-10-21 additions: a different product (stand, screen, Ghost edition, Thor X1...) never attaches
+    "bitaxe-gamma-hex": ["hex", "1300"], "bitaxe-naja-duo": ["naja duo"], "nerdoctaxe": ["nerdoctaxe"],
+    "bitforge-nano": ["bitforge nano"], "heatbit-bitair": ["bitair"], "futurebit-apollo-iii": ["apollo iii"],
+    "hammer-thor-p2": ["thor p2"], "hammer-bc08": ["bc08"], "gekko-kbox-22": ["kbox"], "dcentral-stealthminer": ["stealthminer"],
+}
+TITLE_NOT = {  # words that mean a different product (accessory, other edition)
+    "bitforge-nano": ["ghost"], "nerdoctaxe": ["stand", "screen", "fan", "heatsink", "hydro"], "bitaxe-naja-duo": ["stand", ".stl"],
+    "hammer-bc08": ["hydro"], "futurebit-apollo-iii": ["full node", "apollo ii "], "heatbit-bitair": ["filter"],
 }
 
 
 def title_ok(model, title):
-    t = re.sub(r"\s+", " ", title.lower())
-    return all(w in t for w in TITLE_MUST.get(model, []))
+    t = re.sub(r"\s+", " ", title.lower()) + " "
+    return all(w in t for w in TITLE_MUST.get(model, [])) and not any(w in t for w in TITLE_NOT.get(model, []))
+
+
+def ship_wait(text):
+    """'Ships in 4-6 weeks' / 'Pre-order' wording near the top of a listing -> (status, note). None if it reads as ready to ship."""
+    t = re.sub(r"\s+", " ", text or "")[:400]
+    if re.search(r"pre-?order", t, re.I):
+        m = re.search(r"(?:shipping|ships) (?:with)?in \d+\s*[-–]\s*\d+ weeks", t, re.I)
+        return "preorder", (m.group(0).capitalize() if m else "Pre-order")
+    m = re.search(r"ships in (\d+)\s*[-–]\s*(\d+) weeks", t, re.I)
+    if m:
+        return "backorder", f"Ships in {m.group(1)}-{m.group(2)} weeks (per the shop)"
+    return None
 
 
 UNSCRAPABLE = [
@@ -249,7 +313,7 @@ def collect_bitcoinmerch(ts):
     for model, key in BITCOINMERCH.items():
         handle, want_variant = (key if isinstance(key, tuple) else (key, None))
         p = by_handle.get(handle)
-        if not p: missing.append(model); continue
+        if not p or not title_ok(model, p["title"]): missing.append(model); continue
         vs = p["variants"]
         if want_variant:
             vs = [v for v in vs if v["title"] == want_variant] or []
@@ -260,9 +324,14 @@ def collect_bitcoinmerch(ts):
         psu = "power supply included per product title" if "power supply" in p["title"].lower() else "power supply not mentioned in title (unverified)"
         cfg = (cfg + "; " if cfg else "") + psu
         url = f"{base}/products/{urllib.parse.quote(p['handle'])}"
+        if float(v["price"]) <= 0: missing.append(model); continue
+        wait = ship_wait(strip_html(p.get("body_html") or "")) if avail and model in TITLE_MUST else None
+        status = wait[0] if wait else ("in_stock" if avail else "out_of_stock")
         out.append(offer("bitcoinmerch", model, p["title"], url, v["price"], "USD",
-                         "in_stock" if avail else "out_of_stock", bool(avail), cfg, ts, f"{base}/products.json",
-                         {"compare_at": float(v["compare_at_price"]) if v.get("compare_at_price") else None}))
+                         status, status == "in_stock", cfg, ts, f"{base}/products.json",
+                         {"compare_at": float(v["compare_at_price"]) if v.get("compare_at_price") else None,
+                          "ship_note": wait[1] if wait else None,
+                          "image_src": (p.get("images") or [{}])[0].get("src")}))
     return out, missing
 
 
@@ -300,7 +369,7 @@ def collect_solosatoshi(ts):
         cfg = ", ".join(f"{k}: {val}" for k, val in v["attrs"].items()) or "single option"
         n_in = sum(1 for x in vars_ if x["in_stock"])
         name = re.sub(r"&#8211;", "-", p["name"])
-        if not title_ok(model, name): missing.append(model); continue
+        if not title_ok(model, name) or v["price"] <= 0: missing.append(model); continue
         status = "in_stock" if stocked else ("preorder" if any(x["status"] == "preorder" for x in pool) else
                                              "backorder" if any(x["status"] == "backorder" for x in pool) else "out_of_stock")
         out.append(offer("solosatoshi", model, name, p["permalink"], v["price"], "USD",
@@ -399,6 +468,8 @@ def collect_altair(ts):
             am = re.search(r"Availability:\s*([A-Za-z \-]{2,40})", strip_html(page))
             page_st = text_status(am.group(1)) if am else "unknown"
             status = page_st if page_st != "unknown" else ld_st      # the text shoppers see wins if the two disagree
+            if re.search(r"preorder now|pre-order now", strip_html(page), re.I):
+                status = "preorder"
             cfg, extra = "single option", {}
         else:
             missing.append(model); continue
@@ -458,7 +529,7 @@ def collect_dcentral(ts):
         res = get_json(f"{api}?slug={urllib.parse.quote(slug)}")
         if not res or not title_ok(model, res[0]["name"]): missing.append(model); continue
         p = res[0]; pr = p["prices"]
-        if pr["currency_code"] != "CAD": missing.append(model); continue
+        if pr["currency_code"] != "CAD" or int(pr["price"]) <= 0: missing.append(model); continue   # CA$0 "Planned Board" placeholders
         status = woo_status(p)
         out.append(offer("dcentral", model, p["name"], p["permalink"], int(pr["price"]) / 10 ** pr["currency_minor_unit"], "CAD",
                          status, status == "in_stock", "Canadian dollars; ships from Canada (import costs may apply)", ts, f"{api}?slug={slug}",
@@ -466,9 +537,46 @@ def collect_dcentral(ts):
     return out, missing
 
 
+def collect_dtv(ts):
+    base = SELLERS["dtv"]["url"]
+    api = f"{base}/wp-json/wc/store/v1/products"
+    out, missing = [], []
+    for model, slug in DTV.items():
+        res = get_json(f"{api}?slug={urllib.parse.quote(slug)}")
+        if not res or not title_ok(model, res[0]["name"]): missing.append(model); continue
+        p = res[0]; pr = p["prices"]
+        price = int(pr["price"]) / 10 ** pr["currency_minor_unit"]
+        if pr["currency_code"] != "USD" or price <= 0: missing.append(model); continue
+        status = woo_status(p)
+        out.append(offer("dtv", model, re.sub(r"&#8211;|&#124;", "-", p["name"]), p["permalink"], price, "USD", status, status == "in_stock",
+                         "Power supply included per listing; shipping and tax extra", ts, f"{api}?slug={slug}",
+                         {"image_src": (p.get("images") or [{}])[0].get("src")}))
+    return out, missing
+
+
+def collect_futurebit(ts):
+    base = SELLERS["futurebit"]["url"]
+    by_handle = {p["handle"]: p for p in fetch_shopify_all(base)}
+    out, missing = [], []
+    for model, handle in FUTUREBIT.items():
+        p = by_handle.get(handle)
+        if not p or not title_ok(model, p["title"]): missing.append(model); continue
+        vs = p["variants"]
+        avail = [v for v in vs if v["available"]]
+        v = min(avail or vs, key=lambda v: float(v["price"]))
+        if float(v["price"]) <= 0: missing.append(model); continue
+        wait = ship_wait(p["title"] + " " + strip_html(p.get("body_html") or "")) if avail else None
+        status = wait[0] if wait else ("in_stock" if avail else "out_of_stock")
+        out.append(offer("futurebit", model, p["title"], f"{base}/products/{handle}", v["price"], "USD", status, status == "in_stock",
+                         "Miner-only Standard version, sold direct by the maker; the Full Node version costs more", ts, f"{base}/products.json",
+                         {"ship_note": wait[1] if wait else None, "image_src": (p.get("images") or [{}])[0].get("src")}))
+    return out, missing
+
+
 ADAPTERS = {"bitcoinmerch": collect_bitcoinmerch, "solosatoshi": collect_solosatoshi,
             "bitaxede": collect_bitaxede, "powermining": collect_powermining,
-            "altair": collect_altair, "heatbit": collect_heatbit, "braiins": collect_braiins, "dcentral": collect_dcentral}
+            "altair": collect_altair, "heatbit": collect_heatbit, "braiins": collect_braiins, "dcentral": collect_dcentral,
+            "dtv": collect_dtv, "futurebit": collect_futurebit}
 
 
 def fetch_fx():

@@ -42,7 +42,7 @@ var CF_BEACON_TOKEN = "c27e77d1efd346c6aeed5b72e1ff7b0b";
   // ---- running cost calculator (only models we have listings for)
   var rate = document.getElementById("rate"), tb = document.querySelector("#costTable tbody");
   if (!rate || !tb) return;
-  var mids = Object.keys(L.models).filter(function (mid) { return L.models[mid].category !== "home" && L.offers.some(function (o) { return o.model === mid; }); });
+  var mids = Object.keys(L.models).filter(function (mid) { return (L.models[mid].category || "bitaxe") === "bitaxe" && L.offers.some(function (o) { return o.model === mid; }); });
   function usd(v) { return "$" + v.toFixed(2); }
   function renderCost() {
     var r = parseFloat(rate.value); if (!(r >= 0)) r = 0;
