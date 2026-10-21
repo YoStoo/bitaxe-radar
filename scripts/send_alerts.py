@@ -21,7 +21,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 CONTACT = "contact@bitaxeradar.com"
 FROM = os.environ.get("ALERT_FROM", "Bitaxe Radar <alerts@bitaxeradar.com>")
-POSTAL = "Bitaxe Radar, mailing-address-removed"
+# Mailing address required in every sent email (CAN-SPAM). Kept out of the public repo: set the POSTAL_ADDRESS secret.
+POSTAL = os.environ.get("POSTAL_ADDRESS", "").strip() or "Bitaxe Radar"
 SITE_URL = "https://bitaxeradar.com"
 RESEND = os.environ.get("RESEND_API_BASE", "https://api.resend.com")  # override only for local tests
 REALERT_AFTER = timedelta(days=7)
@@ -306,6 +307,8 @@ def main():
             sys.exit("RESEND_API_KEY is not set")
         if not a.dry_run and not (secret and base):
             sys.exit("SIGNING_SECRET and PUBLIC_BASE are required to build unsubscribe links")
+        if not a.dry_run and not os.environ.get("POSTAL_ADDRESS", "").strip():
+            sys.exit("POSTAL_ADDRESS is required (mailing address for the email footer)")
         client = Resend(key)
         contacts = []
         for c in client.list_contacts():

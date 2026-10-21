@@ -33,6 +33,7 @@ jobs:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           SIGNING_SECRET: ${{ secrets.SIGNING_SECRET }}
           PUBLIC_BASE: ${{ vars.PUBLIC_BASE }}
+          POSTAL_ADDRESS: ${{ secrets.POSTAL_ADDRESS }}
         run: |
           if [ -z "$RESEND_API_KEY" ] || [ -z "$SIGNING_SECRET" ] || [ -z "$PUBLIC_BASE" ]; then echo "alerts not configured; skipping"; exit 0; fi
           python3 scripts/send_alerts.py

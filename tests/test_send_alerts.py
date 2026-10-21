@@ -52,7 +52,7 @@ class Matching(unittest.TestCase):
         props = sa.contact_props(c); m = sa.find_match(props, LATEST, NOW)
         s, h, t = sa.build_email("bob@example.com", props, m, LATEST, AFF, "https://x/unsubscribe?t=1")
         self.assertIn("ref=bitaxeradar", t); self.assertIn("affiliate link", t)
-        self.assertIn("", h); self.assertIn("Unsubscribe", h); self.assertIn("VAT", t)
+        self.assertIn(sa.POSTAL, h); self.assertIn("Unsubscribe", h); self.assertIn("VAT", t)
     def test_affiliate_map_parsed_from_app_js(self):
         self.assertEqual(sa.load_affiliates(ROOT / "site/app.js").get("powermining"), "ref=bitaxeradar")
 
@@ -85,7 +85,7 @@ class LiveAgainstMock(unittest.TestCase):
     def test_live_flow(self):
         srv = HTTPServer(("127.0.0.1", 0), Mock); threading.Thread(target=srv.serve_forever, daemon=True).start()
         Mock.log.clear()
-        env = dict(os.environ, RESEND_API_KEY="re_test", SIGNING_SECRET="s", PUBLIC_BASE="https://w.example",
+        env = dict(os.environ, RESEND_API_KEY="re_test", SIGNING_SECRET="s", PUBLIC_BASE="https://w.example", POSTAL_ADDRESS="Bitaxe Radar, PO Box 1, Testville, IN 00000",
                    RESEND_API_BASE=f"http://127.0.0.1:{srv.server_port}")
         out = subprocess.run([sys.executable, str(ROOT / "scripts/send_alerts.py"), "--latest", str(ROOT / "tests/fixtures/latest.json"),
                               "--now", "2026-10-16T16:00:00Z"], env=env, capture_output=True, text=True)

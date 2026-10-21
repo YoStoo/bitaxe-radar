@@ -18,7 +18,7 @@ Before applying: add a short affiliate disclosure to the site (e.g. footer + nea
 
 Hi Bitcoin Merch team,
 
-I'm the owner, and I run Bitaxe Radar (https://yostoo.github.io/bitaxe-radar/), a free site that tracks prices and stock for small home Bitcoin miners like the Bitaxe and NerdQaxe across a few sellers, including you. It also has a price history chart and a running-cost calculator.
+I run Bitaxe Radar (https://yostoo.github.io/bitaxe-radar/), a free site that tracks prices and stock for small home Bitcoin miners like the Bitaxe and NerdQaxe across a few sellers, including you. It also has a price history chart and a running-cost calculator.
 
 I'd like to join your affiliate program. I'll be upfront: the site just launched, so I don't have traffic numbers or an audience to show yet. I'm building it for people who ask "where can I buy a Bitaxe right now, and who has it in stock?", and I'm a Bitcoin enthusiast who wants to send them to sellers they can trust. Affiliate links would be clearly disclosed on the site.
 
@@ -48,7 +48,7 @@ Bitaxe Radar | https://yostoo.github.io/bitaxe-radar/
 
 Hi,
 
-I'm the owner. I run Bitaxe Radar (https://yostoo.github.io/bitaxe-radar/), a free price and stock tracker for Bitaxe and NerdQaxe miners that lists Bitaxe.de alongside a few other sellers. It just launched, so I have no audience numbers yet.
+I run Bitaxe Radar (https://yostoo.github.io/bitaxe-radar/), a free price and stock tracker for Bitaxe and NerdQaxe miners that lists Bitaxe.de alongside a few other sellers. It just launched, so I have no audience numbers yet.
 
 I read your affiliate program page and saw it's open to the EU plus CH/NO/IS/LI, and that you don't want coupon sites. I'm based in the US and the site is a price-comparison tracker, so I'm probably outside what you had in mind. Before applying, I wanted to ask if there's any way for a site like mine to take part (for example, with a US address, or once the site has built an audience). If not, no worries at all.
 
@@ -81,7 +81,7 @@ Bitaxe Radar (https://yostoo.github.io/bitaxe-radar/) is a free price and stock 
 
 Hi Rolands,
 
-I'm the owner. I just signed up for your affiliate program for Bitaxe Radar (https://yostoo.github.io/bitaxe-radar/), a free price and stock tracker for Bitaxe and NerdQaxe miners that includes Power Mining. The site just launched, so I don't have traffic numbers yet, and I'm not asking for a review unit. I'll be honest about that and let results speak.
+I just signed up for your affiliate program for Bitaxe Radar (https://yostoo.github.io/bitaxe-radar/), a free price and stock tracker for Bitaxe and NerdQaxe miners that includes Power Mining. The site just launched, so I don't have traffic numbers yet, and I'm not asking for a review unit. I'll be honest about that and let results speak.
 
 A couple of questions: (1) what commission rate would I start at, and what do the higher tiers require? (2) I'm in the US, so how should I handle the invoice for payouts? Also, my tracker reads your public product pages a few times a day for price and stock. Let me know if you'd like it done differently.
 

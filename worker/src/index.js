@@ -18,7 +18,8 @@
 const ALLOWED_ORIGINS = ["https://bitaxeradar.com", "https://www.bitaxeradar.com", "https://yostoo.github.io"];
 const FROM = "Bitaxe Radar <alerts@bitaxeradar.com>";
 const CONTACT = "contact@bitaxeradar.com";
-const POSTAL = "Bitaxe Radar, mailing-address-removed";
+// Mailing address for email footers (CAN-SPAM). Kept out of the public repo: `wrangler secret put POSTAL_ADDRESS`.
+let POSTAL = "Bitaxe Radar";
 const CONFIRM_TTL_SEC = 48 * 3600;
 const MODELS = ["any", "bitaxe-supra", "bitaxe-ultra", "bitaxe-gamma", "bitaxe-gamma-duo", "bitaxe-gt-801",
   "nerdaxe-gamma", "nerdaxe-gaia", "nerdqaxe-pp"];
@@ -277,6 +278,7 @@ async function handleUnsubscribe(url, env) {
 
 export default {
   async fetch(request, env) {
+    POSTAL = (env.POSTAL_ADDRESS || "").trim() || "Bitaxe Radar";
     const url = new URL(request.url);
     try {
       if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: corsHeaders(request) });

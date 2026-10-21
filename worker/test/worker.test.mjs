@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 const SCRIPTS = fileURLToPath(new URL("../../scripts", import.meta.url));
 import worker, { signToken, verifyToken, parseSubscription } from "../src/index.js";
 
-const env = { RESEND_API_KEY: "re_x", SIGNING_SECRET: "test-secret", TURNSTILE_SECRET: "ts", PUBLIC_BASE: "https://w.example", SITE_URL: "https://bitaxeradar.com" };
+const env = { RESEND_API_KEY: "re_x", SIGNING_SECRET: "test-secret", TURNSTILE_SECRET: "ts", PUBLIC_BASE: "https://w.example", SITE_URL: "https://bitaxeradar.com", POSTAL_ADDRESS: "Bitaxe Radar, PO Box 1, Testville, IN 00000" };
 const contacts = new Map(); const sent = []; let turnstileOk = true;
 globalThis.fetch = async (url, init = {}) => {
   const u = new URL(url), m = init.method || "GET";
@@ -44,7 +44,7 @@ let r = await post({ email: "Alice@Example.com", model: "bitaxe-gamma", target_p
 assert.equal(r.status, 200); assert.equal(r.headers.get("Access-Control-Allow-Origin"), "https://bitaxeradar.com");
 assert.equal(contacts.get("alice@example.com").unsubscribed, true);
 assert.equal(sent.length, 1); assert.equal(sent[0].from, "Bitaxe Radar <alerts@bitaxeradar.com>");
-assert.match(sent[0].html, //); assert.match(sent[0].html, /affiliate/); assert.match(sent[0].headers["List-Unsubscribe"], /unsubscribe\?t=/);
+assert.match(sent[0].html, /PO Box 1, Testville/); assert.match(sent[0].html, /affiliate/); assert.match(sent[0].headers["List-Unsubscribe"], /unsubscribe\?t=/);
 // rejects: bad origin, failed turnstile, bad email
 assert.equal((await post({ email: "x@y.co", target_price: 5 }, { Origin: "https://evil.example" })).status, 403);
 turnstileOk = false; assert.equal((await post({ email: "x@y.co", target_price: 5 })).status, 400); turnstileOk = true;
@@ -101,7 +101,7 @@ console.log("worker tests: all passed");
   const c0 = contacts.get("carol@example.com");
   assert.equal(c0.unsubscribed, false); assert.equal(c0.properties.target_price.value, 80); assert.equal(c0.properties.newsletter, undefined);
   const m = sent[sent.length - 1]; assert.equal(sent.length, before + 1);
-  assert.equal(m.subject, "Confirm your Home Mining Weekly signup"); assert.match(m.html, //); assert.match(m.headers["List-Unsubscribe"], /nl\/unsubscribe\?t=/);
+  assert.equal(m.subject, "Confirm your Home Mining Weekly signup"); assert.match(m.html, /PO Box 1, Testville/); assert.match(m.headers["List-Unsubscribe"], /nl\/unsubscribe\?t=/);
   const t = tokenFrom(m.html, "nl/confirm");
   assert.equal((await worker.fetch(new Request("https://w.example/confirm?t=" + encodeURIComponent(t)), env)).status, 400); // nc token can't confirm an alert
   r = await worker.fetch(new Request("https://w.example/nl/confirm?t=" + encodeURIComponent(t)), env); assert.equal(r.status, 200);
