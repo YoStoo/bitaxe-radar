@@ -360,3 +360,4 @@ details .tablewrap{margin-bottom:14px}
 .calc-tbl th,.calc-tbl td{white-space:normal}
 @media (max-width:560px){.calc-tbl{font-size:13px}.calc-tbl th,.calc-tbl td{padding:8px 5px}.calc-tbl th{font-size:10.5px}}
 .calc-tbl td.net{white-space:nowrap}
+.etile b span,.etile span span{font-size:inherit;color:inherit}
