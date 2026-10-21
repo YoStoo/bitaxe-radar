@@ -139,11 +139,63 @@ def heat_value_month(watts, rate=POWER_RATE):
     return round_down_money(power_cost_month(watts, rate))
 
 
+def solo_rate(hashrate_ths, net):
+    """Expected solo blocks per day: share of network hashrate x 144 blocks a day."""
+    return share(hashrate_ths, net) * BLOCKS_PER_DAY
+
+
+def solo_chance(hashrate_ths, net, days):
+    """Chance of at least one solo block in `days` (Poisson: 1 - e^(-rate x days))."""
+    return -math.expm1(-solo_rate(hashrate_ths, net) * days)
+
+
 def solo_odds(hashrate_ths, net):
     """Chance of finding a block solo: 1 in N per day and per year, plus the block's dollar value."""
-    p_day = share(hashrate_ths, net) * BLOCKS_PER_DAY
-    p_year = 1 - (1 - p_day) ** 365
-    return {"one_in_day": 1 / p_day, "one_in_year": 1 / p_year, "block_usd": block_btc(net) * net["btc_usd"]}
+    return {"one_in_day": 1 / solo_chance(hashrate_ths, net, 1), "one_in_year": 1 / solo_chance(hashrate_ths, net, 365),
+            "block_usd": block_btc(net) * net["btc_usd"]}
+
+
+# ---- solo odds calculator (/solo-odds/). site/solo.js mirrors these line for line (tests/test_calc_parity.py). ----
+SOLO_PERIODS = (("day", 1), ("year", 365), ("5y", 365 * 5))
+
+
+def fmt_pct(p):
+    """Chance as a percent with about 2 significant figures: '0.0060%', '2.1%', '45%'."""
+    pct = p * 100
+    if pct >= 99.5:
+        return "over 99%"
+    if pct >= 10:
+        return f"{pct:.0f}%"
+    if pct < 0.000001:
+        return "under 0.000001%"
+    d = max(1, 1 - math.floor(math.log10(pct)))
+    return f"{pct:.{d}f}%"
+
+
+def fmt_one_in(p):
+    """'1 in 6.1 million', or 'better than even' once it's over 50%."""
+    if p >= 0.5:
+        return "better than even"
+    return "1 in " + fmt_big(1 / p)
+
+
+def fmt_wait(days):
+    """Average wait for a block, in plain words."""
+    if days < 1:
+        h = max(1, math.floor(days * 24 + 0.5))
+        return f"about {h} hour" + ("" if h == 1 else "s")
+    if days < 60:
+        d = math.floor(days + 0.5)
+        return f"about {d} day" + ("" if d == 1 else "s")
+    if days < 730:
+        return f"about {math.floor(days / DAYS_PER_MONTH + 0.5)} months"
+    return f"about {fmt_big(days / 365)} years"
+
+
+def solo_rows(hashrate_ths, net):
+    """[period, percent, 1-in-N] for a day, a year and 5 years, plus the average wait."""
+    rows = [[k, fmt_pct(solo_chance(hashrate_ths, net, d)), fmt_one_in(solo_chance(hashrate_ths, net, d))] for k, d in SOLO_PERIODS]
+    return rows, fmt_wait(1 / solo_rate(hashrate_ths, net))
 
 
 def fmt_usd(x):

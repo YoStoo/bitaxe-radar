@@ -449,7 +449,7 @@ SELLER_COPY = {
 NAV = [("/miners/", "All miners", "Miners"), ("/deals/", "Deals", "Deals"), ("/find-my-miner/", "Find my miner", "Find"), ("/guides/", "Guides", "Guides")]
 NAV_SECTIONS = {"/miners/": ("/miners/", "/solo-miners/", "/pool-miners/", "/heater-miners/", "/models/", "/home-miners/"),
                 "/deals/": ("/deals/", "/in-stock/", "/bitaxe-black-friday/"), "/find-my-miner/": ("/find-my-miner/",),
-                "/guides/": ("/guides/", "/best/", "/compare/", "/how-we-track/", "/where-to-buy-bitaxe/", "/sellers/")}
+                "/guides/": ("/guides/", "/solo-odds/", "/solo-wins/", "/best/", "/compare/", "/how-we-track/", "/where-to-buy-bitaxe/", "/sellers/")}
 
 # Browse-by-type categories. Any miner can solo or pool mine; these say what each is best suited to. A miner can be in several.
 SOLO_SET = ["bitaxe-gamma", "bitaxe-gamma-duo", "bitaxe-gt-801", "nerdaxe-gamma", "nerdaxe-gaia", "nerdqaxe-pp",
@@ -678,7 +678,7 @@ def header_html(path=""):
 
 FOOT_GROUPS = [
     ("Miners", [("/miners/", "All miners"), ("/solo-miners/", "Solo miners"), ("/pool-miners/", "Pool miners"), ("/heater-miners/", "Heater miners"),
-                ("/deals/", "Deals"), ("/in-stock/", "In stock now"), ("/find-my-miner/", "Find my miner")]),
+                ("/solo-odds/", "Solo odds"), ("/solo-wins/", "Solo wins"), ("/deals/", "Deals"), ("/in-stock/", "In stock now"), ("/find-my-miner/", "Find my miner")]),
     ("Help", [("/guides/", "Guides"), ("/best/", "Best for…"), ("/compare/", "Compare"), ("/sellers/", "Shops"),
               ("/where-to-buy-bitaxe/", "Where to buy"), ("/alerts/", "Price alerts"), ("/newsletter/", "Newsletter")]),
     ("About", [("/how-we-track/", "About & how we track"), ("/advertise/", "Advertise"), ("/bitaxe-black-friday/", "Black Friday 2026"), (f"mailto:{CONTACT}", CONTACT)]),
@@ -995,7 +995,7 @@ def build_model_page(mid):
 <div class="model-top"><figure class="model-photo{"" if mid in MODEL_IMG else " placeholder"}">{model_img(mid, lazy=False)}</figure>
 <div class="model-deal">{best_cta(st) or preorder_cta(st) or '<div class="cta"><div><small>Sold out right now</small><p class="hint">Set a price alert below and we\'ll email you when it\'s back.</p></div></div>'}
 {avail_note}</div></div>
-{earn_box(mid)}
+{earn_box(mid)}{solo_win_html(mid) if mid in SOLO_SET else ''}
 <section aria-labelledby="h-offers"><h2 id="h-offers">Prices by shop</h2>
 {offers_html}
 <p class="hint">Before shipping and tax. Euro and Canadian-dollar prices are converted to US dollars as an estimate. Updated every 6 hours.</p></section>
@@ -1634,7 +1634,8 @@ def build_category(key):
     if key == "solo" and NET and NET_OK:
         so = E.solo_odds(1.2, NET)
         solo_line = (f'<p class="older">A solo block is worth ≈ {block_usd_text(so)} right now. '
-                     f'Each miner page shows its odds. Pool estimates for these are tiny.</p>')
+                     f'Each miner page shows its odds. Pool estimates for these are tiny. '
+                     f'<a href="/solo-odds/">Solo odds calculator</a> · <a href="/solo-wins/">Recent solo wins</a></p>')
     earn_hint = f'<p class="hint">Pool and power figures are estimates: pool payout before electricity, power at <span data-calc="rate">{E.fmt_rate(E.POWER_RATE)}</span>/kWh. {EARN_NOTE}</p>' if NET and NET_OK else ""
     body = f"""<article>
 <header class="hero"><h1>{esc(h1)}</h1>
@@ -1790,6 +1791,13 @@ def miner_line(m):
     return f"- [{SHORT[m]}]({BASE}/models/{m}/): ≈{mm['hashrate_ths']:g} TH/s, ≈{mm['watts']:,g} W; {p}"
 
 
+def solo_llms():
+    if not SOLO_WINS:
+        return ""
+    w = SOLO_WINS[0]
+    return f" Last solo win: {fmt_date(w['time'])} ({w['pool']}); {len(wins_last_year())} in the past 12 months."
+
+
 def build_llms():
     live = [m for m in TRACKED if m not in NOINDEX_MODELS]
     cats = "\n".join(f"- [{h1}]({BASE}{path})" for _, path, _, h1, _, _ in CATS)
@@ -1820,6 +1828,8 @@ Bitaxe Radar is independent. Some shop links are affiliate links; they never cha
 
 ## Guides
 - [Is home mining worth it?]({BASE}/guides/is-home-mining-worth-it/): depends on your electricity price; each miner page has a break-even power price.
+- [Solo odds calculator]({BASE}/solo-odds/): chance of finding a block per day, per year and over 5 years for any hashrate, from the live network hashrate. Solo mining is a lottery.
+- [Solo block wins]({BASE}/solo-wins/): recent Bitcoin blocks found by solo miners, with date, pool, reward and the miner only where publicly reported.{solo_llms()}
 - [Solo vs pool mining]({BASE}/guides/solo-vs-pool-mining/): solo is a lottery for a whole block; pool pays small, steady amounts.
 - [How heater miners work]({BASE}/guides/how-heater-miners-work/): a miner turns its electricity into heat like a space heater.
 - [Where to buy a Bitaxe]({BASE}/where-to-buy-bitaxe/)
@@ -1965,6 +1975,195 @@ def build_guide_worth():
 <section><p class="hint">Not financial advice. Earnings aren't guaranteed and change with Bitcoin's price and network difficulty.</p></section>
 </article>"""
     layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Is home Bitcoin mining worth it?", desc), faq_ld(faq)], lastmod=GUIDE_UPDATED, og_type="article")
+
+
+# ---------------------------------------------------------------------------------------------
+# Solo odds calculator (/solo-odds/) and solo wins feed (/solo-wins/). Odds use the same network inputs as earnings.py.
+# Wins come from data/solo_wins.json (collector/solo_wins.py: mempool.space pool tags + SoloLuck.io's CC BY 4.0 record).
+# ---------------------------------------------------------------------------------------------
+def _load_wins():
+    try:
+        d = json.loads((ROOT / "data" / "solo_wins.json").read_text())
+        return d, [w for w in d.get("wins", []) if w.get("time")]
+    except Exception:
+        return {}, []
+
+
+SOLO_DATA, SOLO_WINS = _load_wins()
+NOW = datetime.now(timezone.utc)
+SOLO_CREDIT = ('Block list from <a href="https://mempool.space/mining">mempool.space</a> pool tags (Solo CKPool, Public Pool, Parasite, Braiins Solo, SoloPool.com). '
+               'Extra solo blocks and reported miner details from SoloLuck.io, '
+               '<a href="https://sololuck.io/legends">“The Solo Block Record”</a>, '
+               '<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.')
+
+
+def fmt_date(iso):
+    d = parse_t(iso)
+    return f"{d:%b} {d.day}, {d.year}"
+
+
+def fmt_hs(hs):
+    for div, unit in ((1e15, "PH/s"), (1e12, "TH/s"), (1e9, "GH/s")):
+        if hs >= div:
+            return f"{float(f'{hs / div:.3g}'):g} {unit}"
+    return f"{hs:,.0f} H/s"
+
+
+def fmt_ths(th):
+    return fmt_hs(th * 1e12)
+
+
+def win_url(w):
+    return f"https://mempool.space/block/{w.get('hash') or w['height']}"
+
+
+def win_miner(w):
+    """What's publicly reported about the winning miner. Never guessed."""
+    if w.get("hashrate_hs"):
+        return "Reported: " + (f'{w["hardware"]}, ≈{fmt_hs(w["hashrate_hs"])}' if w.get("hardware") else f'≈{fmt_hs(w["hashrate_hs"])}')
+    return "Rented hashrate" if w.get("rented") else "Miner not publicly reported"
+
+
+def days_since(w):
+    return max(0, (NOW - parse_t(w["time"])).days)
+
+
+def size_match(mid):
+    """Newest win whose publicly reported hashrate is within half to double this model's hashrate."""
+    th = MODELS[mid]["hashrate_ths"]
+    return next((w for w in SOLO_WINS if w.get("hashrate_hs") and not w.get("rented") and 0.5 <= w["hashrate_hs"] / 1e12 / th <= 2), None)
+
+
+def solo_win_html(mid):
+    if not SOLO_WINS:
+        return ""
+    w = SOLO_WINS[0]
+    d = days_since(w)
+    lines = [f'<p>Last solo block win: <b>{fmt_date(w["time"])}</b> ({esc(w["pool"])}) · {plural(d, "day")} ago</p>']
+    s = size_match(mid)
+    if s:
+        who = f'a reported {esc(s["hardware"])} at ≈{fmt_hs(s["hashrate_hs"])}' if s.get("hardware") else f'a reported ≈{fmt_hs(s["hashrate_hs"])} miner'
+        lines.append(f'<p>Last win by a miner this size: <b>{fmt_date(s["time"])}</b>, {who} ({esc(s["pool"])})</p>')
+    th = MODELS[mid]["hashrate_ths"]
+    return (f'<section class="solowin" aria-label="Solo block wins">{"".join(lines)}'
+            f'<p class="hint"><a href="/solo-odds/?th={th:g}">Your solo odds</a> · <a href="/solo-wins/">All solo wins</a>'
+            + (" · “This size” = reported hashrate within 2× of this one." if s else "") + "</p></section>")
+
+
+def wins_last_year():
+    return [w for w in SOLO_WINS if NOW - parse_t(w["time"]) <= timedelta(days=365)]
+
+
+def odds_tiles(th):
+    rows, wait = E.solo_rows(th, NET)
+    lab = {"day": "Per day", "year": "Per year", "5y": "Over 5 years"}
+    t = "".join(f'<div class="etile"><small>{lab[k]}</small><b data-solo="{k}-in">{esc(one)}</b><span data-solo="{k}-pct">{esc(pct)}</span></div>' for k, pct, one in rows)
+    t += f'<div class="etile"><small>Average wait</small><b data-solo="wait">{esc(wait.replace("about ", ""))}</b><span>for one block, on average</span></div>'
+    return t
+
+
+def build_solo_odds():
+    if not NET:
+        return
+    path = "/solo-odds/"
+    trail = [("Home", "/"), ("Guides", "/guides/"), ("Solo odds calculator", path)]
+    title = "Solo mining odds calculator: your chance of a Bitcoin block | Bitaxe Radar"
+    desc = "Solo Bitcoin mining odds for any hashrate: your chance of a block per day, per year and over 5 years at today's network hashrate. Honest: it's a lottery."
+    g = "bitaxe-gamma" if "bitaxe-gamma" in TRACKED else SOLO_SET[0]
+    gth = MODELS[g]["hashrate_ths"]
+    so = E.solo_odds(gth, NET)
+    opts = "".join(f'<option value="{MODELS[m]["hashrate_ths"]:g}"{" selected" if m == g else ""}>{esc(SHORT[m])} ({fmt_ths(MODELS[m]["hashrate_ths"])})</option>'
+                   for m in sorted(LIVE_TRACKED, key=lambda m: (MODELS[m]["hashrate_ths"], SHORT[m])))
+    form = (f'<form class="solobox" id="solo-form" hidden><label for="solo-m">Pick a miner</label>'
+            f'<select id="solo-m"><option value="">Your own hashrate</option>{opts}</select>'
+            f'<label for="solo-h">or type your hashrate</label><span class="sin"><input id="solo-h" type="number" inputmode="decimal" min="0" step="any" value="{gth:g}">'
+            '<select id="solo-u" aria-label="Unit"><option value="gh">GH/s</option><option value="th" selected>TH/s</option><option value="ph">PH/s</option></select></span></form>')
+    ex = sorted([m for m in SOLO_SET if m in LIVE_TRACKED], key=lambda m: MODELS[m]["hashrate_ths"])
+    rows = ""
+    for m in ex:
+        th = MODELS[m]["hashrate_ths"]
+        r, wait = E.solo_rows(th, NET)
+        rows += (f'<tr><td><a href="/models/{m}/">{esc(SHORT[m])}</a></td><td class="num">{fmt_ths(th)}</td><td class="num nw">{esc(r[1][2])}</td>'
+                 f'<td class="num nw">{esc(wait.replace("about ", ""))}</td></tr>')
+    tbl = (f'<div class="tablewrap"><table class="calc-tbl"><thead><tr><th>Miner</th><th class="num">Hashrate</th><th class="num">Chance per year</th>'
+           f'<th class="num">Avg. wait</th></tr></thead><tbody>{rows}</tbody></table></div>')
+    ly = wins_last_year()
+    small = [w for w in SOLO_WINS if w.get("hashrate_hs") and not w.get("rented") and w["hashrate_hs"] <= 10e12]
+    eh = NET["network_hashrate_hs"] / 1e18
+    faq = [("What are my odds of solo mining a Bitcoin block?",
+            f"Your share of the network's hashrate, times 144 blocks a day. With the network at about {eh:,.0f} EH/s, a {SHORT[g]} ({fmt_ths(gth)}) has about a 1 in {E.fmt_big(so['one_in_year'])} chance a year. Type your own hashrate above."),
+           ("Has anyone actually won a block with a small miner?",
+            f"Yes, rarely. Solo pools found {len(ly)} blocks in the past 12 months"
+            + (f", and some winners reported small miners, for example ≈{fmt_hs(small[0]['hashrate_hs'])} on {fmt_date(small[0]['time'])}" if small else "")
+            + ". Thousands of people solo mine, so a few lucky ones win while almost everyone wins nothing."),
+           ("If I keep mining longer, am I due for a win?",
+            "No. Every block is a fresh draw, and past attempts don't add up. The 5-year figure is the chance of at least one block in 5 years if the network stayed the same size. It usually grows, which makes the odds worse."),
+           ("Is solo mining worth it?",
+            "Not as income. Think of it as a lottery ticket you pay for with electricity. A tiny miner costs a few dollars a month to run, and the most likely result is no block at all."),
+           ("Why do the odds change?",
+            "They depend on the network's total hashrate, which changes daily as miners join or leave. Bitcoin's difficulty adjusts about every two weeks to keep blocks near 10 minutes apart.")]
+    body = f"""<article>
+<header class="hero"><h1>Solo odds calculator</h1>
+<p class="lede">Your real chance of finding a whole Bitcoin block on your own. Plain truth first: solo mining is a lottery, and most solo miners never win.</p>
+<p class="meta">Network ≈ {eh:,.0f} EH/s from mempool.space · updated {tag_time(NET["fetched_at"])}</p>
+{form}</header>
+<section class="earnbox" aria-labelledby="h-odds"><h2 id="h-odds">Chance of finding a block at <span data-solo="th">{fmt_ths(gth)}</span></h2>
+<div class="etiles four">{odds_tiles(gth)}</div>
+<p class="netline">A block pays about {block_usd_text(so)} right now (≈{E.block_btc(NET):.3f} BTC), all to the one miner who finds it.</p>
+<p class="hint">The math: your share of the network's hashrate × 144 blocks a day. Assumes the network stays its current size. Odds, not a forecast. Not financial advice.</p></section>
+<section aria-labelledby="h-ours"><h2 id="h-ours">Odds for the solo miners we track</h2>{tbl}
+<p class="hint">Seller-stated hashrate. <a href="/solo-miners/">Prices for solo miners →</a></p></section>
+<section aria-labelledby="h-wins"><h2 id="h-wins">People do win, sometimes</h2>
+<p>{solo_wins_line()}</p><p><a class="btn ghost" href="/solo-wins/">See recent solo wins</a></p></section>
+<section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}
+<p><a href="/guides/solo-vs-pool-mining/">Solo vs pool, in plain words</a> · <a href="/guides/is-home-mining-worth-it/">Is home mining worth it?</a></p></section>
+</article>"""
+    scripts = f'<script>window.RADAR_SOLO={json.dumps({"network_hashrate_hs": NET["network_hashrate_hs"]})};</script>\n<script src="/solo.js" defer></script>\n'
+    app = {"@context": "https://schema.org", "@type": "WebApplication", "name": "Solo mining odds calculator", "url": BASE + path, "applicationCategory": "UtilitiesApplication",
+           "operatingSystem": "Any", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "description": desc}
+    layout(path, title, desc, body, crumbs=trail, jsonld=[app, faq_ld(faq)], scripts=scripts)
+
+
+def solo_wins_line():
+    if not SOLO_WINS:
+        return "Solo blocks are rare: across all public solo pools, about one a month."
+    w, n = SOLO_WINS[0], len(wins_last_year())
+    return (f"The last solo block was found {plural(days_since(w), 'day')} ago, on {fmt_date(w['time'])} ({esc(w['pool'])}). "
+            f"Solo pools found {plural(n, 'block')} in the past 12 months, out of about 52,000.")
+
+
+def build_solo_wins():
+    if not SOLO_WINS:
+        return
+    path = "/solo-wins/"
+    trail = [("Home", "/"), ("Guides", "/guides/"), ("Solo wins", path)]
+    w0, ly = SOLO_WINS[0], wins_last_year()
+    title = f"Solo Bitcoin block wins: latest {fmt_date(w0['time'])} ({fmt_day(GEN)}) | Bitaxe Radar"
+    desc = (f"Recent Bitcoin blocks found by solo miners: {len(ly)} in the past 12 months. Last one {fmt_date(w0['time'])} on {w0['pool']}. Dates, pools, rewards and reported miners.")
+
+    def li(w):
+        rw = f'{w["reward_btc"]:.3f} BTC' if w.get("reward_btc") else ""
+        return (f'<li><div class="wtop"><b>{fmt_date(w["time"])}</b><span>{rw}</span></div>'
+                f'<div class="wpool">{esc(w["pool"])}</div><div class="wminer">{esc(win_miner(w))}</div>'
+                f'<a href="{esc(win_url(w))}" rel="noopener">Block {w["height"]:,} on mempool.space ↗</a></li>')
+    first, rest = SOLO_WINS[:20], SOLO_WINS[20:]
+    since = SOLO_WINS[-1]
+    body = f"""<article>
+<header class="hero"><h1>Solo block wins</h1>
+<p class="lede">Every Bitcoin block found by a solo miner gives the whole reward to one person. Here are the recent ones we know of.</p>
+<p class="bigline"><b>{plural(days_since(w0), "day")}</b> since the last solo win ({fmt_date(w0["time"])}, {esc(w0["pool"])})</p>
+<p class="meta">{plural(len(ly), "solo block")} in the past 12 months · checked {tag_time(SOLO_DATA.get("checked_at") or SOLO_DATA.get("fetched_at"))}</p></header>
+<section aria-labelledby="h-list"><h2 id="h-list">Recent solo wins</h2>
+<ul class="wins">{"".join(li(w) for w in first)}</ul>
+{f'<details class="more"><summary>Older wins, back to {fmt_date(since["time"])}</summary><ul class="wins">{"".join(li(w) for w in rest)}</ul></details>' if rest else ""}
+<p class="hint">Miner details appear only where the winner reported them publicly. Most never do, so we don't guess. Reward = block subsidy + fees.</p></section>
+<section aria-labelledby="h-odds"><h2 id="h-odds">What are your odds?</h2>
+<p>About 52,000 blocks are found a year and solo miners get only a handful. For one small miner it's a long-shot lottery.</p>
+<p><a class="btn" href="/solo-odds/">Check your solo odds</a></p>
+<p><a href="/solo-miners/">Best miners for solo mining</a> · <a href="/guides/solo-vs-pool-mining/">Solo vs pool</a></p></section>
+<section><p class="hint">Data: {SOLO_CREDIT} Blocks since the April 2024 halving. Checked every 6 hours.</p></section>
+</article>"""
+    layout(path, title, desc, body, crumbs=trail, lastmod=SOLO_DATA.get("fetched_at"))
 
 
 def build_method():
@@ -2409,6 +2608,8 @@ def build_indexes():
            body, crumbs=[("Home", "/"), ("Guides", "/guides/"), ("Compare", "/compare/")])
     # /guides/
     gl = [("/guides/is-home-mining-worth-it/", "Is home mining worth it?", "Check it at your electricity price."),
+          ("/solo-odds/", "Solo odds calculator", "Your real chance of finding a block."),
+          ("/solo-wins/", "Solo block wins", "Recent blocks won by solo miners."),
           ("/guides/solo-vs-pool-mining/", "Solo vs pool mining", "Lottery shot or small steady payouts?"),
           ("/guides/how-heater-miners-work/", "How heater miners work", "A miner that warms the room."),
           ("/where-to-buy-bitaxe/", "Where to buy a Bitaxe", "Every shop, ranked by today's price."),
@@ -2451,6 +2652,8 @@ def main():
     build_guide_heaters()
     build_guide_pool()
     build_guide_worth()
+    build_solo_odds()
+    build_solo_wins()
     build_method()
     build_advertise()
     build_404()

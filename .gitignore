@@ -25,6 +25,8 @@ site/llms-full.txt
 site/miners/
 site/find-my-miner/
 site/alerts/
+site/solo-odds/
+site/solo-wins/
 site/newsletter/
 # private research notes (kept local, not published)
 docs/REDDIT_RESEARCH.md

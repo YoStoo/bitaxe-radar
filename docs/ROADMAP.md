@@ -10,16 +10,15 @@ Updated: Oct 21, 2026
 
 ## 🔨 Now
 
-- Solo odds calculator: enter your TH/s, see your odds of finding a block per day, year and 5 years.
+- Room heat calculator: room size in, which heater miners fit out.
 
 ## ⏭️ Next up (in order)
 
-1. Room heat calculator: room size in, which heater miners fit out.
-2. $/TH leaderboard: best value miners, plus price history ("is this a good price now?").
-3. Seller facts table: where they ship from, warranty, how often "in stock" was true.
-4. Add more home miners: 79 found, 27 on the site so far.
-5. Daily X posts and replies on @BitaxeRadar.
-6. Black Friday push in November (deals page live by about Nov 10, Black Friday is Nov 27).
+1. $/TH leaderboard: best value miners, plus price history ("is this a good price now?").
+2. Seller facts table: where they ship from, warranty, how often "in stock" was true.
+3. Add more home miners: 79 found, 27 on the site so far.
+4. Daily X posts and replies on @BitaxeRadar.
+5. Black Friday push in November (deals page live by about Nov 10, Black Friday is Nov 27).
 
 ## 💰 Money
 
@@ -73,6 +72,8 @@ Later:
 - Oct 21: Affiliate signups sent to D-Central, DTV and Altair.
 - Oct 21: Electricity price calculator: your power price on miner pages, break-even price on model pages, and the guide Is home mining worth it? (/guides/is-home-mining-worth-it/).
 - Oct 21: Bitcube added (Power Mining's new cube miner, pre-order, delivery by Christmas): /models/bitcube/.
+- Oct 21: Solo odds calculator (/solo-odds/): your chance of finding a block per day, per year and over 5 years, for any hashrate or any miner we track.
+- Oct 21: Solo wins feed (/solo-wins/): recent blocks won by solo miners, days since the last win, and on solo miner pages the last win plus the last win by a miner that size (only when the winner reported it).
 
 ## 📊 Numbers (Oct 21)
 
@@ -81,4 +82,4 @@ Later:
 - Subscribers: 1
 - Miners tracked: 27
 - Sellers tracked: 10
-- Pages on the site: 67
+- Pages on the site: 70

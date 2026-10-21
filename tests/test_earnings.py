@@ -43,8 +43,14 @@ class EarningsMath(unittest.TestCase):
     def test_solo_odds(self):
         o = E.solo_odds(1.2, NET)
         p = 1.2e12 / 1e21 * 144
-        self.assertAlmostEqual(o["one_in_day"], 1 / p)
-        self.assertAlmostEqual(o["one_in_year"], 1 / (1 - (1 - p) ** 365))
+        self.assertAlmostEqual(o["one_in_day"] / (1 / (1 - (1 - p) ** 1)), 1, places=6)
+        self.assertAlmostEqual(o["one_in_year"] / (1 / (1 - math.exp(-p * 365))), 1, places=9)
+        self.assertEqual(E.fmt_pct(0.5), "50%")
+        self.assertEqual(E.fmt_pct(0.0000596), "0.0060%")
+        self.assertEqual(E.fmt_pct(0.021), "2.1%")
+        self.assertEqual(E.fmt_one_in(0.6), "better than even")
+        self.assertEqual(E.fmt_wait(0.5), "about 12 hours")
+        self.assertEqual(E.fmt_wait(16_700 * 365), "about 17,000 years")
         self.assertAlmostEqual(o["block_usd"], 320_000)
         self.assertEqual(E.fmt_big(5_787_037), "5.8 million")
         self.assertEqual(E.fmt_big(15_855), "16,000")

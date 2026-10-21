@@ -115,5 +115,73 @@ class CalcPages(unittest.TestCase):
         self.assertIn("is-home-mining-worth-it", (SITE / "sitemap.xml").read_text())
 
 
+SOLO_JS = """
+const fs = require('fs');
+const input = JSON.parse(fs.readFileSync(0, 'utf8'));
+global.window = {RADAR_SOLO: {network_hashrate_hs: input.net.network_hashrate_hs}};
+eval(fs.readFileSync(%s, 'utf8'));
+process.stdout.write(JSON.stringify(input.ths.map(th => window.RadarSolo.rows(th))));
+"""
+SOLO_THS = sorted({float(m["hashrate_ths"]) for m in json.loads((ROOT / "data" / "latest.json").read_text())["models"].values()}
+                  | {0.0001, 0.001, 0.05, 0.48, 0.995, 1, 2.5, 6, 37.2, 100, 230, 1000, 1e4, 1e5, 1e6, 5e6, 1e7})
+
+
+@unittest.skipUnless(shutil.which("node"), "node not installed")
+class SoloParity(unittest.TestCase):
+    def test_js_matches_python(self):
+        js = SOLO_JS % json.dumps(str(SITE / "solo.js"))
+        for net in NETS:
+            got = json.loads(subprocess.run(["node", "-e", js], input=json.dumps({"net": net, "ths": SOLO_THS}),
+                                            capture_output=True, text=True, check=True).stdout)
+            want = [list(E.solo_rows(th, net)) for th in SOLO_THS]
+            self.assertEqual(got, json.loads(json.dumps(want)))
+
+    def test_solo_sense(self):
+        net = NETS[0]
+        self.assertLess(E.solo_chance(1.2, net, 1), E.solo_chance(1.2, net, 365))
+        self.assertLess(E.solo_chance(1.2, net, 365), E.solo_chance(1.2, net, 365 * 5))
+        self.assertAlmostEqual(E.solo_rate(1.2, net), 1.2e12 / net["network_hashrate_hs"] * 144)
+        self.assertEqual(E.solo_rows(1e7, net)[0][0][2], "better than even")
+
+
+class SoloPages(unittest.TestCase):
+    def read(self, p):
+        return (SITE / p.strip("/") / "index.html").read_text()
+
+    def test_solo_odds_page(self):
+        h = self.read("/solo-odds/")
+        self.assertIn('<form class="solobox" id="solo-form" hidden>', h)
+        self.assertIn('src="/solo.js"', h)
+        self.assertIn("window.RADAR_SOLO=", h)
+        self.assertIn('"FAQPage"', h)
+        self.assertIn("lottery", h)
+        net = json.loads((ROOT / "data" / "network.json").read_text())
+        rows, wait = E.solo_rows(1.2, net)
+        self.assertIn(f'data-solo="year-in">{rows[1][2]}<', h)      # no-JS default = Python math for a 1.2 TH/s Bitaxe Gamma
+        for bad in ["guaranteed", "passive income", "you will win", "get rich"]:
+            self.assertNotIn(bad, h.lower())
+        for p in ["/solo-miners/", "/guides/", "/models/bitaxe-gamma/"]:
+            self.assertIn("/solo-odds/", self.read(p), p)
+        self.assertIn("/solo-odds/", (SITE / "llms.txt").read_text())
+        self.assertIn("/solo-odds/", (SITE / "sitemap.xml").read_text())
+
+    def test_solo_wins_page_and_model_line(self):
+        wins = json.loads((ROOT / "data" / "solo_wins.json").read_text())["wins"]
+        if not wins:
+            self.skipTest("no solo wins data")
+        h = self.read("/solo-wins/")
+        self.assertIn("since the last solo win", h)
+        self.assertIn("mempool.space/block/", h)
+        self.assertIn("CC BY 4.0", h)
+        self.assertIn("/solo-wins/", (SITE / "sitemap.xml").read_text())
+        g = self.read("/models/bitaxe-gamma/")
+        self.assertIn("Last solo block win:", g)
+        self.assertNotIn("Last solo block win:", self.read("/models/heatbit-maxi/"))     # not a solo model
+        # "this size" only from a publicly reported hashrate within half to double the model's
+        th = json.loads((ROOT / "data" / "latest.json").read_text())["models"]["bitaxe-gamma"]["hashrate_ths"]
+        known = [w for w in wins if w.get("hashrate_hs") and not w.get("rented") and 0.5 <= w["hashrate_hs"] / 1e12 / th <= 2]
+        self.assertEqual("Last win by a miner this size" in g, bool(known))
+
+
 if __name__ == "__main__":
     unittest.main()

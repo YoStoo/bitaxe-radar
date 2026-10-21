@@ -17,6 +17,9 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
       - run: python3 collector/collect.py
+      # Solo-mined blocks (mempool.space + SoloLuck.io). A failure keeps the last data and never blocks the deploy.
+      - run: python3 collector/solo_wins.py
+        continue-on-error: true
       - run: curl -sf --max-time 20 https://bitaxeradar.com/sitemap.xml -o /tmp/old_sitemap.xml || true
       - run: python3 build_site.py
       - id: inow
