@@ -1,8 +1,22 @@
 // Price-alert signup for the pre-rendered pages (model pages). Same flow as the home page form in app.js:
 // double opt-in, Cloudflare Turnstile bot check, POST to the Cloudflare Worker. Config comes from build_site.py,
 // which reads WORKER_URL / TURNSTILE_SITEKEY from app.js and writes window.RADAR_SIGNUP into the page.
+// Shared Turnstile loader: the script is injected once even when a page has both the alerts and newsletter forms.
+window.radarTurnstileReady = window.radarTurnstileReady || (function () {
+  var q = [], state = 0;
+  return function (cb) {
+    if (state === 2) return cb();
+    q.push(cb);
+    if (state) return; state = 1;
+    window.onTurnstileLoaded = function () { state = 2; q.splice(0).forEach(function (f) { f(); }); };
+    var s = document.createElement("script");
+    s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTurnstileLoaded"; s.async = true; s.defer = true;
+    document.head.appendChild(s);
+  };
+})();
 (function () {
   "use strict";
+  var tsReady = window.radarTurnstileReady;
   var C = window.RADAR_SIGNUP, form = document.getElementById("signup");
   if (!C || !form) return;
   var msg = document.getElementById("signupMsg"), btn = document.getElementById("signupBtn");
@@ -10,13 +24,7 @@
   var tsHost = document.getElementById("turnstile"), tsWidget = null, loaded = false;
 
   function renderTurnstile() { if (window.turnstile && !tsWidget) tsWidget = window.turnstile.render(tsHost, { sitekey: C.sitekey, theme: "dark" }); }
-  function loadTurnstile() {
-    if (loaded) return; loaded = true;
-    window.onTurnstileLoaded = renderTurnstile;
-    var s = document.createElement("script");
-    s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTurnstileLoaded"; s.async = true; s.defer = true;
-    document.head.appendChild(s);
-  }
+  function loadTurnstile() { if (loaded) return; loaded = true; tsReady(renderTurnstile); }
   // Load the bot-check script only when the form is near the screen (keeps the page fast for readers who never sign up).
   if ("IntersectionObserver" in window) {
     var io = new IntersectionObserver(function (es) { if (es.some(function (e) { return e.isIntersecting; })) { loadTurnstile(); io.disconnect(); } }, { rootMargin: "400px" });

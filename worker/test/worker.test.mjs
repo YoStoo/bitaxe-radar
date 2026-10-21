@@ -90,3 +90,34 @@ assert.ok(await verifyToken(pyTok, env.SIGNING_SECRET, "u"), "python-signed toke
 r = await worker.fetch(new Request("https://w.example/unsubscribe?t=" + encodeURIComponent(pyTok), { method: "POST", body: "List-Unsubscribe=One-Click" }), env);
 assert.equal(r.status, 200); assert.equal(contacts.get("bob@example.com").unsubscribed, true);
 console.log("worker tests: all passed");
+
+// ---------- newsletter ----------
+{
+  const before = sent.length;
+  // existing confirmed alert contact: newsletter signup + confirm must not touch alerts
+  contacts.set("carol@example.com", { email: "carol@example.com", unsubscribed: false, properties: { model: { value: "bitaxe-gamma" }, target_price: { value: 80 } } });
+  let r = await post({ type: "newsletter", email: "Carol@Example.com" });
+  assert.equal(r.status, 200);
+  const c0 = contacts.get("carol@example.com");
+  assert.equal(c0.unsubscribed, false); assert.equal(c0.properties.target_price.value, 80); assert.equal(c0.properties.newsletter, undefined);
+  const m = sent[sent.length - 1]; assert.equal(sent.length, before + 1);
+  assert.equal(m.subject, "Confirm your Home Mining Weekly signup"); assert.match(m.html, //); assert.match(m.headers["List-Unsubscribe"], /nl\/unsubscribe\?t=/);
+  const t = tokenFrom(m.html, "nl/confirm");
+  assert.equal((await worker.fetch(new Request("https://w.example/confirm?t=" + encodeURIComponent(t)), env)).status, 400); // nc token can't confirm an alert
+  r = await worker.fetch(new Request("https://w.example/nl/confirm?t=" + encodeURIComponent(t)), env); assert.equal(r.status, 200);
+  const c1 = contacts.get("carol@example.com");
+  assert.equal(c1.properties.newsletter.value, "yes"); assert.equal(c1.unsubscribed, false); assert.equal(c1.properties.model.value, "bitaxe-gamma"); assert.equal(c1.properties.target_price.value, 80);
+  // newsletter unsubscribe leaves alerts on
+  const u = tokenFrom(m.html, "nl/unsubscribe");
+  r = await worker.fetch(new Request("https://w.example/nl/unsubscribe?t=" + encodeURIComponent(u), { method: "POST" }), env); assert.equal(r.status, 200);
+  assert.equal(contacts.get("carol@example.com").properties.newsletter.value, "no"); assert.equal(contacts.get("carol@example.com").unsubscribed, false);
+  // brand new address: created with alerts off and no miner/price
+  r = await post({ type: "newsletter", email: "dan@example.com" }); assert.equal(r.status, 200);
+  const d = contacts.get("dan@example.com"); assert.equal(d.unsubscribed, true); assert.equal(d.properties.newsletter.value, "no"); assert.equal(d.properties.target_price, undefined);
+  await worker.fetch(new Request("https://w.example/nl/confirm?t=" + encodeURIComponent(tokenFrom(sent[sent.length - 1].html, "nl/confirm"))), env);
+  assert.equal(contacts.get("dan@example.com").properties.newsletter.value, "yes"); assert.equal(contacts.get("dan@example.com").unsubscribed, true);
+  // turnstile + email checks apply
+  turnstileOk = false; assert.equal((await post({ type: "newsletter", email: "e@example.com" })).status, 400); turnstileOk = true;
+  assert.equal((await post({ type: "newsletter", email: "nope" })).status, 400);
+  console.log("newsletter tests ok");
+}

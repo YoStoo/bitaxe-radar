@@ -2,6 +2,7 @@ name = "bitaxe-radar-alerts"
 main = "src/index.js"
 compatibility_date = "2026-10-01"
 workers_dev = true
+preview_urls = false
 
 # TODO: after the Worker is deployed, set PUBLIC_BASE to its real public URL
 # (custom domain recommended, e.g. https://subscribe.bitaxeradar.com) and uncomment [[routes]] below.

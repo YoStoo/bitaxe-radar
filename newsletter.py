@@ -19,7 +19,7 @@ DIR = ROOT / "data" / "newsletter"
 BASE = "https://bitaxeradar.com"
 CONTACT = "contact@bitaxeradar.com"
 ET = ZoneInfo("America/New_York")
-UNSUB = "{{{RESEND_UNSUBSCRIBE_URL}}}"          # Resend fills this per recipient when sent as a broadcast
+UNSUB = "{{NL_UNSUBSCRIBE_URL}}"   # the sender fills a per-recipient Worker /nl/unsubscribe link (newsletter-only; NOT Resend's global unsubscribe, which would also stop price alerts)
 POSTAL = "[mailing address goes here before sending]"   # required by law in sent email; never shown on the web page
 DISCLOSURE = ("Some shop links are affiliate links. If you buy through one, Bitaxe Radar may earn a commission "
               "at no extra cost to you. It never changes how prices are ranked.")

@@ -44,5 +44,5 @@ Some shop links are affiliate links. If you buy through one, Bitaxe Radar may ea
 Mining earnings are never guaranteed. Prices change fast, so check the shop's page before buying. Not financial advice.
 You're getting this because you signed up for Home Mining Weekly on bitaxeradar.com. Questions? Reply or write contact@bitaxeradar.com.
 Bitaxe Radar · [mailing address goes here before sending]
-Unsubscribe: {{{RESEND_UNSUBSCRIBE_URL}}}
+Unsubscribe: {{NL_UNSUBSCRIBE_URL}}
 View on the web: https://bitaxeradar.com/newsletter/issue-001/

@@ -2178,25 +2178,35 @@ def build_alerts():
 <header class="hero"><h1>Price-drop alerts</h1>
 <p class="lede">Tell us a miner and your price. We email you once when it's in stock at or under it.</p></header>
 {form}
-<p class="hint">Want a short weekly roundup instead? <a href="/newsletter/">Home Mining Weekly</a> · Questions? <a href="mailto:{CONTACT}">{CONTACT}</a></p>
+<h2>Or get a short weekly roundup</h2>
+{nl_signup()}
+<p class="hint">Past issues: <a href="/newsletter/">Home Mining Weekly</a> · Questions? <a href="mailto:{CONTACT}">{CONTACT}</a></p>
 </article>"""
     layout(path, "Free price-drop alerts for home Bitcoin miners | Bitaxe Radar",
            "Get one email when a Bitaxe, NerdQaxe, Avalon or heater miner is in stock at or under your price. Free, no spam, one-click unsubscribe.",
-           body, crumbs=[("Home", "/"), ("Alerts", path)], scripts=SIGNUP_SCRIPTS)
+           body, crumbs=[("Home", "/"), ("Alerts", path)], scripts=NL_SCRIPTS or SIGNUP_SCRIPTS)
 
 
 # ---------------------------------------------------------------------------------------------
 # NEWSLETTER (Home Mining Weekly): web copies of each issue, from data/newsletter/*.json (see newsletter.py)
 # ---------------------------------------------------------------------------------------------
 NL_NAME = "Home Mining Weekly"
-NL_MAILTO = f"mailto:{CONTACT}?subject=" + "Subscribe%20to%20Home%20Mining%20Weekly" + "&body=" + "Please%20add%20me%20to%20Home%20Mining%20Weekly."
+NL_SCRIPTS = (SIGNUP_SCRIPTS + '\n<script src="/nl-signup.js" defer></script>') if SIGNUP_ENABLED else ""
 
 
 def nl_signup():
+    if not SIGNUP_ENABLED:
+        return f'<section class="signup"><h2 style="margin-top:0">Get the weekly email</h2><p>Signups are paused right now. Write <a href="mailto:{CONTACT}">{CONTACT}</a> and we\'ll add you.</p></section>'
     return f"""<section class="signup" aria-labelledby="h-nl"><h2 id="h-nl" style="margin-top:0">Get the weekly email</h2>
 <p>One short email a week: best prices, new miners, one plain-words explainer. Free, no spam, unsubscribe anytime.</p>
-<p><a class="btn" href="{NL_MAILTO}">Email us to join</a></p>
-<p class="hint">Tap the button and hit send. We add you by hand for now, and you can reply "stop" anytime. Or write <a href="mailto:{CONTACT}">{CONTACT}</a>.</p></section>"""
+<form id="nlsignup" novalidate>
+  <div class="row nl-row"><label>Email <input type="email" id="nlEmail" name="email" autocomplete="email" placeholder="you@example.com" maxlength="254" required></label></div>
+  <div style="position:absolute;left:-9999px" aria-hidden="true"><label>Website <input type="text" id="nlWebsite" name="website" tabindex="-1" autocomplete="off"></label></div>
+  <div class="row signup-actions"><div id="nlTurnstile" class="turnstile-slot"></div><button type="submit" id="nlBtn">Get {NL_NAME}</button></div>
+  <p class="hint">You'll get one email to confirm first. Never sold. Separate from price alerts.</p>
+  <p class="hint" id="nlMsg" role="status" aria-live="polite"></p>
+  <noscript><p class="hint">The sign-up form needs JavaScript for its bot check. Or write <a href="mailto:{CONTACT}">{CONTACT}</a>.</p></noscript>
+</form></section>"""
 
 
 def build_newsletter():
@@ -2224,7 +2234,7 @@ def build_newsletter():
 <p class="hint">{esc(NL.NO_PROMISE)} <a href="/newsletter/">All issues</a></p>
 </article>"""
         layout(path, f"{i['title']}: best home Bitcoin miner prices | Bitaxe Radar", i["preheader"], body,
-               crumbs=[("Home", "/"), ("Newsletter", "/newsletter/"), (f"Issue #{i['num']}", path)], lastmod=i["date"], og_type="article")
+               crumbs=[("Home", "/"), ("Newsletter", "/newsletter/"), (f"Issue #{i['num']}", path)], lastmod=i["date"], og_type="article", scripts=NL_SCRIPTS)
     lis = "".join(f'<li><a href="/newsletter/{i["slug"]}/"><b>{esc(i["title"])}</b><span>{NL.pretty_date(i["date"])} · {esc(i["preheader"])}</span></a></li>' for i in iss)
     body = f"""<article>
 <header class="hero"><h1>{NL_NAME}</h1>
@@ -2235,7 +2245,7 @@ def build_newsletter():
 </article>"""
     layout("/newsletter/", f"{NL_NAME}: a weekly home Bitcoin mining email | Bitaxe Radar",
            "A short weekly email on home Bitcoin miners: best Bitaxe, NerdQaxe, Avalon and heater miner prices, new models and plain-words explainers. Free.",
-           body, crumbs=[("Home", "/"), ("Newsletter", "/newsletter/")], lastmod=iss[0]["date"] if iss else None)
+           body, crumbs=[("Home", "/"), ("Newsletter", "/newsletter/")], lastmod=iss[0]["date"] if iss else None, scripts=NL_SCRIPTS)
 
 
 def tile(href, mid, title, sub):
