@@ -1021,5 +1021,176 @@
    "in_stock": true,
    "status": "in_stock"
   }
+ ],
+ "bitcoinmerch:bitaxe-gamma-hex": [
+  {
+   "t": "2026-10-21T14:51:25Z",
+   "price": 449.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  }
+ ],
+ "bitcoinmerch:bitaxe-naja-duo": [
+  {
+   "t": "2026-10-21T14:51:25Z",
+   "price": 599.99,
+   "currency": "USD",
+   "in_stock": false,
+   "status": "preorder"
+  }
+ ],
+ "bitcoinmerch:nerdoctaxe": [
+  {
+   "t": "2026-10-21T14:51:25Z",
+   "price": 449.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  }
+ ],
+ "bitcoinmerch:bitforge-nano": [
+  {
+   "t": "2026-10-21T14:51:25Z",
+   "price": 269.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  }
+ ],
+ "bitcoinmerch:heatbit-bitair": [
+  {
+   "t": "2026-10-21T14:51:25Z",
+   "price": 179.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  }
+ ],
+ "bitcoinmerch:hammer-thor-p2": [
+  {
+   "t": "2026-10-21T14:51:25Z",
+   "price": 589.99,
+   "currency": "USD",
+   "in_stock": false,
+   "status": "backorder"
+  }
+ ],
+ "bitcoinmerch:gekko-kbox-22": [
+  {
+   "t": "2026-10-21T14:51:25Z",
+   "price": 899.99,
+   "currency": "USD",
+   "in_stock": false,
+   "status": "preorder"
+  }
+ ],
+ "solosatoshi:bitaxe-gamma-hex": [
+  {
+   "t": "2026-10-21T14:51:25Z",
+   "price": 449.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  }
+ ],
+ "solosatoshi:bitaxe-naja-duo": [
+  {
+   "t": "2026-10-21T14:51:25Z",
+   "price": 385.0,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  }
+ ],
+ "solosatoshi:heatbit-bitair": [
+  {
+   "t": "2026-10-21T14:51:25Z",
+   "price": 179.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  }
+ ],
+ "altair:heatbit-bitair": [
+  {
+   "t": "2026-10-21T14:51:25Z",
+   "price": 179.0,
+   "currency": "USD",
+   "in_stock": false,
+   "status": "preorder"
+  }
+ ],
+ "altair:hammer-thor-p2": [
+  {
+   "t": "2026-10-21T14:51:25Z",
+   "price": 369.0,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  }
+ ],
+ "altair:hammer-bc08": [
+  {
+   "t": "2026-10-21T14:51:25Z",
+   "price": 519.0,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  }
+ ],
+ "altair:gekko-kbox-22": [
+  {
+   "t": "2026-10-21T14:51:25Z",
+   "price": 849.0,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  }
+ ],
+ "heatbit:heatbit-bitair": [
+  {
+   "t": "2026-10-21T14:51:25Z",
+   "price": 179.0,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  }
+ ],
+ "dcentral:nerdoctaxe": [
+  {
+   "t": "2026-10-21T14:51:25Z",
+   "price": 849.99,
+   "currency": "CAD",
+   "in_stock": false,
+   "status": "out_of_stock"
+  }
+ ],
+ "dcentral:dcentral-stealthminer": [
+  {
+   "t": "2026-10-21T14:51:25Z",
+   "price": 849.99,
+   "currency": "CAD",
+   "in_stock": true,
+   "status": "in_stock"
+  }
+ ],
+ "dtv:bitforge-nano": [
+  {
+   "t": "2026-10-21T14:51:25Z",
+   "price": 169.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  }
+ ],
+ "futurebit:futurebit-apollo-iii": [
+  {
+   "t": "2026-10-21T14:51:25Z",
+   "price": 899.99,
+   "currency": "USD",
+   "in_stock": false,
+   "status": "backorder"
+  }
  ]
 }
