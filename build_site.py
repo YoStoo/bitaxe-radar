@@ -362,7 +362,7 @@ NEW_COPY = {   # added 2026-10-21 (docs/MINER_CATALOG.md). Stock settings only; 
         who="Someone who wants a cute, quiet solo lottery miner for a desk or shelf, with nothing to build.",
         check=["It's a pre-order. Power Mining says it will deliver by Christmas.",
                "Each order includes a free 777 GH/s of hosted solo hashrate from the order date until your Bitcube arrives.",
-               "Power Mining prices it in euros with tax included. Shipping and any import fees are extra."]),
+               "The price shown is what US buyers pay, in euros with no VAT. EU buyers pay 21% VAT on top. Shipping and any import fees are extra."]),
 }
 MODEL_COPY.update(NEW_COPY)
 
@@ -404,9 +404,10 @@ SELLER_COPY = {
                "Stands and extra fans are optional add-ons that change the price.",
                "Prices are before shipping and sales tax."]),
     "powermining": dict(
-        region="EUR prices (US variant listed)",
+        region="EUR prices (US price, no VAT)",
         about="A European shop that lists a US variant for some miners and says it ships to the US and Canada. Prices are in euros; the dollar figures are estimates.",
-        notes=["Pre-orders are labelled as such, with the seller's own ship-date wording when it gives one.",
+        notes=["We show the price US visitors see, which has no VAT. EU buyers pay 21% VAT on top.",
+               "Pre-orders are labelled as such, with the seller's own ship-date wording when it gives one.",
                "Its FAQ says it ships to the US and Canada (express 2–4 days, standard 4–6 days; customs can add time).",
                "Shipping and import duties are not included, so the real US price will be higher than the figure shown."]),
     "altair": dict(

@@ -44,3 +44,34 @@ class CollectorRules(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class PowerMiningUsPrices(unittest.TestCase):
+    """Power Mining serves EU (LV) prices incl. 21% VAT unless asked for the US storefront."""
+    PRODUCT = {"handle": "bitcube", "title": "Bitcube", "variants": [{"title": "US", "price": "97.11", "available": True, "compare_at_price": None}]}
+
+    def run_with(self, country, seen):
+        page = f'<script>Shopify.country = "{country}";</script><p>PRE-ORDERS OPEN · CHRISTMAS DELIVERY</p>'
+        orig = (C.http_get, C.fetch_shopify_all, C.POWERMINING, C.time.sleep)
+        def fake_get(url, accept="*/*", headers=None):
+            seen.append(headers); return page
+        def fake_all(base, headers=None):
+            seen.append(headers); return [self.PRODUCT]
+        C.http_get, C.fetch_shopify_all, C.POWERMINING, C.time.sleep = fake_get, fake_all, {"bitcube": "bitcube"}, lambda s: None
+        try:
+            return C.collect_powermining("2026-10-21T16:00:00Z")
+        finally:
+            C.http_get, C.fetch_shopify_all, C.POWERMINING, C.time.sleep = orig
+
+    def test_requests_us_storefront_and_notes_vat(self):
+        seen = []
+        out, missing = self.run_with("US", seen)
+        self.assertTrue(seen and all(h == C.POWERMINING_US for h in seen))   # every request asks for the US storefront
+        o = out[0]
+        self.assertEqual((o["price"], o["currency"], o["stock_status"]), (97.11, "EUR", "preorder"))
+        self.assertIn("EU buyers pay 21% VAT on top", o["config"])
+        self.assertEqual(o["ship_note"], "Seller says delivery by Christmas")
+
+    def test_refuses_eu_vat_storefront(self):
+        with self.assertRaises(RuntimeError):   # seller fails -> previous US offers carry forward, never overwritten with EU VAT prices
+            self.run_with("LV", [])

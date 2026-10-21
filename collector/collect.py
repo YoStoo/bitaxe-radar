@@ -90,7 +90,7 @@ SELLERS = {
                      "affiliate": "Unknown - not checked"},
     "bitaxede":     {"name": "Bitaxe.de", "url": "https://bitaxe.de", "currency": "EUR", "method": "Product-page schema.org JSON-LD",
                      "affiliate": "Reported via third-party article; not yet confirmed with seller"},
-    "powermining":  {"name": "Power Mining", "url": "https://powermining.io", "currency": "EUR", "method": "Shopify products.json",
+    "powermining":  {"name": "Power Mining", "url": "https://powermining.io", "currency": "EUR", "method": "Shopify products.json (US storefront via localization cookie: ex-VAT prices)",
                      "affiliate": "Up to 10% via GoAffPro (powermining.io/pages/affiliate); not yet joined"},
     "altair":       {"name": "Altair Technology", "url": "https://altairtech.io", "currency": "USD", "method": "Product page (WooCommerce variation data / JSON-LD)",
                      "affiliate": "Program exists; not yet approved - plain links only"},
@@ -219,8 +219,8 @@ def now_utc():
     return datetime.now(timezone.utc).replace(microsecond=0)
 
 
-def http_get(url, accept="*/*"):
-    req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": accept})
+def http_get(url, accept="*/*", headers=None):
+    req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": accept, **(headers or {})})
     last = None
     for attempt in range(3):
         try:
@@ -237,8 +237,8 @@ def http_get(url, accept="*/*"):
     raise last
 
 
-def get_json(url):
-    return json.loads(http_get(url, "application/json"))
+def get_json(url, headers=None):
+    return json.loads(http_get(url, "application/json", headers))
 
 
 def offer(seller, model, title, url, price, currency, status, in_stock, config, checked_at, source_url, extra=None):
@@ -299,10 +299,10 @@ def ld_image(n):
 # --------------------------------------------------------------------------------------
 # Seller adapters. Each returns a list of offers; raises on total failure.
 # --------------------------------------------------------------------------------------
-def fetch_shopify_all(base):
+def fetch_shopify_all(base, headers=None):
     products, page = [], 1
     while page <= 6:
-        d = get_json(f"{base}/products.json?limit=250&page={page}")
+        d = get_json(f"{base}/products.json?limit=250&page={page}", headers)
         batch = d.get("products", [])
         if not batch: break
         products += batch
@@ -409,9 +409,24 @@ def collect_bitaxede(ts):
     return out, missing
 
 
+# Power Mining (Latvia) shows EU visitors prices incl. 21% VAT and everyone else the ex-VAT price. Without a
+# localization cookie Shopify serves the EU (LV) price, so ask for the US storefront explicitly.
+POWERMINING_US = {"Cookie": "localization=US"}
+
+
+def shopify_country(html):
+    m = re.search(r'Shopify\.country\s*=\s*"([A-Z]{2})"', html)
+    return m.group(1) if m else None
+
+
 def collect_powermining(ts):
     base = SELLERS["powermining"]["url"]
-    by_handle = {p["handle"]: p for p in fetch_shopify_all(base)}
+    # Guard: if the US storefront isn't served, fail the seller (previous offers carry forward as stale)
+    # rather than write VAT-inclusive EU prices over the US ones.
+    country = shopify_country(http_get(f"{base}/products/{next(iter(POWERMINING.values()))}", headers=POWERMINING_US))
+    if country != "US":
+        raise RuntimeError(f"US storefront not served (Shopify.country={country!r}); refusing EU VAT prices")
+    by_handle = {p["handle"]: p for p in fetch_shopify_all(base, POWERMINING_US)}
     out, missing = [], []
     for model, handle in POWERMINING.items():
         p = by_handle.get(handle)
@@ -424,13 +439,15 @@ def collect_powermining(ts):
         v = min(avail or pool, key=lambda v: float(v["price"]))
         url = f"{base}/products/{p['handle']}"
         # Shopify 'available' stays true for pre-orders, so read the product page text too.
-        html = http_get(url)
+        html = http_get(url, headers=POWERMINING_US)
+        if shopify_country(html) != "US":
+            raise RuntimeError(f"US storefront not served for {handle}")
         text = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", re.sub(r"<script.*?</script>|<style.*?</style>", "", html, flags=re.S)))
         pre = re.search(r"you can now pre-order|coming soon[^.]{0,80}pre-order|pre-orders open", text, flags=re.I)
         ship = (re.search(r"Shipping [^.!]{0,60}\d{4}!?", text) or re.search(r"Christmas delivery", text, flags=re.I)) if pre else None
         status = "preorder" if pre else ("in_stock" if avail else "out_of_stock")
-        cfg = (f"Variant: {v['title']}; EUR incl. tax per the page; USB-C power supply and cable in the box; shipping extra" if model == "bitcube"
-               else f"Variant: {v['title']}; page lists power supply + stand in the box; EUR, tax basis not stated; shipping extra")
+        cfg = (f"Variant: {v['title']}; USB-C power supply and cable in the box; US price, no VAT (EU buyers pay 21% VAT on top); shipping extra" if model == "bitcube"
+               else f"Variant: {v['title']}; page lists power supply + stand in the box; US price, no VAT (EU buyers pay 21% VAT on top); shipping extra")
         out.append(offer("powermining", model, p["title"], url, v["price"], "EUR", status,
                          bool(avail) and not pre, cfg, ts, url,
                          {"compare_at": float(v["compare_at_price"]) if v.get("compare_at_price") else None,
