@@ -26,3 +26,6 @@ site/miners/
 site/find-my-miner/
 site/alerts/
 site/newsletter/
+# private research notes (kept local, not published)
+docs/REDDIT_RESEARCH.md
+docs/REBRAND_RESEARCH.md
