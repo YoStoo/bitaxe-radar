@@ -495,7 +495,7 @@ MODEL_IMG = {
     "bitforge-nano": (800, 797, "BitForge Nano enclosed two-chip Bitcoin miner"),
     "heatbit-bitair": (459, 800, "Heatbit Bitair air purifier with built-in Bitcoin miner"),
     "futurebit-apollo-iii": (800, 761, "FutureBit Apollo III cube home Bitcoin miner"),
-    "hammer-thor-p2": (800, 720, "Hammer Miner Thor P2 desk Bitcoin miner"),
+    "hammer-thor-p2": (800, 706, "Hammer Miner Thor P2 desk Bitcoin miner"),
     "hammer-bc08": (800, 738, "Hammer Miner BC08 desktop Bitcoin miner with touchscreen"),
     "gekko-kbox-22": (800, 457, "GekkoScience KBox 22 all-in-one Bitcoin miner and heater"),
 }
