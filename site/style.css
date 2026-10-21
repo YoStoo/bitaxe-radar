@@ -79,3 +79,9 @@ details summary{cursor:pointer;font-weight:600}details p{margin:8px 0 2px;color:
 .top .brand{color:var(--text);text-decoration:none}
 .foot a{color:var(--muted)}
 #summary table{margin-top:8px}
+.cta{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin:14px 0}
+.cta>div{background:var(--panel);border:2px solid var(--accent);border-radius:10px;padding:12px 14px}
+.cta small{display:block;color:var(--muted);font-size:12px}.cta b{font-size:20px}
+.cta .btn{margin-top:8px;font-size:15px;padding:8px 14px}
+.sponsor{border:1px dashed var(--line);border-radius:10px;padding:10px 12px;margin:14px 0;font-size:14px;color:var(--muted)}
+.sponsor small{display:inline-block;text-transform:uppercase;letter-spacing:.05em;font-size:11px;margin-right:6px}

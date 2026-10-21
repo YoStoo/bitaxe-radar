@@ -195,5 +195,23 @@ class SiteTests(unittest.TestCase):
         self.assertIn("/models/bitaxe-gamma/", home)
 
 
+    def test_cta_sponsor_and_advertise(self):
+        self.assertIn("/advertise/", self.pages)
+        self.assertIn(BASE + "/advertise/", self.sitemap)
+        adv = (SITE / "advertise" / "index.html").read_text()
+        self.assertIn("mailto:contact@bitaxeradar.com", adv)
+        for mid in ["bitaxe-gamma", "nerdqaxe-pp"]:
+            html = (SITE / "models" / mid / "index.html").read_text()
+            self.assertIn('class="sponsor"', html)
+            self.assertIn('href="/advertise/"', html)
+            if "Cheapest in stock</small>" in html:
+                self.assertIn('class="cta"', html)
+        # analytics tag only when a real 32-hex token is configured
+        app = (SITE / "app.js").read_text()
+        tok = re.search(r'var CF_BEACON_TOKEN\s*=\s*"([^"]*)"', app).group(1)
+        home = (SITE / "index.html").read_text()
+        self.assertEqual("cloudflareinsights" in home, bool(re.fullmatch(r"[0-9a-f]{32}", tok)))
+
+
 if __name__ == "__main__":
     unittest.main()

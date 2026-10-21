@@ -4,7 +4,9 @@ var AFFILIATE = { powermining: "ref=bitaxeradar" };
 // TODO (before launch): deploy the Cloudflare Worker (see worker/README.md), then set all three:
 var WORKER_URL = "https://bitaxe-radar-alerts.bitaxeradar.workers.dev/subscribe";
 var TURNSTILE_SITEKEY = "0x4AAAAAAFYqcERY2Pvc1wQI";   // public site key
-var SIGNUP_ENABLED = true;                                        
+var SIGNUP_ENABLED = true;
+// Cloudflare Web Analytics site token (public, cookie-free). Empty = no analytics tag. build_site.py reads it.
+var CF_BEACON_TOKEN = "";
 (function () {
   "use strict";
   var R = window.RADAR;

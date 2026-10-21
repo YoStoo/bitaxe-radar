@@ -9,7 +9,7 @@ Outputs
   site/models/<id>/index.html       one pre-rendered page per tracked model
   site/compare/<a>-vs-<b>/          model-vs-model pages
   site/sellers/<id>/                one page per tracked seller
-  site/where-to-buy-bitaxe/, site/in-stock/, site/deals/, site/how-we-track/
+  site/where-to-buy-bitaxe/, site/in-stock/, site/deals/, site/how-we-track/, site/advertise/
   site/sitemap.xml, site/robots.txt, site/404.html
 
 Every number on every page comes from the data files (nothing is invented); the hand-written text is
@@ -50,6 +50,10 @@ AFFILIATE = dict(re.findall(r'(\w+)\s*:\s*"([^"]+)"', re.search(r"var AFFILIATE\
 WORKER_URL = re.search(r'var WORKER_URL\s*=\s*"([^"]+)"', _app).group(1)
 TURNSTILE_SITEKEY = re.search(r'var TURNSTILE_SITEKEY\s*=\s*"([^"]+)"', _app).group(1)
 SIGNUP_ENABLED = re.search(r"var SIGNUP_ENABLED\s*=\s*(true|false)", _app).group(1) == "true"
+_cfb = re.search(r'var CF_BEACON_TOKEN\s*=\s*"([^"]*)"', _app)
+CF_BEACON_TOKEN = _cfb.group(1) if _cfb else ""     # Cloudflare Web Analytics site token (public); empty = no analytics tag
+ANALYTICS = (f"<script defer src=\"https://static.cloudflareinsights.com/beacon.min.js\" data-cf-beacon='{{\"token\": \"{CF_BEACON_TOKEN}\"}}'></script>\n"
+             if re.fullmatch(r"[0-9a-f]{32}", CF_BEACON_TOKEN or "") else "")
 
 # ---------------------------------------------------------------------------------------------
 # helpers
@@ -133,6 +137,27 @@ def offer_link(o, text=None):
     t = text or f"View at {sname(o['seller'])} ↗"
     a = f'<a class="btn" href="{esc(offer_href(o))}" target="_blank" rel="{rel}">{esc(t)}</a>'
     return a + ('<div class="ph">affiliate link</div>' if aff else "")
+
+
+def best_cta(st):
+    """Above-the-fold 'go to the best deal' box: cheapest in-stock listing, plus the cheapest USD-priced one if different."""
+    best, usd_best = st["best"], st["best_usd"]
+    if not best:
+        return ""
+    picks = [("Cheapest in stock", best)]
+    if usd_best and usd_best["id"] != best["id"]:
+        picks.append(("Cheapest in stock at a US-dollar seller", usd_best))
+    items = "".join(
+        f'<div><small>{esc(lbl)}</small><b>{money(o["price"], o["currency"])}</b>'
+        + (f' <span class="hint">≈ {money(usd(o))}</span>' if o["currency"] != "USD" and usd(o) is not None else "")
+        + f' <span class="hint">at {esc(sname(o["seller"]))}</span><br>{offer_link(o, "Check price at " + sname(o["seller"]) + " ↗")}</div>'
+        for lbl, o in picks)
+    return f'<div class="cta" role="region" aria-label="Best deal right now">{items}</div>'
+
+
+SPONSOR_SLOT = ('<aside class="sponsor" aria-label="Sponsor spot"><small>Sponsor spot</small> '
+                '<span>Sell Bitaxe-class miners or accessories? This spot is open. Sponsored placements are always labelled and never change our price rankings. '
+                '<a href="/advertise/">Advertise on Bitaxe Radar</a></span></aside>')
 
 
 def badge(status):
@@ -239,7 +264,8 @@ SELLER_COPY = {
         about="Power Mining prices in euros and lists a US variant for some miners. We convert to dollars only to compare, so the dollar figures are approximate.",
         notes=["Prices and stock come from the store's public Shopify feed. The feed's 'available' flag is true even for pre-orders, so we also read the product page and mark pre-orders as such.",
                "Its page quotes a ship date for pre-orders; we show the seller's own wording in the config column when we have it.",
-               "The tax basis of its prices is not stated on the page and shipping and import duties are not included, so the real US price will be higher than the figure shown."]),
+               "The tax basis of its prices is not stated on the page and shipping and import duties are not included, so the real US price will be higher than the figure shown.",
+               "Its product-page FAQ says it ships to the US and Canada (express 2-4 days, standard 4-6 days, customs delays possible), and its affiliate page says it stocks US and EU warehouses."]),
     "bitaxede": dict(
         region="EUR prices incl. VAT",
         about="Bitaxe.de is a European shop. Its prices are in euros and include VAT, and shipping is extra.",
@@ -397,9 +423,9 @@ def layout(path, title, desc, body, *, crumbs=None, jsonld=(), noindex=False, la
 <footer class="foot"><div class="wrap">
   <p>{FOOT_DISCLOSURE}</p>
   <p>Prices and stock are collected automatically from public seller pages and can be wrong or out of date: check the seller's page before buying. Bitaxe Radar is an independent project, not affiliated with the Bitaxe project, Open Source Miners United or any seller listed.</p>
-  <p><a href="/how-we-track/">How we track</a> · <a href="/where-to-buy-bitaxe/">Where to buy</a> · <a href="/deals/">Deals</a> · <a href="mailto:{CONTACT}">{CONTACT}</a></p>
+  <p><a href="/how-we-track/">How we track</a> · <a href="/where-to-buy-bitaxe/">Where to buy</a> · <a href="/deals/">Deals</a> · <a href="/advertise/">Advertise</a> · <a href="mailto:{CONTACT}">{CONTACT}</a></p>
 </div></footer>
-{scripts}
+{scripts}{ANALYTICS}
 </body>
 </html>
 """
@@ -642,11 +668,13 @@ def build_model_page(mid):
 <header class="hero"><h1>{esc(short)} price and stock</h1>
 <p class="lede">{esc(m['name'])}: {head}</p></header>
 {kpis}
+{best_cta(st)}
 {us_note}{avail_note}
 <section aria-labelledby="h-offers"><h2 id="h-offers">Prices by seller</h2>
 <p class="hint">Listed price for the configuration shown, before shipping, import duties and (where noted) tax. Euro prices are converted to USD only as an approximation (EUR→USD ≈ {FX.get('EUR_USD', 'n/a')}, {esc(FX.get('date', ''))}). Updated about every 6 hours.</p>
 {offers_html}
 <p class="hint">Not listed here: sellers we cannot read yet. See <a href="/where-to-buy-bitaxe/#not-tracked">sellers not tracked yet</a>.</p></section>
+{SPONSOR_SLOT}
 <section aria-labelledby="h-hist"><h2 id="h-hist">Price and stock history</h2>{hist_intro}{hist_html}</section>
 <section aria-labelledby="h-nums"><h2 id="h-nums">Numbers that matter</h2>{spec_tbl}{elec_tbl}{spec_note}</section>
 <section aria-labelledby="h-about"><h2 id="h-about">About the {esc(short)}</h2>
@@ -1015,13 +1043,38 @@ def build_method():
 <section><h2>Which sellers we list</h2><p>We list sellers whose public data we can read and whose pricing looks consistent with the rest of the market. We deliberately leave out shops we have not been able to vet, for example those with prices far below every other seller or only wire/crypto payment, because listing a bad shop would hurt readers. We have not verified shipping regions, warranty or return terms for any seller yet.</p>
 <h3>Sellers we cannot read yet</h3><ul class="plain">{unt}</ul></section>
 <section><h2>How Bitaxe Radar earns money</h2>
-<p>Some seller links are affiliate links: if you buy through one, we may earn a commission at no extra cost to you. Those links are labelled "affiliate link" and carry rel="sponsored". We never change prices, rankings or sort order because of affiliate status: offers are ordered by stock and price. If we ever take a seller sponsorship, it will be labelled. Right now only Power Mining links are affiliate links.</p>
+<p>Some seller links are affiliate links: if you buy through one, we may earn a commission at no extra cost to you. Those links are labelled "affiliate link" and carry rel="sponsored". We never change prices, rankings or sort order because of affiliate status: offers are ordered by stock and price. If we ever take a seller sponsorship, it will be labelled (see <a href="/advertise/">advertise</a>). Right now only Power Mining links are affiliate links.</p>
 <p>We do not publish ratings or reviews, because we have not tested the hardware. We do not give financial advice. Solo mining with a small miner is a lottery: the expected return is negative once electricity is counted.</p></section>
 <section><h2>Spotted a mistake?</h2><p>Prices and stock are collected by software and can be wrong. If you see an error or are a seller who wants a listing corrected, write to <a href="mailto:{CONTACT}">{CONTACT}</a>.</p>
 <p><a href="/where-to-buy-bitaxe/">Where to buy</a> · <a href="/in-stock/">In stock now</a> · <a href="/deals/">Deals</a></p></section>
 </article>"""
     ld = {"@context": "https://schema.org", "@type": "AboutPage", "name": "How Bitaxe Radar tracks prices and stock", "url": BASE + path, "dateModified": METHODOLOGY_UPDATED}
     layout(path, title, desc, body, crumbs=trail, jsonld=[ld], lastmod=METHODOLOGY_UPDATED)
+
+
+def build_advertise():
+    path = "/advertise/"
+    trail = [("Home", "/"), ("Advertise", path)]
+    n_models = len([m for m in TRACKED if m not in NOINDEX_MODELS])
+    mail = f"mailto:{CONTACT}?subject=" + "Sponsor%20spot%20on%20Bitaxe%20Radar"
+    title = "Advertise on Bitaxe Radar: sponsor spots for Bitaxe sellers | Bitaxe Radar"
+    desc = "Sponsor spots on Bitaxe Radar, the price and stock tracker for Bitaxe and NerdQaxe miners. For sellers, builders and accessory makers. Always labelled."
+    body = f"""<article>
+<header class="hero"><h1>Advertise on Bitaxe Radar</h1>
+<p class="lede">Bitaxe Radar tracks prices and stock for Bitaxe-class solo miners across {plural(len(SELLERS), 'seller')} and {plural(len(OFFERS), 'listing')}. People land here when they are deciding where to buy, which is the moment a seller wants to be seen.</p></header>
+<section><h2>What is available</h2><ul>
+<li><strong>Featured seller spot</strong> on our {n_models} model pages, right under the price table, labelled "Sponsored".</li>
+<li><strong>Accessory spot</strong> for stands, cases, heatsinks, fans and power supplies.</li>
+<li><strong>Get listed in the tracker</strong>: if you sell Bitaxe-class miners and we don't track you yet, write to us. Being listed in the price table is free and never paid for.</li></ul></section>
+<section><h2>The rules</h2><ul>
+<li>Every sponsored placement is clearly labelled and uses rel="sponsored" links.</li>
+<li>Sponsors never change price rankings, sort order or stock data. The cheapest in-stock listing is always shown first.</li>
+<li>We only take sponsors we would be comfortable sending readers to (real stock, consistent prices, normal payment methods).</li></ul></section>
+<section><h2>Honest numbers</h2><p>The site launched in October 2026, so we do not have meaningful visitor numbers yet and will not make any up. Early sponsors get introductory pricing, and we'll share real traffic figures as soon as we have them.</p>
+<p><a class="btn" href="{esc(mail)}">Email {CONTACT}</a></p></section>
+<p><a href="/how-we-track/">How we track prices and earn money</a> · <a href="/where-to-buy-bitaxe/">Where to buy</a></p>
+</article>"""
+    layout(path, title, desc, body, crumbs=trail, lastmod=METHODOLOGY_UPDATED)
 
 
 def build_404():
@@ -1052,10 +1105,10 @@ def build_home():
     {model_summary_table(TRACKED)}
     <p class="hint"><a href="/where-to-buy-bitaxe/">Where to buy (US-first)</a> · <a href="/in-stock/">Everything in stock</a> · <a href="/deals/">Best deals</a> · <a href="/how-we-track/">How we track</a></p>
   </section>"""
-    foot = ('<p><a href="/where-to-buy-bitaxe/">Where to buy</a> · <a href="/in-stock/">In stock now</a> · <a href="/deals/">Deals</a> · <a href="/how-we-track/">How we track</a> · '
+    foot = ('<p><a href="/where-to-buy-bitaxe/">Where to buy</a> · <a href="/in-stock/">In stock now</a> · <a href="/deals/">Deals</a> · <a href="/how-we-track/">How we track</a> · <a href="/advertise/">Advertise</a> · '
             + " · ".join(f'<a href="{compare_url(a, b)}">{esc(compare_label(a, b))}</a>' for a, b in COMPARE_PAIRS) + "</p>\n  <p>Sellers: "
             + " · ".join(f'<a href="/sellers/{sid}/">{esc(s["name"])}</a>' for sid, s in SELLERS.items()) + "</p>")
-    out = tpl.replace("<!--HEAD-->", head).replace("<!--SEO-SUMMARY-->", summary).replace("<!--FOOT-LINKS-->", foot)
+    out = tpl.replace("<!--HEAD-->", head).replace("<!--SEO-SUMMARY-->", summary).replace("<!--FOOT-LINKS-->", foot).replace("</body>", ANALYTICS + "</body>")
     (SITE / "index.html").write_text(out)
     PAGES.append(dict(path="/", lastmod=latest["generated_at"]))
 
@@ -1083,6 +1136,7 @@ def main():
     build_in_stock()
     build_deals()
     build_method()
+    build_advertise()
     build_404()
     build_home()
     write_sitemap()
