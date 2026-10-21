@@ -785,42 +785,42 @@
  "powermining:bitaxe-gamma": [
   {
    "t": "2026-10-16T12:33:04Z",
-   "price": 121.0,
+   "price": 100.0,
    "currency": "EUR",
    "in_stock": false,
    "status": "preorder"
   },
   {
    "t": "2026-10-17T10:44:15Z",
-   "price": 121.0,
+   "price": 100.0,
    "currency": "EUR",
    "in_stock": false,
    "status": "preorder"
   },
   {
    "t": "2026-10-18T11:05:35Z",
-   "price": 121.0,
+   "price": 100.0,
    "currency": "EUR",
    "in_stock": false,
    "status": "preorder"
   },
   {
    "t": "2026-10-19T13:16:07Z",
-   "price": 121.0,
+   "price": 100.0,
    "currency": "EUR",
    "in_stock": false,
    "status": "preorder"
   },
   {
    "t": "2026-10-20T11:36:52Z",
-   "price": 121.0,
+   "price": 100.0,
    "currency": "EUR",
    "in_stock": false,
    "status": "preorder"
   },
   {
    "t": "2026-10-21T11:41:33Z",
-   "price": 121.0,
+   "price": 100.0,
    "currency": "EUR",
    "in_stock": false,
    "status": "preorder"
@@ -829,42 +829,42 @@
  "powermining:nerdaxe-gamma": [
   {
    "t": "2026-10-16T12:33:04Z",
-   "price": 168.19,
+   "price": 139.0,
    "currency": "EUR",
    "in_stock": true,
    "status": "in_stock"
   },
   {
    "t": "2026-10-17T10:44:15Z",
-   "price": 168.19,
+   "price": 139.0,
    "currency": "EUR",
    "in_stock": true,
    "status": "in_stock"
   },
   {
    "t": "2026-10-18T11:05:35Z",
-   "price": 168.19,
+   "price": 139.0,
    "currency": "EUR",
    "in_stock": true,
    "status": "in_stock"
   },
   {
    "t": "2026-10-19T13:16:07Z",
-   "price": 168.19,
+   "price": 139.0,
    "currency": "EUR",
    "in_stock": true,
    "status": "in_stock"
   },
   {
    "t": "2026-10-20T11:36:52Z",
-   "price": 168.19,
+   "price": 139.0,
    "currency": "EUR",
    "in_stock": true,
    "status": "in_stock"
   },
   {
    "t": "2026-10-21T11:41:33Z",
-   "price": 168.19,
+   "price": 139.0,
    "currency": "EUR",
    "in_stock": true,
    "status": "in_stock"
@@ -873,42 +873,42 @@
  "powermining:nerdqaxe-pp": [
   {
    "t": "2026-10-16T12:33:04Z",
-   "price": 363.0,
+   "price": 300.0,
    "currency": "EUR",
    "in_stock": true,
    "status": "in_stock"
   },
   {
    "t": "2026-10-17T10:44:15Z",
-   "price": 363.0,
+   "price": 300.0,
    "currency": "EUR",
    "in_stock": true,
    "status": "in_stock"
   },
   {
    "t": "2026-10-18T11:05:35Z",
-   "price": 363.0,
+   "price": 300.0,
    "currency": "EUR",
    "in_stock": true,
    "status": "in_stock"
   },
   {
    "t": "2026-10-19T13:16:07Z",
-   "price": 363.0,
+   "price": 300.0,
    "currency": "EUR",
    "in_stock": true,
    "status": "in_stock"
   },
   {
    "t": "2026-10-20T11:36:52Z",
-   "price": 363.0,
+   "price": 300.0,
    "currency": "EUR",
    "in_stock": true,
    "status": "in_stock"
   },
   {
    "t": "2026-10-21T11:41:33Z",
-   "price": 363.0,
+   "price": 300.0,
    "currency": "EUR",
    "in_stock": true,
    "status": "in_stock"
@@ -1196,7 +1196,7 @@
  "powermining:bitcube": [
   {
    "t": "2026-10-21T16:08:13Z",
-   "price": 117.5,
+   "price": 97.11,
    "currency": "EUR",
    "in_stock": false,
    "status": "preorder"
