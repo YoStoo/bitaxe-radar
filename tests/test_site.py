@@ -212,6 +212,37 @@ class SiteTests(unittest.TestCase):
         home = (SITE / "index.html").read_text()
         self.assertEqual("cloudflareinsights" in home, bool(re.fullmatch(r"[0-9a-f]{32}", tok)))
 
+    def test_no_internal_notes_public(self):
+        """Owner-only material (scrape limits, untracked-seller lists, traffic caveats, affiliate pipeline notes) stays off public pages."""
+        banned = ["not tracked yet", "cannot track", "cannot read", "we cannot", "unscrapable", "prototype", "meaningful visitor numbers",
+                  "not yet joined", "bot protection", "curl exit", "[affiliate link placeholder]"]
+        for f in list(SITE.rglob("*.html")) + [SITE / "data.js", SITE / "app.js"]:
+            txt = f.read_text().lower()
+            for b in banned:
+                self.assertNotIn(b, txt, f"{f.relative_to(SITE)} contains internal text: {b!r}")
+
+    def test_home_cards_and_brand(self):
+        home = (SITE / "index.html").read_text()
+        self.assertIn('id="miners"', home)
+        self.assertGreaterEqual(home.count('class="card'), 4)
+        self.assertIn('class="logo-mark"', home)
+        self.assertIn('id="cost"', home)
+        self.assertIn("signup.js", home)
+        self.assertIn("<svg", (SITE / "favicon.svg").read_text())
+        # every product photo referenced anywhere exists and carries alt text and explicit dimensions
+        for f in list(SITE.rglob("*.html")):
+            for tag in re.findall(r"<img [^>]*>", f.read_text()):
+                src = re.search(r'src="([^"]+)"', tag).group(1)
+                self.assertTrue((SITE / src.lstrip("/")).exists(), f"{f}: missing image {src}")
+                self.assertRegex(tag, r'alt="[^"]{8,}"')
+                self.assertRegex(tag, r'width="\d+" height="\d+"')
+        self.assertIn('loading="lazy"', home)
+        # every card price comes from the data (no invented numbers): each shown price matches a current in-stock offer
+        data = json.loads((SITE / "data.js").read_text()[len("window.RADAR = "):-2])
+        live = {f"{o['price_usd_approx']:,.2f}" for o in data["latest"]["offers"] if o["in_stock"] and o.get("price_usd_approx") is not None}
+        for price in re.findall(r'<div class="price">(?:≈ )?\$([\d,]+\.\d{2})', home):
+            self.assertIn(price, live)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -3,112 +3,62 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bitaxe Radar — price &amp; stock tracker for small solo Bitcoin miners</title>
-<meta name="description" content="Prices, stock and history for Bitaxe Gamma, NerdQaxe++, Nerdaxe and other small solo Bitcoin lottery miners across US and EU sellers, with free price-drop alerts.">
+<meta name="theme-color" content="#0b1222">
+<title>Bitaxe Radar: the cheapest Bitaxe and NerdQaxe in stock right now</title>
+<meta name="description" content="Find the cheapest Bitaxe Gamma, NerdQaxe++ and Nerdaxe miners in stock at US and EU shops. Prices checked every 6 hours, with free price-drop alerts.">
 <link rel="stylesheet" href="/style.css">
 <!--HEAD-->
 </head>
 <body>
-<a class="skip" href="#table">Skip to prices</a>
+<!--HEADER-->
 
-<header class="top">
-  <div class="wrap">
-    <div class="brand"><span class="dot" aria-hidden="true"></span> Bitaxe Radar</div>
-    <nav aria-label="Sections">
-      <a href="#table">Prices</a><a href="#history">History</a><a href="#cost">Running cost</a><a href="#alerts">Alerts</a><a href="#coverage">Coverage</a><a href="/where-to-buy-bitaxe/">Where to buy</a><a href="/deals/">Deals</a>
-    </nav>
-  </div>
-</header>
-
-<div class="notice lottery" role="note">
-  <div class="wrap"><strong>Solo mining is a lottery, not income.</strong>
-  A Bitaxe-class miner has a tiny chance of ever finding a block. Treat any purchase as a hobby / learning expense and expect to lose money. Nothing on this site is financial advice or a revenue projection.</div>
-</div>
-
-<main class="wrap">
-  <section class="hero">
-    <h1>Price &amp; stock tracker for small solo Bitcoin miners</h1>
-    <p class="lede">Bitaxe, Nerdaxe and NerdQaxe home miners across several sellers, side by side — with price history and a yearly electricity-cost estimate you can adjust.</p>
-    <p class="meta" id="freshness" aria-live="polite">Loading data…</p>
+<main class="wrap" id="main">
+  <section class="home-hero">
+    <!--RADAR-BG-->
+    <h1>Find the cheapest Bitaxe <span class="hl">in stock</span>, right now.</h1>
+    <p class="lede">We check US and EU shops every 6 hours, so you can grab the best price before it sells out.</p>
+    <!--HERO-CHIPS-->
   </section>
 
-<!--SEO-SUMMARY-->
+<!--CARDS-->
 
-  <section id="table" aria-labelledby="h-table">
-    <div class="sec-head">
-      <h2 id="h-table">Compare prices</h2>
-      <div class="controls">
-        <label><input type="checkbox" id="onlyStock"> Only show in-stock offers</label>
-      </div>
-    </div>
-    <p class="hint">Prices are the seller's listed price for the configuration shown, before shipping, import duties and (where noted) tax. Euro prices are converted to USD only as an approximation. Configurations differ between sellers (power supply, stand, hashrate revision) — read the “Config” column before comparing.</p>
-    <div id="tables"></div>
+  <section aria-labelledby="h-how">
+    <h2 id="h-how" class="sr">How it works</h2>
+    <ol class="steps">
+      <li><i>1</i><b>We check the shops</b><span>Prices and stock, every 6 hours.</span></li>
+      <li><i>2</i><b>You spot the best deal</b><span>Cheapest in-stock price, up front.</span></li>
+      <li><i>3</i><b>Buy direct</b><span>Straight from the shop. Same price for you.</span></li>
+    </ol>
   </section>
 
-  <section id="history" aria-labelledby="h-hist">
-    <div class="sec-head">
-      <h2 id="h-hist">Price history</h2>
-      <div class="controls"><label>Model <select id="histModel"></select></label></div>
-    </div>
-    <p class="hint" id="histHint"></p>
-    <div id="chart" class="chart" role="img" aria-label="Price history chart"></div>
-    <div id="legend" class="legend"></div>
-  </section>
+<!--SIGNUP-->
 
-  <section id="cost" aria-labelledby="h-cost">
-    <div class="sec-head"><h2 id="h-cost">Yearly electricity cost</h2></div>
-    <div class="calc">
-      <label>Electricity price ($ per kWh)
-        <input id="rate" type="number" min="0" step="0.01" value="0.15" inputmode="decimal">
-      </label>
-      <span class="hint">Default $0.15/kWh is only an <em>assumption</em> — enter your own rate from your utility bill.</span>
-    </div>
-    <div class="tablewrap"><table id="costTable">
-      <thead><tr><th>Model</th><th class="num">Typical watts*</th><th class="num">kWh / year</th><th class="num">Cost / year</th><th class="num">Cost / month</th></tr></thead>
-      <tbody></tbody>
-    </table></div>
-    <p class="hint">*Watts are approximate vendor-stated typical figures (they vary with firmware overclocking, fans and power supply efficiency). Cost = watts × 24 h × 365 days ÷ 1000 × your rate, assuming 24/7 operation. This is electricity only — it ignores the purchase price and any mining revenue.</p>
-  </section>
-
-  <section id="alerts" aria-labelledby="h-alerts">
-    <div class="sec-head"><h2 id="h-alerts">Free price-drop alerts</h2></div>
-    <form id="signup" class="signup" novalidate>
-      <p id="signupIntro"><strong>Get one email when a miner drops to your price.</strong> Pick a miner and a target price (USD). We email you only when it is <em>in stock</em> at or under that price. Free; unsubscribe with one click.</p>
-      <div class="row">
-        <label>Email <input type="email" id="email" name="email" autocomplete="email" placeholder="you@example.com" maxlength="254" required></label>
-        <label>Miner <select id="alertModel" name="model"><option value="any">Any tracked miner</option></select></label>
-        <label>Alert me at or under (USD) <input type="number" min="1" max="100000" step="1" id="alertPrice" name="target_price" placeholder="e.g. 120" inputmode="numeric" required></label>
-      </div>
-      <div style="position:absolute;left:-9999px" aria-hidden="true"><label>Website <input type="text" id="website" name="website" tabindex="-1" autocomplete="off"></label></div>
-      <div class="row signup-actions">
-        <div id="turnstile" class="turnstile-slot"></div>
-        <button type="submit" id="signupBtn">Notify me</button>
-      </div>
-      <p class="hint">Double opt-in: after you submit, we send one confirmation email, and you only start getting alerts once you click the link in it. Alerts go out at most when our checks (every ~6 hours) find a new lower price, and at most about once a week per price. Your email is only used for these alerts and is never sold. Links to sellers may be affiliate links (see disclosure below).</p>
-      <p class="hint" id="signupMsg" role="status" aria-live="polite"></p>
-    </form>
-  </section>
-
-  <section id="coverage" aria-labelledby="h-cov">
-    <div class="sec-head"><h2 id="h-cov">Coverage &amp; sources</h2></div>
-    <p class="hint">Each offer links to the seller's own product page and shows when we last checked it. Stock status is what the seller's page/feed reported at that time and can change within minutes.</p>
-    <div id="trackedSellers"></div>
-    <h3>Not tracked yet</h3>
-    <ul id="unscrapable" class="plain"></ul>
-  </section>
-
-  <section class="disclosure" aria-labelledby="h-disc">
-    <h2 id="h-disc">Affiliate disclosure</h2>
-    <p>Bitaxe Radar earns money through affiliate links and may later take seller sponsorships. If you buy through an affiliate link we may earn a commission at no extra cost to you. <strong>Power Mining links are affiliate links</strong> (marked "affiliate link" next to the button); other sellers are plain links for now. Affiliate status never changes how offers are sorted. Sponsored placements, if any, will be labelled and will not change how offers are sorted.</p>
-    <p>Prices, stock and specs are collected automatically from public seller pages and may be wrong or out of date. Check the seller's page before buying. Not financial advice.</p>
+  <section id="faq" aria-labelledby="h-faq">
+    <h2 id="h-faq">Questions</h2>
+    <details><summary>What is a Bitaxe?</summary>
+      <p>A small, open-source Bitcoin miner about the size of a phone. It uses about as much power as a light bulb and runs quietly on a desk. NerdQaxe and Nerdaxe are similar boards from other makers.</p></details>
+    <details><summary>Can a small miner make money?</summary>
+      <p>Not reliably. It "solo mines": if it ever finds a block it wins the whole reward (about 3.125 BTC), but the odds are tiny and electricity costs money every year. Think of it as a lottery ticket and a fun gadget, not income. Nothing here is financial advice.</p></details>
+    <details id="cost"><summary>How much does it cost to run?</summary>
+      <p>Enter your electricity rate from your power bill. Watts are the sellers' stated figures, running 24/7.</p>
+      <div class="calc"><label>Your rate ($ per kWh) <input id="rate" type="number" min="0" step="0.01" value="0.15" inputmode="decimal"></label></div>
+      <div class="tablewrap"><table id="costTable">
+        <thead><tr><th>Miner</th><th class="num">Watts</th><th class="num">Per month</th><th class="num">Per year</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+    </details>
+    <details><summary>Which one should I buy?</summary>
+      <p>The Bitaxe Gamma is the usual first pick: cheap, quiet and efficient. Want more hashrate? Look at the GT 801 or NerdQaxe++, which use more power. Side by side:</p>
+      <!--COMPARE-LINKS-->
+    </details>
+    <details><summary>Where do your prices come from?</summary>
+      <p>Straight from each shop's own product pages, checked every 6 hours. Prices are before shipping and tax, and stock can change fast, so always confirm on the shop's page. <a href="/how-we-track/">More about how we track</a>.</p></details>
+    <details><summary>How does Bitaxe Radar make money?</summary>
+      <p>Some shop links are affiliate links: if you buy through one, the shop may pay us a small commission at no extra cost to you. It never changes which price we show first.</p></details>
   </section>
 </main>
 
-<footer class="foot"><div class="wrap">
-  <p>Bitaxe Radar — prototype. Not affiliated with the Bitaxe project, Open Source Miners United or any seller listed.</p>
-  <!--FOOT-LINKS-->
-  <p>Contact: <a href="mailto:contact@bitaxeradar.com">contact@bitaxeradar.com</a></p>
-</div></footer>
+<!--FOOTER-->
 
 <script src="/data.js"></script>
 <script src="/app.js"></script>
