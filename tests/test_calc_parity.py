@@ -173,9 +173,21 @@ class SoloPages(unittest.TestCase):
         self.assertIn("since the last solo win", h)
         self.assertIn("mempool.space/block/", h)
         self.assertIn("CC BY 4.0", h)
+        self.assertIn("Pool = the service the winner mined through. Device = the machine they used, if they shared it.", h)
+        self.assertNotIn("not publicly reported", h)
+        unknown = [w for w in wins if not w.get("hashrate_hs") and not w.get("rented")]
+        if unknown:
+            self.assertIn('<span class="dev unk">Device: unknown</span>', h)
+        named = next((w for w in wins if w.get("hardware") and w.get("hashrate_hs")), None)
+        if named:
+            self.assertIn(f'Device: {named["hardware"]} (≈', h)
+            self.assertIn(", reported by winner)", h)
+        self.assertIn(f'Pool: {wins[0]["pool"]}', h)
         self.assertIn("/solo-wins/", (SITE / "sitemap.xml").read_text())
         g = self.read("/models/bitaxe-gamma/")
         self.assertIn("Last solo block win:", g)
+        self.assertIn("Pool: ", g.split("Last solo block win:")[1][:300])
+        self.assertIn("Device: ", g.split("Last solo block win:")[1][:400])
         self.assertNotIn("Last solo block win:", self.read("/models/heatbit-maxi/"))     # not a solo model
         # "this size" only from a publicly reported hashrate within half to double the model's
         th = json.loads((ROOT / "data" / "latest.json").read_text())["models"]["bitaxe-gamma"]["hashrate_ths"]

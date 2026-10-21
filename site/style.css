@@ -376,3 +376,4 @@ details .tablewrap{margin-bottom:14px}
 .wins .wtop{display:flex;justify-content:space-between;gap:8px}.wins .wtop span{color:var(--accent-2);font-weight:700;font-variant-numeric:tabular-nums}
 .wins .wpool{font-weight:600}.wins .wminer{color:var(--muted);font-size:13.5px}.wins a{font-size:13.5px;margin-top:2px}
 .calc-tbl td.nw{white-space:nowrap}
+.dev.unk{color:var(--faint)}.solowin .dev{color:var(--muted)}.solowin .dev.unk{color:var(--faint)}

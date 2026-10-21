@@ -1795,7 +1795,7 @@ def solo_llms():
     if not SOLO_WINS:
         return ""
     w = SOLO_WINS[0]
-    return f" Last solo win: {fmt_date(w['time'])} ({w['pool']}); {len(wins_last_year())} in the past 12 months."
+    return f" Last solo win: {fmt_date(w['time'])} (pool: {w['pool']}; device: {win_device(w)[0].split(': ', 1)[1]}); {len(wins_last_year())} in the past 12 months."
 
 
 def build_llms():
@@ -1829,7 +1829,7 @@ Bitaxe Radar is independent. Some shop links are affiliate links; they never cha
 ## Guides
 - [Is home mining worth it?]({BASE}/guides/is-home-mining-worth-it/): depends on your electricity price; each miner page has a break-even power price.
 - [Solo odds calculator]({BASE}/solo-odds/): chance of finding a block per day, per year and over 5 years for any hashrate, from the live network hashrate. Solo mining is a lottery.
-- [Solo block wins]({BASE}/solo-wins/): recent Bitcoin blocks found by solo miners, with date, pool, reward and the miner only where publicly reported.{solo_llms()}
+- [Solo block wins]({BASE}/solo-wins/): recent Bitcoin blocks found by solo miners, with date, pool (the service the winner mined through), reward and device (only when the winner shared it).{solo_llms()}
 - [Solo vs pool mining]({BASE}/guides/solo-vs-pool-mining/): solo is a lottery for a whole block; pool pays small, steady amounts.
 - [How heater miners work]({BASE}/guides/how-heater-miners-work/): a miner turns its electricity into heat like a space heater.
 - [Where to buy a Bitaxe]({BASE}/where-to-buy-bitaxe/)
@@ -2017,11 +2017,19 @@ def win_url(w):
     return f"https://mempool.space/block/{w.get('hash') or w['height']}"
 
 
-def win_miner(w):
-    """What's publicly reported about the winning miner. Never guessed."""
+def win_device(w):
+    """(text, known) for the winning machine, from the winner's own public report only. Never guessed."""
+    if w.get("rented"):
+        return "Device: rented hashrate", True
     if w.get("hashrate_hs"):
-        return "Reported: " + (f'{w["hardware"]}, ≈{fmt_hs(w["hashrate_hs"])}' if w.get("hardware") else f'≈{fmt_hs(w["hashrate_hs"])}')
-    return "Rented hashrate" if w.get("rented") else "Miner not publicly reported"
+        name = w.get("hardware") or "not named"
+        return f'Device: {name} (≈{fmt_hs(w["hashrate_hs"])}, reported by winner)', True
+    return "Device: unknown", False
+
+
+def device_html(w):
+    t, known = win_device(w)
+    return f'<span class="dev{"" if known else " unk"}">{esc(t)}</span>'
 
 
 def days_since(w):
@@ -2039,15 +2047,14 @@ def solo_win_html(mid):
         return ""
     w = SOLO_WINS[0]
     d = days_since(w)
-    lines = [f'<p>Last solo block win: <b>{fmt_date(w["time"])}</b> ({esc(w["pool"])}) · {plural(d, "day")} ago</p>']
+    lines = [f'<p>Last solo block win: <b>{fmt_date(w["time"])}</b> ({plural(d, "day")} ago)<br>Pool: {esc(w["pool"])} · {device_html(w)}</p>']
     s = size_match(mid)
     if s:
-        who = f'a reported {esc(s["hardware"])} at ≈{fmt_hs(s["hashrate_hs"])}' if s.get("hardware") else f'a reported ≈{fmt_hs(s["hashrate_hs"])} miner'
-        lines.append(f'<p>Last win by a miner this size: <b>{fmt_date(s["time"])}</b>, {who} ({esc(s["pool"])})</p>')
+        lines.append(f'<p>Last win by a miner this size: <b>{fmt_date(s["time"])}</b><br>Pool: {esc(s["pool"])} · {device_html(s)}</p>')
     th = MODELS[mid]["hashrate_ths"]
     return (f'<section class="solowin" aria-label="Solo block wins">{"".join(lines)}'
             f'<p class="hint"><a href="/solo-odds/?th={th:g}">Your solo odds</a> · <a href="/solo-wins/">All solo wins</a>'
-            + (" · “This size” = reported hashrate within 2× of this one." if s else "") + "</p></section>")
+            + (" · “This size” = winner-reported hashrate within 2× of this one." if s else "") + "</p></section>")
 
 
 def wins_last_year():
@@ -2128,7 +2135,7 @@ def solo_wins_line():
     if not SOLO_WINS:
         return "Solo blocks are rare: across all public solo pools, about one a month."
     w, n = SOLO_WINS[0], len(wins_last_year())
-    return (f"The last solo block was found {plural(days_since(w), 'day')} ago, on {fmt_date(w['time'])} ({esc(w['pool'])}). "
+    return (f"The last solo block was found {plural(days_since(w), 'day')} ago, on {fmt_date(w['time'])} (pool: {esc(w['pool'])}). "
             f"Solo pools found {plural(n, 'block')} in the past 12 months, out of about 52,000.")
 
 
@@ -2144,19 +2151,20 @@ def build_solo_wins():
     def li(w):
         rw = f'{w["reward_btc"]:.3f} BTC' if w.get("reward_btc") else ""
         return (f'<li><div class="wtop"><b>{fmt_date(w["time"])}</b><span>{rw}</span></div>'
-                f'<div class="wpool">{esc(w["pool"])}</div><div class="wminer">{esc(win_miner(w))}</div>'
+                f'<div class="wpool">Pool: {esc(w["pool"])}</div><div class="wminer">{device_html(w)}</div>'
                 f'<a href="{esc(win_url(w))}" rel="noopener">Block {w["height"]:,} on mempool.space ↗</a></li>')
     first, rest = SOLO_WINS[:20], SOLO_WINS[20:]
     since = SOLO_WINS[-1]
     body = f"""<article>
 <header class="hero"><h1>Solo block wins</h1>
 <p class="lede">Every Bitcoin block found by a solo miner gives the whole reward to one person. Here are the recent ones we know of.</p>
-<p class="bigline"><b>{plural(days_since(w0), "day")}</b> since the last solo win ({fmt_date(w0["time"])}, {esc(w0["pool"])})</p>
+<p class="bigline"><b>{plural(days_since(w0), "day")}</b> since the last solo win ({fmt_date(w0["time"])}, pool: {esc(w0["pool"])})</p>
+<p class="hint">Pool = the service the winner mined through. Device = the machine they used, if they shared it.</p>
 <p class="meta">{plural(len(ly), "solo block")} in the past 12 months · checked {tag_time(SOLO_DATA.get("checked_at") or SOLO_DATA.get("fetched_at"))}</p></header>
 <section aria-labelledby="h-list"><h2 id="h-list">Recent solo wins</h2>
 <ul class="wins">{"".join(li(w) for w in first)}</ul>
 {f'<details class="more"><summary>Older wins, back to {fmt_date(since["time"])}</summary><ul class="wins">{"".join(li(w) for w in rest)}</ul></details>' if rest else ""}
-<p class="hint">Miner details appear only where the winner reported them publicly. Most never do, so we don't guess. Reward = block subsidy + fees.</p></section>
+<p class="hint">Most winners never share their device, so it shows as unknown. We don't guess. Reward = block subsidy + fees.</p></section>
 <section aria-labelledby="h-odds"><h2 id="h-odds">What are your odds?</h2>
 <p>About 52,000 blocks are found a year and solo miners get only a handful. For one small miner it's a long-shot lottery.</p>
 <p><a class="btn" href="/solo-odds/">Check your solo odds</a></p>
