@@ -579,7 +579,7 @@ def header_html():
 
 def footer_html(extra=""):
     links = [("/solo-miners/", "Solo miners"), ("/pool-miners/", "Pool miners"), ("/heater-miners/", "Heater miners"), ("/#miners", "Bitaxe miners"), ("/home-miners/", "Heater & home miners"), ("/guides/solo-vs-pool-mining/", "Solo vs pool"),
-             ("/guides/how-heater-miners-work/", "How heater miners work"), ("/deals/", "Deals"), ("/bitaxe-black-friday/", "Black Friday 2026"), ("/in-stock/", "In stock"), ("/where-to-buy-bitaxe/", "Where to buy"),
+             ("/guides/how-heater-miners-work/", "How heater miners work"), ("/best/beginners/", "Best for beginners"), ("/best/quiet/", "Quietest miners"), ("/deals/", "Deals"), ("/bitaxe-black-friday/", "Black Friday 2026"), ("/in-stock/", "In stock"), ("/where-to-buy-bitaxe/", "Where to buy"),
              ("/how-we-track/", "About & how we track"), ("/advertise/", "Advertise")]
     return f"""<footer class="foot"><div class="wrap">
   <a class="brand" href="/">{WORDMARK}</a>
@@ -1367,7 +1367,7 @@ def browse_tiles():
     return '<section class="browse-tiles" aria-label="Browse by type"><div class="btiles">' + "".join(tiles) + "</div></section>"
 
 
-def hub_card(mid, heat=True):
+def hub_card(mid, heat=True, rank=None, why=""):
     st, m = STATS[mid], MODELS[mid]
     b = st["best"]
     pre = [o for o in st["offers"] if o["stock_status"] in ("preorder", "backorder") and usd(o) is not None]
@@ -1386,8 +1386,10 @@ def hub_card(mid, heat=True):
         low = st["low_any"]
         price, where = "Sold out", (f'Last listed {money(usd(low))}' if low else "")
         status, cls = '<span class="badge b-out_of_stock">Sold out</span>', "card soldout"
-    return (f'<article class="{cls}"><div class="art{" photo" if mid in MODEL_IMG else ""}">{model_img(mid)}</div><div class="body">'
+    rib = f'<span class="ribbon rank">#{rank}</span>' if rank else ""
+    return (f'<article class="{cls}">{rib}<div class="art{" photo" if mid in MODEL_IMG else ""}">{model_img(mid)}</div><div class="body">'
             f'<h3><a href="/models/{mid}/">{esc(SHORT[mid])}</a></h3>'
+            + (f'<div class="why">{esc(why)}</div>' if why else "") +
             f'<div class="spec">≈{m["hashrate_ths"]:g} TH/s · ≈{m["watts"]:,g} W' + (f' · ≈{btu(hw):,.0f} BTU/h heat' if heat else "") + '</div>'
             f'<div class="price">{price}</div><div class="where">{where}</div>{earn_line(mid)}'
             f'<div class="row">{status}<a class="btn sm" href="/models/{mid}/" aria-label="See {esc(SHORT[mid])} prices">See prices</a></div>'
@@ -1479,6 +1481,184 @@ def build_category(key):
 </article>"""
     items = [(SHORT[m], f"/models/{m}/") for m in ms]
     layout(path, title, desc, body, crumbs=trail, jsonld=[itemlist(f"{h1}: miners tracked by Bitaxe Radar", items)])
+
+
+# ---------------------------------------------------------------------------------------------
+# "Best for" pages: ranked picks with a one-line why. Noise figures are the makers'/sellers' stated numbers.
+# ---------------------------------------------------------------------------------------------
+NOISE = {   # (max stated dB or 0 for fanless, text, source)
+    "heatbit-canvas": (0, "No fans, so it runs silent (maker-stated)", "heatbit.com Canvas FAQ"),
+    "hammer-bc04": (36, "32–36 dB stated", "Altair Technology Hammer series guide"),
+    "avalon-nano-3s": (40, "33–40 dB stated", "Canaan shop listing"),
+    "braiins-bmm-101": (40, "About 40 dB stated", "Braiins Forge product page"),
+    "heatbit-trio": (45, "Up to about 45 dB stated", "heatbit.com Trio FAQ"),
+    "avalon-mini-3": (55, "About 33–55 dB stated, by mode", "seller listings"),
+    "heatbit-maxi": (55, "About 45–55 dB stated, by mode", "heatbit.com Maxi FAQ"),
+}
+
+
+def under_price(limit):
+    ms = [m for m in TRACKED if m not in NOINDEX_MODELS and STATS[m]["best"] and usd(STATS[m]["best"]) is not None and usd(STATS[m]["best"]) < limit]
+    return sorted(ms, key=lambda m: usd(STATS[m]["best"]))
+
+
+def best_defs():
+    """slug -> dict(h1, label, lede, picks=[(mid, why)], faq=[(q, a)], title, desc). Pages without honest picks are skipped."""
+    d = {}
+    beg = [("bitaxe-gamma", "Cheapest way in. Small, open-source, about 18 W, huge community for help."),
+           ("avalon-nano-3s", "Finished box with an app, Wi-Fi and the power adapter in the box. Plug in and go."),
+           ("braiins-bmm-101", "Metal case and touchscreen with Braiins OS already set up. No tinkering."),
+           ("nerdaxe-gamma", "Same class as the Bitaxe Gamma, with a color screen to see what it's doing.")]
+    d["beginners"] = dict(label="Beginners", h1="Best Bitcoin miner for beginners",
+        lede="Cheap, simple, low-power miners that are easy to set up. Start small and learn how mining works.",
+        picks=[x for x in beg if x[0] in TRACKED],
+        title="Best Bitcoin miner for beginners: easy, cheap home miners",
+        what="beginner-friendly Bitcoin miners: Bitaxe Gamma, Avalon Nano 3S, Braiins Mini Miner",
+        faq=[("What is the best Bitcoin miner for a beginner?", "A Bitaxe Gamma if you want the cheapest start and like to tinker a little. An Avalon Nano 3S or Braiins Mini Miner if you want a finished box with an app or screen."),
+             ("Will a beginner miner make money?", "Don't expect it to. Small miners earn tiny amounts in a pool, or take a long-shot chance at a whole block solo. Treat it as a hobby and a way to learn."),
+             ("How much power does a beginner miner use?", "About 18 to 140 W for the miners on this page, roughly a light bulb to a small heater. Each miner page shows the running cost.")])
+    q = sorted([m for m in NOISE if m in TRACKED and NOISE[m][0] <= 45], key=lambda m: (NOISE[m][0], MODELS[m]["watts"]))
+    d["quiet"] = dict(label="Quiet", h1="Quietest Bitcoin miners",
+        lede="Miners whose makers or sellers state a low noise level, quietest first. Good for a bedroom or office.",
+        picks=[(m, NOISE[m][1] + ".") for m in q],
+        title="Quietest Bitcoin miners for a bedroom or office",
+        what="the quietest home Bitcoin miners by stated noise: Heatbit Canvas, Hammer BC04, Avalon Nano 3S",
+        faq=[("What is the quietest Bitcoin miner?", f"Of the miners we track, the {SHORT[q[0]]}: {NOISE[q[0]][1][0].lower() + NOISE[q[0]][1][1:]}." if q else ""),
+             ("Are Bitaxe miners quiet?", "They're small with one little fan, so they're fairly quiet, but shops don't publish a noise figure, so we don't rank them here."),
+             ("How loud is 40 dB?", "About a quiet library or a soft hum. Lower power modes on most miners also lower the noise.")],
+        hint="Noise figures are the makers' or sellers' own numbers, not our measurements. Lower power modes are usually quieter.")
+    u = under_price(100)
+    if u:
+        d["under-100"] = dict(label="Under $100", h1="Best Bitcoin miners under $100",
+            lede="In-stock miners under $100 right now, cheapest first. Prices are before shipping and tax.",
+            picks=[(m, f"About {money(STATS[m]['per_th'])} per TH/s, {MODELS[m]['watts']:g} W of power.") for m in u],
+            more=[m for m in under_price(150) if m not in u],
+            title="Best Bitcoin miners under $100, in stock now",
+            what="Bitcoin miners in stock under $100, checked every 6 hours, cheapest first",
+            faq=[("What is the best Bitcoin miner under $100?", f"Right now the {SHORT[u[0]]}, in stock for {money(usd(STATS[u[0]]['best']))} at {sname(STATS[u[0]]['best']['seller'])}. Prices change, so check the shop."),
+                 ("Is a cheap miner worth it?", "As a hobby and a solo-mining lottery ticket, yes. As income, no: small miners earn very little, and electricity costs money."),
+                 ("Does the price include a power supply?", "Often, but not always. Check the listing details on each miner's page before you buy.")])
+    heat = [("avalon-mini-3", "Built like a baseboard heater. About 800 W, enough for a medium room."),
+            ("heatbit-maxi", "All 1,500 W of its heat comes from mining, plus air purifying. For a bigger room."),
+            ("heatbit-trio", "Space heater and air purifier in one, up to 1,500 W. Only 400 W of that is mining."),
+            ("avalon-q", "Most heat, about 1,674 W. Best for a garage or basement; louder at full power.")]
+    d["heating-a-room"] = dict(label="Heating a room", h1="Best miners for heating a room",
+        lede="Miners built to heat a whole room like a space heater while they mine.",
+        picks=[x for x in heat if x[0] in TRACKED], heat=True,
+        title="Best Bitcoin miners for heating a room this winter",
+        what="Bitcoin heater miners for heating a room: Avalon Mini 3, Heatbit Maxi, Heatbit Trio, Avalon Q",
+        faq=[("What is the best heater miner?", "For a medium room, the Avalon Mini 3 (about 800 W). For a bigger room, the Heatbit Maxi or Trio (up to 1,500 W). The Avalon Q gives the most heat but suits a garage or basement."),
+             ("Does a heater miner heat as well as a space heater?", "Yes, watt for watt. Nearly all the electricity becomes heat, just like an electric heater."),
+             ("Will it pay my heating bill?", "Part of it at best, and nothing is guaranteed. In a pool it earns small amounts that offset some of the power cost.")],
+        hint="Smaller heater miners like the Heatbit Canvas and Avalon Nano 3S warm a person or desk rather than a whole room: see all heater miners.")
+    for k, v in d.items():
+        v["faq"] = [(a, b) for a, b in v["faq"] if b]
+    return {k: v for k, v in d.items() if v["picks"]}
+
+
+def faq_ld(faq):
+    return {"@context": "https://schema.org", "@type": "FAQPage",
+            "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faq]}
+
+
+def best_pills(current=None):
+    return ('<nav class="browse best-row" aria-label="Best for"><span>Best for</span>' + "".join(
+        f'<a href="/best/{k}/"' + (' aria-current="page"' if k == current else "") + f'>{esc(v["label"])}</a>' for k, v in BEST.items()) + "</nav>")
+
+
+def build_best(slug):
+    b = BEST[slug]
+    path = f"/best/{slug}/"
+    trail = [("Home", "/"), (b["h1"], path)]
+    title = f"{b['title']} ({fmt_day(GEN)}) | Bitaxe Radar"
+    desc = shorten(f"Ranked picks: {b['what']}. Live prices and stock, updated every 6 hours.", 158)
+    cards = "".join(hub_card(m, heat=b.get("heat", False), rank=i + 1, why=why) for i, (m, why) in enumerate(b["picks"]))
+    more = b.get("more") or []
+    more_html = (f'<section aria-labelledby="h-more"><h2 id="h-more">Just over $100</h2><div class="cards">{"".join(hub_card(m, heat=False) for m in more)}</div></section>') if more else ""
+    faq_html = "".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in b["faq"])
+    hint = f'<p class="hint">{esc(b["hint"])}</p>' if b.get("hint") else ""
+    body = f"""<article>
+<header class="hero"><h1>{esc(b['h1'])}</h1>
+<p class="lede">{esc(b['lede'])}</p>
+<p class="meta">checked {tag_time(latest['generated_at'])}</p>
+{best_pills(slug)}</header>
+<section aria-label="Ranked picks"><div class="cards">{cards}</div>{hint}</section>
+{more_html}
+<section id="faq" aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{faq_html}</section>
+<section class="guides-line"><p>Browse all: <a href="/solo-miners/">Solo</a> · <a href="/pool-miners/">Pool</a> · <a href="/heater-miners/">Heaters</a> · <a href="/guides/solo-vs-pool-mining/">Solo vs pool</a></p>
+<p class="hint">Hashrate and watts are the sellers' stated figures. Prices are before shipping and tax. Pool and power figures are estimates; {EARN_NOTE.lower()}</p></section>
+</article>"""
+    items = [(SHORT[m], f"/models/{m}/") for m, _ in b["picks"]]
+    layout(path, title, desc, body, crumbs=trail, jsonld=[itemlist(b["h1"], items), faq_ld(b["faq"])])
+
+
+BEST = {}
+
+
+# ---------------------------------------------------------------------------------------------
+# llms.txt: plain-text summary for AI assistants and search tools
+# ---------------------------------------------------------------------------------------------
+def miner_line(m):
+    st = STATS[m]
+    if st["best"]:
+        p = f'in stock from {money(usd(st["best"]))} at {sname(st["best"]["seller"])}'
+    elif st["low_any"]:
+        p = f'not in stock; lowest listed {money(usd(st["low_any"]))} at {sname(st["low_any"]["seller"])} ({STATUS[st["low_any"]["stock_status"]].lower()})'
+    else:
+        p = "no listings"
+    mm = MODELS[m]
+    return f"- [{SHORT[m]}]({BASE}/models/{m}/): ≈{mm['hashrate_ths']:g} TH/s, ≈{mm['watts']:,g} W; {p}"
+
+
+def build_llms():
+    live = [m for m in TRACKED if m not in NOINDEX_MODELS]
+    cats = "\n".join(f"- [{h1}]({BASE}{path})" for _, path, _, h1, _, _ in CATS)
+    bests = "\n".join(f"- [{v['h1']}]({BASE}/best/{k}/)" for k, v in BEST.items())
+    answers = "\n".join(f"- {v['faq'][0][0]} {v['faq'][0][1]} ({BASE}/best/{k}/)" for k, v in BEST.items())
+    head = f"""# Bitaxe Radar
+
+> Price and stock tracker for small home Bitcoin miners (Bitaxe, NerdQaxe, Nerdaxe) and heater and home miners (Avalon, Heatbit, Braiins, Hammer). Prices come from each shop's own pages and are checked every 6 hours. Prices are before shipping and tax. Last update: {latest['generated_at']}.
+
+Bitaxe Radar is independent. Some shop links are affiliate links; they never change prices or rankings. Mining earnings are never guaranteed: small miners are a solo "lottery", and pool payouts change with Bitcoin's price and network difficulty.
+
+## Browse by type
+{cats}
+- [All heater & home miners]({BASE}/home-miners/)
+- [Deals and price drops]({BASE}/deals/)
+- [Everything in stock]({BASE}/in-stock/)
+
+## Best for
+{bests}
+
+## Quick answers
+{answers}
+
+## Miners and current best price
+{chr(10).join(miner_line(m) for m in live)}
+
+## Guides
+- [Solo vs pool mining]({BASE}/guides/solo-vs-pool-mining/): solo is a lottery for a whole block; pool pays small, steady amounts.
+- [How heater miners work]({BASE}/guides/how-heater-miners-work/): a miner turns its electricity into heat like a space heater.
+- [Where to buy a Bitaxe]({BASE}/where-to-buy-bitaxe/)
+- [How we track prices]({BASE}/how-we-track/)
+
+## Optional
+- [Full details for every miner]({BASE}/llms-full.txt)
+- Contact: {CONTACT}
+"""
+    (SITE / "llms.txt").write_text(head)
+    parts = [head.replace("## Optional\n- [Full details for every miner](" + BASE + "/llms-full.txt)\n", "## Optional\n"), "\n## Miner details\n"]
+    for m in live:
+        mm, cp, st = MODELS[m], MODEL_COPY[m], STATS[m]
+        offers = "\n".join(f"  - {sname(o['seller'])}: {money(o['price'], o['currency'])}" + (f" (≈ {money(usd(o))})" if o["currency"] != "USD" and usd(o) else "")
+                           + f", {STATUS[o['stock_status']].lower()}" for o in sort_offers(st["offers"]))
+        tags = ", ".join(h1 for _, _, _, h1, members, _ in CATS if m in members)
+        e = earn(m)
+        est = (f"\nEstimate (changes with Bitcoin price and network difficulty): pool about {E.fmt_usd(e['pool']['usd_month_shown'])}/month before electricity; "
+               f"power about {E.fmt_usd(e['power'])}/month at ${E.POWER_RATE:.2f}/kWh.") if e else ""
+        noise = f"\nNoise: {NOISE[m][1]}." if m in NOISE else ""
+        parts.append(f"\n### {SHORT[m]}\n{BASE}/models/{m}/\n{cp['intro']}\nBest for: {cp['who']}\nGood for: {tags}.{noise}{est}\nPrices:\n{offers}\n")
+    (SITE / "llms-full.txt").write_text("".join(parts))
 
 
 def guide_ld(path, headline, desc):
@@ -1670,7 +1850,7 @@ def build_home():
     compare_links = '<ul class="links">' + "".join(f'<li><a href="{compare_url(a, b)}">{esc(compare_label(a, b))}</a></li>' for a, b in COMPARE_PAIRS) + "</ul>"
     sellers_line = ('<p>Shops we check: ' + " · ".join(f'<a href="/sellers/{sid}/">{esc(s["name"])}</a>' for sid, s in SELLERS.items() if sid in SELLER_COPY) + "</p>\n  ")
     out = (tpl.replace("<!--HEAD-->", head).replace("<!--HEADER-->", header_html()).replace("<!--RADAR-BG-->", RADAR_BG)
-           .replace("<!--HERO-CHIPS-->", chips).replace("<!--BROWSE-->", browse_tiles()).replace("<!--CARDS-->", cards).replace("<!--SIGNUP-->", signup_html("any"))
+           .replace("<!--HERO-CHIPS-->", chips).replace("<!--BROWSE-->", browse_tiles() + "\n" + best_pills()).replace("<!--CARDS-->", cards).replace("<!--SIGNUP-->", signup_html("any"))
            .replace("<!--COMPARE-LINKS-->", compare_links).replace("<!--FOOTER-->", footer_html(sellers_line))
            .replace('<script src="/app.js"></script>', '<script src="/app.js"></script>\n' + SIGNUP_SCRIPTS)
            .replace("</body>", ANALYTICS + "</body>"))
@@ -1686,7 +1866,7 @@ def write_sitemap():
     PAGES.sort(key=lambda p: (p["path"] != "/", p["path"]))
     urls = "".join(f"  <url><loc>{BASE}{p['path']}</loc><lastmod>{p['lastmod']}</lastmod></url>\n" for p in PAGES)
     (SITE / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls + "</urlset>\n")
-    (SITE / "robots.txt").write_text(f"User-agent: *\nAllow: /\n\nSitemap: {BASE}/sitemap.xml\n")
+    (SITE / "robots.txt").write_text(f"User-agent: *\nAllow: /\n\n# Plain-text site summary for AI assistants: {BASE}/llms.txt (full: {BASE}/llms-full.txt)\nSitemap: {BASE}/sitemap.xml\n")
 
 
 def main():
@@ -1705,6 +1885,10 @@ def main():
     build_home_miners()
     for c in CATS:
         build_category(c[0])
+    BEST.update(best_defs())
+    for k in BEST:
+        build_best(k)
+    build_llms()
     build_guide_heaters()
     build_guide_pool()
     build_method()

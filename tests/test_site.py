@@ -336,6 +336,45 @@ class SiteTests(unittest.TestCase):
         self.assertNotIn("Solo block chance", q)
         self.assertIn('class="earn"', (SITE / "index.html").read_text())
 
+    def test_best_for_pages_and_llms(self):
+        best = sorted(p for p in self.pages if p.startswith("/best/"))
+        self.assertTrue({"/best/beginners/", "/best/quiet/", "/best/heating-a-room/"} <= set(best), best)
+        home = (SITE / "index.html").read_text()
+        for path in best:
+            self.assertIn(BASE + path, self.sitemap)
+            self.assertIn(f'href="{path}"', home)                       # "Best for" row on the home page
+            p = self.pages[path]
+            faqs = [json.loads(x) for x in p.ld if '"FAQPage"' in x]
+            self.assertEqual(len(faqs), 1, path)
+            qs = faqs[0]["mainEntity"]
+            self.assertGreaterEqual(len(qs), 2)
+            html = (SITE / path.strip("/") / "index.html").read_text()
+            for q in qs:                                                 # FAQ markup must match visible questions
+                self.assertIn(q["acceptedAnswer"]["text"].replace("'", "&#x27;").replace("&", "&amp;").replace("&amp;#x27;", "&#x27;"), html)
+            self.assertIn('class="ribbon rank">#1<', html)
+            self.assertIn('class="why"', html)
+            for bad in ["guaranteed income", "passive income", "pays for itself", "profit of $"]:
+                self.assertNotIn(bad, html.lower(), path)
+        quiet = (SITE / "best" / "quiet" / "index.html").read_text()
+        self.assertNotIn('href="/models/avalon-q/"', quiet.split("<footer")[0])     # loud at full power, not a quiet pick
+        self.assertNotIn('<h3><a href="/models/bitaxe-gamma/">', quiet)             # no published dB figure
+        if "/best/under-100/" in self.pages:
+            u = (SITE / "best" / "under-100" / "index.html").read_text().split('id="h-more"')[0]
+            for price in re.findall(r'<div class="price">(?:≈ )?\$([\d,]+\.\d{2})', u):
+                self.assertLess(float(price.replace(",", "")), 100)
+        heat = (SITE / "best" / "heating-a-room" / "index.html").read_text()
+        self.assertIn('<h3><a href="/models/avalon-mini-3/">', heat)
+        llms = (SITE / "llms.txt").read_text()
+        self.assertTrue(llms.startswith("# Bitaxe Radar\n\n> "))
+        for need in ("/solo-miners/", "/best/beginners/", "/models/bitaxe-gamma/", "/guides/solo-vs-pool-mining/", "llms-full.txt"):
+            self.assertIn(need, llms)
+        full = (SITE / "llms-full.txt").read_text()
+        self.assertIn("### Bitaxe Gamma", full)
+        self.assertIn("llms.txt", (SITE / "robots.txt").read_text())
+        for t in (llms, full):
+            for b in ["not tracked yet", "unscrapable", "bot protection", "passive income"]:
+                self.assertNotIn(b, t.lower())
+
 
 if __name__ == "__main__":
     unittest.main()
