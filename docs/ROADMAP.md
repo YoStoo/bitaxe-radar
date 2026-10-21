@@ -10,21 +10,16 @@ Updated: Oct 21, 2026
 
 ## 🔨 Now
 
-- Electricity price calculator
-  - Type in your power price on miner pages.
-  - Each model page shows the "break-even" power price (above it, the miner loses money).
-  - New guide: Is home mining worth it? (/guides/is-home-mining-worth-it/)
-  - Status: live on the site since Oct 21.
+- Solo odds calculator: enter your TH/s, see your odds of finding a block per day, year and 5 years.
 
 ## ⏭️ Next up (in order)
 
-1. Solo odds calculator: enter your TH/s, see your odds of finding a block per day, year and 5 years.
-2. Room heat calculator: room size in, which heater miners fit out.
-3. $/TH leaderboard: best value miners, plus price history ("is this a good price now?").
-4. Seller facts table: where they ship from, warranty, how often "in stock" was true.
-5. Add more home miners: 79 found, 26 on the site so far.
-6. Daily X posts and replies on @BitaxeRadar.
-7. Black Friday push in November (deals page live by about Nov 10, Black Friday is Nov 27).
+1. Room heat calculator: room size in, which heater miners fit out.
+2. $/TH leaderboard: best value miners, plus price history ("is this a good price now?").
+3. Seller facts table: where they ship from, warranty, how often "in stock" was true.
+4. Add more home miners: 79 found, 26 on the site so far.
+5. Daily X posts and replies on @BitaxeRadar.
+6. Black Friday push in November (deals page live by about Nov 10, Black Friday is Nov 27).
 
 ## 💰 Money
 
@@ -76,6 +71,7 @@ Later:
 - Oct 21: Easy menu, all-miners page with filters, "Find my miner" quiz.
 - Oct 21: Newsletter #1 on the site, and newsletter signup.
 - Oct 21: Affiliate signups sent to D-Central, DTV and Altair.
+- Oct 21: Electricity price calculator: your power price on miner pages, break-even price on model pages, and the guide Is home mining worth it? (/guides/is-home-mining-worth-it/).
 
 ## 📊 Numbers (Oct 21)
 
