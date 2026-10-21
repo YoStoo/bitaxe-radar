@@ -267,8 +267,9 @@ class SiteTests(unittest.TestCase):
         # nav links to the hub on every page; the phone nav stays short (3 links + alerts visible)
         home = (SITE / "index.html").read_text()
         nav = re.search(r'<nav aria-label="Main">(.*?)</nav>', home, re.S).group(1)
-        self.assertIn('href="/home-miners/"', nav)
-        self.assertLessEqual(len(re.findall(r'<a href="[^"]+">', nav)), 3)
+        for cat in ("/solo-miners/", "/pool-miners/", "/heater-miners/"):
+            self.assertIn(f'href="{cat}"', nav)
+        self.assertLessEqual(len(re.findall(r'<a href="[^"]+">', nav)), 4)   # Solo · Pool · Heaters · Deals (+ Alerts)
         # home miners stay off the Bitaxe-only lists
         for page in ["index.html", "deals/index.html", "in-stock/index.html", "bitaxe-black-friday/index.html", "where-to-buy-bitaxe/index.html"]:
             txt = (SITE / page).read_text()
@@ -287,6 +288,53 @@ class SiteTests(unittest.TestCase):
                 if any(d in href for d in ("altairtech.io", "heatbit.com", "d-central.tech", "solosatoshi.com", "braiinsforge.com", "bitcoinmerch.com")):
                     self.assertNotRegex(href, r"[?&](ref|aff|affiliate|sca_ref|wpam_id)=", f"{path}: {href}")
                     self.assertNotIn("sponsored", rel, f"{path}: {href}")
+
+    def test_browse_category_pages(self):
+        data = json.loads((SITE / "data.js").read_text()[len("window.RADAR = "):-2])
+        tracked = {o["model"] for o in data["latest"]["offers"]}
+        expect = {"/solo-miners/": (["bitaxe-gamma", "nerdqaxe-pp", "braiins-bmm-101"], ["avalon-q", "heatbit-maxi"], "Best for solo mining"),
+                  "/pool-miners/": (["avalon-q", "avalon-mini-3", "heatbit-maxi"], ["bitaxe-gamma"], "Best for pool mining"),
+                  "/heater-miners/": (["heatbit-trio", "heatbit-maxi", "heatbit-canvas", "avalon-mini-3"], ["bitaxe-gamma", "braiins-bmm-101"], "Heater miners")}
+        for path, (yes, no, h1) in expect.items():
+            self.assertIn(path, self.pages)
+            self.assertIn(BASE + path, self.sitemap)
+            html = (SITE / path.strip("/") / "index.html").read_text()
+            self.assertIn(f"<h1>{h1}</h1>", html)
+            self.assertIn('aria-current="page"', html.split("</header>", 2)[1])   # browse pill marks the current page
+            self.assertIn("/guides/solo-vs-pool-mining/", html)
+            for m in yes:
+                if m in tracked:
+                    self.assertIn(f'<h3><a href="/models/{m}/">', html, f"{path} should list {m}")
+                    self.assertIn(f"/img/models/{m}.webp", html)
+            for m in no:
+                self.assertNotIn(f'href="/models/{m}/"', html.split("<footer")[0], f"{path} should not list {m}")
+            for bad in ["guaranteed", "passive income", "pays for itself", "profit of $"]:
+                self.assertNotIn(bad, html.lower(), path)
+        solo = (SITE / "solo-miners" / "index.html").read_text()
+        self.assertNotIn('<h3><a href="/models/bitaxe-supra/">', solo)          # older noindex models only in the small "Older models" line
+        home = (SITE / "index.html").read_text()
+        for cat in ("/solo-miners/", "/pool-miners/", "/heater-miners/"):
+            self.assertIn(f'class="btile" href="{cat}"', home)
+        self.assertIn('class="tag" href="/solo-miners/"', (SITE / "models" / "bitaxe-gamma" / "index.html").read_text())
+        q = (SITE / "models" / "avalon-q" / "index.html").read_text()
+        self.assertIn('class="tag" href="/pool-miners/"', q)
+        self.assertIn('class="tag" href="/heater-miners/"', q)
+        self.assertIn("/home-miners/", self.pages)    # old hub URL keeps working
+
+    def test_earnings_estimates_on_pages(self):
+        net = json.loads((SITE.parent / "data" / "network.json").read_text())
+        for k in ("network_hashrate_hs", "btc_usd", "avg_fees_btc", "subsidy_btc", "fetched_at"):
+            self.assertIn(k, net)
+        g = (SITE / "models" / "bitaxe-gamma" / "index.html").read_text()
+        if 'id="h-earn"' not in g:
+            self.skipTest("network inputs stale; estimates hidden by design")
+        self.assertIn("Solo block chance", g)
+        self.assertIn("Estimate. Changes with Bitcoin price and network difficulty.", g)
+        self.assertIn("$0.15/kWh", g)
+        q = (SITE / "models" / "avalon-q" / "index.html").read_text()
+        self.assertIn("heat offsets part", q)
+        self.assertNotIn("Solo block chance", q)
+        self.assertIn('class="earn"', (SITE / "index.html").read_text())
 
 
 if __name__ == "__main__":
