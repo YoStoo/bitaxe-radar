@@ -342,3 +342,21 @@ details .tablewrap{margin-bottom:14px}
 @media (max-width:700px){.btiles.wide{grid-template-columns:1fr 1fr}.opts span{font-size:13.5px;padding:0 11px}.top nav a{min-height:40px}}
 .nojs[hidden]{display:none}
 #qres{scroll-margin-top:110px}
+/* ---- electricity price calculator ---- */
+.ratebox{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin:14px 0 4px;padding:10px 14px;background:var(--panel);border:1px solid rgba(247,147,26,.45);border-radius:var(--r)}
+.ratebox[hidden]{display:none}
+.ratebox label{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-weight:700;font-size:15px}
+.ratebox .rin{display:inline-flex;align-items:center;gap:4px;font-weight:700}
+.ratebox input{width:86px;min-height:44px;font:700 17px/1 var(--font);color:var(--text);background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:0 10px}
+.ratebox small{color:var(--muted);font-size:12.5px}
+.card .net,.netline{font-size:12.5px;color:var(--muted);font-weight:600}
+.card .net.pos,.netline.pos,td.net.pos{color:var(--good)}
+.card .net.neg,.netline.neg,td.net.neg{color:#ef8b6b}
+.card .heatv{font-size:12.5px;color:var(--accent-2)}
+.netline{font-size:16px;margin:14px 0 4px}
+.earnbox .heatv{margin:8px 0 0;font-size:15px;color:var(--accent-2)}
+.beline{margin:10px 0 0;font-size:15px}
+.earnbox .ratebox{margin:0 0 12px}
+.calc-tbl th,.calc-tbl td{white-space:normal}
+@media (max-width:560px){.calc-tbl{font-size:13px}.calc-tbl th,.calc-tbl td{padding:8px 5px}.calc-tbl th{font-size:10.5px}}
+.calc-tbl td.net{white-space:nowrap}

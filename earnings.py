@@ -89,6 +89,56 @@ def power_cost_month(watts, rate=POWER_RATE):
     return watts / 1000 * 24 * DAYS_PER_MONTH * rate
 
 
+# ---- "your electricity price" calculator. site/calc.js mirrors these line for line (tests/test_calc_parity.py). ----
+def round_up_money(x):
+    """Round up (the conservative direction for a cost): to the cent under $10, to the dollar above."""
+    return math.ceil(x * 100 - 1e-9) / 100 if x < 10 else float(math.ceil(x - 1e-9))
+
+
+def fmt_rate(rate):
+    s = f"{math.floor(rate * 1000 + 0.5) / 1000:.3f}"
+    return "$" + (s[:-1] if s.endswith("0") else s)
+
+
+def net_month(hashrate_ths, watts, net, rate=POWER_RATE):
+    """Pool estimate (already rounded down) minus the power bill. Negative = costs more than it earns."""
+    return pool_estimate(hashrate_ths, net)["usd_month_shown"] - power_cost_month(watts, rate)
+
+
+def net_words(hashrate_ths, watts, net, rate=POWER_RATE):
+    n = net_month(hashrate_ths, watts, net, rate)
+    r = fmt_rate(rate)
+    if abs(n) < 0.01:
+        return f"About breaks even at {r}"
+    if n > 0:
+        return f"Earns about {fmt_usd(round_down_money(n))}/mo more than its power costs at {r}"
+    return f"Costs about {fmt_usd(round_up_money(-n))}/mo more than it earns at {r}"
+
+
+def net_short(hashrate_ths, watts, net, rate=POWER_RATE):
+    """Signed form for tables: '+$1.20' or '−$0.81' (same rounding as net_words)."""
+    n = net_month(hashrate_ths, watts, net, rate)
+    if abs(n) < 0.01:
+        return "$0.00"
+    return ("+" + fmt_usd(round_down_money(n))) if n > 0 else ("−" + fmt_usd(round_up_money(-n)))
+
+
+def breakeven_rate(hashrate_ths, watts, net):
+    """Power price ($/kWh) where the conservative pool estimate equals the power bill, rounded down to 0.1 cent."""
+    kwh_month = watts / 1000 * 24 * DAYS_PER_MONTH
+    return math.floor(pool_estimate(hashrate_ths, net)["usd_month"] / kwh_month * 1000 + 1e-9) / 1000
+
+
+def power_shown(watts, rate=POWER_RATE):
+    """Power bill as shown on the site: rounded up, the conservative direction for a cost."""
+    return round_up_money(power_cost_month(watts, rate))
+
+
+def heat_value_month(watts, rate=POWER_RATE):
+    """What a space heater of the same wattage would cost to run 24/7: the heat you'd pay for anyway."""
+    return round_down_money(power_cost_month(watts, rate))
+
+
 def solo_odds(hashrate_ths, net):
     """Chance of finding a block solo: 1 in N per day and per year, plus the block's dollar value."""
     p_day = share(hashrate_ths, net) * BLOCKS_PER_DAY

@@ -725,7 +725,7 @@ def layout(path, title, desc, body, *, crumbs=None, jsonld=(), noindex=False, la
 {body}
 </main>
 {footer_html()}
-{scripts}{ANALYTICS}
+{scripts}{calc_scripts() if "data-calc=" in body else ""}{ANALYTICS}
 </body>
 </html>
 """
@@ -1409,16 +1409,66 @@ def earn(mid):
     if not (NET and NET_OK):
         return None
     m = MODELS[mid]
-    return dict(pool=E.pool_estimate(m["hashrate_ths"], NET), power=E.power_cost_month(draw_watts(mid)),
+    return dict(pool=E.pool_estimate(m["hashrate_ths"], NET), power=E.power_shown(draw_watts(mid)),
                 solo=E.solo_odds(m["hashrate_ths"], NET))
 
 
-def earn_line(mid):
+def calc_attrs(mid):
+    return f' data-th="{float(MODELS[mid]["hashrate_ths"])!r}" data-w="{float(draw_watts(mid))!r}"'
+
+
+def net_cls(mid):
+    n = E.net_month(MODELS[mid]["hashrate_ths"], draw_watts(mid), NET)
+    return "pos" if n >= 0.01 else "neg" if n <= -0.01 else ""
+
+
+def net_text(mid):
+    return E.net_words(MODELS[mid]["hashrate_ths"], draw_watts(mid), NET)
+
+
+def heat_line(mid, short=False):
+    a = calc_attrs(mid)
+    y = E.fmt_usd(E.heat_value_month(draw_watts(mid)))
+    if short:
+        return f'<div class="heatv">Heat you\'d pay for anyway: about <span data-calc="heat"{a}>{y}</span>/mo (estimate)</div>'
+    return (f'<p class="heatv">Heat you\'d pay for anyway: about <b data-calc="heat"{a}>{y}</b>/mo</p>'
+            f'<p class="hint">Estimate: what a {draw_watts(mid):,g} W electric space heater would cost running 24/7 at <span data-calc="rate">{E.fmt_rate(E.POWER_RATE)}</span>/kWh. '
+            "It only counts if you'd heat the room with electric heat anyway; a heat pump or gas is usually cheaper.</p>")
+
+
+def earn_line(mid, heat=False):
     e = earn(mid)
     if not e:
         return ""
+    a = calc_attrs(mid)
     return (f'<div class="earn" title="Estimate before electricity; changes with Bitcoin price and network difficulty">'
-            f'Pool ≈ {E.fmt_usd(e["pool"]["usd_month_shown"])}/mo <span>· power ≈ {E.fmt_usd(e["power"])}/mo</span></div>')
+            f'Pool ≈ {E.fmt_usd(e["pool"]["usd_month_shown"])}/mo <span>· power ≈ <span data-calc="power"{a}>{E.fmt_usd(e["power"])}</span>/mo</span></div>'
+            f'<div class="net {net_cls(mid)}" data-calc="net"{a}>{esc(net_text(mid))}</div>'
+            + (heat_line(mid, short=True) if heat and mid in HEAT_SET else ""))
+
+
+def rate_box(anchor=False):
+    """Electricity price input. Hidden until calc.js runs; without JS the page shows the $0.15 default figures."""
+    if not (NET and NET_OK):
+        return ""
+    return (f'<form class="ratebox"{" id=\"rate\"" if anchor else ""} hidden><label>Your electricity price '
+            f'<span class="rin">$<input type="number" inputmode="decimal" min="0" max="2" step="0.01" value="{E.POWER_RATE}" aria-label="Electricity price in US dollars per kWh">/kWh</span></label>'
+            '<small>Saved on this device. Updates every estimate on the page.</small></form>')
+
+
+def calc_scripts():
+    if not (NET and NET_OK):
+        return ""
+    data = {k: NET[k] for k in ("network_hashrate_hs", "subsidy_btc", "avg_fees_btc", "btc_usd")}
+    data.update(pool_fee=E.POOL_FEE, haircut=E.HAIRCUT, default_rate=E.POWER_RATE)
+    return f'<script>window.RADAR_NET={json.dumps(data)};</script>\n<script src="/calc.js" defer></script>\n'
+
+
+def breakeven_line(mid):
+    be = E.breakeven_rate(MODELS[mid]["hashrate_ths"], draw_watts(mid), NET)
+    txt = f"about {E.fmt_rate(be)}/kWh" if be >= 0.001 else "under $0.001/kWh"
+    return (f'<p class="beline">Break-even power price: <b>{txt}</b></p>'
+            '<p class="hint">Above this price the power costs more than the pool estimate.</p>')
 
 
 def block_usd_text(so):
@@ -1435,16 +1485,18 @@ def earn_box(mid):
     pe, solo_best, heater = e["pool"], mid in SOLO_SET, mid in HEAT_SET
     tiles = [("In a mining pool", f'{E.fmt_usd(pe["usd_month_shown"])}<small>/month</small>',
               f'about {E.fmt_usd(pe["usd_day_shown"])} a day, before electricity' + (". Tiny, so most owners solo mine" if solo_best and mid not in POOL_SET else "")),
-             ("Power cost", f'{E.fmt_usd(e["power"])}<small>/month</small>',
-              f'≈ {draw_watts(mid):,g} W, 24/7 at ${E.POWER_RATE:.2f}/kWh' + (". The heat offsets part of this" if heater else ""))]
+             ("Power cost", f'<span data-calc="power"{calc_attrs(mid)}>{E.fmt_usd(e["power"])}</span><small>/month</small>',
+              f'≈ {draw_watts(mid):,g} W, 24/7 at <span data-calc="rate">{E.fmt_rate(E.POWER_RATE)}</span>/kWh' + (". The heat offsets part of this" if heater else ""))]
     if solo_best:
         so = e["solo"]
         tiles.append(("Solo block chance", f'1 in {E.fmt_big(so["one_in_year"])}<small>/year</small>',
                       f'about 1 in {E.fmt_big(so["one_in_day"])} a day. A block is worth ≈ {block_usd_text(so)}'))
-    t = "".join(f'<div class="etile"><small>{esc(a)}</small><b>{b}</b><span>{esc(c)}</span></div>' for a, b, c in tiles)
+    t = "".join(f'<div class="etile"><small>{esc(a)}</small><b>{b}</b><span>{c if "data-calc" in c else esc(c)}</span></div>' for a, b, c in tiles)
+    nets = (f'<p class="netline {net_cls(mid)}" data-calc="net"{calc_attrs(mid)}>{esc(net_text(mid))}</p>'
+            + (heat_line(mid) if heater else "") + breakeven_line(mid))
     basis = (f'Uses BTC ≈ ${NET["btc_usd"]:,.0f}, network ≈ {NET["network_hashrate_hs"] / 1e18:,.0f} EH/s and the seller-stated hashrate, '
              f'minus a 2% pool fee and a 10% safety margin, rounded down. Updated {fmt_time(NET["fetched_at"])}.')
-    return (f'<section class="earnbox" aria-labelledby="h-earn"><h2 id="h-earn">What it could earn</h2><div class="etiles">{t}</div>'
+    return (f'<section class="earnbox" aria-labelledby="h-earn"><h2 id="h-earn">What it could earn</h2>{rate_box()}<div class="etiles">{t}</div>{nets}'
             f'<p class="hint">{EARN_NOTE} <span class="basis">{esc(basis)}</span> <a href="/guides/solo-vs-pool-mining/">Solo vs pool</a></p></section>')
 
 
@@ -1498,7 +1550,7 @@ def hub_card(mid, heat=True, rank=None, why="", attrs=""):
             f'<h3><a href="/models/{mid}/">{esc(SHORT[mid])}</a></h3>'
             + (f'<div class="why">{esc(why)}</div>' if why else "") +
             f'<div class="spec">≈{m["hashrate_ths"]:g} TH/s · ≈{m["watts"]:,g} W' + (f' · ≈{btu(hw):,.0f} BTU/h heat' if heat else "") + '</div>'
-            f'<div class="price">{price}</div><div class="where">{where}</div>{earn_line(mid)}'
+            f'<div class="price">{price}</div><div class="where">{where}</div>{earn_line(mid, heat)}'
             f'<div class="row">{status}<a class="btn sm" href="/models/{mid}/" aria-label="See {esc(SHORT[mid])} prices">See prices</a></div>'
             "</div></article>")
 
@@ -1575,13 +1627,14 @@ def build_category(key):
         so = E.solo_odds(1.2, NET)
         solo_line = (f'<p class="older">A solo block is worth ≈ {block_usd_text(so)} right now. '
                      f'Each miner page shows its odds. Pool estimates for these are tiny.</p>')
-    earn_hint = f'<p class="hint">Pool and power figures are estimates: pool payout before electricity, power at ${E.POWER_RATE:.2f}/kWh. {EARN_NOTE}</p>' if NET and NET_OK else ""
+    earn_hint = f'<p class="hint">Pool and power figures are estimates: pool payout before electricity, power at <span data-calc="rate">{E.fmt_rate(E.POWER_RATE)}</span>/kWh. {EARN_NOTE}</p>' if NET and NET_OK else ""
     body = f"""<article>
 <header class="hero"><h1>{esc(h1)}</h1>
 <p class="lede">{esc(cp['lede'])}</p>
 <p class="meta">{n_in} of {len(offs)} listings in stock · checked {tag_time(latest['generated_at'])}</p>
 {browse_pills(path)}
-{best_pills()}</header>
+{best_pills()}
+{rate_box()}</header>
 <section aria-label="{esc(h1)}"><div class="cards">{"".join(hub_card(m, heat=(key == "heat")) for m in ms)}</div>
 {solo_line}</section>
 <section class="guides-line"><p>New to this? {guide}</p>{earn_hint}
@@ -1698,7 +1751,8 @@ def build_best(slug):
 <header class="hero"><h1>{esc(b['h1'])}</h1>
 <p class="lede">{esc(b['lede'])}</p>
 <p class="meta">checked {tag_time(latest['generated_at'])}</p>
-{best_pills(slug)}</header>
+{best_pills(slug)}
+{rate_box()}</header>
 <section aria-label="Ranked picks"><div class="cards">{cards}</div>{hint}</section>
 {more_html}
 <section id="faq" aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{faq_html}</section>
@@ -1756,6 +1810,7 @@ Bitaxe Radar is independent. Some shop links are affiliate links; they never cha
 {chr(10).join(miner_line(m) for m in live)}
 
 ## Guides
+- [Is home mining worth it?]({BASE}/guides/is-home-mining-worth-it/): depends on your electricity price; each miner page has a break-even power price.
 - [Solo vs pool mining]({BASE}/guides/solo-vs-pool-mining/): solo is a lottery for a whole block; pool pays small, steady amounts.
 - [How heater miners work]({BASE}/guides/how-heater-miners-work/): a miner turns its electricity into heat like a space heater.
 - [Where to buy a Bitaxe]({BASE}/where-to-buy-bitaxe/)
@@ -1853,6 +1908,54 @@ def build_guide_pool():
 <p class="hint">Not financial advice. Mining costs electricity, and earnings aren't guaranteed.</p></section>
 </article>"""
     layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Solo vs pool mining, explained simply", desc)], lastmod=GUIDE_UPDATED, og_type="article")
+
+
+def build_guide_worth():
+    path = "/guides/is-home-mining-worth-it/"
+    trail = [("Home", "/"), ("Guides", "/guides/"), ("Is it worth it?", path)]
+    title = "Is home Bitcoin mining worth it at your electricity price? | Bitaxe Radar"
+    desc = "Is a home Bitcoin miner worth it? It depends on your power price. Plain answer with live break-even prices, the solo lottery and the heat offset."
+    if not (NET and NET_OK):
+        return
+    ex = [m for m in ("bitaxe-gamma", "nerdqaxe-pp", "avalon-nano-3s", "hammer-thor-p2", "gekko-kbox-22", "avalon-mini-3", "avalon-q") if m in TRACKED]
+    rows = "".join(f'<tr><td><a href="/models/{m}/">{esc(SHORT[m])}</a></td><td class="num">{E.fmt_usd(earn(m)["pool"]["usd_month_shown"])}</td>'
+                   f'<td class="num" data-calc="power"{calc_attrs(m)}>{E.fmt_usd(earn(m)["power"])}</td>'
+                   f'<td class="num net {net_cls(m)}" data-calc="netnum"{calc_attrs(m)}>{E.net_short(MODELS[m]["hashrate_ths"], draw_watts(m), NET)}</td>'
+                   f'<td class="num">{E.fmt_rate(E.breakeven_rate(MODELS[m]["hashrate_ths"], draw_watts(m), NET))}</td></tr>' for m in ex)
+    tbl = (f'<div class="tablewrap"><table class="calc-tbl"><thead><tr><th>Miner</th><th class="num">Pool /mo</th><th class="num">Power /mo</th><th class="num">Net /mo</th><th class="num">Break-even /kWh</th></tr></thead>'
+           f'<tbody>{rows}</tbody></table></div>')
+    g = "bitaxe-gamma" if "bitaxe-gamma" in TRACKED else ex[0]
+    so = E.solo_odds(MODELS[g]["hashrate_ths"], NET)
+    h = next((m for m in ("avalon-mini-3", "heatbit-maxi", "avalon-q") if m in TRACKED), None)
+    heat_p = ""
+    if h:
+        heat_p = (f"<p>Example: the {esc(SHORT[h])} draws about {draw_watts(h):,g} W. An electric space heater of the same size would cost about "
+                  f'<b data-calc="heat"{calc_attrs(h)}>{E.fmt_usd(E.heat_value_month(draw_watts(h)))}</b>/mo to run 24/7 at <span data-calc="rate">{E.fmt_rate(E.POWER_RATE)}</span>/kWh. '
+                  f"The miner makes the same heat and its pool estimate is about {E.fmt_usd(earn(h)['pool']['usd_month_shown'])}/mo back. That's an estimate, and only real if you'd run electric heat anyway.</p>")
+    faq = [("Is home Bitcoin mining worth it?", "Usually not for the money at typical US power prices. A small miner's pool estimate is often less than its power bill. It can make sense with very cheap power, as a heater you'd run anyway, or as a hobby and a solo lottery ticket."),
+           ("What electricity price makes mining break even?", "It depends on the miner's efficiency. Each miner page shows a break-even power price; for the miners we track today it is roughly "
+            f"${min(E.breakeven_rate(MODELS[m]['hashrate_ths'], draw_watts(m), NET) for m in ex):.2f} to ${max(E.breakeven_rate(MODELS[m]['hashrate_ths'], draw_watts(m), NET) for m in ex):.2f} per kWh, and it moves with Bitcoin's price and difficulty."),
+           ("Does a heater miner save money?", "Only against electric resistance heat you'd use anyway. Then the power is heat you'd pay for regardless and the mining is a small rebate. A heat pump or gas heat is usually cheaper per unit of heat.")]
+    body = f"""<article>
+<header class="hero"><h1>Is home mining worth it?</h1>
+<p class="lede">Short answer: for the money alone, usually not at typical US power prices. It depends on what you pay for electricity, and whether you want the heat or the lottery.</p>
+<p class="meta">Updated <time datetime="{GUIDE_UPDATED}">Oct 21, 2026</time> · 2-minute read · live numbers</p>
+{rate_box()}</header>
+<section aria-labelledby="h-p"><h2 id="h-p">1. It depends on your power price</h2>
+<p>A miner earns a little bitcoin and spends electricity all day. If the power costs more than the bitcoin is worth, you lose money each month. Type your price above and the table updates.</p>
+{tbl}
+<p class="hint">Pool estimate: share of the network × 144 blocks a day × the block reward, minus a 2% pool fee and a 10% safety margin, rounded down. Power runs 24/7 at full draw. {EARN_NOTE} Reddit commenters often quote about $0.06/kWh as a cut-off; the break-even column shows it varies by miner.</p>
+<p><a href="/miners/#rate">Check every miner at your price →</a></p></section>
+<section aria-labelledby="h-s"><h2 id="h-s">2. Solo mining is a lottery</h2>
+<p>Run solo and a miner either finds a whole block, worth about {block_usd_text(so)} right now, or gets nothing. A {esc(SHORT[g])} has about a 1 in {E.fmt_big(so["one_in_year"])} chance a year. People do win, but plan on paying the power bill for a ticket, not for income. <a href="/guides/solo-vs-pool-mining/">Solo vs pool</a>.</p></section>
+<section aria-labelledby="h-h"><h2 id="h-h">3. Heat changes the math</h2>
+<p>A miner turns almost all its power into heat, like an electric space heater. If you'd heat a room with electric heat anyway, that power is a cost you'd have paid regardless, and the mining earns a little of it back.</p>
+{heat_p}
+<p><a href="/heater-miners/">Heater miners</a> · <a href="/best/heating-a-room/">Best for heating a room</a> · <a href="/guides/how-heater-miners-work/">How heater miners work</a></p></section>
+<section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
+<section><p class="hint">Not financial advice. Earnings aren't guaranteed and change with Bitcoin's price and network difficulty.</p></section>
+</article>"""
+    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Is home Bitcoin mining worth it?", desc), faq_ld(faq)], lastmod=GUIDE_UPDATED, og_type="article")
 
 
 def build_method():
@@ -2087,6 +2190,7 @@ def build_miners():
 <div class="nojs">{browse_pills("/miners/")}</div>
 {best_pills()}</header>
 {form}
+{rate_box(anchor=True)}
 <section aria-label="Miners"><div class="cards" id="grid">{cards}</div>{older_html}</section>
 <section class="guides-line"><p>By type: <a href="/solo-miners/">Solo miners</a> · <a href="/pool-miners/">Pool miners</a> · <a href="/heater-miners/">Heater miners</a></p>
 <p>New to this? <a href="/guides/solo-vs-pool-mining/">Solo vs pool</a> · <a href="/guides/how-heater-miners-work/">How heater miners work</a></p>
@@ -2295,7 +2399,8 @@ def build_indexes():
     layout("/compare/", "Compare home Bitcoin miners side by side | Bitaxe Radar", "Head-to-head comparisons of popular home Bitcoin miners: price, hashrate, power use and running cost.",
            body, crumbs=[("Home", "/"), ("Guides", "/guides/"), ("Compare", "/compare/")])
     # /guides/
-    gl = [("/guides/solo-vs-pool-mining/", "Solo vs pool mining", "Lottery shot or small steady payouts?"),
+    gl = [("/guides/is-home-mining-worth-it/", "Is home mining worth it?", "Check it at your electricity price."),
+          ("/guides/solo-vs-pool-mining/", "Solo vs pool mining", "Lottery shot or small steady payouts?"),
           ("/guides/how-heater-miners-work/", "How heater miners work", "A miner that warms the room."),
           ("/where-to-buy-bitaxe/", "Where to buy a Bitaxe", "Every shop, ranked by today's price."),
           ("/how-we-track/", "How we track prices", "Where the numbers come from.")]
@@ -2336,6 +2441,7 @@ def main():
     build_indexes()
     build_guide_heaters()
     build_guide_pool()
+    build_guide_worth()
     build_method()
     build_advertise()
     build_404()
