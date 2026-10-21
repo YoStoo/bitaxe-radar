@@ -80,7 +80,7 @@ def parse_t(iso):
 
 
 def money(v, cur="USD"):
-    return {"USD": "$", "EUR": "€"}.get(cur, cur + " ") + f"{v:,.2f}"
+    return {"USD": "$", "EUR": "€", "CAD": "CA$"}.get(cur, cur + " ") + f"{v:,.2f}"
 
 
 def fmt_time(iso):
@@ -159,6 +159,17 @@ def best_cta(st):
     return f'<div class="cta" role="region" aria-label="Best deal right now">{items}</div>'
 
 
+def preorder_cta(st):
+    """No stock anywhere, but someone takes pre-orders: show the cheapest pre-order, clearly labelled as not in stock."""
+    pre = [o for o in st["offers"] if o["stock_status"] in ("preorder", "backorder") and usd(o) is not None]
+    if not pre:
+        return ""
+    o = min(pre, key=usd)
+    return (f'<div class="cta" role="region" aria-label="Pre-order"><div><small>{esc(STATUS[o["stock_status"]])} (not in stock yet)</small><b>{money(o["price"], o["currency"])}</b>'
+            f'<p class="hint">at <strong>{esc(sname(o["seller"]))}</strong> {badge(o["stock_status"])}</p>'
+            f'{offer_link(o, "Go to " + sname(o["seller"]) + " ↗")}</div></div>')
+
+
 SPONSOR_SLOT = ('<aside class="sponsor" aria-label="Sponsor spot"><small>Sponsor</small> '
                 '<span>Sell miners or accessories? <a href="/advertise/">Your shop could be featured here</a>.</span></aside>')
 
@@ -172,7 +183,9 @@ def badge(status):
 # ---------------------------------------------------------------------------------------------
 SHORT = {"bitaxe-supra": "Bitaxe Supra", "bitaxe-ultra": "Bitaxe Ultra", "bitaxe-gamma": "Bitaxe Gamma",
          "bitaxe-gamma-duo": "Bitaxe Gamma Duo", "bitaxe-gt-801": "Bitaxe GT 801", "nerdaxe-gamma": "Nerdaxe Gamma",
-         "nerdaxe-gaia": "Nerdaxe Gaia", "nerdqaxe-pp": "NerdQaxe++"}
+         "nerdaxe-gaia": "Nerdaxe Gaia", "nerdqaxe-pp": "NerdQaxe++",
+         "avalon-nano-3s": "Avalon Nano 3S", "avalon-mini-3": "Avalon Mini 3", "avalon-q": "Avalon Q", "heatbit-trio": "Heatbit Trio",
+         "heatbit-maxi": "Heatbit Maxi", "heatbit-canvas": "Heatbit Canvas", "braiins-bmm-101": "Braiins Mini Miner", "hammer-bc04": "Hammer BC04"}
 NOINDEX_MODELS = {"bitaxe-supra", "bitaxe-ultra"}   # older generations: pages exist for completeness but stay out of the index/sitemap
 
 MODEL_COPY = {
@@ -224,6 +237,58 @@ MODEL_COPY = {
                "Make sure a power supply is included."]),
 }
 
+HOME_COPY = {
+    "avalon-nano-3s": dict(
+        intro="The Avalon Nano 3S is Canaan's small desk miner. Sellers state about 6 TH/s at up to 140 W, roughly five times a Bitaxe Gamma's hashrate, in a finished case with an included power adapter and Wi-Fi. At 140 W it gives off about as much warmth as a small personal heater, so it doubles as a desk or foot warmer.",
+        who="Someone who wants more hashrate than a Bitaxe in a finished, quiet box, for a desk, office or bedroom.",
+        check=["Color: black and white are usually the same price.",
+               "Solo or pool: it can do either. Pick in its settings (see our solo vs pool guide).",
+               "Prices are before shipping and sales tax."]),
+    "avalon-mini-3": dict(
+        intro="The Avalon Mini 3 is a heater miner shaped like a baseboard heater. Sellers state 37.5 TH/s at up to 800 W, so it heats a room like a mid-size electric heater while it mines. Sellers list app control and several modes (for example a quieter night mode and an extra-heat mode).",
+        who="Someone who already heats a room with electricity in winter and would rather that heat also mine Bitcoin.",
+        check=["At about 800 W it runs on a normal household outlet, but don't share that circuit with other big heaters.",
+               "Noise depends on the mode: sellers list roughly 33 to 55 dB.",
+               "D-Central prices it in Canadian dollars and ships from Canada, so US import costs may apply. Our dollar figure is an estimate."]),
+    "avalon-q": dict(
+        intro="The Avalon Q is Canaan's big home miner, a tower that sellers state at 90 TH/s and about 1,674 W. That's as much heat as a full-size space heater on high, so it suits a large room, garage or basement in winter.",
+        who="Someone who wants the most hashrate from a plug-in home unit and has a room that can use about 1.7 kW of heat.",
+        check=["Power: about 1,674 W is close to the limit of a standard 15 A, 120 V household circuit. Check the maker's circuit guidance, use a lower power mode, or run it on a dedicated circuit.",
+               "Its plug option should match your country (Altair lists a USA plug).",
+               "Mine in a pool if you want small, steady payouts rather than a lottery ticket."]),
+    "heatbit-trio": dict(
+        intro="The Heatbit Trio is a space heater, an air purifier and a Bitcoin miner in one tall cylinder. Heatbit states 10 TH/s from 400 W of mining heat, plus another 1,100 W of ordinary electric heating for 1,500 W in total. That means only part of its heat comes from mining.",
+        who="Someone who wants a room heater and air purifier anyway and likes the idea of it earning a few sats.",
+        check=["It's a pre-order right now. Heatbit says this season's stock is sold out, so read the ship timing on its page.",
+               "HEPA filters are a running cost. Heatbit sells replacement filters separately.",
+               "Pick the US / 120 V version."]),
+    "heatbit-maxi": dict(
+        intro="The Heatbit Maxi is Heatbit's larger heater miner. Heatbit states 39 TH/s with 1,500 W of mining heat, so all of its heat comes from mining, plus air purification. A Maxi Pro version is listed at 60 TH/s for more money.",
+        who="Someone heating a bigger room who wants the heat itself to do the mining.",
+        check=["It's a pre-order right now. Heatbit says this season's stock is sold out, so read the ship timing on its page.",
+               "1,500 W is the most a standard 15 A, 120 V outlet should power continuously, so give it its own circuit.",
+               "Maxi and Maxi Pro look the same but differ in hashrate and price. We track the Maxi."]),
+    "heatbit-canvas": dict(
+        intro="The Heatbit Canvas is a flat heater miner you hang on a wall or stand up, with art on the front. Heatbit states 10 TH/s at 300 W, about 1,020 BTU of heat, for a room of up to about 150 sq ft.",
+        who="Someone who wants a little warmth in a small room and a miner that looks like decor.",
+        check=["It's a pre-order right now. Heatbit says this season's stock is sold out, so read the ship timing on its page.",
+               "At 300 W it adds heat but won't heat a large room on its own.",
+               "Color and artwork options can change the price."]),
+    "braiins-bmm-101": dict(
+        intro="The Braiins Mini Miner (BMM 101) is a desk lottery miner from Braiins, the company behind the Braiins Pool. Braiins states about 1 TH/s at 35–40 W, in a metal case with a touchscreen. That's a similar class to a Bitaxe Gamma, in a more finished box.",
+        who="Someone who wants a solo lottery miner that looks good on a desk and doesn't need tinkering.",
+        check=["It's sold direct by Braiins on its own store.",
+               "At about 1 TH/s, solo mining is a long-shot lottery, and pool payouts are tiny.",
+               "Prices are before shipping and sales tax."]),
+    "hammer-bc04": dict(
+        intro="The Hammer Miner BC04 is a compact desk miner that sellers state at 6 TH/s and 96 W, in the same hashrate class as the Avalon Nano 3S but at a lower stated power draw.",
+        who="Someone comparing small 6 TH/s desk miners on price and power use.",
+        check=["Compare it with the Avalon Nano 3S: same stated hashrate, different power, noise and price.",
+               "Check what power supply comes in the box.",
+               "Prices are before shipping and sales tax."]),
+}
+MODEL_COPY.update(HOME_COPY)
+
 COMPARE_PAIRS = [("bitaxe-gamma", "nerdqaxe-pp"), ("bitaxe-gamma", "bitaxe-gt-801"), ("bitaxe-gamma", "nerdaxe-gamma"),
                  ("bitaxe-gamma", "bitaxe-supra"), ("nerdqaxe-pp", "nerdaxe-gaia")]
 COMPARE_COPY = {
@@ -267,6 +332,27 @@ SELLER_COPY = {
         notes=["Pre-orders are labelled as such, with the seller's own ship-date wording when it gives one.",
                "Its FAQ says it ships to the US and Canada (express 2–4 days, standard 4–6 days; customs can add time).",
                "Shipping and import duties are not included, so the real US price will be higher than the figure shown."]),
+    "altair": dict(
+        region="USD prices",
+        about="A US shop in St. Louis, Missouri that carries a wide range of home miners, including the Avalon line and Hammer miners, priced in US dollars.",
+        notes=["Product pages say orders ship from St. Louis, MO.",
+               "Prices are before shipping and sales tax."]),
+    "heatbit": dict(
+        region="USD prices (sold direct)",
+        about="The maker of the Heatbit heater miners, selling direct from its own store in US dollars.",
+        notes=["Heatbit's heater models are pre-order right now. Its site says this season's stock is sold out.",
+               "We track the US / 120 V version where there's a choice.",
+               "Prices are before shipping and sales tax."]),
+    "braiins": dict(
+        region="USD prices (sold direct)",
+        about="Braiins' own hardware store (Braiins Forge), the company behind Braiins Pool and Braiins OS, selling its Mini Miner direct.",
+        notes=["Prices shown are from the US version of the store.", "Prices are before shipping and sales tax."]),
+    "dcentral": dict(
+        region="CAD prices (ships from Canada)",
+        about="A Canadian shop that sells miners, heater builds and parts, priced in Canadian dollars.",
+        notes=["Prices are in Canadian dollars. Our US-dollar figures are estimates at the latest exchange rate.",
+               "Orders ship from Canada, so US buyers may pay import costs on top.",
+               "Its pages list a lead time on some items. Read the shipping line before you order."]),
     "bitaxede": dict(
         region="EUR prices incl. VAT",
         about="A European shop. Prices are in euros and include VAT; shipping is extra.",
@@ -274,7 +360,8 @@ SELLER_COPY = {
                "Because VAT is included and shipping isn't, its dollar estimates aren't directly comparable to a US shop's pre-tax prices."]),
 }
 
-NAV = [("/#miners", "Miners"), ("/deals/", "Deals"), ("/in-stock/", "In stock"), ("/where-to-buy-bitaxe/", "Where to buy")]
+NAV = [("/#miners", "Bitaxe"), ("/home-miners/", "Heater miners"), ("/deals/", "Deals"), ("/in-stock/", "In stock"), ("/where-to-buy-bitaxe/", "Where to buy")]
+NAV_HIDE_SM = {"/in-stock/", "/where-to-buy-bitaxe/"}       # keep the phone nav to 3 links + Alerts
 
 # ---- brand assets (inline SVG; the radar mark follows the @BitaxeRadar avatar) --------------
 LOGO_SVG = ('<svg class="logo-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false">'
@@ -301,6 +388,14 @@ MODEL_IMG = {
     "nerdaxe-gaia": (752, 841, "Nerdaxe Gaia BM1373 solo Bitcoin miner"),
     "nerdqaxe-pp": (463, 721, "NerdQaxe++ 4.8 TH/s four-chip solo Bitcoin miner"),
     "bitaxe-supra": (595, 864, "Bitaxe Supra 403 solo Bitcoin miner"),
+    "avalon-nano-3s": (800, 377, "Canaan Avalon Nano 3S desk Bitcoin miner"),
+    "avalon-mini-3": (800, 560, "Canaan Avalon Mini 3 baseboard heater Bitcoin miner"),
+    "avalon-q": (443, 800, "Canaan Avalon Q tower home Bitcoin miner"),
+    "heatbit-trio": (333, 800, "Heatbit Trio space heater and Bitcoin miner, silver"),
+    "heatbit-maxi": (311, 800, "Heatbit Maxi heater Bitcoin miner, black"),
+    "heatbit-canvas": (800, 714, "Heatbit Canvas wall heater Bitcoin miner panels with artwork"),
+    "braiins-bmm-101": (800, 500, "Braiins Mini Miner BMM 101 with touchscreen"),
+    "hammer-bc04": (565, 800, "Hammer Miner BC04 desk Bitcoin miner on its stand"),
 }
 MODEL_IMG = {k: v for k, v in MODEL_IMG.items() if (SITE / "img" / "models" / f"{k}.webp").exists()}
 
@@ -380,11 +475,30 @@ def stats(mid):
         per_th=(usd(best) / MODELS[mid]["hashrate_ths"]) if best else None)
 
 
+def cat(mid):
+    return MODELS[mid].get("category", "bitaxe")
+
+
+def is_home(mid):
+    return cat(mid) == "home"
+
+
 STATS = {mid: stats(mid) for mid in MODELS}
 TRACKED = [mid for mid in MODELS if STATS[mid]["offers"]]
-EFF_RANK = {mid: i + 1 for i, mid in enumerate(sorted(TRACKED, key=jth))}
-_pth = sorted([m for m in TRACKED if STATS[m]["per_th"] is not None], key=lambda m: STATS[m]["per_th"])
-PTH_RANK = {mid: i + 1 for i, mid in enumerate(_pth)}
+BITAXE_TRACKED = [m for m in TRACKED if not is_home(m)]
+HOME_TRACKED = [m for m in TRACKED if is_home(m)]
+BITAXE_OFFERS = [o for o in OFFERS if not is_home(o["model"])]
+EFF_RANK, PTH_RANK, RANK_N, PTH_N = {}, {}, {}, {}
+for _grp in (BITAXE_TRACKED, HOME_TRACKED):       # ranks are within a category (a Bitaxe is not compared with a heater)
+    for i, mid in enumerate(sorted(_grp, key=jth)):
+        EFF_RANK[mid], RANK_N[mid] = i + 1, len(_grp)
+    _pth = sorted([m for m in _grp if STATS[m]["per_th"] is not None], key=lambda m: STATS[m]["per_th"])
+    for i, mid in enumerate(_pth):
+        PTH_RANK[mid], PTH_N[mid] = i + 1, len(_pth)
+
+
+def btu(watts):
+    return watts * 3.412
 
 
 def ordinal(n):
@@ -438,7 +552,7 @@ FOOT_DISCLOSURE = ('<strong>Affiliate disclosure:</strong> some shop links are a
 
 
 def header_html():
-    nav = "".join(f'<a href="{p}"{" class=\"hide-sm\"" if p == "/where-to-buy-bitaxe/" else ""}>{esc(n)}</a>' for p, n in NAV) + '<a class="nav-cta" href="/#alerts"><span class="hide-sm">Price alerts</span><span class="show-sm">Alerts</span></a>'
+    nav = "".join(f'<a href="{p}"{" class=\"hide-sm\"" if p in NAV_HIDE_SM else ""}>{esc(n)}</a>' for p, n in NAV) + '<a class="nav-cta" href="/#alerts"><span class="hide-sm">Price alerts</span><span class="show-sm">Alerts</span></a>'
     return f"""<a class="skip" href="#main">Skip to content</a>
 <header class="top"><div class="wrap">
   <a class="brand" href="/" aria-label="Bitaxe Radar home">{WORDMARK}</a>
@@ -447,11 +561,12 @@ def header_html():
 
 
 def footer_html(extra=""):
-    links = [("/#miners", "All miners"), ("/deals/", "Deals"), ("/bitaxe-black-friday/", "Black Friday 2026"), ("/in-stock/", "In stock"), ("/where-to-buy-bitaxe/", "Where to buy"),
+    links = [("/#miners", "Bitaxe miners"), ("/home-miners/", "Heater & home miners"), ("/guides/solo-vs-pool-mining/", "Solo vs pool"),
+             ("/guides/how-heater-miners-work/", "How heater miners work"), ("/deals/", "Deals"), ("/bitaxe-black-friday/", "Black Friday 2026"), ("/in-stock/", "In stock"), ("/where-to-buy-bitaxe/", "Where to buy"),
              ("/how-we-track/", "About & how we track"), ("/advertise/", "Advertise")]
     return f"""<footer class="foot"><div class="wrap">
   <a class="brand" href="/">{WORDMARK}</a>
-  <p>The cheapest in-stock Bitaxe, NerdQaxe and Nerdaxe miners from US and EU shops, checked every 6 hours.</p>
+  <p>The cheapest in-stock Bitaxe, NerdQaxe and Nerdaxe miners, plus heater and home miners, from US, Canadian and EU shops, checked every 6 hours.</p>
   <nav class="foot-links" aria-label="Footer">{"".join(f'<a href="{p}">{esc(n)}</a>' for p, n in links)}<a href="mailto:{CONTACT}">{CONTACT}</a></nav>
   {extra}<p>{FOOT_DISCLOSURE}</p>
   <p>Solo mining is a lottery, not income. Prices can change fast, so check the shop's page before buying. Not financial advice.</p>
@@ -546,9 +661,10 @@ COLORS = ["#f7931a", "#6ea8fe", "#3ecf8e", "#d58cff", "#f5c04a", "#ef6b6b"]
 
 
 def to_usd(p):
-    if p["currency"] == "EUR":
-        return p["price"] * FX["EUR_USD"] if FX.get("EUR_USD") else None
-    return p["price"]
+    if p["currency"] == "USD":
+        return p["price"]
+    rate = FX.get(f'{p["currency"]}_USD')
+    return p["price"] * rate if rate else None
 
 
 def chart_svg(mid):
@@ -654,13 +770,21 @@ def compare_label(a, b):
 def build_model_page(mid):
     m, st, cp = MODELS[mid], STATS[mid], MODEL_COPY[mid]
     short = SHORT[mid]
+    home = is_home(mid)
     path = f"/models/{mid}/"
     best, low = st["best"], st["low_any"]
     n_in = len(st["in_stock"])
     day = fmt_day(GEN)
-    trail = [("Home", "/"), (short, path)]
+    trail = [("Home", "/"), ("Heater & home miners", "/home-miners/"), (short, path)] if home else [("Home", "/"), (short, path)]
+    pre = [o for o in st["offers"] if o["stock_status"] in ("preorder", "backorder")]
 
-    if best:
+    if not best and pre and low and low["stock_status"] in ("preorder", "backorder"):
+        head = (f'<strong>Not in stock right now; {esc(STATUS[low["stock_status"]].lower())} only.</strong> Lowest listed: {money(usd(low))} at {esc(sname(low["seller"]))}.'
+                + (f' {esc(low["ship_note"])}.' if low.get("ship_note") else "") + " Set an alert below and we'll tell you when it's in stock.")
+        title = f"{short} price: {money(usd(low))} {STATUS[low['stock_status']].lower()} ({day}) | Bitaxe Radar"
+        desc = (f"{short} at {plural(st['sellers'], 'seller')}: {STATUS[low['stock_status']].lower()} from {money(usd(low))} at {sname(low['seller'])}, not in stock yet. "
+                f"Specs, heat output, running cost and stock alerts. Updated {day}.")
+    elif best:
         head = (f'In stock at {n_in} of {plural(st["sellers"], "shop")}. Cheapest right now: <strong>{money(usd(best))}</strong> at {esc(sname(best["seller"]))}.')
         title = f"{short} price: {money(usd(best))} in stock ({day}) | Bitaxe Radar"
         desc = (f"{short} prices at {plural(st['sellers'], 'seller')}: cheapest in stock {money(usd(best))} at {sname(best['seller'])}, "
@@ -680,20 +804,24 @@ def build_model_page(mid):
     per_th = st["per_th"]
     rows = [("Hashrate", f"≈ {m['hashrate_ths']:g} TH/s (seller-stated)"),
             ("Power", f"≈ {m['watts']:g} W (seller-stated)"),
-            ("Efficiency", f"≈ {jth(mid):.1f} J/TH · {ordinal(EFF_RANK[mid])} best of {len(TRACKED)}"),
-            ("Chip", m["chip"]),
-            ("Price per TH/s", (f"{money(per_th)} · {ordinal(PTH_RANK[mid])} cheapest of {len(PTH_RANK)}") if per_th else "n/a, none in stock"),
+            ("Efficiency", f"≈ {jth(mid):.1f} J/TH · {ordinal(EFF_RANK[mid])} best of {RANK_N[mid]}" + (" home miners" if home else "")),
+            (("Type", m["kind"]) if home else ("Chip", m["chip"])),
+            ("Price per TH/s", (f"{money(per_th)} · {ordinal(PTH_RANK[mid])} cheapest of {PTH_N[mid]}") if per_th else "n/a, none in stock"),
             ("Energy", f"≈ {kwh_year(mid):,.0f} kWh a year if run 24/7")]
+    if home:
+        hw = m.get("heat_watts", m["watts"])
+        rows.insert(2, ("Heat output", f"≈ {btu(hw):,.0f} BTU/h at full power (≈ {hw:,g} W of heat" + (", including non-mining heat)" if "heat_watts" in m else ")")))
     spec_tbl = '<div class="tablewrap"><table><tbody>' + "".join(f'<tr><th scope="row">{esc(k)}</th><td>{esc(v)}</td></tr>' for k, v in rows) + "</tbody></table></div>"
     kwh = kwh_year(mid)
     elec_tbl = ('<div class="tablewrap"><table><thead><tr><th>Power price</th>' + "".join(f'<th class="num">${r:.2f}/kWh</th>' for r in ELEC_RATES) + "</tr></thead>"
                 f'<tbody><tr><th scope="row">Cost per year, 24/7</th>{"".join(f"<td class=num>${kwh * r:,.0f}</td>" for r in ELEC_RATES)}</tr></tbody></table></div>')
-    spec_note = f'<p class="hint">{esc(m["note"])}. Want your own rate? Use the <a href="/#cost">power-cost calculator</a>.</p>'
+    spec_note = (f'<p class="hint">{esc(m["note"])}. Running cost assumes full power 24/7; heater miners usually cycle with a thermostat, so real use is often lower.</p>' if home else
+                 f'<p class="hint">{esc(m["note"])}. Want your own rate? Use the <a href="/#cost">power-cost calculator</a>.</p>')
 
     yrs = lottery_years(mid)
     rel_c = related_compare(mid)
     rel_links = "".join(f'<li><a href="{compare_url(a, b)}">{esc(compare_label(a, b))}</a></li>' for a, b in rel_c)
-    others = [x for x in TRACKED if x != mid and x not in NOINDEX_MODELS][:6]
+    others = [x for x in TRACKED if x != mid and x not in NOINDEX_MODELS and cat(x) == cat(mid)][:6]
     other_links = "".join(f'<li><a href="/models/{x}/">{esc(SHORT[x])}' + (f' <span class="hint">from {money(usd(STATS[x]["best"]))}</span>' if STATS[x]["best"] else ' <span class="hint">sold out</span>') + "</a></li>" for x in others)
 
     chart = chart_svg(mid)
@@ -717,7 +845,18 @@ def build_model_page(mid):
     faq.append((f"Is the {short} in stock?", f"At the last check: {stock_lines}. Stock changes fast, so confirm on the shop's page.", False))
     faq.append((f"How much electricity does the {short} use?",
                 f"Sellers state about {m['watts']:g} W, roughly {kwh:,.0f} kWh a year if it runs 24/7. At $0.10, $0.15 and $0.25 per kWh that's about ${kwh * 0.10:,.0f}, ${kwh * 0.15:,.0f} and ${kwh * 0.25:,.0f} a year.", False))
-    faq.append((f"Can a {short} make money?",
+    if home:
+        hw = m.get("heat_watts", m["watts"])
+        faq.append((f"How much heat does the {short} give off?",
+                    f"Almost all the electricity a miner uses comes out as heat, like an electric space heater. At full power that's about {hw:,g} W, or roughly {btu(hw):,.0f} BTU per hour"
+                    + (f", of which about {m['watts']:g} W comes from mining." if "heat_watts" in m else ".")
+                    + ' <a href="/guides/how-heater-miners-work/">How heater miners work</a>.', True))
+        faq.append((f"Will the {short} pay for its electricity?",
+                    "Usually not all of it, and nothing is guaranteed. Pointed at a mining pool, it earns small, steady amounts of bitcoin that can offset part of the power bill. "
+                    "How much depends on Bitcoin's price, the network's total hashrate and your electricity rate, and all three change. Pointed at solo mining, it's a lottery ticket for a whole block. "
+                    '<a href="/guides/solo-vs-pool-mining/">Solo vs pool, explained</a>.', True))
+    else:
+      faq.append((f"Can a {short} make money?",
                 f"Almost certainly not. It's a solo \"lottery\" miner: it either finds a whole Bitcoin block (a huge reward) or nothing. As a rough illustration, on a {NETWORK_EH_ILLUSTRATION:,} EH/s network it would find a block about once every {sig2(yrs)} years on average, while electricity costs money every year. Buy it as a hobby, not an investment.", False))
     faq.append((f"How do I get told when the {short} price drops?",
                 "Use the alert form on this page: pick your price and we email you once it's in stock at or under it. Free, and you can unsubscribe in one click.", False))
@@ -727,13 +866,13 @@ def build_model_page(mid):
     body = f"""<article>
 <header class="hero"><h1>{esc(short)}</h1>
 <p class="lede">{head}</p>
-<p class="meta">≈{m['hashrate_ths']:g} TH/s · ≈{m['watts']:g} W · {esc(m['chip'])} · checked {tag_time(st['checked'])}</p></header>
+<p class="meta">≈{m['hashrate_ths']:g} TH/s · ≈{m['watts']:,g} W{f" mining ({m['heat_watts']:,g} W total heat)" if m.get('heat_watts') else ""} · {esc(m['kind'] if home else m['chip'])} · checked {tag_time(st['checked'])}</p></header>
 <div class="model-top"><figure class="model-photo{"" if mid in MODEL_IMG else " placeholder"}">{model_img(mid, lazy=False)}</figure>
-<div class="model-deal">{best_cta(st) or '<div class="cta"><div><small>Sold out right now</small><p class="hint">Set a price alert below and we\'ll email you when it\'s back.</p></div></div>'}
+<div class="model-deal">{best_cta(st) or preorder_cta(st) or '<div class="cta"><div><small>Sold out right now</small><p class="hint">Set a price alert below and we\'ll email you when it\'s back.</p></div></div>'}
 {avail_note}</div></div>
 <section aria-labelledby="h-offers"><h2 id="h-offers">Prices by shop</h2>
 {offers_html}
-<p class="hint">Before shipping and tax. Euro prices are converted to dollars as an estimate. Updated every 6 hours.</p></section>
+<p class="hint">Before shipping and tax. Euro and Canadian-dollar prices are converted to US dollars as an estimate. Updated every 6 hours.</p></section>
 {SPONSOR_SLOT}
 <section aria-labelledby="h-hist"><h2 id="h-hist">Price history</h2>{hist_html}</section>
 {signup_html(mid)}
@@ -745,7 +884,8 @@ def build_model_page(mid):
 <section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{faq_html}</section>
 <section aria-labelledby="h-more"><h2 id="h-more">Keep comparing</h2>
 {'<ul class="links">' + rel_links + "</ul>" if rel_links else ""}
-<ul class="links">{other_links}</ul></section>
+<ul class="links">{other_links}</ul>
+{'<p><a href="/home-miners/">All heater &amp; home miners</a> · <a href="/guides/how-heater-miners-work/">How heater miners work</a> · <a href="/guides/solo-vs-pool-mining/">Solo vs pool</a></p>' if home else ""}</section>
 </article>"""
 
     offer_ld = []
@@ -858,7 +998,8 @@ def build_seller_page(sid):
     path = f"/sellers/{sid}/"
     n_in = sum(1 for o in offs if in_stock(o))
     aff = aff_param(sid)
-    trail = [("Home", "/"), ("Where to buy", "/where-to-buy-bitaxe/"), (s["name"], path)]
+    trail = ([("Home", "/"), ("Heater & home miners", "/home-miners/"), (s["name"], path)] if all(is_home(o["model"]) for o in offs)
+             else [("Home", "/"), ("Where to buy", "/where-to-buy-bitaxe/"), (s["name"], path)])
     rows = []
     for o in offs:
         ins = sorted(STATS[o["model"]]["in_stock"], key=usd)
@@ -886,8 +1027,9 @@ def build_seller_page(sid):
                if aff else "")
     notes = "".join(f"<li>{esc(n)}</li>" for n in cp["notes"])
     unverified = '<p class="hint">Check the shop\'s own shipping, warranty and return pages before you pay.</p>'
-    title = f"{s['name']} Bitaxe prices and stock ({fmt_day(GEN)}) | Bitaxe Radar"
-    desc = f"{s['name']}: {len(offs)} Bitaxe-family miners tracked, {n_in} in stock now ({cp['region']}). Prices, stock, price log and buying notes."
+    kind_txt = "heater and home miners" if all(is_home(o["model"]) for o in offs) else ("Bitaxe-family and home miners" if any(is_home(o["model"]) for o in offs) else "Bitaxe-family miners")
+    title = f"{s['name']} miner prices and stock ({fmt_day(GEN)}) | Bitaxe Radar"
+    desc = f"{s['name']}: {len(offs)} {kind_txt} tracked, {n_in} in stock now ({cp['region']}). Prices, stock, price log and buying notes."
     body = f"""<article>
 <header class="hero"><h1>{esc(s['name'])}: prices and stock</h1><p class="lede">{esc(cp['about'])}</p>
 <p class="meta">{summary}</p></header>
@@ -895,7 +1037,7 @@ def build_seller_page(sid):
 <p class="hint">Store: <a href="{esc(s['url'])}" rel="nofollow noopener" target="_blank">{esc(s['url'].replace('https://', ''))}</a>. Prices are before shipping and tax.</p></section>
 <section aria-labelledby="h-n"><h2 id="h-n">Good to know</h2><ul>{notes}</ul>{unverified}{aff_txt}</section>
 <section aria-labelledby="h-l"><h2 id="h-l">Price log</h2><details class="more"><summary>Show price log</summary>{log}</details></section>
-<section><h2>See also</h2><ul class="links"><li><a href="/where-to-buy-bitaxe/">Where to buy a Bitaxe</a></li><li><a href="/in-stock/">Everything in stock</a></li><li><a href="/deals/">Best deals</a></li></ul></section>
+<section><h2>See also</h2><ul class="links"><li><a href="/home-miners/">Heater &amp; home miners</a></li><li><a href="/where-to-buy-bitaxe/">Where to buy a Bitaxe</a></li><li><a href="/in-stock/">Everything in stock</a></li><li><a href="/deals/">Best deals</a></li></ul></section>
 </article>"""
     ld = {"@context": "https://schema.org", "@type": "WebPage", "name": f"{s['name']} prices and stock", "url": BASE + path,
           "dateModified": latest["generated_at"], "about": {"@type": "Organization", "name": s["name"], "url": s["url"]}}
@@ -926,14 +1068,15 @@ def model_summary_table(models, *, usd_only=False):
             f'<tbody>{"".join(rows)}</tbody></table></div>')
 
 
-CURRENT_MODELS = [m for m in TRACKED if m not in NOINDEX_MODELS]
+CURRENT_MODELS = [m for m in BITAXE_TRACKED if m not in NOINDEX_MODELS]
 
 
 def build_where_to_buy():
     path = "/where-to-buy-bitaxe/"
     trail = [("Home", "/"), ("Where to buy a Bitaxe", path)]
-    usd_sellers = [sid for sid in SELLERS if SELLERS[sid]["currency"] == "USD"]
-    eur_sellers = [sid for sid in SELLERS if SELLERS[sid]["currency"] != "USD"]
+    bx_sellers = [sid for sid in SELLERS if any(o["seller"] == sid for o in BITAXE_OFFERS)]
+    usd_sellers = [sid for sid in bx_sellers if SELLERS[sid]["currency"] == "USD"]
+    eur_sellers = [sid for sid in bx_sellers if SELLERS[sid]["currency"] != "USD"]
     qa = []
     g = STATS["bitaxe-gamma"]
     if g["best_usd"]:
@@ -941,20 +1084,20 @@ def build_where_to_buy():
     gl = g["low_any"]
     if gl and not in_stock(gl):
         qa.append(f"The cheapest listed Gamma, {money(usd(gl))} at {esc(sname(gl['seller']))}, is {esc(STATUS[gl['stock_status']].lower())} at the last check.")
-    ins_usd = [o for o in OFFERS if in_stock(o) and o["currency"] == "USD"]
-    qa.append(f"Right now {len(ins_usd)} of our {sum(1 for o in OFFERS if o['currency'] == 'USD')} USD-priced listings are in stock, across {len({o['seller'] for o in ins_usd})} sellers.")
+    ins_usd = [o for o in BITAXE_OFFERS if in_stock(o) and o["currency"] == "USD"]
+    qa.append(f"Right now {len(ins_usd)} of our {sum(1 for o in BITAXE_OFFERS if o['currency'] == 'USD')} USD-priced listings are in stock, across {len({o['seller'] for o in ins_usd})} sellers.")
     qa_html = "".join(f"<li>{x}</li>" for x in qa)
 
     def seller_row(sid):
         s, cp = SELLERS[sid], SELLER_COPY[sid]
-        offs = [o for o in OFFERS if o["seller"] == sid]
+        offs = [o for o in BITAXE_OFFERS if o["seller"] == sid]
         n_in = sum(1 for o in offs if in_stock(o))
         return (f'<tr><td><a href="/sellers/{sid}/">{esc(s["name"])}</a></td><td>{esc(cp["region"])}</td><td class="num">{len(offs)}</td><td class="num">{n_in}</td>'
                 f'<td class="cfg">{tag_time(max(o["checked_at"] for o in offs))}</td></tr>')
     sellers_tbl = ('<div class="tablewrap"><table><thead><tr><th>Shop</th><th>Pricing</th><th class="num">Models</th><th class="num">In stock</th><th>Last checked</th></tr></thead>'
                    f'<tbody>{"".join(seller_row(s) for s in usd_sellers + eur_sellers)}</tbody></table></div>')
     title = f"Where to buy a Bitaxe in the US: prices and stock ({fmt_day(GEN)}) | Bitaxe Radar"
-    desc = (f"Where to buy a Bitaxe or NerdQaxe: {len(SELLERS)} sellers tracked, {len(ins_usd)} USD-priced listings in stock. "
+    desc = (f"Where to buy a Bitaxe or NerdQaxe: {len(bx_sellers)} sellers tracked, {len(ins_usd)} USD-priced listings in stock. "
             f"Cheapest in-stock Gamma {money(g['best_usd']['price']) if g['best_usd'] else 'n/a'}. Updated {fmt_day(GEN)}.")
     body = f"""<article>
 <header class="hero"><h1>Where to buy a Bitaxe (US-first)</h1>
@@ -987,12 +1130,12 @@ def build_in_stock():
 
     def srt(lst):
         return sorted(lst, key=lambda o: (order[o["model"]], usd(o) if usd(o) is not None else 1e9))
-    ins = srt([o for o in OFFERS if in_stock(o)])
-    pre = srt([o for o in OFFERS if o["stock_status"] in ("preorder", "backorder")])
-    oos = srt([o for o in OFFERS if o["stock_status"] in ("out_of_stock", "unknown")])
-    none = [m for m in TRACKED if not STATS[m]["in_stock"]]
+    ins = srt([o for o in BITAXE_OFFERS if in_stock(o)])
+    pre = srt([o for o in BITAXE_OFFERS if o["stock_status"] in ("preorder", "backorder")])
+    oos = srt([o for o in BITAXE_OFFERS if o["stock_status"] in ("out_of_stock", "unknown")])
+    none = [m for m in BITAXE_TRACKED if not STATS[m]["in_stock"]]
     notes = []
-    for mid in TRACKED:
+    for mid in BITAXE_TRACKED:
         st = STATS[mid]
         if st["best"] and st["low_any"]["id"] != st["best"]["id"] and not in_stock(st["low_any"]):
             notes.append(f"The cheapest listed {esc(SHORT[mid])}, {money(usd(st['low_any']))} at {esc(sname(st['low_any']['seller']))}, is {esc(STATUS[st['low_any']['stock_status']].lower())}. Cheapest in stock: {money(usd(st['best']))} at {esc(sname(st['best']['seller']))}.")
@@ -1000,16 +1143,16 @@ def build_in_stock():
         notes.append("Sold out everywhere we check: " + ", ".join(f'<a href="/models/{m}/">{esc(SHORT[m])}</a>' for m in none) + ".")
     n_sellers = len({o["seller"] for o in ins})
     title = f"Bitaxe in stock now: {len(ins)} listings at {plural(n_sellers, 'seller')} ({fmt_day(GEN)}) | Bitaxe Radar"
-    desc = f"What is in stock right now: {len(ins)} of {len(OFFERS)} tracked Bitaxe, Nerdaxe and NerdQaxe listings, plus {len(pre)} pre-order or backorder. Updated {fmt_day(GEN)}."
+    desc = f"What is in stock right now: {len(ins)} of {len(BITAXE_OFFERS)} tracked Bitaxe, Nerdaxe and NerdQaxe listings, plus {len(pre)} pre-order or backorder. Updated {fmt_day(GEN)}."
     body = f"""<article>
 <header class="hero"><h1>Bitaxe and NerdQaxe in stock now</h1>
-<p class="lede">{len(ins)} of {len(OFFERS)} tracked listings are in stock at the last check. Another {len(pre)} are pre-order or backorder (not in stock yet) and {len(oos)} are sold out.</p>
+<p class="lede">{len(ins)} of {len(BITAXE_OFFERS)} tracked listings are in stock at the last check. Another {len(pre)} are pre-order or backorder (not in stock yet) and {len(oos)} are sold out.</p>
 <p class="meta">Checked {tag_time(latest['generated_at'])} · updated every 6 hours</p></header>
 <section aria-labelledby="h-n"><h2 id="h-n">What the stock picture means today</h2><ul>{"".join(f"<li>{x}</li>" for x in notes) or "<li>Nothing unusual at the last check.</li>"}</ul></section>
 <section aria-labelledby="h-i"><h2 id="h-i">In stock ({len(ins)})</h2>{offers_table(ins, show_model=True) if ins else "<p>Nothing is in stock at the tracked sellers at the last check.</p>"}</section>
 <section aria-labelledby="h-p"><h2 id="h-p">Pre-order and backorder ({len(pre)})</h2><p class="hint">Not in stock. Read the seller's shipping note before ordering.</p>{offers_table(pre, show_model=True) if pre else "<p>None right now.</p>"}</section>
 <section aria-labelledby="h-o"><h2 id="h-o">Sold out ({len(oos)})</h2>{offers_table(oos, show_model=True) if oos else "<p>None right now.</p>"}</section>
-<section><h2>Related</h2><p><a href="/where-to-buy-bitaxe/">Where to buy a Bitaxe</a> · <a href="/deals/">Best deals</a> · <a href="/how-we-track/">How we track</a></p></section>
+<section><h2>Related</h2><p><a href="/where-to-buy-bitaxe/">Where to buy a Bitaxe</a> · <a href="/deals/">Best deals</a> · <a href="/home-miners/">Heater &amp; home miners</a> · <a href="/how-we-track/">How we track</a></p></section>
 </article>"""
     items = [(f"{SHORT[o['model']]} at {sname(o['seller'])}", f"/models/{o['model']}/") for o in ins]
     layout(path, title, desc, body, crumbs=trail, jsonld=[itemlist("Bitaxe-class miners in stock now", items)])
@@ -1018,7 +1161,7 @@ def build_in_stock():
 def build_deals():
     path = "/deals/"
     trail = [("Home", "/"), ("Best deals", path)]
-    cand = [m for m in TRACKED if STATS[m]["best"]]
+    cand = [m for m in BITAXE_TRACKED if STATS[m]["best"]]
     ranked = sorted(cand, key=lambda m: STATS[m]["per_th"])
     rows = []
     for i, mid in enumerate(ranked, 1):
@@ -1027,24 +1170,24 @@ def build_deals():
                     f'<td class="num">{money(st["per_th"])}</td><td class="num">≈{jth(mid):.1f}</td><td>{offer_link(b, "View ↗")}</td></tr>')
     rank_tbl = ('<div class="tablewrap"><table><thead><tr><th class="num">#</th><th>Model</th><th class="num">Cheapest in stock</th><th>Seller</th><th class="num">$ per stated TH/s</th><th class="num">J/TH</th><th>Buy</th></tr></thead>'
                 f'<tbody>{"".join(rows)}</tbody></table></div>')
-    disc = [o for o in OFFERS if o.get("compare_at") and o["compare_at"] > o["price"]]
+    disc = [o for o in BITAXE_OFFERS if o.get("compare_at") and o["compare_at"] > o["price"]]
     disc_rows = "".join(f'<tr><td><a href="/models/{o["model"]}/">{esc(SHORT[o["model"]])}</a></td><td>{esc(sname(o["seller"]))}</td><td class="num">{money(o["price"], o["currency"])}</td>'
                         f'<td class="num">{money(o["compare_at"], o["currency"])}</td><td class="num">{(1 - o["price"] / o["compare_at"]) * 100:.0f}%</td><td>{badge(o["stock_status"])}</td></tr>' for o in disc)
     disc_html = (('<div class="tablewrap"><table><thead><tr><th>Model</th><th>Seller</th><th class="num">Price now</th><th class="num">Seller\'s compare-at price</th><th class="num">Difference</th><th>Stock</th></tr></thead>'
                   f'<tbody>{disc_rows}</tbody></table></div><p class="hint">The compare-at price is whatever the seller entered as the "was" price. We have not verified it was ever the selling price, so treat it as the seller\'s claim.</p>')
                  if disc else "<p>No tracked seller shows a compare-at (&ldquo;was&rdquo;) price at the last check.</p>")
-    ch = price_changes(7)
+    ch = [c for c in price_changes(7) if not is_home(c[0]["model"])]
     ch_rows = "".join(f'<tr><td><a href="/models/{o["model"]}/">{esc(SHORT[o["model"]])}</a></td><td>{esc(sname(o["seller"]))}</td><td class="num">{money(old, o["currency"])}</td><td class="num">{money(new, o["currency"])}</td>'
                       f'<td class="num">{(new / old - 1) * 100:+.1f}%</td><td>{esc(fmt_day(t))}</td></tr>' for o, old, new, t in ch)
     ch_html = (f'<div class="tablewrap"><table><thead><tr><th>Model</th><th>Seller</th><th class="num">Was</th><th class="num">Now</th><th class="num">Change</th><th>When</th></tr></thead><tbody>{ch_rows}</tbody></table></div>'
                if ch else "<p>No price changes in the last 7 days.</p>")
-    gaps = [(mid, STATS[mid]) for mid in TRACKED if STATS[mid]["best"] and STATS[mid]["low_any"]["id"] != STATS[mid]["best"]["id"] and not in_stock(STATS[mid]["low_any"])]
+    gaps = [(mid, STATS[mid]) for mid in BITAXE_TRACKED if STATS[mid]["best"] and STATS[mid]["low_any"]["id"] != STATS[mid]["best"]["id"] and not in_stock(STATS[mid]["low_any"])]
     gap_rows = "".join(f'<tr><td><a href="/models/{mid}/">{esc(SHORT[mid])}</a></td><td>{esc(sname(st["low_any"]["seller"]))}</td><td class="num">{money(usd(st["low_any"]))}</td><td>{badge(st["low_any"]["stock_status"])}</td>'
                        f'<td class="num">{money(usd(st["best"]))}</td><td class="num">{money(usd(st["best"]) - usd(st["low_any"]))}</td></tr>' for mid, st in gaps)
     gap_html = (('<div class="tablewrap"><table><thead><tr><th>Model</th><th>Cheapest listing</th><th class="num">Price</th><th>Status</th><th class="num">Cheapest in stock</th><th class="num">Premium</th></tr></thead>'
                  f"<tbody>{gap_rows}</tbody></table></div>") if gaps else "<p>At the last check the cheapest listing for every model was also in stock.</p>")
     spread = []
-    for mid in TRACKED:
+    for mid in BITAXE_TRACKED:
         ins = sorted(STATS[mid]["in_stock"], key=usd)
         if len(ins) >= 2:
             spread.append((mid, ins[0], ins[-1]))
@@ -1118,6 +1261,152 @@ def build_black_friday():
     layout(path, title, desc, body, crumbs=trail, scripts=SIGNUP_SCRIPTS)
 
 
+
+# ---------------------------------------------------------------------------------------------
+# HEATER & HOME MINERS hub + plain-language guides
+# ---------------------------------------------------------------------------------------------
+HEATER_GROUP = ["avalon-mini-3", "avalon-q", "heatbit-trio", "heatbit-maxi", "heatbit-canvas"]
+DESK_GROUP = ["avalon-nano-3s", "hammer-bc04", "braiins-bmm-101"]
+GUIDE_UPDATED = "2026-10-21"
+NETWORK_EH_SEEN = "about 1,050 EH/s"       # mempool.space /api/v1/mining/hashrate/3d on 2026-10-21 (see docs/HOME_MINING_HUB_PLAN.md)
+
+
+def hub_card(mid):
+    st, m = STATS[mid], MODELS[mid]
+    b = st["best"]
+    pre = [o for o in st["offers"] if o["stock_status"] in ("preorder", "backorder") and usd(o) is not None]
+    hw = m.get("heat_watts", m["watts"])
+    if b:
+        conv = b["currency"] != "USD"
+        price = f'{"≈ " if conv else ""}{money(usd(b))}' + (f'<small>{"CA" if b["currency"] == "CAD" else "EU"} shop</small>' if conv else "")
+        where = f'at {esc(sname(b["seller"]))}' + (f' · in stock at {plural(len(st["in_stock"]), "shop")}' if len(st["in_stock"]) > 1 else "")
+        status, cls = badge("in_stock"), "card"
+    elif pre:
+        o = min(pre, key=usd)
+        price = money(usd(o))
+        where = f'at {esc(sname(o["seller"]))} · not in stock yet'
+        status, cls = badge(o["stock_status"]), "card"
+    else:
+        low = st["low_any"]
+        price, where = "Sold out", (f'Last listed {money(usd(low))}' if low else "")
+        status, cls = '<span class="badge b-out_of_stock">Sold out</span>', "card soldout"
+    return (f'<article class="{cls}"><div class="art{" photo" if mid in MODEL_IMG else ""}">{model_img(mid)}</div><div class="body">'
+            f'<h3><a href="/models/{mid}/">{esc(SHORT[mid])}</a></h3>'
+            f'<div class="spec">≈{m["hashrate_ths"]:g} TH/s · ≈{m["watts"]:,g} W · ≈{btu(hw):,.0f} BTU/h heat</div>'
+            f'<div class="price">{price}</div><div class="where">{where}</div>'
+            f'<div class="row">{status}<a class="btn sm" href="/models/{mid}/" aria-label="See {esc(SHORT[mid])} prices">See prices</a></div>'
+            "</div></article>")
+
+
+def build_home_miners():
+    path = "/home-miners/"
+    trail = [("Home", "/"), ("Heater & home miners", path)]
+    heaters = [m for m in HEATER_GROUP if m in HOME_TRACKED]
+    desk = [m for m in DESK_GROUP if m in HOME_TRACKED]
+    home_offers = [o for o in OFFERS if is_home(o["model"])]
+    n_in = sum(1 for o in home_offers if in_stock(o))
+    cheapest_heater = cheapest([o for m in heaters for o in STATS[m]["in_stock"]])
+    title = f"Bitcoin heater miners & home miners: prices and stock ({fmt_day(GEN)}) | Bitaxe Radar"
+    desc = (f"Heater miners and home Bitcoin miners compared: Avalon, Heatbit, Braiins and Hammer prices and stock at US shops, "
+            f"{n_in} of {len(home_offers)} listings in stock. Updated {fmt_day(GEN)}.")
+    lead_bits = f' Cheapest heater miner in stock today: <strong>{money(usd(cheapest_heater))}</strong> ({esc(SHORT[cheapest_heater["model"]])} at {esc(sname(cheapest_heater["seller"]))}).' if cheapest_heater else ""
+    body = f"""<article>
+<header class="hero"><h1>Heater &amp; home miners</h1>
+<p class="lede">Miners built to live in your home: they warm a room like a space heater while they mine Bitcoin. Prices and stock from the shops, checked every 6 hours.{lead_bits}</p>
+<p class="meta">{n_in} of {len(home_offers)} listings in stock · checked {tag_time(latest['generated_at'])}</p></header>
+<section aria-labelledby="h-heat"><div class="sec-head"><h2 id="h-heat">Heater miners</h2><a href="/guides/how-heater-miners-work/">How they work →</a></div>
+<div class="cards">{"".join(hub_card(m) for m in heaters)}</div></section>
+<section aria-labelledby="h-desk"><div class="sec-head"><h2 id="h-desk">Desk &amp; small home miners</h2><a href="/#miners">Bitaxe miners →</a></div>
+<div class="cards">{"".join(hub_card(m) for m in desk)}</div></section>
+<section aria-labelledby="h-explain"><h2 id="h-explain">New to this? Two-minute reads</h2><ul class="links">
+<li><a href="/guides/how-heater-miners-work/">How a heater miner works</a></li>
+<li><a href="/guides/solo-vs-pool-mining/">Solo vs pool mining, in plain words</a></li></ul></section>
+<section id="faq" aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>
+<details><summary>What is a heater miner?</summary><p>A Bitcoin miner made to sit in a room and heat it. A mining chip turns almost all of its electricity into heat, like an electric space heater, so these units are built to be quiet, safe on a household outlet and controlled like a heater. The difference is that the heat also does mining work. <a href="/guides/how-heater-miners-work/">More</a>.</p></details>
+<details><summary>Will it pay my power bill?</summary><p>Part of it at best, and nothing is guaranteed. In a mining pool it earns small, steady amounts of bitcoin that offset some of the electricity cost. How much changes with Bitcoin's price, the network's total hashrate and your power rate. If you'd buy an electric heater anyway, that offset is the appeal.</p></details>
+<details><summary>Solo or pool: which should I pick?</summary><p>Pool if you want small, regular payouts. Solo if you want a long-shot chance at a whole block (about 3.125 BTC plus fees) and are fine with probably getting nothing. Most heater-miner owners pool. <a href="/guides/solo-vs-pool-mining/">Solo vs pool explained</a>.</p></details>
+<details><summary>Can I plug it into a normal outlet?</summary><p>Smaller units, yes. A standard US 15 A, 120 V circuit should carry about 1,440 W continuously (the 80% rule), so 1,500 W-class units are best on their own circuit, and don't share a circuit with another heater. Check the maker's guidance.</p></details>
+<details><summary>Why do some show "Pre-order"?</summary><p>The shop takes orders but doesn't have stock to ship yet. We label these separately from in-stock listings, and the shop's page has its ship timing.</p></details>
+</section>
+<p class="hint">Hashrate, watts and heat are the sellers' stated figures. BTU/h = watts × 3.412. Prices are before shipping and tax; Canadian-dollar prices are converted as an estimate.</p>
+</article>"""
+    items = [(SHORT[m], f"/models/{m}/") for m in heaters + desk]
+    layout(path, title, desc, body, crumbs=trail, jsonld=[itemlist("Heater and home Bitcoin miners tracked by Bitaxe Radar", items)])
+
+
+def guide_ld(path, headline, desc):
+    return {"@context": "https://schema.org", "@type": "Article", "headline": headline, "description": desc, "url": BASE + path,
+            "datePublished": GUIDE_UPDATED, "dateModified": GUIDE_UPDATED, "image": f"{BASE}/og-image.png",
+            "author": {"@type": "Organization", "name": "Bitaxe Radar", "url": BASE + "/"},
+            "publisher": {"@type": "Organization", "name": "Bitaxe Radar", "url": BASE + "/"}}
+
+
+def build_guide_heaters():
+    path = "/guides/how-heater-miners-work/"
+    trail = [("Home", "/"), ("Heater & home miners", "/home-miners/"), ("How heater miners work", path)]
+    title = "How a Bitcoin heater miner works (plain English) | Bitaxe Radar"
+    desc = "How a Bitcoin heater miner works: why a miner heats a room like a space heater, how pool mining offsets part of the power bill, and what to check first."
+    ex = [m for m in ("avalon-nano-3s", "avalon-mini-3", "heatbit-maxi") if m in HOME_TRACKED]
+    ex_rows = "".join(f'<tr><td><a href="/models/{m}/">{esc(SHORT[m])}</a></td><td class="num">≈{MODELS[m]["watts"]:,g} W</td><td class="num">≈{btu(MODELS[m]["watts"]):,.0f}</td></tr>' for m in ex)
+    ex_tbl = (f'<div class="tablewrap"><table><thead><tr><th>Miner</th><th class="num">Stated power</th><th class="num">Heat (BTU/h)</th></tr></thead><tbody>{ex_rows}</tbody></table></div>'
+              '<p class="hint">Heat = stated watts × 3.412, at full power.</p>') if ex else ""
+    body = f"""<article>
+<header class="hero"><h1>How a heater miner works</h1>
+<p class="lede">The short version: a Bitcoin miner is a space heater that also does mining work. Here's what that means for your room and your power bill.</p>
+<p class="meta">Updated <time datetime="{GUIDE_UPDATED}">Oct 21, 2026</time> · 2-minute read</p></header>
+<section aria-labelledby="h-1"><h2 id="h-1">1. Electricity in, heat out</h2>
+<p>A mining chip does billions of calculations a second, and nearly every watt it uses ends up as heat, just like an electric space heater. So a 1,000 W miner warms a room about as much as a 1,000 W heater.</p>
+<p>A heater miner puts that chip in a quiet, room-friendly case with a fan, a thermostat or app, and heater-style modes. You run it when you want heat, and it mines while it does.</p>
+{ex_tbl}</section>
+<section aria-labelledby="h-2"><h2 id="h-2">2. Where the money comes from</h2>
+<p>While it heats, the miner can earn bitcoin. There are two ways to run it:</p>
+<ul><li><strong>Pool mining:</strong> you join thousands of other miners. The pool finds blocks often and pays you a small share for your work, minus a pool fee. You get small, steady payouts that knock part of the power bill back down.</li>
+<li><strong>Solo mining:</strong> you try to find a whole block on your own. If you do, you get the full reward (about 3.125 BTC plus fees), but for one home miner that's a long-shot lottery, and most of the time you get nothing.</li></ul>
+<p>Most heater-miner owners pool. <a href="/guides/solo-vs-pool-mining/">Solo vs pool, explained</a>.</p></section>
+<section aria-labelledby="h-3"><h2 id="h-3">3. What it won't do</h2>
+<ul><li><strong>It won't usually cover your whole power bill.</strong> Pool earnings rise and fall with Bitcoin's price and the network's total hashrate. Your electricity rate decides how much they offset. We don't show earnings promises.</li>
+<li><strong>It's not the cheapest heat.</strong> A heat pump can move several units of heat for each unit of electricity, so it heats for less than any electric heater, miners included. Heater miners make the most sense in place of a plain electric heater.</li>
+<li><strong>It's not free in summer.</strong> If you don't need the heat, you're paying for power just to mine.</li></ul></section>
+<section aria-labelledby="h-4"><h2 id="h-4">4. Before you buy</h2>
+<ul><li><strong>Size:</strong> about 300–800 W suits a small or medium room. 1,500 W-class units are like a full-size space heater on high.</li>
+<li><strong>Circuit:</strong> a US 15 A, 120 V circuit should carry about 1,440 W continuously. Put big units on their own circuit, and follow the maker's guidance.</li>
+<li><strong>Noise:</strong> fans are louder in high-heat modes. Check the stated decibels.</li>
+<li><strong>Stock:</strong> many heater miners sell out before winter, and pre-orders ship later. Check the badge on each listing.</li></ul></section>
+<section><h2>Compare heater miners</h2><p><a class="btn" href="/home-miners/">See prices and stock</a></p></section>
+</article>"""
+    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "How a Bitcoin heater miner works", desc)], lastmod=GUIDE_UPDATED, og_type="article")
+
+
+def build_guide_pool():
+    path = "/guides/solo-vs-pool-mining/"
+    trail = [("Home", "/"), ("Heater & home miners", "/home-miners/"), ("Solo vs pool mining", path)]
+    title = "Solo vs pool mining, explained simply | Bitaxe Radar"
+    desc = "Solo vs pool Bitcoin mining in plain words: solo is a lottery for a whole block, pool pays small steady amounts. Which suits a Bitaxe or a heater miner."
+    ex = [m for m in ("bitaxe-gamma", "avalon-nano-3s", "avalon-mini-3", "avalon-q") if m in TRACKED]
+    rows = "".join(f'<tr><td><a href="/models/{m}/">{esc(SHORT[m])}</a></td><td class="num">≈{MODELS[m]["hashrate_ths"]:g} TH/s</td><td class="num">~{sig2(lottery_years(m))} yrs</td></tr>' for m in ex)
+    tbl = (f'<div class="tablewrap"><table><thead><tr><th>Miner</th><th class="num">Stated hashrate</th><th class="num">Avg. wait for a solo block</th></tr></thead><tbody>{rows}</tbody></table></div>'
+           f'<p class="hint">Illustration only: assumes a network of {NETWORK_EH_ILLUSTRATION:,} EH/s (mempool.space showed {NETWORK_EH_SEEN} on Oct 21, 2026) and 144 blocks a day. '
+           "It's an average: a block could come tomorrow or never, and the network keeps growing, which makes the odds worse.</p>") if ex else ""
+    body = f"""<article>
+<header class="hero"><h1>Solo vs pool mining</h1>
+<p class="lede">Every miner, from a Bitaxe to a heater miner, can run one of two ways. One is a lottery ticket, the other is a small, steady paycheck.</p>
+<p class="meta">Updated <time datetime="{GUIDE_UPDATED}">Oct 21, 2026</time> · 2-minute read</p></header>
+<section aria-labelledby="h-s"><h2 id="h-s">Solo: the lottery</h2>
+<p>Your miner tries to find the next Bitcoin block by itself. If it wins, you get the whole block reward, about 3.125 BTC plus fees. If it doesn't, you get nothing. For a home miner the odds are tiny, but small solo miners have won blocks, and that thrill is why many Bitaxe owners run solo.</p>
+{tbl}</section>
+<section aria-labelledby="h-p"><h2 id="h-p">Pool: the steady paycheck</h2>
+<p>Thousands of miners combine their hashrate in a pool. The pool finds blocks regularly and splits each reward by how much work everyone did, minus a pool fee. You get small, regular payouts instead of all or nothing.</p>
+<p>On average a pool pays about what solo mining would over a very long time, just smoothed out, minus the fee. Pool payouts move with Bitcoin's price and the network's total hashrate, so nobody can promise a fixed amount.</p></section>
+<section aria-labelledby="h-w"><h2 id="h-w">Which should you pick?</h2>
+<ul><li><strong>Bitaxe and other tiny miners:</strong> usually solo. A pool would pay them very little, so the long-shot is the fun part.</li>
+<li><strong>Heater miners:</strong> usually pool, so the heat you'd pay for anyway earns a little back.</li>
+<li><strong>You can switch anytime.</strong> It's a setting in the miner (the pool address), not a different device.</li></ul></section>
+<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/how-heater-miners-work/">How a heater miner works</a></li><li><a href="/home-miners/">Heater &amp; home miner prices</a></li><li><a href="/#miners">Bitaxe prices</a></li></ul>
+<p class="hint">Not financial advice. Mining costs electricity, and earnings aren't guaranteed.</p></section>
+</article>"""
+    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Solo vs pool mining, explained simply", desc)], lastmod=GUIDE_UPDATED, og_type="article")
+
+
 def build_method():
     path = "/how-we-track/"
     trail = [("Home", "/"), ("About & how we track", path)]
@@ -1126,13 +1415,13 @@ def build_method():
     desc = "How Bitaxe Radar collects Bitaxe and NerdQaxe prices and stock: sources, schedule, currency conversion, history, which sellers we list and affiliate income."
     body = f"""<article>
 <header class="hero"><h1>About Bitaxe Radar</h1>
-<p class="lede">We check the shops that sell Bitaxe-style home miners every 6 hours and show you who has each one in stock, and for how much.</p></header>
+<p class="lede">We check the shops that sell Bitaxe-style miners and heater and home miners every 6 hours, and show you who has each one in stock and for how much.</p></header>
 <section><h2>Where the prices come from</h2>
 <p>Straight from each shop's own product pages. We show the price and stock status the shop itself reports, and link you to that page so you can check it. Last check: {tag_time(latest['generated_at'])}.</p>
 <div class="tablewrap"><table><thead><tr><th>Shop</th><th>Currency</th><th>Pricing</th></tr></thead><tbody>{src_rows}</tbody></table></div></section>
 <section><h2>What a price means</h2><ul>
 <li>The shop's listed price for the bundle shown, <strong>before</strong> shipping, import duties and (unless noted) tax.</li>
-<li>Euro prices are converted to dollars at the ECB reference rate ({esc(FX.get('EUR_USD', 'n/a'))} on {esc(FX.get('date', ''))}), so treat them as estimates.</li>
+<li>Euro and Canadian-dollar prices are converted to US dollars at the ECB reference rates (€1 = ${esc(FX.get('EUR_USD', 'n/a'))}, CA$1 = ${esc(FX.get('CAD_USD', 'n/a'))} on {esc(FX.get('date', ''))}), so treat them as estimates.</li>
 <li>Bundles differ (power supply, stand, fan, revision). We note what's included when the shop says so.</li>
 <li>Hashrate and power are the shop's stated figures, not our own measurements.</li></ul></section>
 <section><h2>What "in stock" means</h2><p>Only listings the shop says are available now. Pre-orders and backorders are labelled separately because they ship later. Stock can change within minutes, so always confirm on the shop's page.</p></section>
@@ -1217,7 +1506,7 @@ def build_home():
     {"@type": "Organization", "@id": BASE + "/#org", "name": "Bitaxe Radar", "url": BASE + "/", "email": CONTACT},
     {"@type": "WebSite", "@id": BASE + "/#site", "name": "Bitaxe Radar", "url": BASE + "/", "publisher": {"@id": BASE + "/#org"}}]})}
 {jsonld_tag(itemlist("Bitaxe-class miners tracked by Bitaxe Radar", items))}"""
-    ins = [o for o in OFFERS if in_stock(o)]
+    ins = [o for o in BITAXE_OFFERS if in_stock(o)]
     chips = (f'<ul class="chips"><li class="live"><strong>{len(ins)}</strong> listings in stock</li>'
              f'<li><strong>{len(SELLERS)}</strong> shops checked</li>'
              f'<li>Updated <time id="freshness" datetime="{esc(latest["generated_at"])}">{esc(fmt_time(latest["generated_at"]))}</time></li></ul>')
@@ -1229,6 +1518,7 @@ def build_home():
     <div class="sec-head"><h2 id="h-miners">Today's best prices</h2><a href="/in-stock/">Everything in stock →</a></div>
     <div class="cards">{"".join(home_card(m, best_value) for m in CURRENT_MODELS)}</div>
     {older_html}
+    <p class="older">Want one that heats a room too? <a href="/home-miners/">See heater &amp; home miners →</a></p>
   </section>"""
     compare_links = '<ul class="links">' + "".join(f'<li><a href="{compare_url(a, b)}">{esc(compare_label(a, b))}</a></li>' for a, b in COMPARE_PAIRS) + "</ul>"
     sellers_line = ('<p>Shops we check: ' + " · ".join(f'<a href="/sellers/{sid}/">{esc(s["name"])}</a>' for sid, s in SELLERS.items() if sid in SELLER_COPY) + "</p>\n  ")
@@ -1265,6 +1555,9 @@ def main():
     build_in_stock()
     build_deals()
     build_black_friday()
+    build_home_miners()
+    build_guide_heaters()
+    build_guide_pool()
     build_method()
     build_advertise()
     build_404()

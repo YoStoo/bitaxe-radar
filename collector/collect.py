@@ -36,6 +36,23 @@ MODELS = {
     "nerdaxe-gamma":    {"name": "Nerdaxe Gamma",             "chip": "BM1370", "hashrate_ths": 1.2,  "watts": 18, "note": "Gamma-class board with a color display"},
     "nerdaxe-gaia":     {"name": "Nerdaxe Gaia",              "chip": "BM1373", "hashrate_ths": 2.6,  "watts": 25, "note": "Sellers state 2.4-2.6 TH/s"},
     "nerdqaxe-pp":      {"name": "NerdQaxe++ (4.8 TH/s)",     "chip": "4x BM1370", "hashrate_ths": 4.8, "watts": 80, "note": "Revisions differ by seller (4.8 TH/s std, Rev 6.1 ~6 TH/s ~100 W, Rev 7)"},
+    # ---- heater & home miners (category "home"): plug-in units for a living space. Figures are seller/maker-stated.
+    "avalon-nano-3s":   {"name": "Canaan Avalon Nano 3S", "category": "home", "kind": "Desk miner / mini heater", "maker": "Canaan",
+                         "hashrate_ths": 6, "watts": 140, "note": "Seller-stated 6 TH/s (+/- 5%) at up to 140 W"},
+    "avalon-mini-3":    {"name": "Canaan Avalon Mini 3", "category": "home", "kind": "Room heater miner", "maker": "Canaan",
+                         "hashrate_ths": 37.5, "watts": 800, "note": "Seller-stated 37.5 TH/s at up to 800 W, baseboard-heater shape"},
+    "avalon-q":         {"name": "Canaan Avalon Q (90 TH/s)", "category": "home", "kind": "Large heater miner", "maker": "Canaan",
+                         "hashrate_ths": 90, "watts": 1674, "note": "Seller-stated 90 TH/s at about 1,674 W"},
+    "heatbit-trio":     {"name": "Heatbit Trio", "category": "home", "kind": "Space heater + air purifier + miner", "maker": "Heatbit",
+                         "hashrate_ths": 10, "watts": 400, "heat_watts": 1500, "note": "Maker-stated 10 TH/s at 400 W of mining heat, plus 1,100 W of standard heating (1,500 W total)"},
+    "heatbit-maxi":     {"name": "Heatbit Maxi", "category": "home", "kind": "Space heater + air purifier + miner", "maker": "Heatbit",
+                         "hashrate_ths": 39, "watts": 1500, "note": "Maker-stated 39 TH/s with 1,500 W of mining heat (the Maxi Pro variant states 60 TH/s)"},
+    "heatbit-canvas":   {"name": "Heatbit Canvas", "category": "home", "kind": "Wall heater + miner", "maker": "Heatbit",
+                         "hashrate_ths": 10, "watts": 300, "note": "Maker-stated 10 TH/s at 300 W, wall-mounted"},
+    "braiins-bmm-101":  {"name": "Braiins Mini Miner BMM 101", "category": "home", "kind": "Desk lottery miner", "maker": "Braiins",
+                         "hashrate_ths": 1, "watts": 40, "note": "Maker-stated 1 TH/s at about 35-40 W"},
+    "hammer-bc04":      {"name": "Hammer Miner BC04", "category": "home", "kind": "Desk miner", "maker": "Hammer",
+                         "hashrate_ths": 6, "watts": 96, "note": "Seller-stated 6 TH/s at 96 W"},
 }
 # hashrate_ths / watts above are typical VENDOR-STATED figures used only for the cost estimate.
 # They are approximate and must be labelled as such on the site.
@@ -49,6 +66,14 @@ SELLERS = {
                      "affiliate": "Reported via third-party article; not yet confirmed with seller"},
     "powermining":  {"name": "Power Mining", "url": "https://powermining.io", "currency": "EUR", "method": "Shopify products.json",
                      "affiliate": "Up to 10% via GoAffPro (powermining.io/pages/affiliate); not yet joined"},
+    "altair":       {"name": "Altair Technology", "url": "https://altairtech.io", "currency": "USD", "method": "Product page (WooCommerce variation data / JSON-LD)",
+                     "affiliate": "Program exists; not yet approved - plain links only"},
+    "heatbit":      {"name": "Heatbit", "url": "https://heatbit.com", "currency": "USD", "method": "Shopify products.json + product page pre-order check",
+                     "affiliate": "5% via GoAffPro; not yet approved - plain links only"},
+    "braiins":      {"name": "Braiins Forge", "url": "https://braiinsforge.com", "currency": "USD", "method": "Product-page schema.org JSON-LD",
+                     "affiliate": "No store affiliate program"},
+    "dcentral":     {"name": "D-Central", "url": "https://d-central.tech", "currency": "CAD", "method": "WooCommerce Store API",
+                     "affiliate": "Applied Oct 21; not yet approved - plain links only"},
 }
 
 # Explicit product mapping (seller -> model -> identifier). No fuzzy matching, so no mis-matches.
@@ -67,6 +92,9 @@ SOLOSATOSHI = {  # WooCommerce slug
     "bitaxe-gamma-duo": "bitaxe-duo-bitcoin-solo-miner-650-model",
     "bitaxe-gt-801":    "bitaxe-gt-gamma-turbo",
     "nerdqaxe-pp":      "nerdqaxe-plus-plus",
+    "avalon-nano-3s":   "avalon-nano-3s-bitcoin-solo-miner",
+    "avalon-mini-3":    "canaan-avalon-mini-3-37-5th-bitcoin-home-mining-space-heater",
+    "avalon-q":         "canaan-avalon-q-90th-bitcoin-home-miner",
 }
 BITAXEDE = {  # product page slug
     "bitaxe-gamma":  "bitaxe-gamma-601",
@@ -81,11 +109,37 @@ POWERMINING = {  # Shopify handle
     "nerdqaxe-pp":   "nerdqaxe",
 }
 
+ALTAIR = {  # product slug -> (variation attribute filter or None)
+    "avalon-nano-3s": ("canaan-avalon-nano-3s", None),
+    "avalon-mini-3":  ("canaan-avalon-mini-3", None),
+    "avalon-q":       ("avalon-q", ("attribute_power-plug", "USA")),
+    "hammer-bc04":    ("hammer-miner-bc04-home-bitcoin-miner", None),
+}
+HEATBIT = {  # Shopify handle -> regex the US variant title must match
+    "heatbit-trio":   ("heatbit-trio", r"/ US /"),
+    "heatbit-maxi":   ("heatbit-maxi", r"/ US / Maxi$"),
+    "heatbit-canvas": ("heatbit-canvas", r".*"),
+}
+BRAIINS = {"braiins-bmm-101": "bmm-101"}       # braiinsforge.com/products/<slug>
+DCENTRAL = {"avalon-mini-3": "canaan-avalon-mini-3"}  # WooCommerce slug
+# Every listing title for a home miner must contain these words (lower-case), or the listing is skipped as a possible mis-match.
+TITLE_MUST = {
+    "avalon-nano-3s": ["avalon", "nano 3s"], "avalon-mini-3": ["avalon", "mini 3"], "avalon-q": ["avalon q"],
+    "heatbit-trio": ["trio"], "heatbit-maxi": ["maxi"], "heatbit-canvas": ["canvas"],
+    "braiins-bmm-101": ["bmm 101"], "hammer-bc04": ["hammer", "bc04"],
+}
+
+
+def title_ok(model, title):
+    t = re.sub(r"\s+", " ", title.lower())
+    return all(w in t for w in TITLE_MUST.get(model, []))
+
+
 UNSCRAPABLE = [
     {"seller": "MineShop (mineshop.eu)", "url": "https://mineshop.eu", "reason": "HTTP 403 (bot protection) from the collector box; its Shopify/Woo feeds are blocked. Needs manual checks or a partner feed."},
     {"seller": "NerdQaxe Store (nerdqaxestore.com)", "url": "https://nerdqaxestore.com", "reason": "TLS/connection failure from the collector box (curl exit 35) and HTTP 500 via WebFetch on 2026-10-16. Retry later / from another network."},
     {"seller": "Plebsource (plebsource.com)", "url": "https://plebsource.com", "reason": "TLS/connection failure from the collector box (curl exit 35) on 2026-10-16."},
-    {"seller": "Altair Technology (altairtech.io)", "url": "https://altairtech.io", "reason": "WooCommerce Store API returned empty body and search returned HTTP 202 (bot challenge). Needs a browser-based scraper or manual entry."},
+    {"seller": "Canaan official shop (shop.canaan.io)", "url": "https://shop.canaan.io", "reason": "HTTP 403 (bot protection) on 2026-10-21. Avalon models are tracked at authorized US resellers instead."},
     {"seller": "TinyChipHub (tinychiphub.com)", "url": "https://tinychiphub.com", "reason": "JS-rendered Shopline storefront; no usable public product feed found. Not scraped."},
     {"seller": "Mining Now / MinerCompare (aggregators)", "url": "https://miningnow.com", "reason": "Competitors/aggregators - deliberately NOT scraped; used only as market research.", "internal": True},
     {"seller": "CryptoMinerBros, MillionMiner, bitaxehardware.com", "url": "", "reason": "Deliberately excluded for now: unvetted sellers (wire/crypto-only payment, anomalous $69-$79 Gamma prices, no price in structured data). Vet before listing.", "internal": True},
@@ -126,6 +180,51 @@ def offer(seller, model, title, url, price, currency, status, in_stock, config, 
     }
     if extra: o.update(extra)
     return o
+
+
+def strip_html(h):
+    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", re.sub(r"<script.*?</script>|<style.*?</style>", "", h, flags=re.S))).strip()
+
+
+def woo_status(d):
+    """Stock status from a WooCommerce Store API product/variation. The stock_availability text/class is what the shop
+    shows shoppers; the bare is_in_stock flag can disagree with it (it stays True for backorders), so it is only a fallback."""
+    sa = d.get("stock_availability") or {}
+    cls, txt = (sa.get("class") or "").lower(), (sa.get("text") or "").lower()
+    if "out-of-stock" in cls or "out of stock" in txt or "sold out" in txt:
+        return "out_of_stock"
+    if re.search(r"pre-?order", txt):
+        return "preorder"
+    if "backorder" in cls or "backorder" in txt:
+        return "backorder"
+    if "in-stock" in cls or "in stock" in txt:
+        return "in_stock"
+    return "in_stock" if d.get("is_in_stock") else "out_of_stock"
+
+
+def text_status(txt):
+    t = (txt or "").lower()
+    if "out of stock" in t or "sold out" in t: return "out_of_stock"
+    if re.search(r"pre-?order", t): return "preorder"
+    if "backorder" in t: return "backorder"
+    if "in stock" in t: return "in_stock"
+    return "unknown"
+
+
+def ld_nodes(html):
+    out = []
+    for m in re.findall(r'<script type="application/ld\+json"[^>]*>(.*?)</script>', html, flags=re.S):
+        try: d = json.loads(m)
+        except ValueError: continue
+        for n in (d if isinstance(d, list) else d.get("@graph", [d])):
+            if isinstance(n, dict): out.append(n)
+    return out
+
+
+def ld_image(n):
+    img = n.get("image")
+    img = img[0] if isinstance(img, list) and img else img
+    return img.get("url") if isinstance(img, dict) else img
 
 
 # --------------------------------------------------------------------------------------
@@ -180,14 +279,16 @@ def collect_solosatoshi(ts):
         def fetch_var(v):
             d = get_json(f"{api}/{v['id']}")
             time.sleep(0.2)
+            st = woo_status(d)
             return {"attrs": {a["name"]: a["value"] for a in v["attributes"]},
                     "price": int(d["prices"]["price"]) / 10 ** d["prices"]["currency_minor_unit"],
-                    "in_stock": bool(d["is_in_stock"])}
+                    "status": st, "in_stock": st == "in_stock"}
         with ThreadPoolExecutor(max_workers=3) as vex:  # modest parallelism, still polite
             vars_ = list(vex.map(fetch_var, p.get("variations", [])))
         if not vars_:
             pr = p["prices"]
-            vars_ = [{"attrs": {}, "price": int(pr["price"]) / 10 ** pr["currency_minor_unit"], "in_stock": bool(p["is_in_stock"])}]
+            st = woo_status(p)
+            vars_ = [{"attrs": {}, "price": int(pr["price"]) / 10 ** pr["currency_minor_unit"], "status": st, "in_stock": st == "in_stock"}]
 
         def na_psu(v):
             return v["attrs"].get("Power Supply", "").lower().startswith("north america") or v["attrs"].get("Power Supply", "").lower().startswith("north american")
@@ -198,10 +299,15 @@ def collect_solosatoshi(ts):
         v = min(stocked or pool, key=lambda v: v["price"])
         cfg = ", ".join(f"{k}: {val}" for k, val in v["attrs"].items()) or "single option"
         n_in = sum(1 for x in vars_ if x["in_stock"])
-        out.append(offer("solosatoshi", model, re.sub(r"&#8211;", "-", p["name"]), p["permalink"], v["price"], "USD",
-                         "in_stock" if stocked else "out_of_stock", bool(stocked), cfg, ts, f"{api}?slug={slug}",
+        name = re.sub(r"&#8211;", "-", p["name"])
+        if not title_ok(model, name): missing.append(model); continue
+        status = "in_stock" if stocked else ("preorder" if any(x["status"] == "preorder" for x in pool) else
+                                             "backorder" if any(x["status"] == "backorder" for x in pool) else "out_of_stock")
+        out.append(offer("solosatoshi", model, name, p["permalink"], v["price"], "USD",
+                         status, bool(stocked), cfg, ts, f"{api}?slug={slug}",
                          {"variants_in_stock": n_in, "variants_total": len(vars_),
-                          "lowest_any_variant": min(x["price"] for x in vars_)}))
+                          "lowest_any_variant": min(x["price"] for x in vars_),
+                          "image_src": (p.get("images") or [{}])[0].get("src")}))
     return out, missing
 
 
@@ -258,14 +364,118 @@ def collect_powermining(ts):
     return out, missing
 
 
+def collect_altair(ts):
+    """Altair's Store API is blocked, but its product pages are not: variable products embed WooCommerce's
+    data-product_variations JSON (price + availability per variation); simple products carry schema.org Product JSON-LD."""
+    import html as _h
+    base = SELLERS["altair"]["url"]
+    out, missing = [], []
+    for model, (slug, want) in ALTAIR.items():
+        url = f"{base}/product/{slug}/"
+        page = http_get(url)
+        nodes = ld_nodes(page)
+        prod = next((n for n in nodes if n.get("@type") in ("Product", "ProductGroup")), None)
+        title = (prod or {}).get("name") or _h.unescape(re.search(r"<title>(.*?)</title>", page, re.S).group(1)).split(" - ")[0]
+        if not title_ok(model, title): missing.append(model); continue
+        m = re.search(r'data-product_variations="([^"]+)"', page)
+        if m:
+            vs = json.loads(_h.unescape(m.group(1)))
+            if not isinstance(vs, list) or not vs: missing.append(model); continue
+            if want:
+                vs = [v for v in vs if v["attributes"].get(want[0]) == want[1]]
+                if not vs: missing.append(model); continue
+            for v in vs:
+                v["_status"] = text_status(strip_html(v.get("availability_html", ""))) if v.get("availability_html") else ("in_stock" if v.get("is_in_stock") else "out_of_stock")
+            avail = [v for v in vs if v["_status"] == "in_stock"]
+            v = min(avail or vs, key=lambda v: float(v["display_price"]))
+            price, status = float(v["display_price"]), v["_status"]
+            cfg = ", ".join(f"{k.replace('attribute_', '').replace('-', ' ').title()}: {val}" for k, val in v["attributes"].items()) or "single option"
+            extra = {"variants_in_stock": len(avail), "variants_total": len(vs)}
+        elif prod and prod.get("@type") == "Product" and prod.get("offers"):
+            o = prod["offers"]; o = o[0] if isinstance(o, list) else o
+            if o.get("priceCurrency", "USD") != "USD": missing.append(model); continue
+            price = float(o["price"])
+            ld_st = SCHEMA_STATUS.get(str(o.get("availability", "")).rsplit("/", 1)[-1], ("unknown", False))[0]
+            am = re.search(r"Availability:\s*([A-Za-z \-]{2,40})", strip_html(page))
+            page_st = text_status(am.group(1)) if am else "unknown"
+            status = page_st if page_st != "unknown" else ld_st      # the text shoppers see wins if the two disagree
+            cfg, extra = "single option", {}
+        else:
+            missing.append(model); continue
+        extra["image_src"] = ld_image(prod) if prod else None
+        out.append(offer("altair", model, _h.unescape(title), url, price, "USD", status, status == "in_stock",
+                         cfg + "; ships from St. Louis, MO", ts, url, extra))
+        time.sleep(1)
+    return out, missing
+
+
+def collect_heatbit(ts):
+    base = SELLERS["heatbit"]["url"]
+    by_handle = {p["handle"]: p for p in fetch_shopify_all(base)}
+    out, missing = [], []
+    for model, (handle, vpat) in HEATBIT.items():
+        p = by_handle.get(handle)
+        if not p or not title_ok(model, p["title"]): missing.append(model); continue
+        vs = [v for v in p["variants"] if re.search(vpat, v["title"])]
+        if not vs: missing.append(model); continue
+        avail = [v for v in vs if v["available"]]
+        v = min(avail or vs, key=lambda v: float(v["price"]))
+        url = f"{base}/products/{handle}"
+        # Shopify 'available' stays true for pre-orders. Heatbit tags pre-order products and shows a
+        # "Sold Out for This Season - Preorder Now" banner on those pages, so check both.
+        page_txt = strip_html(http_get(url))
+        pre = ("pre-order" in [t.lower() for t in p.get("tags", [])]) or bool(re.search(r"sold out for this season|pre-?order now", page_txt, re.I))
+        status = "preorder" if (avail and pre) else ("in_stock" if avail else "out_of_stock")
+        cfg = ("" if v["title"] == "Default Title" else f"Variant: {v['title']}; ") + "sold direct by the maker; shipping and tax extra"
+        out.append(offer("heatbit", model, p["title"], url, v["price"], "USD", status, status == "in_stock", cfg, ts, f"{base}/products.json",
+                         {"compare_at": float(v["compare_at_price"]) if v.get("compare_at_price") else None,
+                          "ship_note": "Seller says this season's stock is sold out; pre-orders open" if status == "preorder" else None,
+                          "image_src": (p.get("images") or [{}])[0].get("src")}))
+        time.sleep(1)
+    return out, missing
+
+
+def collect_braiins(ts):
+    base = SELLERS["braiins"]["url"]
+    out, missing = [], []
+    for model, slug in BRAIINS.items():
+        url = f"{base}/products/{slug}"
+        prod = next((n for n in ld_nodes(http_get(url)) if n.get("@type") == "Product"), None)
+        if not prod or not title_ok(model, prod.get("name", "")): missing.append(model); continue
+        o = prod["offers"]; o = o[0] if isinstance(o, list) else o
+        if o.get("priceCurrency") != "USD": missing.append(model); continue
+        status, ins = SCHEMA_STATUS.get(str(o.get("availability", "")).rsplit("/", 1)[-1], ("unknown", False))
+        out.append(offer("braiins", model, prod["name"], url, o["price"], "USD", status, ins,
+                         "Sold direct by the maker (US store); shipping and tax extra", ts, url, {"image_src": ld_image(prod)}))
+    return out, missing
+
+
+def collect_dcentral(ts):
+    base = SELLERS["dcentral"]["url"]
+    api = f"{base}/wp-json/wc/store/v1/products"
+    out, missing = [], []
+    for model, slug in DCENTRAL.items():
+        res = get_json(f"{api}?slug={urllib.parse.quote(slug)}")
+        if not res or not title_ok(model, res[0]["name"]): missing.append(model); continue
+        p = res[0]; pr = p["prices"]
+        if pr["currency_code"] != "CAD": missing.append(model); continue
+        status = woo_status(p)
+        out.append(offer("dcentral", model, p["name"], p["permalink"], int(pr["price"]) / 10 ** pr["currency_minor_unit"], "CAD",
+                         status, status == "in_stock", "Canadian dollars; ships from Canada (import costs may apply)", ts, f"{api}?slug={slug}",
+                         {"image_src": (p.get("images") or [{}])[0].get("src")}))
+    return out, missing
+
+
 ADAPTERS = {"bitcoinmerch": collect_bitcoinmerch, "solosatoshi": collect_solosatoshi,
-            "bitaxede": collect_bitaxede, "powermining": collect_powermining}
+            "bitaxede": collect_bitaxede, "powermining": collect_powermining,
+            "altair": collect_altair, "heatbit": collect_heatbit, "braiins": collect_braiins, "dcentral": collect_dcentral}
 
 
 def fetch_fx():
     try:
-        d = get_json("https://api.frankfurter.dev/v1/latest?base=EUR&symbols=USD")
-        return {"EUR_USD": d["rates"]["USD"], "date": d["date"], "source": "Frankfurter (ECB reference rates)"}
+        d = get_json("https://api.frankfurter.dev/v1/latest?base=EUR&symbols=USD,CAD")
+        return {"EUR_USD": d["rates"]["USD"], "CAD_USD": round(d["rates"]["USD"] / d["rates"]["CAD"], 6),
+                "date": d["date"], "source": "Frankfurter (ECB reference rates)"}
     except Exception as e:
         print("FX fetch failed:", e, file=sys.stderr)
         return None
@@ -291,7 +501,7 @@ def main():
         except Exception as e:
             return sid, None, f"{type(e).__name__}: {e}"
 
-    with ThreadPoolExecutor(max_workers=4) as ex:  # one thread per seller; each seller is hit sequentially
+    with ThreadPoolExecutor(max_workers=8) as ex:  # one thread per seller; each seller is hit sequentially
         for sid, res, err in ex.map(run, ADAPTERS):
             if err: errors[sid] = err; print(f"[{sid}] FAILED: {err}", file=sys.stderr)
             else:
@@ -308,8 +518,8 @@ def main():
                     o = dict(o); o["stale"] = True; offers.append(o)
 
     for o in offers:
-        o["price_usd_approx"] = (round(o["price"] * fx["EUR_USD"], 2) if o["currency"] == "EUR" and fx
-                                 else (o["price"] if o["currency"] == "USD" else None))
+        rate = (fx or {}).get(f'{o["currency"]}_USD')
+        o["price_usd_approx"] = o["price"] if o["currency"] == "USD" else (round(o["price"] * rate, 2) if rate else None)
 
     # history: append when value changed, or when last point is >20h old
     for o in offers:

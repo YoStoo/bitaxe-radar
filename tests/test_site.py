@@ -127,7 +127,7 @@ class SiteTests(unittest.TestCase):
                         offers = n["offers"]
                         for o in (offers["offers"] if isinstance(offers, dict) else offers):
                             self.assertRegex(o["price"], r"^\d+\.\d{2}$")
-                            self.assertIn(o["priceCurrency"], ("USD", "EUR"))
+                            self.assertIn(o["priceCurrency"], ("USD", "EUR", "CAD"))
                             self.assertTrue(o["availability"].startswith("https://schema.org/"))
         gamma = json.loads(self.pages["/models/bitaxe-gamma/"].ld[0])
         self.assertEqual(gamma["@type"], "Product")
@@ -249,6 +249,44 @@ class SiteTests(unittest.TestCase):
         live = {f"{o['price_usd_approx']:,.2f}" for o in data["latest"]["offers"] if o["in_stock"] and o.get("price_usd_approx") is not None}
         for price in re.findall(r'<div class="price">(?:≈ )?\$([\d,]+\.\d{2})', home):
             self.assertIn(price, live)
+
+
+    def test_home_miners_hub_and_guides(self):
+        data = json.loads((SITE / "data.js").read_text()[len("window.RADAR = "):-2])
+        models = data["latest"]["models"]
+        home_ids = [m for m, v in models.items() if v.get("category") == "home" and any(o["model"] == m for o in data["latest"]["offers"])]
+        self.assertGreaterEqual(len(home_ids), 5)
+        for path in ["/home-miners/", "/guides/solo-vs-pool-mining/", "/guides/how-heater-miners-work/"]:
+            self.assertIn(path, self.pages)
+            self.assertIn(BASE + path, self.sitemap)
+        hub = (SITE / "home-miners" / "index.html").read_text()
+        for mid in home_ids:
+            self.assertIn(f'href="/models/{mid}/"', hub, mid)
+            self.assertIn(BASE + f"/models/{mid}/", self.sitemap)
+            self.assertIn(f"/img/models/{mid}.webp", hub, f"{mid} has no product photo on the hub")
+        # nav links to the hub on every page; the phone nav stays short (3 links + alerts visible)
+        home = (SITE / "index.html").read_text()
+        nav = re.search(r'<nav aria-label="Main">(.*?)</nav>', home, re.S).group(1)
+        self.assertIn('href="/home-miners/"', nav)
+        self.assertLessEqual(len(re.findall(r'<a href="[^"]+">', nav)), 3)
+        # home miners stay off the Bitaxe-only lists
+        for page in ["index.html", "deals/index.html", "in-stock/index.html", "bitaxe-black-friday/index.html", "where-to-buy-bitaxe/index.html"]:
+            txt = (SITE / page).read_text()
+            for mid in home_ids:
+                self.assertNotIn(f'href="/models/{mid}/"', txt.split('<footer')[0].split('id="alerts"')[0], f"{page} lists {mid}")
+        # no earnings promises on the explainers
+        for g in ["guides/solo-vs-pool-mining/index.html", "guides/how-heater-miners-work/index.html", "home-miners/index.html"]:
+            txt = (SITE / g).read_text().lower()
+            for bad in ["guaranteed income", "passive income", "pays for itself", "per day profit", "profit of $"]:
+                self.assertNotIn(bad, txt, g)
+
+    def test_unapproved_sellers_plain_links(self):
+        """Only Power Mining carries an affiliate param; links to shops we are not approved with stay plain."""
+        for path, p in self.pages.items():
+            for href, rel in p.hrefs_rel:
+                if any(d in href for d in ("altairtech.io", "heatbit.com", "d-central.tech", "solosatoshi.com", "braiinsforge.com", "bitcoinmerch.com")):
+                    self.assertNotRegex(href, r"[?&](ref|aff|affiliate|sca_ref|wpam_id)=", f"{path}: {href}")
+                    self.assertNotIn("sponsored", rel, f"{path}: {href}")
 
 
 if __name__ == "__main__":
