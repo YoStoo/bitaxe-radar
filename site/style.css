@@ -290,3 +290,4 @@ details .tablewrap{margin-bottom:14px}
 }
 .card .earn span{color:var(--muted);font-weight:500}
 @media (max-width:700px){.etiles{grid-template-columns:1fr 1fr;gap:8px}.etile{padding:11px 12px}.etile:nth-child(3){grid-column:1/-1}.etile b{font-size:21px}.etile span{font-size:12px}}
+@media (max-width:700px){.browse{flex-wrap:wrap;overflow:visible;gap:6px}.browse a{font-size:13.5px;padding:6px 11px}}
