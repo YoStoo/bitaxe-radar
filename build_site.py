@@ -26,7 +26,7 @@ ROOT = Path(__file__).resolve().parent
 SITE = ROOT / "site"
 BASE = "https://bitaxeradar.com"
 CONTACT = "contact@bitaxeradar.com"
-METHODOLOGY_UPDATED = "2026-10-16"      # bump when the hand-written methodology text changes
+METHODOLOGY_UPDATED = "2026-10-21"      # bump when the hand-written methodology text changes
 NETWORK_EH_ILLUSTRATION = 1000          # EH/s, round number for the lottery illustration only (labelled as such on pages)
 BLOCKS_PER_YEAR = 52560                 # 144 blocks/day * 365
 ELEC_RATES = (0.10, 0.15, 0.25)         # $/kWh scenarios (assumptions, labelled as such)
@@ -38,7 +38,10 @@ latest = dict(latest, unscrapable=[u for u in latest["unscrapable"] if not u.get
 # ---------------------------------------------------------------------------------------------
 # 1) data.js for the interactive home page (unchanged behaviour)
 # ---------------------------------------------------------------------------------------------
-payload = {"latest": latest, "history": history}
+_PUBLIC_SELLER_KEYS = ("name", "url", "currency")
+_public_latest = {k: v for k, v in latest.items() if k not in ("unscrapable", "errors", "unmapped_products")}
+_public_latest["sellers"] = {sid: {k: s[k] for k in _PUBLIC_SELLER_KEYS if k in s} for sid, s in latest["sellers"].items()}
+payload = {"latest": _public_latest, "history": history}
 (SITE / "data.js").write_text("window.RADAR = " + json.dumps(payload, ensure_ascii=False, separators=(",", ":")) + ";\n")
 print("wrote site/data.js:", len(latest["offers"]), "offers,", len(history), "history series")
 
@@ -131,11 +134,11 @@ def offer_href(o):
     return o["url"] + (("&" if "?" in o["url"] else "?") + p) if p else o["url"]
 
 
-def offer_link(o, text=None):
+def offer_link(o, text=None, cls="btn"):
     aff = aff_param(o["seller"])
     rel = "sponsored nofollow noopener" if aff else "nofollow noopener"
     t = text or f"View at {sname(o['seller'])} ↗"
-    a = f'<a class="btn" href="{esc(offer_href(o))}" target="_blank" rel="{rel}">{esc(t)}</a>'
+    a = f'<a class="{cls}" href="{esc(offer_href(o))}" target="_blank" rel="{rel}">{esc(t)}</a>'
     return a + ('<div class="ph">affiliate link</div>' if aff else "")
 
 
@@ -146,18 +149,18 @@ def best_cta(st):
         return ""
     picks = [("Cheapest in stock", best)]
     if usd_best and usd_best["id"] != best["id"]:
-        picks.append(("Cheapest in stock at a US-dollar seller", usd_best))
+        picks.append(("Cheapest at a US shop", usd_best))
     items = "".join(
         f'<div><small>{esc(lbl)}</small><b>{money(o["price"], o["currency"])}</b>'
-        + (f' <span class="hint">≈ {money(usd(o))}</span>' if o["currency"] != "USD" and usd(o) is not None else "")
-        + f' <span class="hint">at {esc(sname(o["seller"]))}</span><br>{offer_link(o, "Check price at " + sname(o["seller"]) + " ↗")}</div>'
+        + f'<p class="hint">at <strong>{esc(sname(o["seller"]))}</strong>'
+        + (f' · ≈ {money(usd(o))}' if o["currency"] != "USD" and usd(o) is not None else "") + ' ' + badge(o["stock_status"]) + '</p>'
+        + f'{offer_link(o, "Go to " + sname(o["seller"]) + " ↗")}</div>'
         for lbl, o in picks)
     return f'<div class="cta" role="region" aria-label="Best deal right now">{items}</div>'
 
 
-SPONSOR_SLOT = ('<aside class="sponsor" aria-label="Sponsor spot"><small>Sponsor spot</small> '
-                '<span>Sell Bitaxe-class miners or accessories? This spot is open. Sponsored placements are always labelled and never change our price rankings. '
-                '<a href="/advertise/">Advertise on Bitaxe Radar</a></span></aside>')
+SPONSOR_SLOT = ('<aside class="sponsor" aria-label="Sponsor spot"><small>Sponsor</small> '
+                '<span>Sell miners or accessories? <a href="/advertise/">Your shop could be featured here</a>.</span></aside>')
 
 
 def badge(status):
@@ -188,7 +191,7 @@ MODEL_COPY = {
     "bitaxe-gt-801": dict(
         intro="The Bitaxe GT (also sold as Gamma Turbo, model 801) is a two-chip BM1370 board. Sellers state 2.0–2.4 TH/s at about 43 W, which makes it the fastest of the Bitaxe-branded boards we track but also one of the hungrier ones. Because it runs hotter than a single-chip Gamma, the cooling that comes with it matters.",
         who="People who want the most hashrate from a Bitaxe-style open-source board and are comfortable with higher power draw and heat.",
-        check=["Whether a power supply is included: Bitcoin Merch's listing title does not say, so we flag it as unverified.",
+        check=["Whether a power supply is included: Bitcoin Merch's listing doesn't say, so check before ordering.",
                "Cooling: look for the fan and heatsink setup the seller ships.",
                "Seller-quoted hashrate ranges are optimistic ranges, not guarantees."]),
     "nerdaxe-gamma": dict(
@@ -196,17 +199,17 @@ MODEL_COPY = {
         who="Buyers who like the Gamma's numbers but want a built-in screen to see status at a glance.",
         check=["Compare against the Bitaxe Gamma's price: the silicon is the same class, so you are paying for display and case.",
                "Region variant: Power Mining lists a US version; Bitaxe.de prices include VAT.",
-               "Stock changes quickly, so check the status column before planning around it."]),
+               "Stock changes quickly, so check the stock badge before planning around it."]),
     "nerdaxe-gaia": dict(
         intro="The Nerdaxe Gaia uses a newer BM1373 chip. Sellers state 2.4–2.6 TH/s at about 25 W, which is the best hashrate-per-watt of the miners we track on paper. It is also one of the pricier small miners, and as a newer design it has fewer long-term user reports than the Gamma family.",
         who="Buyers who care most about efficiency and are willing to pay a premium for a newer chip.",
-        check=["Efficiency figures are vendor-stated; treat them as targets rather than measurements.",
+        check=["Efficiency figures are seller-stated; treat them as targets rather than measurements.",
                "Pre-order listings may ship weeks later: read the shipping note on the seller's page.",
-               "Prices can differ a lot between sellers, so compare the config column."]),
+               "Prices can differ a lot between sellers, so compare what each listing includes."]),
     "nerdqaxe-pp": dict(
         intro="The NerdQaxe++ combines four BM1370 chips on one board. The standard version is stated at about 4.8 TH/s and 80 W; some sellers also list newer revisions (Rev 6.1 at roughly 6 TH/s and about 100 W, and Rev 7) that are not the same product at the same price. It is the highest-hashrate miner on this site, and it is closer to a small space heater than the single-chip boards.",
         who="Hobbyists who want the most hashrate from a compact open-source miner and have somewhere to put the heat and fan noise.",
-        check=["Revision: 4.8 TH/s standard, Rev 6.1 and Rev 7 are different configurations, so read the config column before comparing prices.",
+        check=["Revision: 4.8 TH/s standard, Rev 6.1 and Rev 7 are different configurations, so read each listing's details before comparing prices.",
                "Fan and stand options change the price (Solo Satoshi lists them as separate choices).",
                "Power: at around 80 W or more it needs a proper supply rated for it."]),
     "bitaxe-supra": dict(
@@ -215,7 +218,7 @@ MODEL_COPY = {
         check=["Compare against a current Gamma listing before buying an older board.",
                "Make sure a power supply is included."]),
     "bitaxe-ultra": dict(
-        intro="The Bitaxe Ultra uses the older BM1366 chip at about 0.4–0.5 TH/s and 12 W. We track one listing for it. It is slower than the current Gamma at a similar price, so this page is for reference.",
+        intro="The Bitaxe Ultra uses the older BM1366 chip at about 0.4–0.5 TH/s and 12 W. It is slower than the current Gamma at a similar price, so this page is for reference.",
         who="Collectors and people who already own one.",
         check=["Compare against a current Gamma listing before buying an older board.",
                "Make sure a power supply is included."]),
@@ -249,32 +252,86 @@ COMPARE_COPY = {
 SELLER_COPY = {
     "bitcoinmerch": dict(
         region="USD prices",
-        about="Bitcoin Merch lists most of the Bitaxe-family miners we track, priced in US dollars, and most of its listing titles say a power supply is included.",
-        notes=["We read prices and stock from the store's public Shopify product feed.",
-               "Most titles say 'w/ Power Supply'. The Bitaxe GT 801 title does not, so our config column marks it unverified.",
-               "Prices are before shipping and sales tax. We have not verified its shipping regions or return terms, so check at checkout."]),
+        about="A US shop that carries most of the Bitaxe-family miners, priced in US dollars. Most listings include a power supply.",
+        notes=["Most listings say a power supply is included. The Bitaxe GT 801 listing doesn't say, so check before you buy.",
+               "Prices are before shipping and sales tax."]),
     "solosatoshi": dict(
         region="USD prices",
-        about="Solo Satoshi sells Bitaxe-family miners priced in US dollars, with a North America power-supply option.",
-        notes=["Stock is read per option (variation) from the store's public API, because the product-level 'in stock' flag can be wrong for variable products: we saw it report in stock while every option was sold out.",
-               "The price we show is for the North America power supply with no stand or extra fan, since that is the closest to apples-to-apples with other sellers' bundles.",
-               "We have not verified its shipping regions or return terms, so check at checkout."]),
+        about="A US shop (Houston) and often one of the cheapest places for a Bitaxe, priced in US dollars with a North America power-supply option.",
+        notes=["The price we show is for the North America power supply with no stand or extra fan, so it compares fairly with other shops' bundles.",
+               "Stands and extra fans are optional add-ons that change the price.",
+               "Prices are before shipping and sales tax."]),
     "powermining": dict(
         region="EUR prices (US variant listed)",
-        about="Power Mining prices in euros and lists a US variant for some miners. We convert to dollars only to compare, so the dollar figures are approximate.",
-        notes=["Prices and stock come from the store's public Shopify feed. The feed's 'available' flag is true even for pre-orders, so we also read the product page and mark pre-orders as such.",
-               "Its page quotes a ship date for pre-orders; we show the seller's own wording in the config column when we have it.",
-               "The tax basis of its prices is not stated on the page and shipping and import duties are not included, so the real US price will be higher than the figure shown.",
-               "Its product-page FAQ says it ships to the US and Canada (express 2-4 days, standard 4-6 days, customs delays possible), and its affiliate page says it stocks US and EU warehouses."]),
+        about="A European shop that lists a US variant for some miners and says it ships to the US and Canada. Prices are in euros; the dollar figures are estimates.",
+        notes=["Pre-orders are labelled as such, with the seller's own ship-date wording when it gives one.",
+               "Its FAQ says it ships to the US and Canada (express 2–4 days, standard 4–6 days; customs can add time).",
+               "Shipping and import duties are not included, so the real US price will be higher than the figure shown."]),
     "bitaxede": dict(
         region="EUR prices incl. VAT",
-        about="Bitaxe.de is a European shop. Its prices are in euros and include VAT, and shipping is extra.",
-        notes=["We read prices and stock from the schema.org data on each product page. Its home page and product pages sometimes disagree about stock, so we use the product page.",
-               "Its own partner-program page describes delivery to the EU plus Switzerland, Norway, Iceland and Liechtenstein; we have not verified delivery to the US.",
-               "Because VAT is included and shipping is not, its dollar-approximate prices are not directly comparable to a US shop's pre-tax prices."]),
+        about="A European shop. Prices are in euros and include VAT; shipping is extra.",
+        notes=["It delivers to the EU plus Switzerland, Norway, Iceland and Liechtenstein, so it's mainly useful for European buyers.",
+               "Because VAT is included and shipping isn't, its dollar estimates aren't directly comparable to a US shop's pre-tax prices."]),
 }
 
-NAV = [("/", "Home"), ("/where-to-buy-bitaxe/", "Where to buy"), ("/in-stock/", "In stock"), ("/deals/", "Deals"), ("/how-we-track/", "How we track")]
+NAV = [("/#miners", "Miners"), ("/deals/", "Deals"), ("/in-stock/", "In stock"), ("/where-to-buy-bitaxe/", "Where to buy")]
+
+# ---- brand assets (inline SVG; the radar mark follows the @BitaxeRadar avatar) --------------
+LOGO_SVG = ('<svg class="logo-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false">'
+            '<circle cx="32" cy="32" r="31" fill="#0f1a2e"/>'
+            '<g fill="none" stroke="#5b74a6" stroke-width="3.2"><circle cx="32" cy="32" r="25"/><circle cx="32" cy="32" r="16.5"/><circle cx="32" cy="32" r="8"/></g>'
+            '<path d="M32 32 L40.6 8.5 A25 25 0 0 1 53.2 18.8 Z" fill="#f7931a" fill-opacity=".55"/>'
+            '<circle cx="45" cy="17.5" r="4" fill="#f7931a"/><circle cx="32" cy="32" r="4" fill="#f7931a"/></svg>')
+WORDMARK = f'{LOGO_SVG}<span>Bitaxe <b>Radar</b></span>'
+RADAR_BG = ('<svg class="radar-bg" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><g fill="none" stroke="#8fa6d6" stroke-width="1.5">'
+            '<circle cx="100" cy="100" r="96"/><circle cx="100" cy="100" r="72"/><circle cx="100" cy="100" r="48"/><circle cx="100" cy="100" r="24"/>'
+            '<path d="M100 0v200M0 100h200" stroke-opacity=".5"/></g><path d="M100 100 L132.8 9.8 A96 96 0 0 1 178.6 45 Z" fill="#f7931a" fill-opacity=".8"/></svg>')
+CHIPS = {"bitaxe-supra": 1, "bitaxe-ultra": 1, "bitaxe-gamma": 1, "bitaxe-gamma-duo": 2, "bitaxe-gt-801": 2,
+         "nerdaxe-gamma": 1, "nerdaxe-gaia": 1, "nerdqaxe-pp": 4}
+SCREEN = {"nerdaxe-gamma", "nerdaxe-gaia"}
+
+
+# Product photos: each one is the seller's own product image for that exact model (sources in docs/IMAGE_SOURCES.md),
+# background-trimmed and resized to WebP. Models without a reliable photo fall back to the drawn placeholder.
+MODEL_IMG = {
+    "bitaxe-gamma": (627, 864, "Bitaxe Gamma 602 solo Bitcoin miner"),
+    "bitaxe-gamma-duo": (606, 824, "Bitaxe Gamma Duo 650 dual-chip solo Bitcoin miner"),
+    "bitaxe-gt-801": (827, 864, "Bitaxe GT 801 (Gamma Turbo) solo Bitcoin miner in its heatsink case"),
+    "nerdaxe-gamma": (644, 864, "Nerdaxe Gamma solo Bitcoin miner with color display"),
+    "nerdaxe-gaia": (752, 841, "Nerdaxe Gaia BM1373 solo Bitcoin miner"),
+    "nerdqaxe-pp": (463, 721, "NerdQaxe++ 4.8 TH/s four-chip solo Bitcoin miner"),
+    "bitaxe-supra": (595, 864, "Bitaxe Supra 403 solo Bitcoin miner"),
+}
+MODEL_IMG = {k: v for k, v in MODEL_IMG.items() if (SITE / "img" / "models" / f"{k}.webp").exists()}
+
+
+def model_img(mid, *, lazy=True):
+    if mid not in MODEL_IMG:
+        return miner_art(mid)
+    w, h, alt = MODEL_IMG[mid]
+    attrs = 'loading="lazy" decoding="async"' if lazy else 'fetchpriority="high" decoding="async"'
+    return f'<img src="/img/models/{mid}.webp" width="{w}" height="{h}" alt="{esc(alt)}" {attrs}>'
+
+
+def miner_art(mid):
+    """Generic illustration of a small miner board (we have no licensed product photos yet): chip count from the model's chip field."""
+    n = CHIPS.get(mid, 1)
+    w = 26 if n < 4 else 20
+    gap = 8
+    total = n * w + (n - 1) * gap
+    x0 = 60 - total / 2 + (10 if mid in SCREEN else 0)
+    chips = "".join(
+        f'<rect x="{x0 + i * (w + gap):.1f}" y="{40 - w / 2:.1f}" width="{w}" height="{w}" rx="3" fill="#0c1324" stroke="#f7931a" stroke-width="1.6"/>'
+        f'<g stroke="#f7931a" stroke-opacity=".55" stroke-width="1.2">' + "".join(
+            f'<path d="M{x0 + i * (w + gap) + 5 + k * (w - 10) / 3:.1f} {40 - w / 2 + 5:.1f}v{w - 10}"/>' for k in range(4)) + "</g>"
+        for i in range(n))
+    screen = ('<rect x="14" y="27" width="22" height="26" rx="2" fill="#0c1324" stroke="#5b74a6" stroke-width="1.4"/>'
+              '<path d="M18 34h14M18 39h10M18 44h12" stroke="#34d399" stroke-width="1.6" stroke-linecap="round"/>') if mid in SCREEN else ""
+    return ('<svg viewBox="0 0 120 80" aria-hidden="true" focusable="false">'
+            '<rect x="4" y="10" width="112" height="60" rx="8" fill="#16223d" stroke="#2f4270" stroke-width="1.5"/>'
+            '<circle cx="12" cy="18" r="2" fill="#2f4270"/><circle cx="108" cy="18" r="2" fill="#2f4270"/><circle cx="12" cy="62" r="2" fill="#2f4270"/><circle cx="108" cy="62" r="2" fill="#2f4270"/>'
+            '<rect x="100" y="56" width="10" height="7" rx="1.5" fill="#24365e"/><circle cx="104" cy="25" r="1.8" fill="#34d399"/>'
+            + screen + chips + "</svg>")
 
 
 # ---------------------------------------------------------------------------------------------
@@ -376,9 +433,30 @@ def crumbs_html(trail):
     return '<nav class="crumbs" aria-label="Breadcrumb">' + " › ".join(parts) + "</nav>"
 
 
-FOOT_DISCLOSURE = ('<strong>Affiliate disclosure:</strong> some seller links on Bitaxe Radar are affiliate links (labelled "affiliate link", with rel="sponsored"). '
-                   "If you buy through one we may earn a commission at no extra cost to you. Affiliate status never changes how offers are ranked or sorted. "
-                   'See <a href="/how-we-track/">how we track prices</a>.')
+FOOT_DISCLOSURE = ('<strong>Affiliate disclosure:</strong> some shop links are affiliate links (labelled "affiliate link"). '
+                   "If you buy through one we may earn a commission at no extra cost to you. It never changes how prices are ranked.")
+
+
+def header_html():
+    nav = "".join(f'<a href="{p}"{" class=\"hide-sm\"" if p == "/where-to-buy-bitaxe/" else ""}>{esc(n)}</a>' for p, n in NAV) + '<a class="nav-cta" href="/#alerts"><span class="hide-sm">Price alerts</span><span class="show-sm">Alerts</span></a>'
+    return f"""<a class="skip" href="#main">Skip to content</a>
+<header class="top"><div class="wrap">
+  <a class="brand" href="/" aria-label="Bitaxe Radar home">{WORDMARK}</a>
+  <nav aria-label="Main">{nav}</nav>
+</div></header>"""
+
+
+def footer_html(extra=""):
+    links = [("/#miners", "All miners"), ("/deals/", "Deals"), ("/in-stock/", "In stock"), ("/where-to-buy-bitaxe/", "Where to buy"),
+             ("/how-we-track/", "About & how we track"), ("/advertise/", "Advertise")]
+    return f"""<footer class="foot"><div class="wrap">
+  <a class="brand" href="/">{WORDMARK}</a>
+  <p>The cheapest in-stock Bitaxe, NerdQaxe and Nerdaxe miners from US and EU shops, checked every 6 hours.</p>
+  <nav class="foot-links" aria-label="Footer">{"".join(f'<a href="{p}">{esc(n)}</a>' for p, n in links)}<a href="mailto:{CONTACT}">{CONTACT}</a></nav>
+  {extra}<p>{FOOT_DISCLOSURE}</p>
+  <p>Solo mining is a lottery, not income. Prices can change fast, so check the shop's page before buying. Not financial advice.</p>
+  <small>Bitaxe Radar is independent and not affiliated with the Bitaxe project, Open Source Miners United or any shop listed.</small>
+</div></footer>"""
 
 
 def layout(path, title, desc, body, *, crumbs=None, jsonld=(), noindex=False, lastmod=None, scripts="", og_type="website", index_in_sitemap=True):
@@ -388,7 +466,6 @@ def layout(path, title, desc, body, *, crumbs=None, jsonld=(), noindex=False, la
     ld = list(jsonld)
     if crumbs:
         ld.append(breadcrumb_ld(crumbs))
-    nav = "".join(f'<a href="{p}">{esc(n)}</a>' for p, n in NAV)
     robots = '<meta name="robots" content="noindex,follow">\n' if noindex else ""
     canon = f'<link rel="canonical" href="{esc(url)}">\n' if path != "/404.html" else ""
     page = f"""<!doctype html>
@@ -396,6 +473,7 @@ def layout(path, title, desc, body, *, crumbs=None, jsonld=(), noindex=False, la
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b1222">
 <title>{esc(title)}</title>
 <meta name="description" content="{esc(desc)}">
 {robots}{canon}<link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -410,21 +488,12 @@ def layout(path, title, desc, body, *, crumbs=None, jsonld=(), noindex=False, la
 {"".join(jsonld_tag(x) for x in ld)}
 </head>
 <body>
-<a class="skip" href="#main">Skip to content</a>
-<header class="top"><div class="wrap">
-  <a class="brand" href="/"><span class="dot" aria-hidden="true"></span> Bitaxe Radar</a>
-  <nav aria-label="Main">{nav}</nav>
-</div></header>
-<div class="notice lottery" role="note"><div class="wrap"><strong>Solo mining is a lottery, not income.</strong> A Bitaxe-class miner has a tiny chance of ever finding a block. Treat any purchase as a hobby expense. Nothing here is financial advice.</div></div>
+{header_html()}
 <main class="wrap" id="main">
 {crumbs_html(crumbs) if crumbs else ""}
 {body}
 </main>
-<footer class="foot"><div class="wrap">
-  <p>{FOOT_DISCLOSURE}</p>
-  <p>Prices and stock are collected automatically from public seller pages and can be wrong or out of date: check the seller's page before buying. Bitaxe Radar is an independent project, not affiliated with the Bitaxe project, Open Source Miners United or any seller listed.</p>
-  <p><a href="/how-we-track/">How we track</a> · <a href="/where-to-buy-bitaxe/">Where to buy</a> · <a href="/deals/">Deals</a> · <a href="/advertise/">Advertise</a> · <a href="mailto:{CONTACT}">{CONTACT}</a></p>
-</div></footer>
+{footer_html()}
 {scripts}{ANALYTICS}
 </body>
 </html>
@@ -436,22 +505,35 @@ def layout(path, title, desc, body, *, crumbs=None, jsonld=(), noindex=False, la
         PAGES.append(dict(path=path, lastmod=lastmod or latest["generated_at"]))
 
 
+CFG_CLEAN = [(r"\s*per product title", ""), (r"power supply not mentioned in title \(unverified\)", "power supply not mentioned, check the listing"),
+             (r"\s*\(listed 'inkl\. MwSt\.'\)", ""), (r"EUR, tax basis not stated; ", ""), (r"page lists power supply \+ stand in the box", "power supply + stand included"),
+             (r"^Base price incl", "Incl")]
+
+
+def cfg_text(o):
+    """Shopper-facing version of the collector's config note (drops our internal sourcing remarks)."""
+    t = o["config"]
+    for a, b in CFG_CLEAN:
+        t = re.sub(a, b, t)
+    return t + (f" · {o['ship_note']}" if o.get("ship_note") else "")
+
+
 def offers_table(offers, *, show_model=False, best_id=None):
     rows = []
     for o in offers:
         cur = money(o["price"], o["currency"])
         approx = f'<div class="cfg">≈ {money(usd(o))}</div>' if o["currency"] != "USD" and usd(o) is not None else ""
         cmp_at = f'<div class="cfg">seller-listed was {money(o["compare_at"], o["currency"])}</div>' if o.get("compare_at") and o["compare_at"] > o["price"] else ""
-        cfg = esc(o["config"]) + (f" · {esc(o['ship_note'])}" if o.get("ship_note") else "") + (
-            f" · {o['variants_in_stock']}/{o['variants_total']} options in stock" if o.get("variants_total") else "")
-        best = ' class="best"' if best_id and o["id"] == best_id else ""
-        tagb = '<span class="tag-best">Best in-stock</span>' if best_id and o["id"] == best_id else ""
-        stale = '<div class="stale">stale data</div>' if o.get("stale") else ""
-        first = (f'<td><a href="/models/{o["model"]}/">{esc(SHORT[o["model"]])}</a></td>' if show_model else "")
-        rows.append(f'<tr{best}>{first}<td><a href="/sellers/{esc(o["seller"])}/">{esc(sname(o["seller"]))}</a>{tagb}{stale}</td>'
-                    f'<td class="num">{cur}{approx}{cmp_at}</td><td>{badge(o["stock_status"])}</td><td class="cfg">{cfg}</td>'
-                    f'<td class="cfg">{tag_time(o["checked_at"])}</td><td>{offer_link(o)}</td></tr>')
-    head = ("<th>Model</th>" if show_model else "") + '<th>Seller</th><th class="num">Price</th><th>Stock</th><th>Config</th><th>Checked</th><th>Buy</th>'
+        cfg = esc(cfg_text(o))
+        is_best = best_id and o["id"] == best_id
+        best = ' class="best"' if is_best else ""
+        tagb = '<span class="tag-best">Cheapest</span>' if is_best else ""
+        stale = '<div class="stale">may be out of date</div>' if o.get("stale") else ""
+        first = (f'<td class="model-cell"><a href="/models/{o["model"]}/">{esc(SHORT[o["model"]])}</a></td>' if show_model else "")
+        rows.append(f'<tr{best}>{first}<td class="seller-cell"><a href="/sellers/{esc(o["seller"])}/">{esc(sname(o["seller"]))}</a>{tagb}{stale}</td>'
+                    f'<td class="num price-cell">{cur}{approx}{cmp_at}</td><td class="status-cell">{badge(o["stock_status"])}</td><td class="cfg">{cfg}</td>'
+                    f'<td class="cfg checked-cell">{tag_time(o["checked_at"])}</td><td class="buy-cell">{offer_link(o, cls="btn" if is_best else "btn ghost")}</td></tr>')
+    head = ("<th>Model</th>" if show_model else "") + '<th>Shop</th><th class="num">Price</th><th>Stock</th><th>Details</th><th>Checked</th><th><span class="sr">Buy</span></th>'
     return f'<div class="tablewrap"><table class="offers"><thead><tr>{head}</tr></thead><tbody>{"".join(rows)}</tbody></table></div>'
 
 
@@ -478,7 +560,7 @@ def chart_svg(mid):
             series.append((o, COLORS[i % len(COLORS)], pts))
     if not series or max(len(s[2]) for s in series) < 2:
         return ""
-    W, Hh, ml, mr, mt, mb = 900, 300, 56, 16, 14, 34
+    W, Hh, ml, mr, mt, mb = 640, 320, 58, 14, 14, 34
     allp = [p for s in series for p in s[2]]
     tmin, tmax = min(p[0] for p in allp), max(p[0] for p in allp)
     vmin, vmax = min(p[1] for p in allp), max(p[1] for p in allp)
@@ -494,17 +576,17 @@ def chart_svg(mid):
     g = []
     for i in range(5):
         v = vmin + (vmax - vmin) * i / 4
-        g.append(f'<line x1="{ml}" x2="{W - mr}" y1="{Y(v):.1f}" y2="{Y(v):.1f}" stroke="#2a2f3a"/><text x="{ml - 8}" y="{Y(v) + 4:.1f}" text-anchor="end" fill="#9aa3b2" font-size="12">${v:.0f}</text>')
-    g.append(f'<text x="{ml}" y="{Hh - 10}" fill="#9aa3b2" font-size="12">{fmt_day(tmin)}</text><text x="{W - mr}" y="{Hh - 10}" text-anchor="end" fill="#9aa3b2" font-size="12">{fmt_day(tmax)}</text>')
+        g.append(f'<line x1="{ml}" x2="{W - mr}" y1="{Y(v):.1f}" y2="{Y(v):.1f}" stroke="#24324f"/><text x="{ml - 8}" y="{Y(v) + 5:.1f}" text-anchor="end" fill="#97a3bb" font-size="15">${v:.0f}</text>')
+    g.append(f'<text x="{ml}" y="{Hh - 8}" fill="#97a3bb" font-size="15">{fmt_day(tmin)}</text><text x="{W - mr}" y="{Hh - 8}" text-anchor="end" fill="#97a3bb" font-size="15">{fmt_day(tmax)}</text>')
     legend = []
     for o, col, pts in series:
         if len(pts) > 1:
-            g.append(f'<polyline fill="none" stroke="{col}" stroke-width="2" points="{" ".join(f"{X(t):.1f},{Y(v):.1f}" for t, v, _ in pts)}"/>')
+            g.append(f'<polyline fill="none" stroke="{col}" stroke-width="3" stroke-linejoin="round" points="{" ".join(f"{X(t):.1f},{Y(v):.1f}" for t, v, _ in pts)}"/>')
         for t, v, p in pts:
-            fill = col if p.get("in_stock") else "#0f1115"
-            g.append(f'<circle cx="{X(t):.1f}" cy="{Y(v):.1f}" r="4" fill="{fill}" stroke="{col}" stroke-width="2"><title>{esc(sname(o["seller"]))}: {esc(money(p["price"], p["currency"]))} ({esc(STATUS.get(p["status"], p["status"]))}) {esc(fmt_time(p["t"]))}</title></circle>')
+            fill = col if p.get("in_stock") else "#131d35"
+            g.append(f'<circle cx="{X(t):.1f}" cy="{Y(v):.1f}" r="5" fill="{fill}" stroke="{col}" stroke-width="2.5"><title>{esc(sname(o["seller"]))}: {esc(money(p["price"], p["currency"]))} ({esc(STATUS.get(p["status"], p["status"]))}) {esc(fmt_time(p["t"]))}</title></circle>')
         legend.append(f'<span><i style="background:{col}"></i>{esc(sname(o["seller"]))}</span>')
-    legend.append("<span>● filled = in stock, ○ hollow = not in stock at that point</span>")
+    legend.append("<span>● in stock · ○ not in stock</span>")
     return (f'<div class="chart"><svg viewBox="0 0 {W} {Hh}" role="img" aria-label="Price history for {esc(SHORT[mid])} in USD (EUR sellers converted at the latest rate)">{"".join(g)}</svg></div>'
             f'<div class="legend">{"".join(legend)}</div>')
 
@@ -523,28 +605,27 @@ def history_log_table(mid):
             f'<tbody>{"".join(rows)}</tbody></table></div>')
 
 
-HIST_NOTE = ('<p class="hint">A data point is logged when a seller\'s price or stock changes, and at least about once a day otherwise, so points are not evenly spaced. '
-             "Nothing is back-filled: the log only covers the time we have been tracking. EUR prices are converted at the latest ECB reference rate, so exchange-rate moves show up as small changes on those lines.</p>")
+HIST_NOTE = '<p class="hint">Euro prices are shown in dollars at the latest exchange rate.</p>'
 
 
 # ---- signup form ---------------------------------------------------------------------------
 def signup_html(default_model="any"):
     if not SIGNUP_ENABLED:
         return ""
-    opts = '<option value="any">Any tracked miner</option>' + "".join(
+    opts = '<option value="any">Any miner</option>' + "".join(
         f'<option value="{esc(m)}"{" selected" if m == default_model else ""}>{esc(MODELS[m]["name"])}</option>' for m in TRACKED)
     return f"""<section id="alerts" aria-labelledby="h-alerts">
 <h2 id="h-alerts">Get an email when the price drops</h2>
+<p class="lede">Pick a miner and your price. We email you once it's in stock at or under it.</p>
 <form id="signup" class="signup" novalidate>
-  <p id="signupIntro"><strong>Get one email when a miner drops to your price.</strong> Pick a miner and a target price (USD). We email you only when it is <em>in stock</em> at or under that price. Free; unsubscribe with one click.</p>
   <div class="row">
     <label>Email <input type="email" id="email" name="email" autocomplete="email" placeholder="you@example.com" maxlength="254" required></label>
     <label>Miner <select id="alertModel" name="model">{opts}</select></label>
-    <label>Alert me at or under (USD) <input type="number" min="1" max="100000" step="1" id="alertPrice" name="target_price" placeholder="e.g. 120" inputmode="numeric" required></label>
+    <label>My price (USD) <input type="number" min="1" max="100000" step="1" id="alertPrice" name="target_price" placeholder="e.g. 120" inputmode="numeric" required></label>
   </div>
   <div style="position:absolute;left:-9999px" aria-hidden="true"><label>Website <input type="text" id="website" name="website" tabindex="-1" autocomplete="off"></label></div>
-  <div class="row signup-actions"><div id="turnstile" class="turnstile-slot"></div><button type="submit" id="signupBtn">Notify me</button></div>
-  <p class="hint">Double opt-in: we send one confirmation email, and you only start getting alerts after you click the link in it. At most about one alert per price per week. Your email is only used for these alerts and is never sold.</p>
+  <div class="row signup-actions"><div id="turnstile" class="turnstile-slot"></div><button type="submit" id="signupBtn">Email me when it drops</button></div>
+  <p class="hint">Free. You'll get one email to confirm first. No spam, never sold, unsubscribe in one click.</p>
   <p class="hint" id="signupMsg" role="status" aria-live="polite"></p>
   <noscript><p class="hint">The sign-up form needs JavaScript for its bot check.</p></noscript>
 </form>
@@ -580,114 +661,91 @@ def build_model_page(mid):
     trail = [("Home", "/"), (short, path)]
 
     if best:
-        head = (f'cheapest in stock right now: <strong>{money(usd(best))}</strong> at {esc(sname(best["seller"]))}'
-                + (f' ({esc(money(best["price"], best["currency"]))}, converted)' if best["currency"] != "USD" else "") + f'. In stock at {n_in} of {plural(st["sellers"], "tracked seller")}.')
+        head = (f'In stock at {n_in} of {plural(st["sellers"], "shop")}. Cheapest right now: <strong>{money(usd(best))}</strong> at {esc(sname(best["seller"]))}.')
         title = f"{short} price: {money(usd(best))} in stock ({day}) | Bitaxe Radar"
         desc = (f"{short} prices at {plural(st['sellers'], 'seller')}: cheapest in stock {money(usd(best))} at {sname(best['seller'])}, "
                 f"listed {money(usd(low))}–{money(usd(st['high_any']))}. Stock, price log, running cost. Updated {day}.")
     else:
-        head = (f'<strong>not in stock at any tracked seller at the last check.</strong> Lowest listed price: {money(usd(low))} at {esc(sname(low["seller"]))} ({esc(STATUS[low["stock_status"]].lower())}).')
+        head = (f'<strong>Sold out everywhere we check right now.</strong> Lowest listed price: {money(usd(low))} at {esc(sname(low["seller"]))} ({esc(STATUS[low["stock_status"]].lower())}). Set an alert below and we\'ll tell you when it\'s back.')
         title = f"{short} price: sold out or pre-order only ({day}) | Bitaxe Radar"
         desc = (f"{short} at {plural(st['sellers'], 'seller')}: none has it in stock at the last check ({day}). "
                 f"Lowest listed {money(usd(low))} at {sname(low['seller'])}. Stock status, price log and price alerts.")
 
-    kp = [("Cheapest in stock", money(usd(best)) if best else "none in stock"),
-          ("Lowest listed (any status)", money(usd(low))),
-          ("In stock at", f"{n_in} of {st['sellers']} sellers"),
-          ("Last checked", None)]
-    kpis = '<div class="kpis">' + "".join(
-        f'<div><small>{esc(k)}</small><b>{tag_time(st["checked"]) if v is None else esc(v)}</b></div>' for k, v in kp) + "</div>"
-
-    usd_best = st["best_usd"]
-    if usd_best and best and usd_best["id"] != best["id"]:
-        us_note = f'<p>Cheapest in stock at a USD-priced seller: <strong>{money(usd_best["price"])}</strong> at {esc(sname(usd_best["seller"]))}.</p>'
-    elif not usd_best:
-        us_note = "<p>No USD-priced seller has it in stock at the last check. Prices from euro sellers are converted for comparison and will not include shipping, VAT differences or import duties.</p>"
-    else:
-        us_note = ""
     avail_note = ""
     if best and low and low["id"] != best["id"] and not in_stock(low):
-        avail_note = (f'<p class="hint">The lowest listed price, {money(usd(low))} at {esc(sname(low["seller"]))}, is <strong>{esc(STATUS[low["stock_status"]].lower())}</strong>, '
-                      f'so the cheapest in-stock price is {money(usd(best))}, which is {money(usd(best) - usd(low))} higher.</p>')
+        avail_note = (f'<p class="avail">Listed cheaper at {esc(sname(low["seller"]))} ({money(usd(low))}), but it\'s {esc(STATUS[low["stock_status"]].lower())}.</p>')
 
     offers_html = offers_table(sort_offers(st["offers"]), best_id=best["id"] if best else None)
 
     per_th = st["per_th"]
-    rows = [("Stated hashrate", f"≈ {m['hashrate_ths']:g} TH/s (vendor-stated)"),
-            ("Stated power", f"≈ {m['watts']:g} W (vendor-stated)"),
-            ("Efficiency", f"≈ {jth(mid):.1f} J/TH, {ordinal(EFF_RANK[mid])} best of {len(TRACKED)} tracked models"),
+    rows = [("Hashrate", f"≈ {m['hashrate_ths']:g} TH/s (seller-stated)"),
+            ("Power", f"≈ {m['watts']:g} W (seller-stated)"),
+            ("Efficiency", f"≈ {jth(mid):.1f} J/TH · {ordinal(EFF_RANK[mid])} best of {len(TRACKED)}"),
             ("Chip", m["chip"]),
-            ("Price per TH/s at cheapest in-stock price", (f"{money(per_th)} per TH/s, {ordinal(PTH_RANK[mid])} cheapest of {len(PTH_RANK)} models with stock") if per_th else "n/a, none in stock"),
-            ("Energy used", f"≈ {kwh_year(mid):,.0f} kWh per year if run 24/7")]
+            ("Price per TH/s", (f"{money(per_th)} · {ordinal(PTH_RANK[mid])} cheapest of {len(PTH_RANK)}") if per_th else "n/a, none in stock"),
+            ("Energy", f"≈ {kwh_year(mid):,.0f} kWh a year if run 24/7")]
     spec_tbl = '<div class="tablewrap"><table><tbody>' + "".join(f'<tr><th scope="row">{esc(k)}</th><td>{esc(v)}</td></tr>' for k, v in rows) + "</tbody></table></div>"
     kwh = kwh_year(mid)
-    elec_tbl = ('<div class="tablewrap"><table><thead><tr><th>Electricity price (assumption)</th>' + "".join(f'<th class="num">${r:.2f}/kWh</th>' for r in ELEC_RATES) + "</tr></thead>"
-                f'<tbody><tr><th scope="row">Yearly cost, 24/7</th>{"".join(f"<td class=num>${kwh * r:,.0f}</td>" for r in ELEC_RATES)}</tr></tbody></table></div>')
-    spec_note = f'<p class="hint">{esc(m["note"])}. Watts are approximate vendor-stated typical figures and move with firmware overclocking, fans and power-supply efficiency. The <a href="/#cost">home page calculator</a> lets you enter your own electricity rate and wattage.</p>'
+    elec_tbl = ('<div class="tablewrap"><table><thead><tr><th>Power price</th>' + "".join(f'<th class="num">${r:.2f}/kWh</th>' for r in ELEC_RATES) + "</tr></thead>"
+                f'<tbody><tr><th scope="row">Cost per year, 24/7</th>{"".join(f"<td class=num>${kwh * r:,.0f}</td>" for r in ELEC_RATES)}</tr></tbody></table></div>')
+    spec_note = f'<p class="hint">{esc(m["note"])}. Want your own rate? Use the <a href="/#cost">power-cost calculator</a>.</p>'
 
     yrs = lottery_years(mid)
-    lottery = (f'<p>A solo miner does not earn a steady income: it either finds a whole block (a very large reward) or nothing. As a rough illustration only, if the whole network were {NETWORK_EH_ILLUSTRATION:,} EH/s (a round number we chose, not today\'s figure: look up the current one), '
-               f'a miner at {m["hashrate_ths"]:g} TH/s would be expected to find a block about once every <strong>{sig2(yrs)} years</strong> on average, and most years it finds nothing. '
-               f'Electricity is a real cost every year either way. If you want one, buy it as a hobby and for learning, not as an investment.</p>')
-
     rel_c = related_compare(mid)
     rel_links = "".join(f'<li><a href="{compare_url(a, b)}">{esc(compare_label(a, b))}</a></li>' for a, b in rel_c)
     others = [x for x in TRACKED if x != mid and x not in NOINDEX_MODELS][:6]
-    other_links = "".join(f'<li><a href="/models/{x}/">{esc(SHORT[x])}</a>' + (f' <span class="hint">from {money(usd(STATS[x]["best"]))} in stock</span>' if STATS[x]["best"] else ' <span class="hint">none in stock</span>') + "</li>" for x in others)
+    other_links = "".join(f'<li><a href="/models/{x}/">{esc(SHORT[x])}' + (f' <span class="hint">from {money(usd(STATS[x]["best"]))}</span>' if STATS[x]["best"] else ' <span class="hint">sold out</span>') + "</a></li>" for x in others)
 
     chart = chart_svg(mid)
     log = history_log_table(mid)
-    hist_html = chart + log + HIST_NOTE if (chart or log) else "<p>No history logged yet for this model.</p>"
     firsts = [h["first"] for o in st["offers"] for h in [hist_summary(o)] if h]
     first_day = min(firsts) if firsts else None
-    hist_intro = (f"<p>We have been tracking since {esc(fmt_day(first_day))}. " + (
-        "There are not enough data points yet to draw a trend line, so the table below is the honest summary." if not chart else "Lines appear once a seller has more than one logged point.") + "</p>") if first_day else ""
+    since = f'<p class="hint">Tracking since {esc(fmt_day(first_day))}.</p>' if first_day else ""
+    if chart or log:
+        hist_html = since + chart + (f'<details class="more"><summary>Price log by shop</summary>{log}{HIST_NOTE}</details>' if log else "")
+    else:
+        hist_html = "<p>No history yet for this model.</p>"
 
     faq = []
     if best:
         a1 = (f"At our last check ({fmt_time(st['checked'])}) the cheapest in-stock listing was {money(usd(best))} at {sname(best['seller'])}"
-              + (f", from {money(best['price'], best['currency'])}" if best["currency"] != "USD" else "") + ". Prices exclude shipping and tax; configs differ, so read the config column.")
+              + (f", from {money(best['price'], best['currency'])}" if best["currency"] != "USD" else "") + ". Prices exclude shipping and tax, and bundles differ, so check the details line.")
     else:
-        a1 = f"Nothing is in stock at the tracked sellers right now. The lowest listed price is {money(usd(low))} at {sname(low['seller'])}, which is {STATUS[low['stock_status']].lower()}."
+        a1 = f"Nothing is in stock at the shops we check right now. The lowest listed price is {money(usd(low))} at {sname(low['seller'])}, which is {STATUS[low['stock_status']].lower()}."
     faq.append((f"What is the cheapest {short} right now?", a1, False))
     stock_lines = "; ".join(f"{sname(o['seller'])}: {STATUS[o['stock_status']].lower()}" for o in sort_offers(st["offers"]))
-    faq.append((f"Is the {short} in stock?", f"At the last check: {stock_lines}. Stock changes within minutes, so confirm on the seller's page.", False))
+    faq.append((f"Is the {short} in stock?", f"At the last check: {stock_lines}. Stock changes fast, so confirm on the shop's page.", False))
     faq.append((f"How much electricity does the {short} use?",
-                f"Sellers state about {m['watts']:g} W, which is roughly {kwh:,.0f} kWh a year if it runs 24/7. At $0.10, $0.15 and $0.25 per kWh that is about ${kwh * 0.10:,.0f}, ${kwh * 0.15:,.0f} and ${kwh * 0.25:,.0f} a year.", False))
+                f"Sellers state about {m['watts']:g} W, roughly {kwh:,.0f} kWh a year if it runs 24/7. At $0.10, $0.15 and $0.25 per kWh that's about ${kwh * 0.10:,.0f}, ${kwh * 0.15:,.0f} and ${kwh * 0.25:,.0f} a year.", False))
     faq.append((f"Can a {short} make money?",
-                f"Almost certainly not. It is a solo lottery miner: at an illustrative {NETWORK_EH_ILLUSTRATION:,} EH/s network the expected time to a block is about {sig2(yrs)} years, while electricity costs money every year. Buy it as a hobby.", False))
-    faq.append((f"How do I get notified when the {short} price drops?",
-                "Use the alert form on this page: pick a target price and we email you once when it is in stock at or under it. It is free, needs an email confirmation, and unsubscribes in one click.", False))
-    if rel_c:
-        a, b = rel_c[0]
-        faq.append((f"How does the {short} compare with other miners?", f'See our side-by-side page: <a href="{compare_url(a, b)}">{esc(compare_label(a, b))}</a>.', True))
+                f"Almost certainly not. It's a solo \"lottery\" miner: it either finds a whole Bitcoin block (a huge reward) or nothing. As a rough illustration, on a {NETWORK_EH_ILLUSTRATION:,} EH/s network it would find a block about once every {sig2(yrs)} years on average, while electricity costs money every year. Buy it as a hobby, not an investment.", False))
+    faq.append((f"How do I get told when the {short} price drops?",
+                "Use the alert form on this page: pick your price and we email you once it's in stock at or under it. Free, and you can unsubscribe in one click.", False))
     faq_html = "".join(f"<details><summary>{esc(q)}</summary><p>{a if raw else esc(a)}</p></details>" for q, a, raw in faq)
 
     check_html = "".join(f"<li>{esc(c)}</li>" for c in cp["check"])
     body = f"""<article>
-<header class="hero"><h1>{esc(short)} price and stock</h1>
-<p class="lede">{esc(m['name'])}: {head}</p></header>
-{kpis}
-{best_cta(st)}
-{us_note}{avail_note}
-<section aria-labelledby="h-offers"><h2 id="h-offers">Prices by seller</h2>
-<p class="hint">Listed price for the configuration shown, before shipping, import duties and (where noted) tax. Euro prices are converted to USD only as an approximation (EUR→USD ≈ {FX.get('EUR_USD', 'n/a')}, {esc(FX.get('date', ''))}). Updated about every 6 hours.</p>
+<header class="hero"><h1>{esc(short)}</h1>
+<p class="lede">{head}</p>
+<p class="meta">≈{m['hashrate_ths']:g} TH/s · ≈{m['watts']:g} W · {esc(m['chip'])} · checked {tag_time(st['checked'])}</p></header>
+<div class="model-top"><figure class="model-photo{"" if mid in MODEL_IMG else " placeholder"}">{model_img(mid, lazy=False)}</figure>
+<div class="model-deal">{best_cta(st) or '<div class="cta"><div><small>Sold out right now</small><p class="hint">Set a price alert below and we\'ll email you when it\'s back.</p></div></div>'}
+{avail_note}</div></div>
+<section aria-labelledby="h-offers"><h2 id="h-offers">Prices by shop</h2>
 {offers_html}
-<p class="hint">Not listed here: sellers we cannot read yet. See <a href="/where-to-buy-bitaxe/#not-tracked">sellers not tracked yet</a>.</p></section>
+<p class="hint">Before shipping and tax. Euro prices are converted to dollars as an estimate. Updated every 6 hours.</p></section>
 {SPONSOR_SLOT}
-<section aria-labelledby="h-hist"><h2 id="h-hist">Price and stock history</h2>{hist_intro}{hist_html}</section>
-<section aria-labelledby="h-nums"><h2 id="h-nums">Numbers that matter</h2>{spec_tbl}{elec_tbl}{spec_note}</section>
-<section aria-labelledby="h-about"><h2 id="h-about">About the {esc(short)}</h2>
-<p>{esc(cp['intro'])}</p>
-<p><strong>Who it suits:</strong> {esc(cp['who'])}</p>
-<h3>Check before you buy</h3><ul>{check_html}</ul></section>
-<section aria-labelledby="h-lot"><h2 id="h-lot">Is it worth it? The lottery maths</h2>{lottery}</section>
+<section aria-labelledby="h-hist"><h2 id="h-hist">Price history</h2>{hist_html}</section>
 {signup_html(mid)}
-<section aria-labelledby="h-faq"><h2 id="h-faq">Frequently asked questions</h2>{faq_html}</section>
+<section aria-labelledby="h-about"><h2 id="h-about">Good to know</h2>
+<details><summary>About the {esc(short)}</summary><p>{esc(cp['intro'])}</p><p><strong>Best for:</strong> {esc(cp['who'])}</p></details>
+<details><summary>Check before you buy</summary><ul>{check_html}</ul></details>
+<details><summary>Specs and running cost</summary>{spec_tbl}<br>{elec_tbl}{spec_note}</details>
+</section>
+<section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{faq_html}</section>
 <section aria-labelledby="h-more"><h2 id="h-more">Keep comparing</h2>
-{"<h3>Side by side</h3><ul>" + rel_links + "</ul>" if rel_links else ""}
-<h3>Other miners we track</h3><ul>{other_links}</ul>
-<p><a href="/where-to-buy-bitaxe/">Where to buy a Bitaxe</a> · <a href="/in-stock/">Everything in stock now</a> · <a href="/deals/">Best deals</a></p></section>
+{'<ul class="links">' + rel_links + "</ul>" if rel_links else ""}
+<ul class="links">{other_links}</ul></section>
 </article>"""
 
     offer_ld = []
@@ -697,6 +755,8 @@ def build_model_page(mid):
                          "seller": {"@type": "Organization", "name": sname(o["seller"]), "url": SELLERS[o["seller"]]["url"]}})
     product = {"@context": "https://schema.org", "@type": "Product", "name": m["name"],
                "description": shorten(cp["intro"], 300), "url": BASE + path}
+    if mid in MODEL_IMG:
+        product["image"] = f"{BASE}/img/models/{mid}.webp"
     if best:
         ins_prices = [usd(o) for o in st["in_stock"] if usd(o) is not None]
         product["offers"] = {"@type": "AggregateOffer", "priceCurrency": "USD", "lowPrice": f"{min(ins_prices):.2f}", "highPrice": f"{max(ins_prices):.2f}",
@@ -772,16 +832,16 @@ def build_compare_page(a, b):
 <p class="lede">{esc(cc['angle'])}</p>
 <p class="meta">Prices checked {tag_time(max(ta['checked'], tb['checked']))}</p></header>
 <section aria-labelledby="h-v"><h2 id="h-v">The numbers, in plain words</h2><ul>{"".join(f"<li>{x}</li>" for x in lines)}</ul>
-<p class="hint">Hashrate and power are vendor-stated approximations. Higher hashrate raises your lottery odds in proportion, but the odds stay tiny either way.</p></section>
+<p class="hint">Hashrate and power are seller-stated. More hashrate raises your lottery odds, but they stay tiny either way.</p></section>
 <section aria-labelledby="h-t"><h2 id="h-t">Side by side</h2>{tbl}</section>
 <section aria-labelledby="h-w"><h2 id="h-w">Which one fits you?</h2>
 <p><strong>Pick the {esc(sa)} if</strong> {esc(cc['a_for'])}</p>
 <p><strong>Pick the {esc(sb)} if</strong> {esc(cc['b_for'])}</p>
-<p>Neither is an income source. See the lottery maths on each model page.</p></section>
+<p class="hint">Neither is an income source: solo mining is a lottery.</p></section>
 <section aria-labelledby="h-a"><h2 id="h-a">Where to buy the {esc(sa)}</h2>{best_block(a, ta)}</section>
 <section aria-labelledby="h-b"><h2 id="h-b">Where to buy the {esc(sb)}</h2>{best_block(b, tb)}</section>
 <section aria-labelledby="h-al"><h2 id="h-al">Price alerts</h2><p>Want a nudge when one of them drops? Use the form on the <a href="/models/{a}/#alerts">{esc(sa)} page</a> or the <a href="/models/{b}/#alerts">{esc(sb)} page</a>.</p></section>
-<section><h2>More comparisons</h2><ul>{olinks}</ul></section>
+<section><h2>More comparisons</h2><ul class="links">{olinks}</ul></section>
 </article>"""
     ld = {"@context": "https://schema.org", "@type": "WebPage", "name": f"{sa} vs {sb}", "url": BASE + path,
           "dateModified": latest["generated_at"], "about": [{"@type": "Product", "name": MODELS[a]["name"], "url": BASE + f"/models/{a}/"},
@@ -809,7 +869,7 @@ def build_seller_page(sid):
             rank = "only in-stock listing"
         cur = money(o["price"], o["currency"]) + (f' <span class="cfg">≈ {money(usd(o))}</span>' if o["currency"] != "USD" else "")
         rows.append(f'<tr><td><a href="/models/{o["model"]}/">{esc(SHORT[o["model"]])}</a></td><td class="num">{cur}</td><td>{badge(o["stock_status"])}</td><td class="cfg">{esc(rank) or "–"}</td><td class="cfg">{tag_time(o["checked_at"])}</td><td>{offer_link(o, "View ↗")}</td></tr>')
-    tbl = ('<div class="tablewrap"><table><thead><tr><th>Model</th><th class="num">Price</th><th>Stock</th><th>Versus other sellers</th><th>Checked</th><th>Buy</th></tr></thead>'
+    tbl = ('<div class="tablewrap"><table><thead><tr><th>Model</th><th class="num">Price</th><th>Stock</th><th>Versus other shops</th><th>Checked</th><th><span class="sr">Buy</span></th></tr></thead>'
            f'<tbody>{"".join(rows)}</tbody></table></div>')
     log_rows = []
     for o in offs:
@@ -822,21 +882,20 @@ def build_seller_page(sid):
     cheapest_cnt = sum(1 for o in offs if in_stock(o) and STATS[o["model"]]["best"]["id"] == o["id"])
     summary = (f"We track {plural(len(offs), 'model')} at {esc(s['name'])}; {n_in} {'is' if n_in == 1 else 'are'} in stock right now"
                + (f", and {cheapest_cnt} of {'it' if n_in == 1 else 'those'} {'is' if cheapest_cnt == 1 else 'are'} the cheapest in-stock price we see for {'that model' if cheapest_cnt == 1 else 'those models'}." if cheapest_cnt else "."))
-    aff_txt = (f"Links to {esc(s['name'])} on this site are <strong>affiliate links</strong>: if you buy after clicking, we may earn a commission at no extra cost to you. It does not change how we rank or sort offers."
-               if aff else f"We have no affiliate arrangement with {esc(s['name'])} right now, so our links to it are plain links and we earn nothing if you buy.")
+    aff_txt = (f'<p class="hint">Links to {esc(s["name"])} are affiliate links: if you buy after clicking, we may earn a commission at no extra cost to you. It never changes how we rank prices.</p>'
+               if aff else "")
     notes = "".join(f"<li>{esc(n)}</li>" for n in cp["notes"])
-    unverified = '<p class="hint">Shipping regions, delivery times, warranty and return terms are <strong>not</strong> verified by us for any seller yet. Read the seller\'s own policy pages before you pay.</p>'
+    unverified = '<p class="hint">Check the shop\'s own shipping, warranty and return pages before you pay.</p>'
     title = f"{s['name']} Bitaxe prices and stock ({fmt_day(GEN)}) | Bitaxe Radar"
-    desc = f"{s['name']}: {len(offs)} Bitaxe-family miners tracked, {n_in} in stock now ({cp['region']}). Prices, stock log, affiliate status."
+    desc = f"{s['name']}: {len(offs)} Bitaxe-family miners tracked, {n_in} in stock now ({cp['region']}). Prices, stock, price log and buying notes."
     body = f"""<article>
 <header class="hero"><h1>{esc(s['name'])}: prices and stock</h1><p class="lede">{esc(cp['about'])}</p>
 <p class="meta">{summary}</p></header>
 <section aria-labelledby="h-p"><h2 id="h-p">What {esc(s['name'])} has right now</h2>{tbl}
 <p class="hint">Store: <a href="{esc(s['url'])}" rel="nofollow noopener" target="_blank">{esc(s['url'].replace('https://', ''))}</a>. Prices are before shipping and tax.</p></section>
-<section aria-labelledby="h-l"><h2 id="h-l">Stock and price log</h2>{log}</section>
-<section aria-labelledby="h-n"><h2 id="h-n">How we read this seller</h2><ul>{notes}</ul>{unverified}</section>
-<section aria-labelledby="h-a"><h2 id="h-a">Affiliate status</h2><p>{aff_txt}</p></section>
-<section><h2>See also</h2><p><a href="/where-to-buy-bitaxe/">Where to buy a Bitaxe</a> · <a href="/in-stock/">Everything in stock now</a> · <a href="/how-we-track/">How we track prices</a></p></section>
+<section aria-labelledby="h-n"><h2 id="h-n">Good to know</h2><ul>{notes}</ul>{unverified}{aff_txt}</section>
+<section aria-labelledby="h-l"><h2 id="h-l">Price log</h2><details class="more"><summary>Show price log</summary>{log}</details></section>
+<section><h2>See also</h2><ul class="links"><li><a href="/where-to-buy-bitaxe/">Where to buy a Bitaxe</a></li><li><a href="/in-stock/">Everything in stock</a></li><li><a href="/deals/">Best deals</a></li></ul></section>
 </article>"""
     ld = {"@context": "https://schema.org", "@type": "WebPage", "name": f"{s['name']} prices and stock", "url": BASE + path,
           "dateModified": latest["generated_at"], "about": {"@type": "Organization", "name": s["name"], "url": s["url"]}}
@@ -890,34 +949,30 @@ def build_where_to_buy():
         s, cp = SELLERS[sid], SELLER_COPY[sid]
         offs = [o for o in OFFERS if o["seller"] == sid]
         n_in = sum(1 for o in offs if in_stock(o))
-        aff = "yes, affiliate links" if aff_param(sid) else "none, plain links"
         return (f'<tr><td><a href="/sellers/{sid}/">{esc(s["name"])}</a></td><td>{esc(cp["region"])}</td><td class="num">{len(offs)}</td><td class="num">{n_in}</td>'
-                f'<td>{esc(aff)}</td><td class="cfg">{tag_time(max(o["checked_at"] for o in offs))}</td></tr>')
-    sellers_tbl = ('<div class="tablewrap"><table><thead><tr><th>Seller</th><th>Pricing</th><th class="num">Models tracked</th><th class="num">In stock now</th><th>Affiliate?</th><th>Last checked</th></tr></thead>'
+                f'<td class="cfg">{tag_time(max(o["checked_at"] for o in offs))}</td></tr>')
+    sellers_tbl = ('<div class="tablewrap"><table><thead><tr><th>Shop</th><th>Pricing</th><th class="num">Models</th><th class="num">In stock</th><th>Last checked</th></tr></thead>'
                    f'<tbody>{"".join(seller_row(s) for s in usd_sellers + eur_sellers)}</tbody></table></div>')
-    unt = "".join(f"<li><strong>{esc(u['seller'])}:</strong> {esc(u['reason'])}</li>" for u in latest["unscrapable"])
     title = f"Where to buy a Bitaxe in the US: prices and stock ({fmt_day(GEN)}) | Bitaxe Radar"
     desc = (f"Where to buy a Bitaxe or NerdQaxe: {len(SELLERS)} sellers tracked, {len(ins_usd)} USD-priced listings in stock. "
             f"Cheapest in-stock Gamma {money(g['best_usd']['price']) if g['best_usd'] else 'n/a'}. Updated {fmt_day(GEN)}.")
     body = f"""<article>
 <header class="hero"><h1>Where to buy a Bitaxe (US-first)</h1>
-<p class="lede">Which tracked sellers have each miner in stock, and at what price. We lead with sellers that price in US dollars, and keep the European shops listed below them for comparison.</p>
+<p class="lede">Who has each miner in stock right now, and for how much. US-dollar shops first, European shops below for comparison.</p>
 <p class="meta">Data collected {tag_time(latest['generated_at'])}</p></header>
 <section aria-labelledby="h-q"><h2 id="h-q">The short answer today</h2><ul>{qa_html}</ul></section>
 <section aria-labelledby="h-m"><h2 id="h-m">Cheapest in stock at a USD-priced seller</h2>
 {model_summary_table(CURRENT_MODELS, usd_only=True)}
-<p class="hint">"None in stock" means no USD-priced seller we track has it available at the last check. Euro-priced shops may still have it: open the model page. Prices exclude shipping and sales tax. Whether a seller ships to your address is for you to confirm at checkout.</p></section>
-<section aria-labelledby="h-s"><h2 id="h-s">Sellers we track</h2>{sellers_tbl}
-<p class="hint">USD-priced sellers come first. "Plain links" means we earn nothing if you buy there. Euro-priced sellers are converted to dollars for comparison only, and real US cost will differ with shipping, VAT and import duties.</p></section>
+<p class="hint">"None in stock" means no US-dollar shop has it right now; a European shop may, so open the model page. Prices are before shipping and tax.</p></section>
+<section aria-labelledby="h-s"><h2 id="h-s">Shops we check</h2>{sellers_tbl}
+<p class="hint">Euro prices are converted to dollars as an estimate; shipping, VAT and import duties will change the real US cost.</p></section>
 <section aria-labelledby="h-c"><h2 id="h-c">Before you buy: a checklist</h2><ul>
 <li><strong>What is in the box.</strong> Power supply, stand and fan are included by some sellers and sold separately by others. A cheap listing without a power supply is not cheaper.</li>
 <li><strong>Which revision.</strong> Gamma 601 vs 602, NerdQaxe++ 4.8 TH/s vs Rev 6.1 vs Rev 7: they are different products at different prices.</li>
 <li><strong>Pre-order or in stock.</strong> Pre-order and backorder items can take weeks. We label these separately.</li>
 <li><strong>Total cost.</strong> Add shipping, sales tax or import duty, and the electricity to run it.</li>
-<li><strong>Payment safety.</strong> Be wary of a price far below every other seller, or a shop that only takes wire or crypto. We only list sellers we have looked at.</li>
+<li><strong>Payment safety.</strong> Be wary of a price far below every other shop, or a shop that only takes wire or crypto.</li>
 <li><strong>Look-alikes.</strong> Prefer sellers that name the exact board and revision in the title.</li></ul></section>
-<section id="not-tracked" aria-labelledby="h-n"><h2 id="h-n">Sellers we cannot track yet</h2>
-<p>These shops exist but we cannot read their stock automatically yet, so they are not in our tables. Check them yourself if you want a wider search.</p><ul class="plain">{unt}</ul></section>
 <section><h2>Browse by miner</h2><ul>{"".join(f'<li><a href="/models/{m}/">{esc(SHORT[m])}</a></li>' for m in CURRENT_MODELS)}</ul>
 <p><a href="/in-stock/">Everything in stock now</a> · <a href="/deals/">Best deals</a> · <a href="/how-we-track/">How we track</a></p></section>
 </article>"""
@@ -942,14 +997,14 @@ def build_in_stock():
         if st["best"] and st["low_any"]["id"] != st["best"]["id"] and not in_stock(st["low_any"]):
             notes.append(f"The cheapest listed {esc(SHORT[mid])}, {money(usd(st['low_any']))} at {esc(sname(st['low_any']['seller']))}, is {esc(STATUS[st['low_any']['stock_status']].lower())}. Cheapest in stock: {money(usd(st['best']))} at {esc(sname(st['best']['seller']))}.")
     if none:
-        notes.append("No tracked seller has these in stock: " + ", ".join(f'<a href="/models/{m}/">{esc(SHORT[m])}</a>' for m in none) + ".")
+        notes.append("Sold out everywhere we check: " + ", ".join(f'<a href="/models/{m}/">{esc(SHORT[m])}</a>' for m in none) + ".")
     n_sellers = len({o["seller"] for o in ins})
     title = f"Bitaxe in stock now: {len(ins)} listings at {plural(n_sellers, 'seller')} ({fmt_day(GEN)}) | Bitaxe Radar"
     desc = f"What is in stock right now: {len(ins)} of {len(OFFERS)} tracked Bitaxe, Nerdaxe and NerdQaxe listings, plus {len(pre)} pre-order or backorder. Updated {fmt_day(GEN)}."
     body = f"""<article>
 <header class="hero"><h1>Bitaxe and NerdQaxe in stock now</h1>
 <p class="lede">{len(ins)} of {len(OFFERS)} tracked listings are in stock at the last check. Another {len(pre)} are pre-order or backorder (not in stock yet) and {len(oos)} are sold out.</p>
-<p class="meta">Data collected {tag_time(latest['generated_at'])}. Refreshed about every 6 hours.</p></header>
+<p class="meta">Checked {tag_time(latest['generated_at'])} · updated every 6 hours</p></header>
 <section aria-labelledby="h-n"><h2 id="h-n">What the stock picture means today</h2><ul>{"".join(f"<li>{x}</li>" for x in notes) or "<li>Nothing unusual at the last check.</li>"}</ul></section>
 <section aria-labelledby="h-i"><h2 id="h-i">In stock ({len(ins)})</h2>{offers_table(ins, show_model=True) if ins else "<p>Nothing is in stock at the tracked sellers at the last check.</p>"}</section>
 <section aria-labelledby="h-p"><h2 id="h-p">Pre-order and backorder ({len(pre)})</h2><p class="hint">Not in stock. Read the seller's shipping note before ordering.</p>{offers_table(pre, show_model=True) if pre else "<p>None right now.</p>"}</section>
@@ -979,11 +1034,10 @@ def build_deals():
                   f'<tbody>{disc_rows}</tbody></table></div><p class="hint">The compare-at price is whatever the seller entered as the "was" price. We have not verified it was ever the selling price, so treat it as the seller\'s claim.</p>')
                  if disc else "<p>No tracked seller shows a compare-at (&ldquo;was&rdquo;) price at the last check.</p>")
     ch = price_changes(7)
-    first_t = min(parse_t(p[0]["t"]) for p in history.values() if p)
     ch_rows = "".join(f'<tr><td><a href="/models/{o["model"]}/">{esc(SHORT[o["model"]])}</a></td><td>{esc(sname(o["seller"]))}</td><td class="num">{money(old, o["currency"])}</td><td class="num">{money(new, o["currency"])}</td>'
                       f'<td class="num">{(new / old - 1) * 100:+.1f}%</td><td>{esc(fmt_day(t))}</td></tr>' for o, old, new, t in ch)
     ch_html = (f'<div class="tablewrap"><table><thead><tr><th>Model</th><th>Seller</th><th class="num">Was</th><th class="num">Now</th><th class="num">Change</th><th>When</th></tr></thead><tbody>{ch_rows}</tbody></table></div>'
-               if ch else f"<p>No price changes logged in the last 7 days. We started tracking on {esc(fmt_day(first_t))}, so there is not much history yet; this list fills in as prices move.</p>")
+               if ch else "<p>No price changes in the last 7 days.</p>")
     gaps = [(mid, STATS[mid]) for mid in TRACKED if STATS[mid]["best"] and STATS[mid]["low_any"]["id"] != STATS[mid]["best"]["id"] and not in_stock(STATS[mid]["low_any"])]
     gap_rows = "".join(f'<tr><td><a href="/models/{mid}/">{esc(SHORT[mid])}</a></td><td>{esc(sname(st["low_any"]["seller"]))}</td><td class="num">{money(usd(st["low_any"]))}</td><td>{badge(st["low_any"]["stock_status"])}</td>'
                        f'<td class="num">{money(usd(st["best"]))}</td><td class="num">{money(usd(st["best"]) - usd(st["low_any"]))}</td></tr>' for mid, st in gaps)
@@ -1004,10 +1058,10 @@ def build_deals():
     desc = f"Best Bitaxe deals right now: cheapest in-stock price per model ranked by cost per TH/s, seller discounts, price drops and seller price spread. Updated {fmt_day(GEN)}."
     body = f"""<article>
 <header class="hero"><h1>Best Bitaxe deals right now</h1>
-<p class="lede">A "deal" here is the cheapest in-stock price for each miner, ranked by dollars per stated TH/s, so you can compare a cheap small miner with an expensive big one. Everything on this page is recalculated from live seller data.</p>
+<p class="lede">The cheapest in-stock price for each miner, ranked by how much hashrate you get per dollar.</p>
 <p class="meta">Data collected {tag_time(latest['generated_at'])}</p></header>
 <section aria-labelledby="h-r"><h2 id="h-r">Cheapest in stock, ranked by price per TH/s</h2>{rank_tbl}
-<p class="hint">Hashrate is the vendor-stated figure, and "price per TH/s" ignores power cost, shipping and bundle differences. Lowest is not automatically best: see the model page for configs.</p></section>
+<p class="hint">Uses seller-stated hashrate and ignores power cost, shipping and bundle differences.</p></section>
 <section aria-labelledby="h-d"><h2 id="h-d">Seller-listed discounts</h2>{disc_html}</section>
 <section aria-labelledby="h-c"><h2 id="h-c">Price changes in the last 7 days</h2>{ch_html}</section>
 <section aria-labelledby="h-g"><h2 id="h-g">Cheaper listings that are not in stock</h2><p>Some of the lowest prices we see are on sold-out, backorder or pre-order listings. This shows how much more the cheapest in-stock listing costs.</p>{gap_html}</section>
@@ -1021,32 +1075,28 @@ def build_deals():
 
 def build_method():
     path = "/how-we-track/"
-    trail = [("Home", "/"), ("How we track prices", path)]
-    src_rows = "".join(f'<tr><td><a href="/sellers/{sid}/">{esc(s["name"])}</a></td><td>{esc(s["currency"])}</td><td>{esc(s["method"])}</td></tr>' for sid, s in SELLERS.items())
-    unt = "".join(f"<li><strong>{esc(u['seller'])}:</strong> {esc(u['reason'])}</li>" for u in latest["unscrapable"])
+    trail = [("Home", "/"), ("About & how we track", path)]
+    src_rows = "".join(f'<tr><td><a href="/sellers/{sid}/">{esc(s["name"])}</a></td><td>{esc(s["currency"])}</td><td>{esc(SELLER_COPY.get(sid, {}).get("region", ""))}</td></tr>' for sid, s in SELLERS.items())
     title = "How Bitaxe Radar tracks prices and stock (methodology) | Bitaxe Radar"
-    desc = "How Bitaxe Radar collects Bitaxe and NerdQaxe prices and stock: sources, schedule, currency conversion, history, excluded sellers and affiliate income."
+    desc = "How Bitaxe Radar collects Bitaxe and NerdQaxe prices and stock: sources, schedule, currency conversion, history, which sellers we list and affiliate income."
     body = f"""<article>
-<header class="hero"><h1>How we track prices and stock</h1>
-<p class="lede">Bitaxe Radar is a price and stock tracker for small solo Bitcoin miners. This page explains where the numbers come from, what they leave out, and how the site earns money.</p></header>
-<section><h2>Where the data comes from</h2>
-<p>An automated job reads each seller's own public product pages or product feeds about every 6 hours. We read the price and the stock status the seller itself reports, and we link to the seller's product page so you can check it. Last collection: {tag_time(latest['generated_at'])}.</p>
-<div class="tablewrap"><table><thead><tr><th>Seller</th><th>Currency</th><th>How we read it</th></tr></thead><tbody>{src_rows}</tbody></table></div>
-<p>The job identifies itself with a descriptive user agent, makes about one request per product page, and backs off when a site asks it to.</p></section>
+<header class="hero"><h1>About Bitaxe Radar</h1>
+<p class="lede">We check the shops that sell Bitaxe-style home miners every 6 hours and show you who has each one in stock, and for how much.</p></header>
+<section><h2>Where the prices come from</h2>
+<p>Straight from each shop's own product pages. We show the price and stock status the shop itself reports, and link you to that page so you can check it. Last check: {tag_time(latest['generated_at'])}.</p>
+<div class="tablewrap"><table><thead><tr><th>Shop</th><th>Currency</th><th>Pricing</th></tr></thead><tbody>{src_rows}</tbody></table></div></section>
 <section><h2>What a price means</h2><ul>
-<li>It is the seller's listed price for the configuration shown in the Config column, <strong>before</strong> shipping, import duties and (unless noted) tax.</li>
-<li>Euro prices are converted to US dollars only so sellers can be compared. We use the ECB reference rate from Frankfurter (latest: {esc(FX.get('EUR_USD', 'n/a'))} on {esc(FX.get('date', ''))}). Treat converted figures as approximate.</li>
-<li>Bundles differ (power supply, stand, fan, region, revision). We say what we could verify and mark what we could not.</li>
-<li>"Stated" hashrate and power are vendor-stated approximations, not our measurements. We have not benchmarked any miner.</li></ul></section>
-<section><h2>What "in stock" means</h2><p>We call a listing in stock only when the seller reports it available now. Pre-order and backorder are shown separately because they usually ship later. Some shops report stock unreliably (for example a product-level flag that says in stock while every option is sold out), so we read stock per option where we can. Stock can change within minutes, so always confirm on the seller's page.</p></section>
-<section><h2>How the history works</h2><p>We log a data point whenever a seller's price or stock status changes, and at least about once a day otherwise. We do not back-fill and we do not invent history: charts only cover the time we have been tracking, and several models have only a few points so far.</p></section>
-<section><h2>Which sellers we list</h2><p>We list sellers whose public data we can read and whose pricing looks consistent with the rest of the market. We deliberately leave out shops we have not been able to vet, for example those with prices far below every other seller or only wire/crypto payment, because listing a bad shop would hurt readers. We have not verified shipping regions, warranty or return terms for any seller yet.</p>
-<h3>Sellers we cannot read yet</h3><ul class="plain">{unt}</ul></section>
+<li>The shop's listed price for the bundle shown, <strong>before</strong> shipping, import duties and (unless noted) tax.</li>
+<li>Euro prices are converted to dollars at the ECB reference rate ({esc(FX.get('EUR_USD', 'n/a'))} on {esc(FX.get('date', ''))}), so treat them as estimates.</li>
+<li>Bundles differ (power supply, stand, fan, revision). We note what's included when the shop says so.</li>
+<li>Hashrate and power are the shop's stated figures, not our own measurements.</li></ul></section>
+<section><h2>What "in stock" means</h2><p>Only listings the shop says are available now. Pre-orders and backorders are labelled separately because they ship later. Stock can change within minutes, so always confirm on the shop's page.</p></section>
+<section><h2>Price history</h2><p>We log a point whenever a price or stock status changes, and about once a day otherwise. Charts start when we started tracking; nothing is filled in after the fact.</p></section>
+<section><h2>Which shops we list</h2><p>Shops with real stock, consistent prices and normal payment methods. We leave out shops we can't vet, like ones with prices far below everyone else or wire/crypto-only payment.</p></section>
 <section><h2>How Bitaxe Radar earns money</h2>
-<p>Some seller links are affiliate links: if you buy through one, we may earn a commission at no extra cost to you. Those links are labelled "affiliate link" and carry rel="sponsored". We never change prices, rankings or sort order because of affiliate status: offers are ordered by stock and price. If we ever take a seller sponsorship, it will be labelled (see <a href="/advertise/">advertise</a>). Right now only Power Mining links are affiliate links.</p>
-<p>We do not publish ratings or reviews, because we have not tested the hardware. We do not give financial advice. Solo mining with a small miner is a lottery: the expected return is negative once electricity is counted.</p></section>
-<section><h2>Spotted a mistake?</h2><p>Prices and stock are collected by software and can be wrong. If you see an error or are a seller who wants a listing corrected, write to <a href="mailto:{CONTACT}">{CONTACT}</a>.</p>
-<p><a href="/where-to-buy-bitaxe/">Where to buy</a> · <a href="/in-stock/">In stock now</a> · <a href="/deals/">Deals</a></p></section>
+<p>Some shop links are affiliate links: if you buy through one, we may earn a commission at no extra cost to you. They're labelled "affiliate link" and never change prices, rankings or sort order. Any sponsored placement is clearly labelled (see <a href="/advertise/">advertise</a>).</p>
+<p>We don't publish ratings or reviews, because we haven't tested the hardware, and nothing here is financial advice. Solo mining with a small miner is a lottery: once you count electricity, you should expect to lose money.</p></section>
+<section><h2>Spotted a mistake?</h2><p>Write to <a href="mailto:{CONTACT}">{CONTACT}</a>. Shops can ask us to correct a listing the same way.</p></section>
 </article>"""
     ld = {"@context": "https://schema.org", "@type": "AboutPage", "name": "How Bitaxe Radar tracks prices and stock", "url": BASE + path, "dateModified": METHODOLOGY_UPDATED}
     layout(path, title, desc, body, crumbs=trail, jsonld=[ld], lastmod=METHODOLOGY_UPDATED)
@@ -1061,18 +1111,18 @@ def build_advertise():
     desc = "Sponsor spots on Bitaxe Radar, the price and stock tracker for Bitaxe and NerdQaxe miners. For sellers, builders and accessory makers. Always labelled."
     body = f"""<article>
 <header class="hero"><h1>Advertise on Bitaxe Radar</h1>
-<p class="lede">Bitaxe Radar tracks prices and stock for Bitaxe-class solo miners across {plural(len(SELLERS), 'seller')} and {plural(len(OFFERS), 'listing')}. People land here when they are deciding where to buy, which is the moment a seller wants to be seen.</p></header>
+<p class="lede">People come to Bitaxe Radar when they're deciding where to buy a miner. That's the moment you want your shop in front of them.</p>
+<p><a class="btn" href="{esc(mail)}">Email {CONTACT}</a></p></header>
 <section><h2>What is available</h2><ul>
-<li><strong>Featured seller spot</strong> on our {n_models} model pages, right under the price table, labelled "Sponsored".</li>
+<li><strong>Featured shop spot</strong> on our {n_models} miner pages, right under the price table, labelled "Sponsor".</li>
 <li><strong>Accessory spot</strong> for stands, cases, heatsinks, fans and power supplies.</li>
 <li><strong>Get listed in the tracker</strong>: if you sell Bitaxe-class miners and we don't track you yet, write to us. Being listed in the price table is free and never paid for.</li></ul></section>
 <section><h2>The rules</h2><ul>
 <li>Every sponsored placement is clearly labelled and uses rel="sponsored" links.</li>
 <li>Sponsors never change price rankings, sort order or stock data. The cheapest in-stock listing is always shown first.</li>
 <li>We only take sponsors we would be comfortable sending readers to (real stock, consistent prices, normal payment methods).</li></ul></section>
-<section><h2>Honest numbers</h2><p>The site launched in October 2026, so we do not have meaningful visitor numbers yet and will not make any up. Early sponsors get introductory pricing, and we'll share real traffic figures as soon as we have them.</p>
+<section><h2>Stats and pricing</h2><p>Contact us for current stats and rates. Early sponsors get introductory pricing.</p>
 <p><a class="btn" href="{esc(mail)}">Email {CONTACT}</a></p></section>
-<p><a href="/how-we-track/">How we track prices and earn money</a> · <a href="/where-to-buy-bitaxe/">Where to buy</a></p>
 </article>"""
     layout(path, title, desc, body, crumbs=trail, lastmod=METHODOLOGY_UPDATED)
 
@@ -1085,10 +1135,33 @@ def build_404():
 # ---------------------------------------------------------------------------------------------
 # HOME PAGE (template + pre-rendered summary)
 # ---------------------------------------------------------------------------------------------
+def home_card(mid, best_value):
+    st, m = STATS[mid], MODELS[mid]
+    b = st["best"]
+    ribbon = '<span class="ribbon" title="Most hashrate per dollar">Best value</span>' if mid == best_value else ""
+    if b:
+        eu = b["currency"] != "USD"
+        price = (f'{"≈ " if eu else ""}{money(usd(b))}' + ('<small>EU shop</small>' if eu else ""))
+        where = f'at {esc(sname(b["seller"]))}' + (f' · in stock at {plural(len(st["in_stock"]), "shop")}' if len(st["in_stock"]) > 1 else "")
+        status, cls = badge("in_stock"), "card"
+    else:
+        low = st["low_any"]
+        price = "Sold out"
+        where = f'Last listed {money(usd(low))}' if low else ""
+        status, cls = '<span class="badge b-out_of_stock">Sold out</span>', "card soldout"
+    return (f'<article class="{cls}">{ribbon}<div class="art{" photo" if mid in MODEL_IMG else ""}">{model_img(mid)}</div><div class="body">'
+            f'<h3><a href="/models/{mid}/">{esc(SHORT[mid])}</a></h3>'
+            f'<div class="spec">≈{m["hashrate_ths"]:g} TH/s · ≈{m["watts"]:g} W</div>'
+            f'<div class="price">{price}</div><div class="where">{where}</div>'
+            f'<div class="row">{status}<a class="btn sm" href="/models/{mid}/" aria-label="See {esc(SHORT[mid])} prices">See prices</a></div>'
+            "</div></article>")
+
+
 def build_home():
     tpl = (ROOT / "templates" / "home.html").read_text()
     t = re.search(r"<title>(.*?)</title>", tpl, re.S).group(1)
     d = re.search(r'<meta name="description" content="(.*?)">', tpl, re.S).group(1)
+    items = [(SHORT[m], f"/models/{m}/") for m in CURRENT_MODELS]
     head = f"""<link rel="canonical" href="{BASE}/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <meta property="og:site_name" content="Bitaxe Radar"><meta property="og:type" content="website">
@@ -1097,18 +1170,29 @@ def build_home():
 <meta name="twitter:card" content="summary_large_image">
 {jsonld_tag({"@context": "https://schema.org", "@graph": [
     {"@type": "Organization", "@id": BASE + "/#org", "name": "Bitaxe Radar", "url": BASE + "/", "email": CONTACT},
-    {"@type": "WebSite", "@id": BASE + "/#site", "name": "Bitaxe Radar", "url": BASE + "/", "publisher": {"@id": BASE + "/#org"}}]})}"""
+    {"@type": "WebSite", "@id": BASE + "/#site", "name": "Bitaxe Radar", "url": BASE + "/", "publisher": {"@id": BASE + "/#org"}}]})}
+{jsonld_tag(itemlist("Bitaxe-class miners tracked by Bitaxe Radar", items))}"""
     ins = [o for o in OFFERS if in_stock(o)]
-    summary = f"""<section id="summary" aria-labelledby="h-sum">
-    <h2 id="h-sum">Cheapest in stock right now</h2>
-    <p class="hint">{len(ins)} of {len(OFFERS)} tracked listings are in stock · data collected {tag_time(latest['generated_at'])}. Each model has its own page with every seller, history and an alert form.</p>
-    {model_summary_table(TRACKED)}
-    <p class="hint"><a href="/where-to-buy-bitaxe/">Where to buy (US-first)</a> · <a href="/in-stock/">Everything in stock</a> · <a href="/deals/">Best deals</a> · <a href="/how-we-track/">How we track</a></p>
+    chips = (f'<ul class="chips"><li class="live"><strong>{len(ins)}</strong> listings in stock</li>'
+             f'<li><strong>{len(SELLERS)}</strong> shops checked</li>'
+             f'<li>Updated <time id="freshness" datetime="{esc(latest["generated_at"])}">{esc(fmt_time(latest["generated_at"]))}</time></li></ul>')
+    best_value = min((m for m in CURRENT_MODELS if STATS[m]["per_th"]), key=lambda m: STATS[m]["per_th"], default=None)
+    older = [m for m in TRACKED if m in NOINDEX_MODELS]
+    older_html = ('<p class="older">Older models: ' + " · ".join(
+        f'<a href="/models/{m}/">{esc(SHORT[m])}</a>' + (f' from {money(usd(STATS[m]["best"]))}' if STATS[m]["best"] else " (sold out)") for m in older) + "</p>") if older else ""
+    cards = f"""<section id="miners" aria-labelledby="h-miners">
+    <div class="sec-head"><h2 id="h-miners">Today's best prices</h2><a href="/in-stock/">Everything in stock →</a></div>
+    <div class="cards">{"".join(home_card(m, best_value) for m in CURRENT_MODELS)}</div>
+    {older_html}
   </section>"""
-    foot = ('<p><a href="/where-to-buy-bitaxe/">Where to buy</a> · <a href="/in-stock/">In stock now</a> · <a href="/deals/">Deals</a> · <a href="/how-we-track/">How we track</a> · <a href="/advertise/">Advertise</a> · '
-            + " · ".join(f'<a href="{compare_url(a, b)}">{esc(compare_label(a, b))}</a>' for a, b in COMPARE_PAIRS) + "</p>\n  <p>Sellers: "
-            + " · ".join(f'<a href="/sellers/{sid}/">{esc(s["name"])}</a>' for sid, s in SELLERS.items()) + "</p>")
-    out = tpl.replace("<!--HEAD-->", head).replace("<!--SEO-SUMMARY-->", summary).replace("<!--FOOT-LINKS-->", foot).replace("</body>", ANALYTICS + "</body>")
+    compare_links = '<ul class="links">' + "".join(f'<li><a href="{compare_url(a, b)}">{esc(compare_label(a, b))}</a></li>' for a, b in COMPARE_PAIRS) + "</ul>"
+    sellers_line = ('<p>Shops we check: ' + " · ".join(f'<a href="/sellers/{sid}/">{esc(s["name"])}</a>' for sid, s in SELLERS.items() if sid in SELLER_COPY) + "</p>\n  ")
+    out = (tpl.replace("<!--HEAD-->", head).replace("<!--HEADER-->", header_html()).replace("<!--RADAR-BG-->", RADAR_BG)
+           .replace("<!--HERO-CHIPS-->", chips).replace("<!--CARDS-->", cards).replace("<!--SIGNUP-->", signup_html("any"))
+           .replace("<!--COMPARE-LINKS-->", compare_links).replace("<!--FOOTER-->", footer_html(sellers_line))
+           .replace('<script src="/app.js"></script>', '<script src="/app.js"></script>\n' + SIGNUP_SCRIPTS)
+           .replace("</body>", ANALYTICS + "</body>"))
+    assert "<!--" not in out, "unfilled placeholder in home template"
     (SITE / "index.html").write_text(out)
     PAGES.append(dict(path="/", lastmod=latest["generated_at"]))
 
