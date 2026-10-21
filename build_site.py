@@ -447,7 +447,7 @@ def header_html():
 
 
 def footer_html(extra=""):
-    links = [("/#miners", "All miners"), ("/deals/", "Deals"), ("/in-stock/", "In stock"), ("/where-to-buy-bitaxe/", "Where to buy"),
+    links = [("/#miners", "All miners"), ("/deals/", "Deals"), ("/bitaxe-black-friday/", "Black Friday 2026"), ("/in-stock/", "In stock"), ("/where-to-buy-bitaxe/", "Where to buy"),
              ("/how-we-track/", "About & how we track"), ("/advertise/", "Advertise")]
     return f"""<footer class="foot"><div class="wrap">
   <a class="brand" href="/">{WORDMARK}</a>
@@ -1067,10 +1067,55 @@ def build_deals():
 <section aria-labelledby="h-g"><h2 id="h-g">Cheaper listings that are not in stock</h2><p>Some of the lowest prices we see are on sold-out, backorder or pre-order listings. This shows how much more the cheapest in-stock listing costs.</p>{gap_html}</section>
 <section aria-labelledby="h-s"><h2 id="h-s">Price spread between sellers (in stock)</h2>{spread_html}</section>
 <section><h2>Want a heads-up?</h2><p>Pick a model and a target price on its page and we email you once when it is in stock at or under that price: <a href="/models/bitaxe-gamma/#alerts">set an alert</a>.</p>
-<p><a href="/in-stock/">Everything in stock now</a> · <a href="/where-to-buy-bitaxe/">Where to buy</a></p></section>
+<p><a href="/in-stock/">Everything in stock now</a> · <a href="/where-to-buy-bitaxe/">Where to buy</a> · <a href="/bitaxe-black-friday/">Black Friday 2026 tracker</a></p></section>
 </article>"""
     items = [(f"{SHORT[m]} {money(usd(STATS[m]['best']))}", f"/models/{m}/") for m in ranked]
     layout(path, title, desc, body, crumbs=trail, jsonld=[itemlist("Cheapest in-stock Bitaxe-class miners by price per TH/s", items)])
+
+
+BF_DATES = dict(bf="2026-11-27", cm="2026-11-30")   # Black Friday / Cyber Monday 2026
+
+
+def build_black_friday():
+    path = "/bitaxe-black-friday/"
+    trail = [("Home", "/"), ("Black Friday 2026", path)]
+    rows, n_at_low = [], 0
+    for mid in [m for m in CURRENT_MODELS if m in TRACKED]:
+        st, b = STATS[mid], STATS[mid]["best"]
+        logged = [to_usd(dict(price=pt["price"], currency=o["currency"])) for o in st["offers"] for pt in hist_pts(o["id"]) if pt.get("in_stock")]
+        logged = [x for x in logged if x is not None]
+        lo = min(logged) if logged else None
+        now = usd(b) if b else None
+        if now is not None and lo is not None and now <= lo + 0.005:
+            verdict, n_at_low = '<span class="badge in">At our lowest logged price</span>', n_at_low + 1
+        elif now is not None and lo is not None:
+            verdict = f"{money(now - lo)} above our lowest logged"
+        else:
+            verdict = "Sold out everywhere we check"
+        alert_a = f'<a href="/models/{mid}/#alerts">Get alert</a>'
+        rows.append(f'<tr><td><a href="/models/{mid}/">{esc(SHORT[mid])}</a></td><td class="num">{money(now) if now is not None else "&ndash;"}</td>'
+                    f'<td>{esc(sname(b["seller"])) if b else "&ndash;"}</td><td class="num">{money(lo) if lo is not None else "&ndash;"}</td><td>{verdict}</td>'
+                    f'<td>{offer_link(b, "View ↗") if b else alert_a}</td></tr>')
+    tbl = ('<div class="tablewrap"><table><thead><tr><th>Miner</th><th class="num">Cheapest in stock now</th><th>Shop</th><th class="num">Lowest in-stock price we have logged</th><th>Today vs our low</th><th>Buy</th></tr></thead>'
+           f'<tbody>{"".join(rows)}</tbody></table></div>')
+    first = min((pts[0]["t"] for pts in history.values() if pts), default=latest["generated_at"])
+    title = "Bitaxe Black Friday 2026 deals: live prices vs our lowest logged | Bitaxe Radar"
+    desc = "Bitaxe and NerdQaxe Black Friday 2026 deals: live in-stock prices from US and EU shops vs the lowest price we have logged."
+    body = f"""<article>
+<header class="hero"><h1>Bitaxe Black Friday 2026 deals</h1>
+<p class="lede">Black Friday is November 27 and Cyber Monday is November 30. We check every shop every 6 hours, so this page shows whether today's price is actually a deal compared with what we've seen.</p>
+<p class="meta">Prices checked {tag_time(latest['generated_at'])} · tracking since {esc(fmt_day(first))}</p></header>
+<section aria-labelledby="h-t"><h2 id="h-t">Today's price vs our lowest logged</h2>{tbl}
+<p class="hint">{n_at_low} of {len(rows)} miners are at the lowest in-stock price we've logged. Prices are before shipping and tax; euro prices are converted to dollars as an estimate.</p></section>
+<section aria-labelledby="h-a"><h2 id="h-a">Get a Black Friday price alert</h2><p>Pick a miner and your target price. We email you once when it's in stock at or under that price, so you don't have to refresh shop pages all week.</p>{signup_html("any")}</section>
+<section aria-labelledby="h-h"><h2 id="h-h">How to spot a real Black Friday deal</h2><ul>
+<li>Compare against the price history on each miner's page, not the shop's "was" price.</li>
+<li>Check what's in the box: some bundles include a power supply or stand, some don't.</li>
+<li>Stock moves fast on popular models. Sold-out listings drop off the "cheapest in stock" column.</li>
+<li>A small miner is a lottery ticket, not an investment. Buy one because you want to run it.</li></ul></section>
+<section><h2>More</h2><p><a href="/deals/">Best deals right now</a> · <a href="/in-stock/">Everything in stock</a> · <a href="/where-to-buy-bitaxe/">Where to buy a Bitaxe</a></p></section>
+</article>"""
+    layout(path, title, desc, body, crumbs=trail, scripts=SIGNUP_SCRIPTS)
 
 
 def build_method():
@@ -1219,6 +1264,7 @@ def main():
     build_where_to_buy()
     build_in_stock()
     build_deals()
+    build_black_friday()
     build_method()
     build_advertise()
     build_404()

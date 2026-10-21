@@ -195,6 +195,13 @@ class SiteTests(unittest.TestCase):
         self.assertIn("/models/bitaxe-gamma/", home)
 
 
+    def test_black_friday_page(self):
+        self.assertIn("/bitaxe-black-friday/", self.pages)
+        self.assertIn(BASE + "/bitaxe-black-friday/", self.sitemap)
+        html = (SITE / "bitaxe-black-friday" / "index.html").read_text()
+        self.assertIn("November 27", html)
+        self.assertIn('id="alerts"', html) if 'id="alerts"' in (SITE / "models" / "bitaxe-gamma" / "index.html").read_text() else None
+
     def test_cta_sponsor_and_advertise(self):
         self.assertIn("/advertise/", self.pages)
         self.assertIn(BASE + "/advertise/", self.sitemap)
