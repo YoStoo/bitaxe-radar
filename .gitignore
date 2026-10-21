@@ -22,3 +22,6 @@ site/heater-miners/
 site/best/
 site/llms.txt
 site/llms-full.txt
+site/miners/
+site/find-my-miner/
+site/alerts/
