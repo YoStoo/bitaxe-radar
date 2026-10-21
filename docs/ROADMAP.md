@@ -1,0 +1,87 @@
+# Bitaxe Radar Roadmap
+
+Updated: Oct 21, 2026
+
+## 🎯 Goal
+
+- Step 1: make the first dollar.
+- Step 2: grow to a couple thousand dollars a month.
+- How: be the go-to site for home Bitcoin mining. Prices, stock, guides, tools.
+
+## 🔨 Now
+
+- Electricity price calculator
+  - Type in your power price on miner pages.
+  - Each model page shows the "break-even" power price (above it, the miner loses money).
+  - New guide: Is home mining worth it? (/guides/is-home-mining-worth-it/)
+  - Status: live on the site since Oct 21. Checking it works well on phones.
+
+## ⏭️ Next up (in order)
+
+1. Solo odds calculator: enter your TH/s, see your odds of finding a block per day, year and 5 years.
+2. Room heat calculator: room size in, which heater miners fit out.
+3. $/TH leaderboard: best value miners, plus price history ("is this a good price now?").
+4. Seller facts table: where they ship from, warranty, how often "in stock" was true.
+5. Add more home miners: 79 found, 26 on the site so far.
+6. Daily X posts and replies on @BitaxeRadar.
+7. Black Friday push in November (deals page live by about Nov 10, Black Friday is Nov 27).
+
+## 💰 Money
+
+Affiliate programs (we earn when someone buys through our link):
+
+- ✅ Power Mining: live since Oct 16.
+- ⏳ Solo Satoshi: applied Oct 16, waiting.
+- ⏳ D-Central: applied Oct 21, waiting.
+- ⏳ DTV Electronics: applied Oct 21, waiting.
+- ⏳ Altair: applied Oct 21. They emailed "we'll review it shortly."
+- ⏳ Bitcoin Merch: emailed Oct 16, no reply. Follow-up planned Oct 23 (needs your OK).
+- ❌ Heatbit: not done yet. Captcha failed, retry with you.
+
+Later:
+
+- Sponsors and Stripe payments: once there's real traffic.
+- Newsletter emails: once there are 25 to 50 subscribers. Until then, issues go on the site as web pages.
+
+## 💡 Later ideas
+
+- AI chat helper that picks a miner for you (the quiz is step one).
+- New name for the site (on hold, your call).
+- Bitcoin nodes section.
+- Mining news and network stats.
+- Videos.
+
+## 🙋 Waiting on the owner
+
+- Heatbit affiliate signup retry.
+- Rename decision (no rush).
+- PO Box address before the first newsletter email goes out.
+
+## ✅ Done
+
+- Oct 16: Site launched. Price and stock tracking every 6 hours.
+- Oct 16: Power Mining affiliate link added.
+- Oct 16: Email price alerts.
+- Oct 16: Contact email (contact@bitaxeradar.com).
+- Oct 16: Pages Google can find (models, sellers, deals, compare).
+- Oct 21: "Best deal right now" button on model pages.
+- Oct 21: Advertise page and sponsor spot.
+- Oct 21: Visitor stats turned on (Cloudflare).
+- Oct 21: New look with photo cards.
+- Oct 21: Black Friday tracker page.
+- Oct 21: Heater and home miners added.
+- Oct 21: Solo, pool and heater miner pages, with earnings estimates.
+- Oct 21: "Best for" pages (beginners, quiet, under $100, heating a room).
+- Oct 21: 10 more home miners and 2 more sellers.
+- Oct 21: Easy menu, all-miners page with filters, "Find my miner" quiz.
+- Oct 21: Newsletter #1 on the site, and newsletter signup.
+- Oct 21: Affiliate signups sent to D-Central, DTV and Altair.
+
+## 📊 Numbers (Oct 21)
+
+- Revenue: $0
+- Visitors: about 17 views a day
+- Subscribers: 1
+- Miners tracked: 26
+- Sellers tracked: 10
+- Pages on the site: 66
