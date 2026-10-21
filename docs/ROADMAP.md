@@ -82,4 +82,4 @@ Later:
 - Subscribers: 1
 - Miners tracked: 27
 - Sellers tracked: 10
-- Pages on the site: 70
+- Pages on the site: 69
