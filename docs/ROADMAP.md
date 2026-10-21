@@ -10,15 +10,14 @@ Updated: Oct 21, 2026
 
 ## 🔨 Now
 
-- Room heat calculator: room size in, which heater miners fit out.
+- $/TH leaderboard: best value miners, plus price history ("is this a good price now?").
 
 ## ⏭️ Next up (in order)
 
-1. $/TH leaderboard: best value miners, plus price history ("is this a good price now?").
-2. Seller facts table: where they ship from, warranty, how often "in stock" was true.
-3. Add more home miners: 79 found, 27 on the site so far.
-4. Daily X posts and replies on @BitaxeRadar.
-5. Black Friday push in November (deals page live by about Nov 10, Black Friday is Nov 27).
+1. Seller facts table: where they ship from, warranty, how often "in stock" was true.
+2. Add more home miners: 79 found, 27 on the site so far.
+3. Daily X posts and replies on @BitaxeRadar.
+4. Black Friday push in November (deals page live by about Nov 10, Black Friday is Nov 27).
 
 ## 💰 Money
 
@@ -74,6 +73,7 @@ Later:
 - Oct 21: Bitcube added (Power Mining's new cube miner, pre-order, delivery by Christmas): /models/bitcube/.
 - Oct 21: Solo odds calculator (/solo-odds/): your chance of finding a block per day, per year and over 5 years, for any hashrate or any miner we track.
 - Oct 21: Solo wins feed (/solo-wins/): recent blocks won by solo miners, days since the last win, and on solo miner pages the last win plus the last win by a miner that size (only when the winner reported it).
+- Oct 21: Room heat calculator (/heat-calculator/): type your room size, see how much heat it needs and which miners can heat it, with today's prices.
 
 ## 📊 Numbers (Oct 21)
 
@@ -82,4 +82,4 @@ Later:
 - Subscribers: 1
 - Miners tracked: 27
 - Sellers tracked: 10
-- Pages on the site: 69
+- Pages on the site: 70
