@@ -1327,7 +1327,7 @@ def earn_box(mid):
         return ""
     pe, solo_best, heater = e["pool"], mid in SOLO_SET, mid in HEAT_SET
     tiles = [("In a mining pool", f'{E.fmt_usd(pe["usd_month_shown"])}<small>/month</small>',
-              f'about {E.fmt_usd(pe["usd_day_shown"])} a day, before electricity' + (". Tiny, so most owners solo mine" if solo_best and pe["usd_month"] < 10 else "")),
+              f'about {E.fmt_usd(pe["usd_day_shown"])} a day, before electricity' + (". Tiny, so most owners solo mine" if solo_best and mid not in POOL_SET else "")),
              ("Power cost", f'{E.fmt_usd(e["power"])}<small>/month</small>',
               f'≈ {draw_watts(mid):,g} W, 24/7 at ${E.POWER_RATE:.2f}/kWh' + (". The heat offsets part of this" if heater else ""))]
     if solo_best:
