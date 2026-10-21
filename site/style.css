@@ -377,3 +377,14 @@ details .tablewrap{margin-bottom:14px}
 .wins .wpool{font-weight:600}.wins .wminer{color:var(--muted);font-size:13.5px}.wins a{font-size:13.5px;margin-top:2px}
 .calc-tbl td.nw{white-space:nowrap}
 .dev.unk{color:var(--faint)}.solowin .dev{color:var(--muted)}.solowin .dev.unk{color:var(--faint)}
+/* room heat calculator */
+.heatlist{list-style:none;padding:0;margin:12px 0;display:grid;gap:8px}
+.heatlist li{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center;padding:12px 14px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r)}
+.heatlist li[hidden]{display:none}
+.heatlist .hn{font-weight:700}.heatlist .hp{text-align:right;font-weight:700;white-space:nowrap}
+.heatlist .hs{color:var(--muted);font-size:14px}
+.heatlist .fit{justify-self:end;font-size:13px;font-weight:700;padding:3px 8px;border-radius:999px;background:var(--panel2);text-align:right}
+.heatlist .f-fits{color:var(--good);background:var(--good-bg)}
+.heatlist .f-helps{color:var(--muted);border:1px solid var(--line)}
+.heatlist .f-big{color:var(--warn);background:var(--warn-bg)}
+@media (max-width:700px){.heatlist li{grid-template-columns:1fr}.heatlist .hp,.heatlist .fit{justify-self:start;text-align:left}}

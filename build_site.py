@@ -450,7 +450,7 @@ SELLER_COPY = {
 NAV = [("/miners/", "All miners", "Miners"), ("/deals/", "Deals", "Deals"), ("/find-my-miner/", "Find my miner", "Find"), ("/guides/", "Guides", "Guides")]
 NAV_SECTIONS = {"/miners/": ("/miners/", "/solo-miners/", "/pool-miners/", "/heater-miners/", "/models/", "/home-miners/"),
                 "/deals/": ("/deals/", "/in-stock/", "/bitaxe-black-friday/"), "/find-my-miner/": ("/find-my-miner/",),
-                "/guides/": ("/guides/", "/solo-odds/", "/solo-wins/", "/best/", "/compare/", "/how-we-track/", "/where-to-buy-bitaxe/", "/sellers/")}
+                "/guides/": ("/guides/", "/solo-odds/", "/heat-calculator/", "/solo-wins/", "/best/", "/compare/", "/how-we-track/", "/where-to-buy-bitaxe/", "/sellers/")}
 
 # Browse-by-type categories. Any miner can solo or pool mine; these say what each is best suited to. A miner can be in several.
 SOLO_SET = ["bitaxe-gamma", "bitaxe-gamma-duo", "bitaxe-gt-801", "nerdaxe-gamma", "nerdaxe-gaia", "nerdqaxe-pp",
@@ -679,7 +679,7 @@ def header_html(path=""):
 
 FOOT_GROUPS = [
     ("Miners", [("/miners/", "All miners"), ("/solo-miners/", "Solo miners"), ("/pool-miners/", "Pool miners"), ("/heater-miners/", "Heater miners"),
-                ("/solo-odds/", "Solo odds"), ("/solo-wins/", "Solo wins"), ("/deals/", "Deals"), ("/in-stock/", "In stock now"), ("/find-my-miner/", "Find my miner")]),
+                ("/solo-odds/", "Solo odds"), ("/solo-wins/", "Solo wins"), ("/heat-calculator/", "Room heat calculator"), ("/deals/", "Deals"), ("/in-stock/", "In stock now"), ("/find-my-miner/", "Find my miner")]),
     ("Help", [("/guides/", "Guides"), ("/best/", "Best for…"), ("/compare/", "Compare"), ("/sellers/", "Shops"),
               ("/where-to-buy-bitaxe/", "Where to buy"), ("/alerts/", "Price alerts"), ("/newsletter/", "Newsletter")]),
     ("About", [("/how-we-track/", "About & how we track"), ("/advertise/", "Advertise"), ("/bitaxe-black-friday/", "Black Friday 2026"), (f"mailto:{CONTACT}", CONTACT)]),
@@ -1629,7 +1629,7 @@ def build_category(key):
     desc = f"Prices and stock for {cp['what']}. {n_in} of {len(offs)} listings in stock, checked every 6 hours."
     older_html = ('<p class="older">Older models: ' + " · ".join(
         f'<a href="/models/{m}/">{esc(SHORT[m])}</a>' + (f' from {money(usd(STATS[m]["best"]))}' if STATS[m]["best"] else " (sold out)") for m in older) + "</p>") if older else ""
-    guide = ('<a href="/guides/how-heater-miners-work/">How heater miners work</a> · <a href="/guides/solo-vs-pool-mining/">Solo vs pool</a>' if key == "heat"
+    guide = ('<a href="/heat-calculator/">Which one fits my room?</a> · <a href="/guides/how-heater-miners-work/">How heater miners work</a> · <a href="/guides/solo-vs-pool-mining/">Solo vs pool</a>' if key == "heat"
              else '<a href="/guides/solo-vs-pool-mining/">Solo vs pool, in plain words</a>' + (' · <a href="/guides/how-heater-miners-work/">How heater miners work</a>' if key == "pool" else ""))
     solo_line = ""
     if key == "solo" and NET and NET_OK:
@@ -1833,6 +1833,7 @@ Bitaxe Radar is independent. Some shop links are affiliate links; they never cha
 - [Solo block wins]({BASE}/solo-wins/): recent Bitcoin blocks found by solo miners, with date, pool (the service the winner mined through), reward and device (only when the winner shared it).{solo_llms()}
 - [Solo vs pool mining]({BASE}/guides/solo-vs-pool-mining/): solo is a lottery for a whole block; pool pays small, steady amounts.
 - [How heater miners work]({BASE}/guides/how-heater-miners-work/): a miner turns its electricity into heat like a space heater.
+- [Room heat calculator]({BASE}/heat-calculator/): room size in, heat needed (about 10 W per sq ft as a rule of thumb) and which tracked miners can heat it.
 - [Where to buy a Bitaxe]({BASE}/where-to-buy-bitaxe/)
 - [How we track prices]({BASE}/how-we-track/)
 - [All guides]({BASE}/guides/)
@@ -1895,7 +1896,7 @@ def build_guide_heaters():
 <li><strong>Circuit:</strong> a US 15 A, 120 V circuit should carry about 1,440 W continuously. Put big units on their own circuit, and follow the maker's guidance.</li>
 <li><strong>Noise:</strong> fans are louder in high-heat modes. Check the stated decibels.</li>
 <li><strong>Stock:</strong> many heater miners sell out before winter, and pre-orders ship later. Check the badge on each listing.</li></ul></section>
-<section><h2>Compare heater miners</h2><p><a class="btn" href="/heater-miners/">See heater miners</a></p></section>
+<section><h2>Compare heater miners</h2><p><a class="btn" href="/heater-miners/">See heater miners</a> <a class="btn ghost" href="/heat-calculator/">Which one fits my room?</a></p></section>
 </article>"""
     layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "How a Bitcoin heater miner works", desc)], lastmod=GUIDE_UPDATED, og_type="article")
 
@@ -2173,6 +2174,84 @@ def build_solo_wins():
 <section><p class="hint">Data: {SOLO_CREDIT} Blocks since the April 2024 halving. Checked every 6 hours.</p></section>
 </article>"""
     layout(path, title, desc, body, crumbs=trail, lastmod=SOLO_DATA.get("fetched_at"))
+
+
+# ---------------------------------------------------------------------------------------------
+# Room heat calculator (/heat-calculator/). Mirrors site/heat.js (tests/test_heat_calc.py).
+# ---------------------------------------------------------------------------------------------
+HEAT_WPSF = {"good": 7, "average": 10, "poor": 13}     # rule-of-thumb watts of heat per sq ft (8 ft ceiling)
+HEAT_FIT_LABEL = {"fits": "Can heat this room", "helps": "Adds warmth, won't heat it alone", "big": "More heat than this room needs",
+                  "small": "Too small for this room"}
+
+
+def heat_need(sqft, ins="average"):
+    return sqft * HEAT_WPSF.get(ins, HEAT_WPSF["average"])
+
+
+def heat_fit(heat_w, need_w):
+    r = heat_w / need_w
+    return "big" if r > 1.6 else "fits" if r >= 0.8 else "helps" if r >= 0.3 else "small"
+
+
+def heat_rank(heat_w, need_w):
+    return {"fits": 0, "helps": 1, "big": 2, "small": 3}[heat_fit(heat_w, need_w)] * 1e6 + abs(heat_w - need_w)
+
+
+def heat_candidates():
+    """Miners that give off enough heat to matter in a room (100 W+), with a price a shopper can see."""
+    return [m for m in LIVE_TRACKED if draw_watts(m) >= 100 and show_price(m) is not None]
+
+
+def build_heat_calc():
+    path = "/heat-calculator/"
+    ms = heat_candidates()
+    if not ms:
+        return
+    trail = [("Home", "/"), ("Guides", "/guides/"), ("Room heat calculator", path)]
+    title = "Room heat calculator: which Bitcoin heater miner fits your room? | Bitaxe Radar"
+    desc = "Type your room size and see how much heat it needs, and which heater and home Bitcoin miners can heat it, with today's prices."
+    sq0, ins0 = 150, "average"
+    n0 = heat_need(sq0, ins0)
+
+    def li(m):
+        hw, ft = draw_watts(m), heat_fit(draw_watts(m), n0)
+        st = STATS[m]
+        price = f"from {money(show_price(m))}" + ("" if st["best"] else " (pre-order)")
+        return (f'<li data-w="{hw:g}"{" hidden" if ft == "small" else ""}><a class="hn" href="/models/{m}/">{esc(SHORT[m])}</a><span class="hp">{price}</span>'
+                f'<span class="hs">≈{hw:,g} W · ≈{btu(hw):,.0f} BTU/h at full power</span><span class="fit f-{ft}">{esc(HEAT_FIT_LABEL[ft])}</span></li>')
+    items = "".join(li(m) for m in sorted(ms, key=lambda m: heat_rank(draw_watts(m), n0)))
+    form = ('<form class="solobox" id="heat-form" hidden><label for="heat-a">Room size</label>'
+            f'<span class="sin"><input id="heat-a" type="number" inputmode="decimal" min="1" step="any" value="{sq0}">'
+            '<select id="heat-u" aria-label="Unit"><option value="sqft" selected>sq ft</option><option value="m2">m²</option></select></span>'
+            '<label for="heat-i">How well does the room hold heat?</label><select id="heat-i">'
+            '<option value="good">Well (newer home, good windows)</option><option value="average" selected>Average</option>'
+            '<option value="poor">Poorly (drafty, old windows, basement)</option></select></form>')
+    faq = [("How much heat does a room need?",
+            "A common rule of thumb for electric heat is about 10 watts per square foot for an average room with an 8-foot ceiling. "
+            "Use less for a well-sealed room and more for a drafty one. It's a starting point, not an exact number."),
+           ("Does a miner heat as well as a space heater?",
+            "Yes, watt for watt. Nearly all the electricity a miner uses comes out as heat, like an electric space heater."),
+           ("What if the miner gives more heat than my room needs?",
+            "Most heater miners have lower power modes or a thermostat, so they can run cooler. At full power a big one will overheat a small room."),
+           ("What does 1,500 W mean for my outlet?",
+            "A US 15 A, 120 V circuit should carry about 1,440 W continuously. Put big units on their own circuit and follow the maker's guidance.")]
+    body = f"""<article>
+<header class="hero"><h1>Room heat calculator</h1>
+<p class="lede">Type your room size. See how much heat it needs and which miners can warm it while they mine.</p>
+{form}</header>
+<section class="earnbox" aria-labelledby="h-need"><h2 id="h-need">Your room needs about <span data-heat="w">{n0:,.0f} W</span></h2>
+<p class="netline">That's about <span data-heat="btu">{btu(n0):,.0f} BTU/h</span> of heat to keep it warm on a cold day.</p>
+<p class="hint">Rule of thumb: about 10 W per sq ft for an average room with an 8 ft ceiling (7 W if it holds heat well, 13 W if it's drafty). An estimate, not a heating survey.</p></section>
+<section aria-labelledby="h-fit"><h2 id="h-fit">Miners that fit</h2>
+<ul class="heatlist" id="heat-list">{items}</ul>
+<p id="heat-none" hidden>None of the miners we track give off enough heat for a room this big. Try a smaller room, or use a miner as a top-up next to your normal heat.</p>
+<p class="hint">Heat = stated full-power watts × 3.412. Prices are before shipping and tax. <a href="/heater-miners/">All heater miners →</a></p></section>
+<section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}
+<p><a href="/guides/how-heater-miners-work/">How heater miners work</a> · <a href="/best/heating-a-room/">Best for heating a room</a> · <a href="/guides/is-home-mining-worth-it/">Is home mining worth it?</a></p></section>
+</article>"""
+    app = {"@context": "https://schema.org", "@type": "WebApplication", "name": "Room heat calculator for Bitcoin heater miners", "url": BASE + path,
+           "applicationCategory": "UtilitiesApplication", "operatingSystem": "Any", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "description": desc}
+    layout(path, title, desc, body, crumbs=trail, jsonld=[app, faq_ld(faq)], scripts='<script src="/heat.js" defer></script>\n')
 
 
 def build_method():
@@ -2619,6 +2698,7 @@ def build_indexes():
     gl = [("/guides/is-home-mining-worth-it/", "Is home mining worth it?", "Check it at your electricity price."),
           ("/solo-odds/", "Solo odds calculator", "Your real chance of finding a block."),
           ("/solo-wins/", "Solo block wins", "Recent blocks won by solo miners."),
+          ("/heat-calculator/", "Room heat calculator", "Which heater miner fits your room."),
           ("/guides/solo-vs-pool-mining/", "Solo vs pool mining", "Lottery shot or small steady payouts?"),
           ("/guides/how-heater-miners-work/", "How heater miners work", "A miner that warms the room."),
           ("/where-to-buy-bitaxe/", "Where to buy a Bitaxe", "Every shop, ranked by today's price."),
@@ -2662,6 +2742,7 @@ def main():
     build_guide_pool()
     build_guide_worth()
     build_solo_odds()
+    build_heat_calc()
     build_solo_wins()
     build_method()
     build_advertise()

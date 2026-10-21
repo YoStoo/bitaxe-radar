@@ -27,7 +27,9 @@ site/find-my-miner/
 site/alerts/
 site/solo-odds/
 site/solo-wins/
+site/heat-calculator/
 site/newsletter/
 # private research notes (kept local, not published)
 docs/REDDIT_RESEARCH.md
 docs/REBRAND_RESEARCH.md
+docs/BACKUP_IDEAS.md
