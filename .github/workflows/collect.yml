@@ -1,7 +1,7 @@
 name: collect-and-deploy
 on:
   schedule: [{cron: "17 */6 * * *"}]
-  push: {branches: [main], paths: ["site/**", "collector/**", "build_site.py", "earnings.py", "templates/**", ".github/workflows/**"]}
+  push: {branches: [main], paths: ["site/**", "collector/**", "build_site.py", "earnings.py", "newsletter.py", "data/newsletter/**", "scripts/indexnow.py", "templates/**", ".github/workflows/**"]}
   workflow_dispatch: {}
 permissions:
   contents: write
@@ -11,12 +11,17 @@ concurrency: {group: pages, cancel-in-progress: false}
 jobs:
   collect:
     runs-on: ubuntu-latest
+    outputs: {indexnow_urls: "${{ steps.inow.outputs.urls }}"}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
       - run: python3 collector/collect.py
+      - run: curl -sf --max-time 20 https://bitaxeradar.com/sitemap.xml -o /tmp/old_sitemap.xml || true
       - run: python3 build_site.py
+      - id: inow
+        continue-on-error: true
+        run: echo "urls=$(python3 scripts/indexnow.py diff /tmp/old_sitemap.xml site/sitemap.xml)" >> "$GITHUB_OUTPUT"
       - run: |
           git config user.name "radar-bot"; git config user.email "radar-bot@users.noreply.github.com"
           git add data site/data.js
@@ -41,3 +46,13 @@ jobs:
     steps:
       - id: d
         uses: actions/deploy-pages@v4
+  # Ping IndexNow (Bing/Yandex/...) with new or content-changed URLs once they are live. Never fails the run.
+  indexnow:
+    needs: [collect, deploy]
+    if: needs.collect.outputs.indexnow_urls != ''
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - env: {URLS: "${{ needs.collect.outputs.indexnow_urls }}"}
+        run: python3 scripts/indexnow.py submit $URLS

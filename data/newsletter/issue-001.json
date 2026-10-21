@@ -1,0 +1,127 @@
+{
+  "num": 1,
+  "slug": "issue-001",
+  "title": "Home Mining Weekly #1",
+  "subject": "Home Mining Weekly #1: this week's best miner prices",
+  "preheader": "Best home miner prices this week, 3 new miners, and solo vs pool in 30 seconds.",
+  "date": "2026-10-21",
+  "intro": "Welcome to the first Home Mining Weekly. Each week: the best prices we found on home Bitcoin miners, what's new on the site, and one quick explainer. Two minutes, tops.",
+  "price_models": [
+    "bitaxe-gamma",
+    "bitaxe-gamma-duo",
+    "avalon-nano-3s",
+    "hammer-bc04",
+    "nerdqaxe-pp",
+    "braiins-bmm-101"
+  ],
+  "new_miners": [
+    {
+      "model": "bitaxe-gamma-hex",
+      "blurb": "Six chips on one open-source Bitaxe board (about 8.4 TH/s stated), with a liquid cooler.",
+      "name": "Bitaxe Gamma Hex (1300)",
+      "from_usd": 449.99
+    },
+    {
+      "model": "heatbit-bitair",
+      "blurb": "An air purifier with a tiny miner inside. A fun solo long shot, not a heater.",
+      "name": "Heatbit Bitair",
+      "from_usd": 179.0
+    },
+    {
+      "model": "hammer-thor-p2",
+      "blurb": "A quiet-ish desk miner, about 10 TH/s stated, without a heater-sized power draw.",
+      "name": "Hammer Miner Thor P2",
+      "from_usd": 369.0
+    }
+  ],
+  "explainer": {
+    "title": "Solo vs pool, in 30 seconds",
+    "paras": [
+      "Solo is a lottery ticket. Your miner tries to win a whole Bitcoin block on its own. If it wins, it gets the full reward. Most of the time it gets nothing, and for a home miner the odds are tiny.",
+      "Pool is a small, steady trickle. Thousands of miners share the work and split each reward, so you get small, regular payouts. They go up and down with Bitcoin's price and the network, so nobody can promise an amount.",
+      "Same miner, either way: it's just a setting. Small Bitaxes usually go solo for the long shot. Heater miners usually go pool."
+    ],
+    "link": "/guides/solo-vs-pool-mining/"
+  },
+  "prices": [
+    {
+      "model": "bitaxe-gamma",
+      "name": "Bitaxe Gamma (601/602)",
+      "hashrate_ths": 1.2,
+      "watts": 18,
+      "seller": "solosatoshi",
+      "seller_name": "Solo Satoshi",
+      "price": 67.0,
+      "currency": "USD",
+      "price_usd": 67.0,
+      "url": "https://www.solosatoshi.com/product/bitaxe-gamma/",
+      "checked_at": "2026-10-21T15:10:09Z"
+    },
+    {
+      "model": "bitaxe-gamma-duo",
+      "name": "Bitaxe Gamma Duo (650)",
+      "hashrate_ths": 1.63,
+      "watts": 26,
+      "seller": "solosatoshi",
+      "seller_name": "Solo Satoshi",
+      "price": 111.69,
+      "currency": "USD",
+      "price_usd": 111.69,
+      "url": "https://www.solosatoshi.com/product/bitaxe-duo-bitcoin-solo-miner-650-model/",
+      "checked_at": "2026-10-21T15:10:09Z"
+    },
+    {
+      "model": "hammer-bc04",
+      "name": "Hammer Miner BC04",
+      "hashrate_ths": 6,
+      "watts": 96,
+      "seller": "altair",
+      "seller_name": "Altair Technology",
+      "price": 215.0,
+      "currency": "USD",
+      "price_usd": 215.0,
+      "url": "https://altairtech.io/product/hammer-miner-bc04-home-bitcoin-miner/",
+      "checked_at": "2026-10-21T15:10:09Z"
+    },
+    {
+      "model": "avalon-nano-3s",
+      "name": "Canaan Avalon Nano 3S",
+      "hashrate_ths": 6,
+      "watts": 140,
+      "seller": "solosatoshi",
+      "seller_name": "Solo Satoshi",
+      "price": 219.0,
+      "currency": "USD",
+      "price_usd": 219.0,
+      "url": "https://www.solosatoshi.com/product/avalon-nano-3s-bitcoin-solo-miner/",
+      "checked_at": "2026-10-21T15:10:09Z"
+    },
+    {
+      "model": "nerdqaxe-pp",
+      "name": "NerdQaxe++ (4.8 TH/s)",
+      "hashrate_ths": 4.8,
+      "watts": 80,
+      "seller": "bitcoinmerch",
+      "seller_name": "Bitcoin Merch",
+      "price": 274.99,
+      "currency": "USD",
+      "price_usd": 274.99,
+      "url": "https://bitcoinmerch.com/products/nerdqaxe-plus-plus",
+      "checked_at": "2026-10-21T15:10:09Z"
+    },
+    {
+      "model": "braiins-bmm-101",
+      "name": "Braiins Mini Miner BMM 101",
+      "hashrate_ths": 1,
+      "watts": 40,
+      "seller": "braiins",
+      "seller_name": "Braiins Forge",
+      "price": 299.0,
+      "currency": "USD",
+      "price_usd": 299.0,
+      "url": "https://braiinsforge.com/products/bmm-101",
+      "checked_at": "2026-10-21T15:10:09Z"
+    }
+  ],
+  "snapshot_at": "2026-10-21T15:10:09Z"
+}

@@ -1,0 +1,48 @@
+HOME MINING WEEKLY #1 · October 21, 2026
+Bitaxe Radar
+
+Welcome to the first Home Mining Weekly. Each week: the best prices we found on home Bitcoin miners, what's new on the site, and one quick explainer. Two minutes, tops.
+
+THIS WEEK'S BEST PRICES
+(cheapest in-stock listing, checked Oct 21, 2026, 11:10 AM ET)
+- Bitaxe Gamma (601/602): $67.00 at Solo Satoshi
+  https://www.solosatoshi.com/product/bitaxe-gamma/
+- Bitaxe Gamma Duo (650): $111.69 at Solo Satoshi
+  https://www.solosatoshi.com/product/bitaxe-duo-bitcoin-solo-miner-650-model/
+- Hammer Miner BC04: $215.00 at Altair Technology
+  https://altairtech.io/product/hammer-miner-bc04-home-bitcoin-miner/
+- Canaan Avalon Nano 3S: $219.00 at Solo Satoshi
+  https://www.solosatoshi.com/product/avalon-nano-3s-bitcoin-solo-miner/
+- NerdQaxe++ (4.8 TH/s): $274.99 at Bitcoin Merch
+  https://bitcoinmerch.com/products/nerdqaxe-plus-plus
+- Braiins Mini Miner BMM 101: $299.00 at Braiins Forge
+  https://braiinsforge.com/products/bmm-101
+Live prices: https://bitaxeradar.com/deals/
+
+3 NEW MINERS ON THE SITE
+- Bitaxe Gamma Hex (1300) (from $449.99): Six chips on one open-source Bitaxe board (about 8.4 TH/s stated), with a liquid cooler.
+  https://bitaxeradar.com/models/bitaxe-gamma-hex/
+- Heatbit Bitair (from $179.00): An air purifier with a tiny miner inside. A fun solo long shot, not a heater.
+  https://bitaxeradar.com/models/heatbit-bitair/
+- Hammer Miner Thor P2 (from $369.00): A quiet-ish desk miner, about 10 TH/s stated, without a heater-sized power draw.
+  https://bitaxeradar.com/models/hammer-thor-p2/
+
+NOT SURE WHICH ONE FITS YOU?
+Take the 3-question Find my miner quiz: https://bitaxeradar.com/find-my-miner/
+
+SOLO VS POOL, IN 30 SECONDS
+Solo is a lottery ticket. Your miner tries to win a whole Bitcoin block on its own. If it wins, it gets the full reward. Most of the time it gets nothing, and for a home miner the odds are tiny.
+Pool is a small, steady trickle. Thousands of miners share the work and split each reward, so you get small, regular payouts. They go up and down with Bitcoin's price and the network, so nobody can promise an amount.
+Same miner, either way: it's just a setting. Small Bitaxes usually go solo for the long shot. Heater miners usually go pool.
+Guide: https://bitaxeradar.com/guides/solo-vs-pool-mining/
+
+PRICE-DROP ALERTS
+Get one email when a miner hits your price: https://bitaxeradar.com/alerts/
+
+--
+Some shop links are affiliate links. If you buy through one, Bitaxe Radar may earn a commission at no extra cost to you. It never changes how prices are ranked.
+Mining earnings are never guaranteed. Prices change fast, so check the shop's page before buying. Not financial advice.
+You're getting this because you signed up for Home Mining Weekly on bitaxeradar.com. Questions? Reply or write contact@bitaxeradar.com.
+Bitaxe Radar · [mailing address goes here before sending]
+Unsubscribe: {{{RESEND_UNSUBSCRIBE_URL}}}
+View on the web: https://bitaxeradar.com/newsletter/issue-001/

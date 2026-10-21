@@ -23,6 +23,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import earnings as E
+import newsletter as NL
 
 ROOT = Path(__file__).resolve().parent
 SITE = ROOT / "site"
@@ -672,7 +673,7 @@ FOOT_GROUPS = [
     ("Miners", [("/miners/", "All miners"), ("/solo-miners/", "Solo miners"), ("/pool-miners/", "Pool miners"), ("/heater-miners/", "Heater miners"),
                 ("/deals/", "Deals"), ("/in-stock/", "In stock now"), ("/find-my-miner/", "Find my miner")]),
     ("Help", [("/guides/", "Guides"), ("/best/", "Best for…"), ("/compare/", "Compare"), ("/sellers/", "Shops"),
-              ("/where-to-buy-bitaxe/", "Where to buy"), ("/alerts/", "Price alerts")]),
+              ("/where-to-buy-bitaxe/", "Where to buy"), ("/alerts/", "Price alerts"), ("/newsletter/", "Newsletter")]),
     ("About", [("/how-we-track/", "About & how we track"), ("/advertise/", "Advertise"), ("/bitaxe-black-friday/", "Black Friday 2026"), (f"mailto:{CONTACT}", CONTACT)]),
 ]
 
@@ -2177,11 +2178,64 @@ def build_alerts():
 <header class="hero"><h1>Price-drop alerts</h1>
 <p class="lede">Tell us a miner and your price. We email you once when it's in stock at or under it.</p></header>
 {form}
-<p class="hint">Questions? <a href="mailto:{CONTACT}">{CONTACT}</a></p>
+<p class="hint">Want a short weekly roundup instead? <a href="/newsletter/">Home Mining Weekly</a> · Questions? <a href="mailto:{CONTACT}">{CONTACT}</a></p>
 </article>"""
     layout(path, "Free price-drop alerts for home Bitcoin miners | Bitaxe Radar",
            "Get one email when a Bitaxe, NerdQaxe, Avalon or heater miner is in stock at or under your price. Free, no spam, one-click unsubscribe.",
            body, crumbs=[("Home", "/"), ("Alerts", path)], scripts=SIGNUP_SCRIPTS)
+
+
+# ---------------------------------------------------------------------------------------------
+# NEWSLETTER (Home Mining Weekly): web copies of each issue, from data/newsletter/*.json (see newsletter.py)
+# ---------------------------------------------------------------------------------------------
+NL_NAME = "Home Mining Weekly"
+NL_MAILTO = f"mailto:{CONTACT}?subject=" + "Subscribe%20to%20Home%20Mining%20Weekly" + "&body=" + "Please%20add%20me%20to%20Home%20Mining%20Weekly."
+
+
+def nl_signup():
+    return f"""<section class="signup" aria-labelledby="h-nl"><h2 id="h-nl" style="margin-top:0">Get the weekly email</h2>
+<p>One short email a week: best prices, new miners, one plain-words explainer. Free, no spam, unsubscribe anytime.</p>
+<p><a class="btn" href="{NL_MAILTO}">Email us to join</a></p>
+<p class="hint">Tap the button and hit send. We add you by hand for now, and you can reply "stop" anytime. Or write <a href="mailto:{CONTACT}">{CONTACT}</a>.</p></section>"""
+
+
+def build_newsletter():
+    iss = NL.issues()
+    for i in iss:
+        path = f"/newsletter/{i['slug']}/"
+        rows = "".join(f'<tr><td><a href="/models/{p["model"]}/">{esc(SHORT.get(p["model"], p["name"]))}</a><br><small class="hint">at {esc(p["seller_name"])}</small></td>'
+                       f'<td class="num"><b>{esc(NL.price_label(p))}</b></td><td>{offer_link(dict(seller=p["seller"], url=p["url"]), "Shop ↗", "btn sm")}</td></tr>'
+                       for p in i["prices"])
+        new = "".join(f'<li><a href="/models/{n["model"]}/"><b>{esc(SHORT.get(n["model"], n["name"]))}</b>'
+                      + (f' · from {money(n["from_usd"])}' if n.get("from_usd") else "") + f'</a> {esc(n["blurb"])}</li>' for n in i["new_miners"])
+        ex = i["explainer"]
+        body = f"""<article>
+<header class="hero"><h1>{esc(i["title"])}</h1>
+<p class="lede">{esc(i["intro"])}</p>
+<p class="meta">Issue #{i["num"]} · <time datetime="{i["date"]}">{NL.pretty_date(i["date"])}</time> · 2-minute read</p></header>
+<section aria-labelledby="h-p"><h2 id="h-p">This week's best prices</h2>
+<div class="tablewrap"><table><thead><tr><th>Miner</th><th class="num">Price</th><th></th></tr></thead><tbody>{rows}</tbody></table></div>
+<p class="hint">Cheapest in-stock listing we found, checked {esc(NL.et_time(i["snapshot_at"]))}. These were the prices when the issue went out; they change fast. <a href="/deals/">See today's live prices</a>.</p></section>
+<section aria-labelledby="h-n"><h2 id="h-n">{plural(len(i["new_miners"]), "new miner")} on the site</h2><ul>{new}</ul><p><a href="/miners/">Browse all miners →</a></p></section>
+<section aria-labelledby="h-q"><h2 id="h-q">Not sure which one fits you?</h2><p>Answer 3 quick questions and we'll suggest a miner.</p><p><a class="btn" href="/find-my-miner/">Take the Find my miner quiz</a></p></section>
+<section aria-labelledby="h-e"><h2 id="h-e">{esc(ex["title"])}</h2>{"".join(f"<p>{esc(t)}</p>" for t in ex["paras"])}<p><a href="{esc(ex["link"])}">Read the 2-minute guide →</a></p></section>
+<section aria-labelledby="h-a"><h2 id="h-a">Want a heads-up when a price drops?</h2><p>Pick a miner and your price. We email you once when it's in stock at or under it.</p><p><a class="btn" href="/alerts/">Set a free price alert</a></p></section>
+{nl_signup()}
+<p class="hint">{esc(NL.NO_PROMISE)} <a href="/newsletter/">All issues</a></p>
+</article>"""
+        layout(path, f"{i['title']}: best home Bitcoin miner prices | Bitaxe Radar", i["preheader"], body,
+               crumbs=[("Home", "/"), ("Newsletter", "/newsletter/"), (f"Issue #{i['num']}", path)], lastmod=i["date"], og_type="article")
+    lis = "".join(f'<li><a href="/newsletter/{i["slug"]}/"><b>{esc(i["title"])}</b><span>{NL.pretty_date(i["date"])} · {esc(i["preheader"])}</span></a></li>' for i in iss)
+    body = f"""<article>
+<header class="hero"><h1>{NL_NAME}</h1>
+<p class="lede">A short weekly email about home Bitcoin miners: the best prices we found, new miners, and one quick explainer. Every issue is also posted here.</p></header>
+{nl_signup()}
+<h2>All issues</h2><ul class="glist">{lis or "<li>The first issue is coming soon.</li>"}</ul>
+<p class="hint">Rather get one email when a specific miner drops in price? <a href="/alerts/">Set a price alert</a>.</p>
+</article>"""
+    layout("/newsletter/", f"{NL_NAME}: a weekly home Bitcoin mining email | Bitaxe Radar",
+           "A short weekly email on home Bitcoin miners: best Bitaxe, NerdQaxe, Avalon and heater miner prices, new models and plain-words explainers. Free.",
+           body, crumbs=[("Home", "/"), ("Newsletter", "/newsletter/")], lastmod=iss[0]["date"] if iss else None)
 
 
 def tile(href, mid, title, sub):
@@ -2263,6 +2317,7 @@ def main():
     build_miners()
     build_quiz()
     build_alerts()
+    build_newsletter()
     for c in CATS:
         build_category(c[0])
     for k in BEST:
