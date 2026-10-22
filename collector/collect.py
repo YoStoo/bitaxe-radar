@@ -79,6 +79,10 @@ MODELS = {
     "bitcube":          {"name": "Power Mining Bitcube", "category": "home", "kind": "Desk lottery miner with touchscreen", "maker": "Power Mining",
                          "chip": "Avalon A3197", "hashrate_ths": 0.777, "watts": 25,
                          "note": "Maker-stated up to 777 GH/s in Turbo (550 GH/s Quiet) at 20-25 W from the wall, USB-C powered"},
+    # added 2026-10-22: Heatbit's water heater element miner, pre-order (Genesis batch) from launch day
+    "heatbit-bitwater": {"name": "Heatbit Bitwater", "category": "home", "kind": "Water heater miner (tank element)", "maker": "Heatbit",
+                         "chip": "BM1370 x20", "hashrate_ths": 34, "watts": 600,
+                         "note": "Maker-stated up to 34 TH/s and up to 600 W, from 12 J/TH; replaces the lower element of a 30-80 gal electric water heater"},
 }
 # hashrate_ths / watts above are typical VENDOR-STATED figures used only for the cost estimate.
 # They are approximate and must be labelled as such on the site.
@@ -165,6 +169,7 @@ HEATBIT = {  # Shopify handle -> regex the US variant title must match
     "heatbit-maxi":   ("heatbit-maxi", r"/ US / Maxi$"),
     "heatbit-canvas": ("heatbit-canvas", r".*"),
     "heatbit-bitair": ("bitair", r".*"),
+    "heatbit-bitwater": ("bitwater", r".*"),
 }
 BRAIINS = {"braiins-bmm-101": "bmm-101"}       # braiinsforge.com/products/<slug>
 DCENTRAL = {"avalon-mini-3": "canaan-avalon-mini-3", "nerdoctaxe": "the-nerdoctaxe-gamma",
@@ -178,7 +183,7 @@ TITLE_MUST = {
     "braiins-bmm-101": ["bmm 101"], "hammer-bc04": ["hammer", "bc04"],
     # strict title words for the 2026-10-21 additions: a different product (stand, screen, Ghost edition, Thor X1...) never attaches
     "bitaxe-gamma-hex": ["hex", "1300"], "bitaxe-naja-duo": ["naja duo"], "nerdoctaxe": ["nerdoctaxe"],
-    "bitforge-nano": ["bitforge nano"], "heatbit-bitair": ["bitair"], "futurebit-apollo-iii": ["apollo iii"],
+    "bitforge-nano": ["bitforge nano"], "heatbit-bitair": ["bitair"], "heatbit-bitwater": ["bitwater"], "futurebit-apollo-iii": ["apollo iii"],
     "hammer-thor-p2": ["thor p2"], "hammer-bc08": ["bc08"], "gekko-kbox-22": ["kbox"], "dcentral-stealthminer": ["stealthminer"],
 }
 TITLE_NOT = {  # words that mean a different product (accessory, other edition)
@@ -503,6 +508,14 @@ def collect_altair(ts):
     return out, missing
 
 
+HEATBIT_LAUNCH = {"heatbit-bitwater"}   # brand-new products on pre-order: show the stated ship window, not the "sold out this season" note
+
+
+def heatbit_ship_note(text):
+    m = re.search(r"(?i:ships) (?:in )?(Q[1-4] \d{4}|(?:early|mid|late) \d{4}|[A-Z][a-z]+ \d{4})", text or "")
+    return f"Pre-order. Seller says it ships {m.group(1)}" if m else "Pre-order. Read the seller's shipping note"
+
+
 def collect_heatbit(ts):
     base = SELLERS["heatbit"]["url"]
     by_handle = {p["handle"]: p for p in fetch_shopify_all(base)}
@@ -523,7 +536,7 @@ def collect_heatbit(ts):
         cfg = ("" if v["title"] == "Default Title" else f"Variant: {v['title']}; ") + "sold direct by the maker; shipping and tax extra"
         out.append(offer("heatbit", model, p["title"], url, v["price"], "USD", status, status == "in_stock", cfg, ts, f"{base}/products.json",
                          {"compare_at": float(v["compare_at_price"]) if v.get("compare_at_price") else None,
-                          "ship_note": "Seller says this season's stock is sold out; pre-orders open" if status == "preorder" else None,
+                          "ship_note": (heatbit_ship_note(strip_html(p.get("body_html") or "") + " " + page_txt) if model in HEATBIT_LAUNCH else "Seller says this season's stock is sold out; pre-orders open") if status == "preorder" else None,
                           "image_src": (p.get("images") or [{}])[0].get("src")}))
         time.sleep(1)
     return out, missing

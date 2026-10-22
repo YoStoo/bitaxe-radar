@@ -60,3 +60,9 @@ No photo (drawn placeholder kept):
 | File | Model | Seller | Product title checked | Original image URL |
 |---|---|---|---|---|
 | bitcube.webp | Power Mining Bitcube (touchscreen showing 777 GH/s) | Power Mining, the maker (Shopify `/products/bitcube.js`, first image, already transparent; trimmed) | Bitcube | https://cdn.shopify.com/s/files/1/0880/2874/1979/files/bitcube-hero-777-square.png?v=1792489005 |
+
+## Heatbit Bitwater (added 2026-10-22)
+
+| File | Model | Seller | Product title checked | Original image URL |
+|---|---|---|---|---|
+| heatbit-bitwater.webp | Heatbit Bitwater (element with controller board) | Heatbit, the maker (Shopify `products/bitwater.json`, "02-bitwater-element" image; white background removed, trimmed) | Bitwater – Water Heater Element That Mines Bitcoin | https://cdn.shopify.com/s/files/1/0382/4127/1943/files/02-bitwater-element_8bf2aecb-c998-4ad4-9185-bab65de56737.jpg |

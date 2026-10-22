@@ -192,7 +192,7 @@ SHORT = {"bitaxe-supra": "Bitaxe Supra", "bitaxe-ultra": "Bitaxe Ultra", "bitaxe
          "heatbit-maxi": "Heatbit Maxi", "heatbit-canvas": "Heatbit Canvas", "braiins-bmm-101": "Braiins Mini Miner", "hammer-bc04": "Hammer BC04",
          "bitaxe-gamma-hex": "Bitaxe Gamma Hex", "bitaxe-naja-duo": "Bitaxe Naja Duo", "nerdoctaxe": "NerdOCTaxe Gamma", "bitforge-nano": "BitForge Nano",
          "heatbit-bitair": "Heatbit Bitair", "futurebit-apollo-iii": "FutureBit Apollo III", "hammer-thor-p2": "Hammer Thor P2", "hammer-bc08": "Hammer BC08",
-         "gekko-kbox-22": "GekkoScience KBox 22", "dcentral-stealthminer": "D-Central StealthMiner", "bitcube": "Bitcube"}
+         "gekko-kbox-22": "GekkoScience KBox 22", "dcentral-stealthminer": "D-Central StealthMiner", "bitcube": "Bitcube", "heatbit-bitwater": "Heatbit Bitwater"}
 NOINDEX_MODELS = {"bitaxe-supra", "bitaxe-ultra"}   # older generations: pages exist for completeness but stay out of the index/sitemap
 
 MODEL_COPY = {
@@ -363,6 +363,14 @@ NEW_COPY = {   # added 2026-10-21 (docs/MINER_CATALOG.md). Stock settings only; 
         check=["It's a pre-order. Power Mining says it will deliver by Christmas.",
                "Each order includes a free 777 GH/s of hosted solo hashrate from the order date until your Bitcube arrives.",
                "The price shown is what US buyers pay, in euros with no VAT. EU buyers pay 21% VAT on top. Shipping and any import fees are extra."]),
+    "heatbit-bitwater": dict(
+        intro="The Heatbit Bitwater is a water heater element with a Bitcoin miner built in. It screws into the lower element port of a regular electric tank water heater and heats your water with mining chips instead of a resistance wire. Heatbit states 20 BM1370 chips, up to 34 TH/s and up to 600 W, from 12 J/TH. The water cools the chips, so there are no fans.",
+        who="A homeowner with an electric tank water heater who pays for hot water anyway and wants that heat to mine Bitcoin, with no noise and no box in the room.",
+        check=["It's a pre-order (Genesis batch at $899). Heatbit says later batches cost up to $1,299 and it ships Q1 2027 to the US and Canada.",
+               "It only fits standard electric tank heaters (30 to 80 gallons, 1-inch NPSM element port). Not gas or heat-pump water heaters.",
+               "It replaces the lower element; the upper element and thermostat stay. Heatbit says install takes 30 to 45 minutes, and the controller plugs into a normal outlet.",
+               "It only mines while your tank needs heat, so real hashrate depends on how much hot water you use.",
+               "Mines solo to your own address by default, or to any pool. 1-year warranty."]),
 }
 MODEL_COPY.update(NEW_COPY)
 
@@ -449,7 +457,7 @@ SELLER_COPY = {
 # Same menu on every page, desktop and phone (docs/NAV_AUDIT.md): All miners · Deals · Find my miner · Guides + Alerts button
 NAV = [("/miners/", "All miners", "Miners"), ("/deals/", "Deals", "Deals"), ("/find-my-miner/", "Find my miner", "Find"), ("/guides/", "Guides", "Guides")]
 NAV_SECTIONS = {"/miners/": ("/miners/", "/solo-miners/", "/pool-miners/", "/heater-miners/", "/models/", "/home-miners/"),
-                "/deals/": ("/deals/", "/in-stock/", "/bitaxe-black-friday/"), "/find-my-miner/": ("/find-my-miner/",),
+                "/deals/": ("/deals/", "/in-stock/", "/price-per-th/", "/bitaxe-black-friday/"), "/find-my-miner/": ("/find-my-miner/",),
                 "/guides/": ("/guides/", "/solo-odds/", "/heat-calculator/", "/solo-wins/", "/best/", "/compare/", "/how-we-track/", "/where-to-buy-bitaxe/", "/sellers/")}
 
 # Browse-by-type categories. Any miner can solo or pool mine; these say what each is best suited to. A miner can be in several.
@@ -457,7 +465,7 @@ SOLO_SET = ["bitaxe-gamma", "bitaxe-gamma-duo", "bitaxe-gt-801", "nerdaxe-gamma"
             "braiins-bmm-101", "avalon-nano-3s", "hammer-bc04", "bitaxe-supra", "bitaxe-ultra",
             "bitaxe-naja-duo", "bitforge-nano", "heatbit-bitair", "bitaxe-gamma-hex", "nerdoctaxe", "hammer-thor-p2", "hammer-bc08", "futurebit-apollo-iii", "bitcube"]
 POOL_SET = ["avalon-nano-3s", "hammer-bc04", "heatbit-canvas", "heatbit-trio", "avalon-mini-3", "heatbit-maxi", "avalon-q",
-            "bitaxe-gamma-hex", "nerdoctaxe", "hammer-thor-p2", "hammer-bc08", "futurebit-apollo-iii", "gekko-kbox-22", "dcentral-stealthminer"]
+            "bitaxe-gamma-hex", "nerdoctaxe", "hammer-thor-p2", "hammer-bc08", "futurebit-apollo-iii", "gekko-kbox-22", "dcentral-stealthminer", "heatbit-bitwater"]
 HEAT_SET = ["avalon-nano-3s", "heatbit-canvas", "heatbit-trio", "avalon-mini-3", "heatbit-maxi", "avalon-q", "gekko-kbox-22", "dcentral-stealthminer"]
 CATS = [  # key, path, nav/tag label, h1, set, photo for the browse tile
     ("solo", "/solo-miners/", "Solo", "Best for solo mining", SOLO_SET, "bitaxe-gamma"),
@@ -506,6 +514,7 @@ MODEL_IMG = {
     "hammer-thor-p2": (800, 706, "Hammer Miner Thor P2 desk Bitcoin miner"),
     "hammer-bc08": (800, 738, "Hammer Miner BC08 desktop Bitcoin miner with touchscreen"),
     "gekko-kbox-22": (800, 457, "GekkoScience KBox 22 all-in-one Bitcoin miner and heater"),
+    "heatbit-bitwater": (800, 639, "Heatbit Bitwater water heater element with a built-in Bitcoin miner"),
     "bitcube": (800, 613, "Power Mining Bitcube cube Bitcoin miner with 777 GH/s on its touchscreen"),
 }
 MODEL_IMG = {k: v for k, v in MODEL_IMG.items() if (SITE / "img" / "models" / f"{k}.webp").exists()}
@@ -679,7 +688,7 @@ def header_html(path=""):
 
 FOOT_GROUPS = [
     ("Miners", [("/miners/", "All miners"), ("/solo-miners/", "Solo miners"), ("/pool-miners/", "Pool miners"), ("/heater-miners/", "Heater miners"),
-                ("/solo-odds/", "Solo odds"), ("/solo-wins/", "Solo wins"), ("/heat-calculator/", "Room heat calculator"), ("/deals/", "Deals"), ("/in-stock/", "In stock now"), ("/find-my-miner/", "Find my miner")]),
+                ("/solo-odds/", "Solo odds"), ("/solo-wins/", "Solo wins"), ("/heat-calculator/", "Room heat calculator"), ("/deals/", "Deals"), ("/price-per-th/", "Price per TH/s"), ("/in-stock/", "In stock now"), ("/find-my-miner/", "Find my miner")]),
     ("Help", [("/guides/", "Guides"), ("/best/", "Best for…"), ("/compare/", "Compare"), ("/sellers/", "Shops"),
               ("/where-to-buy-bitaxe/", "Where to buy"), ("/alerts/", "Price alerts"), ("/newsletter/", "Newsletter")]),
     ("About", [("/how-we-track/", "About & how we track"), ("/advertise/", "Advertise"), ("/bitaxe-black-friday/", "Black Friday 2026"), (f"mailto:{CONTACT}", CONTACT)]),
@@ -932,7 +941,7 @@ def build_model_page(mid):
             ("Power", f"≈ {m['watts']:g} W (seller-stated)"),
             ("Efficiency", f"≈ {jth(mid):.1f} J/TH · {ordinal(EFF_RANK[mid])} best of {RANK_N[mid]}" + (" home miners" if home else "")),
             (("Type", m["kind"]) if home else ("Chip", m["chip"])),
-            ("Price per TH/s", (f"{money(per_th)} · {ordinal(PTH_RANK[mid])} cheapest of {PTH_N[mid]}") if per_th else "n/a, none in stock"),
+            ("Price per TH/s", (f"{money(per_th)} · {ordinal(PTH_RANK[mid])} cheapest of {PTH_N[mid]} · {price_check(mid)[1]}") if per_th else "n/a, none in stock"),
             ("Energy", f"≈ {kwh_year(mid):,.0f} kWh a year if run 24/7")]
     if home:
         hw = m.get("heat_watts", m["watts"])
@@ -1251,7 +1260,7 @@ def build_where_to_buy():
 
 def deal_pills(current):
     return ('<nav class="browse" aria-label="Deals filter">' + "".join(f'<a href="{p}"' + (' aria-current="page"' if p == current else "") + f'>{l}</a>'
-            for p, l in (("/deals/", "All deals"), ("/in-stock/", "In stock only"))) + "</nav>")
+            for p, l in (("/deals/", "All deals"), ("/price-per-th/", "Price per TH/s"), ("/in-stock/", "In stock only"))) + "</nav>")
 
 
 def build_in_stock():
@@ -1672,6 +1681,7 @@ NOISE = {   # (max stated dB or 0 for fanless, text, source)
     "heatbit-bitair": (44, "25–44 dB stated", "Heatbit / Altair listings"),
     "gekko-kbox-22": (47, "About 38–47 dB stated, by mode", "Altair Technology listing"),
     "dcentral-stealthminer": (60, "Under 60 dB stated", "D-Central listing"),
+    "heatbit-bitwater": (0, "No fans; the water in the tank cools the chips (maker-stated)", "heatbit.com Bitwater page"),
 }
 
 
@@ -1834,6 +1844,7 @@ Bitaxe Radar is independent. Some shop links are affiliate links; they never cha
 - [Solo vs pool mining]({BASE}/guides/solo-vs-pool-mining/): solo is a lottery for a whole block; pool pays small, steady amounts.
 - [How heater miners work]({BASE}/guides/how-heater-miners-work/): a miner turns its electricity into heat like a space heater.
 - [Room heat calculator]({BASE}/heat-calculator/): room size in, heat needed (about 10 W per sq ft as a rule of thumb) and which tracked miners can heat it.
+- [Price per TH/s leaderboard]({BASE}/price-per-th/): miners ranked by price per stated TH/s at today's cheapest in-stock price, with J/TH and a check against the lowest price we have logged.
 - [Where to buy a Bitaxe]({BASE}/where-to-buy-bitaxe/)
 - [How we track prices]({BASE}/how-we-track/)
 - [All guides]({BASE}/guides/)
@@ -2197,9 +2208,12 @@ def heat_rank(heat_w, need_w):
     return {"fits": 0, "helps": 1, "big": 2, "small": 3}[heat_fit(heat_w, need_w)] * 1e6 + abs(heat_w - need_w)
 
 
+NOT_ROOM_HEAT = {"heatbit-bitwater"}   # heats a water tank, not the room
+
+
 def heat_candidates():
     """Miners that give off enough heat to matter in a room (100 W+), with a price a shopper can see."""
-    return [m for m in LIVE_TRACKED if draw_watts(m) >= 100 and show_price(m) is not None]
+    return [m for m in LIVE_TRACKED if draw_watts(m) >= 100 and show_price(m) is not None and m not in NOT_ROOM_HEAT]
 
 
 def build_heat_calc():
@@ -2252,6 +2266,104 @@ def build_heat_calc():
     app = {"@context": "https://schema.org", "@type": "WebApplication", "name": "Room heat calculator for Bitcoin heater miners", "url": BASE + path,
            "applicationCategory": "UtilitiesApplication", "operatingSystem": "Any", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "description": desc}
     layout(path, title, desc, body, crumbs=trail, jsonld=[app, faq_ld(faq)], scripts='<script src="/heat.js" defer></script>\n')
+
+# ---------------------------------------------------------------------------------------------
+# $/TH leaderboard (/price-per-th/): best value per stated TH/s, plus "is this a good price now?" from our own price log
+# ---------------------------------------------------------------------------------------------
+def model_price_low(mid):
+    """Lowest in-stock USD price we have logged for this model at any tracked shop, and when tracking started.
+    Non-USD points use today's conversion rate (same as the offer's current estimate)."""
+    lo, lo_t, first = None, None, None
+    for o in STATS[mid]["offers"]:
+        rate = (usd(o) / o["price"]) if usd(o) and o["price"] else None
+        if not rate:
+            continue
+        for pt in hist_pts(o["id"]):
+            first = pt["t"] if first is None or pt["t"] < first else first
+            if pt.get("in_stock") and pt.get("price"):
+                v = pt["price"] * rate
+                if lo is None or v < lo - 0.005:
+                    lo, lo_t = v, pt["t"]
+    return lo, lo_t, first
+
+
+def price_check(mid):
+    """(css class, short verdict) comparing today's cheapest in-stock price with the lowest we've logged."""
+    b = STATS[mid]["best"]
+    if not b:
+        return "", "Not in stock"
+    cur = usd(b)
+    lo, lo_t, first = model_price_low(mid)
+    if lo is None or first is None:
+        return "", "New, no history yet"
+    days = (GEN - parse_t(first)).days
+    if days < 2:
+        return "", f"Tracking since {fmt_day(first)}"
+    if cur <= lo + 0.01:
+        return "pc-low", f"Lowest since {fmt_day(first)}"
+    pct = (cur / lo - 1) * 100
+    if pct <= 5:
+        return "pc-near", f"Within {max(pct, 1):.0f}% of our low ({money(lo)})"
+    return "pc-high", f"{pct:.0f}% above our low of {money(lo)} ({fmt_day(lo_t)})"
+
+
+PTH_GROUPS = [("bitaxe", "Bitaxe and open-source miners", "Small boards and desk miners, mostly bought as a solo lottery ticket."),
+              ("home", "Home, heater and bigger miners", "Finished boxes, heaters and 10 TH/s+ home miners.")]
+
+
+def build_price_per_th():
+    path = "/price-per-th/"
+    trail = [("Home", "/"), ("Deals", "/deals/"), ("Price per TH/s", path)]
+    groups = {"bitaxe": [m for m in BITAXE_TRACKED if m in LIVE_TRACKED], "home": [m for m in HOME_TRACKED if m in LIVE_TRACKED]}
+    ranked_all, sections = [], []
+    for key, h2, sub in PTH_GROUPS:
+        ms = sorted([m for m in groups[key] if STATS[m]["per_th"]], key=lambda m: STATS[m]["per_th"])
+        if not ms:
+            continue
+        ranked_all += ms
+        rows = []
+        for i, mid in enumerate(ms, 1):
+            st, b = STATS[mid], STATS[mid]["best"]
+            cls, verdict = price_check(mid)
+            rows.append(f'<tr><td class="num">{i}</td><td><a href="/models/{mid}/">{esc(SHORT[mid])}</a><br><small>≈{MODELS[mid]["hashrate_ths"]:g} TH/s · ≈{MODELS[mid]["watts"]:,g} W</small></td>'
+                        f'<td class="num"><b>{money(st["per_th"])}</b></td><td class="num">{"≈ " if b["currency"] != "USD" else ""}{money(usd(b))}<br><small>{esc(sname(b["seller"]))}</small></td>'
+                        f'<td class="num">≈{jth(mid):.1f}</td><td><span class="pc {cls}">{esc(verdict)}</span></td><td>{offer_link(b, "View ↗")}</td></tr>')
+        sections.append(f'<section aria-labelledby="h-{key}"><h2 id="h-{key}">{esc(h2)}</h2><p class="hint">{esc(sub)}</p>'
+                        '<div class="tablewrap"><table><thead><tr><th class="num">#</th><th>Miner</th><th class="num">$ per TH/s</th><th class="num">Cheapest in stock</th>'
+                        f'<th class="num">J/TH</th><th>Price check</th><th>Buy</th></tr></thead><tbody>{"".join(rows)}</tbody></table></div></section>')
+    pre = sorted([m for m in LIVE_TRACKED if not STATS[m]["best"] and show_price(m) is not None], key=lambda m: show_price(m) / MODELS[m]["hashrate_ths"])
+    pre_rows = "".join(f'<tr><td><a href="/models/{m}/">{esc(SHORT[m])}</a></td><td class="num">{money(show_price(m) / MODELS[m]["hashrate_ths"])}</td>'
+                       f'<td class="num">{money(show_price(m))}</td><td class="num">≈{jth(m):.1f}</td><td>{badge(STATS[m]["low_any"]["stock_status"])}</td></tr>' for m in pre)
+    pre_html = (f'<section aria-labelledby="h-pre"><h2 id="h-pre">Pre-order and sold out</h2><p class="hint">Not in stock, so not ranked. The price per TH/s uses the lowest listed price.</p>'
+                '<div class="tablewrap"><table><thead><tr><th>Miner</th><th class="num">$ per TH/s</th><th class="num">Lowest listed</th><th class="num">J/TH</th><th>Status</th></tr></thead>'
+                f'<tbody>{pre_rows}</tbody></table></div></section>') if pre else ""
+    top = {k: next((m for m in ranked_all if m in groups[k]), None) for k in groups}
+    first_t = min((p["t"] for pts in history.values() for p in pts), default=latest["generated_at"])
+    lead = " ".join(f"Best value {lbl}: <strong>{esc(SHORT[m])}</strong> at {money(STATS[m]['per_th'])} per TH/s." for k, lbl in (("bitaxe", "small miner"), ("home", "home miner")) if (m := top.get(k)))
+    faq = [("What does price per TH/s mean?",
+            "The price you pay for each terahash per second of mining power: today's cheapest in-stock price divided by the hashrate the maker states. Lower means more hashrate for your money."),
+           ("Is the cheapest price per TH/s always the best buy?",
+            "Not always. J/TH (power per terahash) decides your electricity bill, which over a year can cost more than the miner. Noise, heat and size matter too. A cheap-per-TH miner that is loud or power hungry may not suit a bedroom."),
+           ("How do you know if a price is good right now?",
+            f"We log every tracked listing's price and stock about every 6 hours since {fmt_day(first_t)}. Price check compares today's cheapest in-stock price with the lowest in-stock price we have logged for that miner at any tracked shop. Our history is short, so it can't say whether a price is low for the year."),
+           ("Do you include shipping and tax?",
+            "No. Prices are before shipping, tax and import fees. Euro and Canadian-dollar prices are converted to US dollars as an estimate.")]
+    body = f"""<article>
+<header class="hero"><h1>Price per TH/s leaderboard</h1>
+{deal_pills(path)}
+<p class="lede">Which miners give you the most hashrate per dollar today, and whether today's price is a good one.</p>
+<p>{lead}</p>
+<p class="meta">Checked {tag_time(latest['generated_at'])} · updated every 6 hours · hashrate is the maker's stated figure</p></header>
+{"".join(sections)}
+{pre_html}
+<section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
+<section><h2>Related</h2><p><a href="/deals/">Best deals</a> · <a href="/in-stock/">In stock now</a> · <a href="/find-my-miner/">Find my miner</a> · <a href="/guides/is-home-mining-worth-it/">Is home mining worth it?</a> · <a href="/alerts/">Price alerts</a></p></section>
+</article>"""
+    title = f"Bitcoin miner price per TH/s: best value home miners ({fmt_day(GEN)}) | Bitaxe Radar"
+    desc = "Home Bitcoin miners ranked by price per TH/s at today's cheapest in-stock price, with J/TH and a price check against our own price log."
+    items = [(SHORT[m], f"/models/{m}/") for m in ranked_all]
+    layout(path, title, desc, body, crumbs=trail, jsonld=[itemlist("Bitcoin miners ranked by price per TH/s", items), faq_ld(faq)])
+
 
 
 def build_method():
@@ -2699,6 +2811,7 @@ def build_indexes():
           ("/solo-odds/", "Solo odds calculator", "Your real chance of finding a block."),
           ("/solo-wins/", "Solo block wins", "Recent blocks won by solo miners."),
           ("/heat-calculator/", "Room heat calculator", "Which heater miner fits your room."),
+          ("/price-per-th/", "Price per TH/s leaderboard", "Most hashrate per dollar, and is today's price good?"),
           ("/guides/solo-vs-pool-mining/", "Solo vs pool mining", "Lottery shot or small steady payouts?"),
           ("/guides/how-heater-miners-work/", "How heater miners work", "A miner that warms the room."),
           ("/where-to-buy-bitaxe/", "Where to buy a Bitaxe", "Every shop, ranked by today's price."),
@@ -2726,6 +2839,7 @@ def main():
     build_where_to_buy()
     build_in_stock()
     build_deals()
+    build_price_per_th()
     build_black_friday()
     build_redirect("/home-miners/", "/miners/", "All miners")
     build_miners()

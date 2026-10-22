@@ -388,3 +388,6 @@ details .tablewrap{margin-bottom:14px}
 .heatlist .f-helps{color:var(--muted);border:1px solid var(--line)}
 .heatlist .f-big{color:var(--warn);background:var(--warn-bg)}
 @media (max-width:700px){.heatlist li{grid-template-columns:1fr}.heatlist .hp,.heatlist .fit{justify-self:start;text-align:left}}
+/* price check chips (/price-per-th/) */
+.pc{display:inline-block;font-size:13px;font-weight:700;padding:3px 8px;border-radius:999px;background:var(--panel2);color:var(--muted);white-space:nowrap}
+.pc-low{color:var(--good);background:var(--good-bg)}.pc-near{color:var(--blue)}.pc-high{color:var(--warn);background:var(--warn-bg)}
