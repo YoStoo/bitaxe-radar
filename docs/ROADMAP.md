@@ -1,6 +1,6 @@
 # Bitaxe Radar Roadmap
 
-Updated: Oct 21, 2026
+Updated: Oct 22, 2026
 
 ## 🎯 Goal
 
@@ -10,12 +10,12 @@ Updated: Oct 21, 2026
 
 ## 🔨 Now
 
-- $/TH leaderboard: best value miners, plus price history ("is this a good price now?").
+- Seller facts table: where they ship from, warranty, how often "in stock" was true.
 
 ## ⏭️ Next up (in order)
 
-1. Seller facts table: where they ship from, warranty, how often "in stock" was true.
-2. Add more home miners: 79 found, 27 on the site so far.
+1. Add more home miners: 79 found, 28 on the site so far.
+2. Price-drop posts on X when the leaderboard shows a new low.
 3. Daily X posts and replies on @BitaxeRadar.
 4. Black Friday push in November (deals page live by about Nov 10, Black Friday is Nov 27).
 
@@ -73,13 +73,16 @@ Later:
 - Oct 21: Bitcube added (Power Mining's new cube miner, pre-order, delivery by Christmas): /models/bitcube/.
 - Oct 21: Solo odds calculator (/solo-odds/): your chance of finding a block per day, per year and over 5 years, for any hashrate or any miner we track.
 - Oct 21: Solo wins feed (/solo-wins/): recent blocks won by solo miners, days since the last win, and on solo miner pages the last win plus the last win by a miner that size (only when the winner reported it).
+- Oct 22: Heatbit Bitwater added (water heater element that mines, pre-order $899, ships Q1 2027): /models/heatbit-bitwater/.
+- Oct 22: Price per TH/s leaderboard (/price-per-th/): miners ranked by price per TH/s, with a price check ("lowest since Oct 16" or "% above our low"). Model pages show the price check too.
 - Oct 21: Room heat calculator (/heat-calculator/): type your room size, see how much heat it needs and which miners can heat it, with today's prices.
 
-## 📊 Numbers (Oct 21)
+## 📊 Numbers (Oct 22)
 
-- Revenue: $0
-- Visitors: about 17 views a day
-- Subscribers: 1
-- Miners tracked: 27
+- Revenue: $0 (no commission emails yet)
+- Visitors: unknown today (Cloudflare stats not readable from here)
+- Subscribers: unknown today (last count: 1)
+- X: 1 follower, 4 to 12 views per post
+- Miners tracked: 28
 - Sellers tracked: 10
-- Pages on the site: 70
+- Pages on the site: 72
