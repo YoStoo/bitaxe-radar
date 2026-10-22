@@ -10,14 +10,13 @@ Updated: Oct 22, 2026
 
 ## 🔨 Now
 
-- Seller facts table: where they ship from, warranty, how often "in stock" was true.
+- Add more home miners: 79 found, 28 on the site so far.
 
 ## ⏭️ Next up (in order)
 
-1. Add more home miners: 79 found, 28 on the site so far.
-2. Price-drop posts on X when the leaderboard shows a new low.
-3. Daily X posts and replies on @BitaxeRadar.
-4. Black Friday push in November (deals page live by about Nov 10, Black Friday is Nov 27).
+1. Price-drop posts on X when the leaderboard shows a new low.
+2. Daily X posts and replies on @BitaxeRadar.
+3. Black Friday push in November (deals page live by about Nov 10, Black Friday is Nov 27).
 
 ## 💰 Money
 
@@ -75,6 +74,7 @@ Later:
 - Oct 21: Solo wins feed (/solo-wins/): recent blocks won by solo miners, days since the last win, and on solo miner pages the last win plus the last win by a miner that size (only when the winner reported it).
 - Oct 22: Heatbit Bitwater added (water heater element that mines, pre-order $899, ships Q1 2027): /models/heatbit-bitwater/.
 - Oct 22: Price per TH/s leaderboard (/price-per-th/): miners ranked by price per TH/s, with a price check ("lowest since Oct 16" or "% above our low"). Model pages show the price check too.
+- Oct 22: Shop facts table (/sellers/ and each shop page): where each shop ships from, its warranty and returns as stated on its own site, and how often its miners were in stock when we checked.
 - Oct 21: Room heat calculator (/heat-calculator/): type your room size, see how much heat it needs and which miners can heat it, with today's prices.
 
 ## 📊 Numbers (Oct 22)

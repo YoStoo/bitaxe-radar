@@ -454,6 +454,53 @@ SELLER_COPY = {
                "Because VAT is included and shipping isn't, its dollar estimates aren't directly comparable to a US shop's pre-tax prices."]),
 }
 
+# Shop facts table (/sellers/ and each shop page). Only what the shop's own pages say (checked Oct 22, 2026);
+# None means we couldn't find it stated, and the page says so instead of guessing.
+SELLER_FACTS = {
+    "bitcoinmerch": dict(ships="United States", warranty=None, returns="30 days", src="https://bitcoinmerch.com/policies/refund-policy"),
+    "solosatoshi": dict(ships="Houston, Texas", warranty=None, returns=None, src=None),
+    "powermining": dict(ships="Europe (ships to the US and Canada)", warranty=None, returns=None, src=None),
+    "altair": dict(ships="St. Louis, Missouri", warranty="14 days against defects (items with a maker's warranty excluded)", returns=None, src="https://altairtech.io/refund_returns/"),
+    "heatbit": dict(ships=None, warranty="12 months from shipping", returns=None, src="https://heatbit.com/policies/refund-policy"),
+    "braiins": dict(ships="Warehouses in the US and the EU", warranty="2 years from delivery", returns=None, src="https://braiinsforge.com/terms"),
+    "dtv": dict(ships="United States", warranty=None, returns=None, src=None),
+    "futurebit": dict(ships="United States", warranty=None, returns="14 days", src="https://shop.futurebit.io/policies/refund-policy"),
+    "dcentral": dict(ships="Montreal, Canada", warranty="Defects reported within 30 days of delivery; in-house repair bench", returns="30 days for DOA or defects", src="https://d-central.tech/warranty/"),
+    "bitaxede": dict(ships="Europe (EU, Switzerland, Norway, Iceland, Liechtenstein only)", warranty=None, returns=None, src=None),
+}
+
+
+def stock_rate(sid):
+    """Share of all our checks of this shop's listings that found the item in stock (ready to ship)."""
+    pts = [p for oid, ps in history.items() if oid.split(":", 1)[0] == sid for p in ps]
+    if not pts:
+        return None
+    return dict(pct=round(100 * sum(1 for p in pts if p.get("in_stock")) / len(pts)), n=len(pts), first=min(p["t"] for p in pts))
+
+
+def facts_cells(sid):
+    f = SELLER_FACTS.get(sid, {})
+    nf = '<span class="cfg">Not stated</span>'
+    wr = esc(f["warranty"]) if f.get("warranty") else nf
+    if f.get("returns"):
+        wr += f'<br><span class="cfg">Returns: {esc(f["returns"])}</span>'
+    sr = stock_rate(sid)
+    rate = f'{sr["pct"]}%<br><span class="cfg">of {sr["n"]} checks</span>' if sr else "–"
+    return esc(f["ships"]) if f.get("ships") else nf, wr, rate
+
+
+def facts_table(sids):
+    rows = []
+    for sid in sids:
+        ships, wr, rate = facts_cells(sid)
+        rows.append(f'<tr><td><a href="/sellers/{sid}/">{esc(SELLERS[sid]["name"])}</a></td><td>{ships}</td><td>{wr}</td><td class="num">{rate}</td></tr>')
+    return ('<div class="tablewrap"><table class="facts"><thead><tr><th>Shop</th><th>Ships from</th><th>Warranty</th><th class="num">In stock when we checked</th></tr></thead>'
+            f'<tbody>{"".join(rows)}</tbody></table></div>')
+
+
+FACTS_NOTE = ('<p class="hint">Ships from and warranty come from each shop\'s own pages. "Not stated" means we couldn\'t find it, so ask the shop. '
+              'In stock counts every check of every miner the shop lists since we started tracking; pre-orders count as not in stock.</p>')
+
 # Same menu on every page, desktop and phone (docs/NAV_AUDIT.md): All miners · Deals · Find my miner · Guides + Alerts button
 NAV = [("/miners/", "All miners", "Miners"), ("/deals/", "Deals", "Deals"), ("/find-my-miner/", "Find my miner", "Find"), ("/guides/", "Guides", "Guides")]
 NAV_SECTIONS = {"/miners/": ("/miners/", "/solo-miners/", "/pool-miners/", "/heater-miners/", "/models/", "/home-miners/"),
@@ -1161,6 +1208,8 @@ def build_seller_page(sid):
     aff_txt = (f'<p class="hint">Links to {esc(s["name"])} are affiliate links: if you buy after clicking, we may earn a commission at no extra cost to you. It never changes how we rank prices.</p>'
                if aff else "")
     notes = "".join(f"<li>{esc(n)}</li>" for n in cp["notes"])
+    src = SELLER_FACTS.get(sid, {}).get("src")
+    src_txt = f'<p class="hint">Source: <a href="{esc(src)}" rel="nofollow noopener" target="_blank">{esc(s["name"])} policy page</a>.</p>' if src else ""
     unverified = '<p class="hint">Check the shop\'s own shipping, warranty and return pages before you pay.</p>'
     kind_txt = "heater and home miners" if all(is_home(o["model"]) for o in offs) else ("Bitaxe-family and home miners" if any(is_home(o["model"]) for o in offs) else "Bitaxe-family miners")
     title = f"{s['name']} miner prices and stock ({fmt_day(GEN)}) | Bitaxe Radar"
@@ -1170,6 +1219,7 @@ def build_seller_page(sid):
 <p class="meta">{summary}</p></header>
 <section aria-labelledby="h-p"><h2 id="h-p">What {esc(s['name'])} has right now</h2>{tbl}
 <p class="hint">Store: <a href="{esc(s['url'])}" rel="nofollow noopener" target="_blank">{esc(s['url'].replace('https://', ''))}</a>. Prices are before shipping and tax.</p></section>
+<section aria-labelledby="h-f"><h2 id="h-f">Shop facts</h2>{facts_table([sid])}{src_txt}{FACTS_NOTE}</section>
 <section aria-labelledby="h-n"><h2 id="h-n">Good to know</h2><ul>{notes}</ul>{unverified}{aff_txt}</section>
 <section aria-labelledby="h-l"><h2 id="h-l">Price log</h2><details class="more"><summary>Show price log</summary>{log}</details></section>
 <section><h2>See also</h2><ul class="links"><li><a href="/miners/">All home miners</a></li><li><a href="/where-to-buy-bitaxe/">Where to buy a Bitaxe</a></li><li><a href="/in-stock/">Everything in stock</a></li><li><a href="/deals/">Best deals</a></li></ul></section>
@@ -2778,16 +2828,18 @@ def build_indexes():
     layout("/models/", "All home Bitcoin miner models A to Z | Bitaxe Radar", f"An A to Z list of the {len(LIVE_TRACKED)} home Bitcoin miners Bitaxe Radar tracks, with today's lowest price.",
            body, crumbs=[("Home", "/"), ("All miners", "/miners/"), ("Models A to Z", "/models/")])
     # /sellers/
-    shops = []
+    shops, shop_ids = [], []
     for sid, s in SELLERS.items():
         if sid not in SELLER_COPY or not any(o["seller"] == sid for o in OFFERS):
             continue
+        shop_ids.append(sid)
         offs = [o for o in OFFERS if o["seller"] == sid]
         n_in = sum(1 for o in offs if in_stock(o))
         shops.append(f'<li><a class="shop" href="/sellers/{sid}/"><b>{esc(s["name"])}</b><span>{plural(len({o["model"] for o in offs}), "miner")} · {n_in} in stock · prices in {esc(s["currency"])}</span></a></li>')
     body = f"""<article><header class="hero"><h1>Shops we check</h1>
-<p class="lede">{len(shops)} shops, checked every 6 hours. Tap one to see everything it sells and its shipping notes.</p></header>
+<p class="lede">{len(shops)} shops, checked every 6 hours. Tap one to see everything it sells and its shipping notes, or compare them in the table below.</p></header>
 <ul class="shops">{"".join(shops)}</ul>
+<section aria-labelledby="h-f"><h2 id="h-f">Compare shops</h2>{facts_table(shop_ids)}{FACTS_NOTE}</section>
 <p><a href="/where-to-buy-bitaxe/">Where to buy a Bitaxe</a> · <a href="/how-we-track/">How we pick shops</a></p></article>"""
     layout("/sellers/", "Shops we check for home Bitcoin miners | Bitaxe Radar", f"The {len(shops)} US, Canadian and EU shops Bitaxe Radar checks every 6 hours for home Bitcoin miner prices and stock.",
            body, crumbs=[("Home", "/"), ("Shops", "/sellers/")])

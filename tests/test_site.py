@@ -419,6 +419,16 @@ class NavBuildTests(unittest.TestCase):
         self.assertIn("Every home Bitcoin miner, <span", home)
         self.assertIn('href="/find-my-miner/"', home.split("</section>")[0])
 
+    def test_seller_facts_table(self):
+        idx = self.read("/sellers/")
+        self.assertIn('<table class="facts">', idx)
+        self.assertIn("Ships from", idx)
+        self.assertIn("St. Louis, Missouri", idx)
+        self.assertRegex(idx, r"\d+%<br><span class=\"cfg\">of \d+ checks")
+        page = self.read("/sellers/altair/")
+        self.assertIn("Shop facts", page)
+        self.assertIn("14 days against defects", page)
+
     def test_breadcrumbs(self):
         crumbs = lambda h: re.findall(r'<a href="([^"]+)">', re.search(r'<nav class="crumbs"[^>]*>(.*?)</nav>', h, re.S).group(1))
         self.assertEqual(crumbs(self.read("/models/bitaxe-gamma/")), ["/", "/miners/", "/solo-miners/"])
