@@ -1,6 +1,6 @@
 # Bitaxe Radar Roadmap
 
-Updated: Oct 22, 2026
+Updated: Oct 23, 2026
 
 ## 🎯 Goal
 
@@ -10,7 +10,7 @@ Updated: Oct 22, 2026
 
 ## 🔨 Now
 
-- Add more home miners: 79 found, 28 on the site so far.
+- Add more home miners: 79 found, 29 on the site so far.
 
 ## ⏭️ Next up (in order)
 
@@ -75,14 +75,16 @@ Later:
 - Oct 22: Heatbit Bitwater added (water heater element that mines, pre-order $899, ships Q1 2027): /models/heatbit-bitwater/.
 - Oct 22: Price per TH/s leaderboard (/price-per-th/): miners ranked by price per TH/s, with a price check ("lowest since Oct 16" or "% above our low"). Model pages show the price check too.
 - Oct 22: Shop facts table (/sellers/ and each shop page): where each shop ships from, its warranty and returns as stated on its own site, and how often its miners were in stock when we checked.
+- Oct 23: NMQAxe++ Nexus added (NMMiner's new 2-chip desk miner, ~8.5 TH/s at ~110 W, $399, in stock): /models/nmqaxe-nexus/. NMMiner is our 11th shop (/sellers/nmminer/).
+- Oct 23: Avalon Nano 3S now also tracked at Power Mining (our paying affiliate) and Bitcoin Merch, so it shows 4 shops.
 - Oct 21: Room heat calculator (/heat-calculator/): type your room size, see how much heat it needs and which miners can heat it, with today's prices.
 
-## 📊 Numbers (Oct 22)
+## 📊 Numbers (Oct 23)
 
 - Revenue: $0 (no commission emails yet)
 - Visitors: unknown today (Cloudflare stats not readable from here)
-- Subscribers: unknown today (last count: 1)
+- Subscribers: 1 confirmed (from the 6-hourly alert run)
 - X: 1 follower, 4 to 12 views per post
-- Miners tracked: 28
-- Sellers tracked: 10
-- Pages on the site: 72
+- Miners tracked: 29
+- Sellers tracked: 11
+- Pages on the site: 74
