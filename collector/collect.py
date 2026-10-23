@@ -83,6 +83,10 @@ MODELS = {
     "heatbit-bitwater": {"name": "Heatbit Bitwater", "category": "home", "kind": "Water heater miner (tank element)", "maker": "Heatbit",
                          "chip": "BM1370 x20", "hashrate_ths": 34, "watts": 600,
                          "note": "Maker-stated up to 34 TH/s and up to 600 W, from 12 J/TH; replaces the lower element of a 30-80 gal electric water heater"},
+    # added 2026-10-23: NMMiner's dual-BM1373 desk miner (listed Sep 29, shipping since Oct 20). Normal mode figures, not Turbo.
+    "nmqaxe-nexus":     {"name": "NMMiner NMQAxe++ Nexus", "category": "home", "kind": "Desk miner", "maker": "NMMiner",
+                         "chip": "2x BM1373", "hashrate_ths": 8.5, "watts": 110,
+                         "note": "Maker-stated ~8.5 TH/s at ~110 W in Normal mode (Eco ~6 TH/s at ~63 W; Turbo ~11 TH/s at ~172 W)"},
 }
 # hashrate_ths / watts above are typical VENDOR-STATED figures used only for the cost estimate.
 # They are approximate and must be labelled as such on the site.
@@ -106,6 +110,8 @@ SELLERS = {
                      "affiliate": "Applied; under review - plain links only"},
     "futurebit":    {"name": "FutureBit", "url": "https://shop.futurebit.io", "currency": "USD", "method": "Shopify products.json",
                      "affiliate": "None known"},
+    "nmminer":      {"name": "NMMiner", "url": "https://www.nmminer.com", "currency": "USD", "method": "WooCommerce Store API (variation-level stock)",
+                     "affiliate": "None known"},
     "dcentral":     {"name": "D-Central", "url": "https://d-central.tech", "currency": "CAD", "method": "WooCommerce Store API",
                      "affiliate": "Applied Oct 21; not yet approved - plain links only"},
 }
@@ -126,6 +132,7 @@ BITCOINMERCH = {  # Shopify handle
     "heatbit-bitair":   "bitcoin-merch®-heatbit-bitair-air-purifier-bitcoin-miner",
     "hammer-thor-p2":   "bitcoin-merch®-hammer-miner-thor-p2-10th-s-lottery-miner-w-power-supply",
     "gekko-kbox-22":    "bitcoin-merch®-gekkoscience-kbox-22th-s-bitcoin-miner-heater",
+    "avalon-nano-3s":   "bitcoin-merch-avalon-nano-3s-bitcoin-miner-6-th-s",
 }
 SOLOSATOSHI = {  # WooCommerce slug
     "bitaxe-supra":     "bitaxe-supra",
@@ -152,6 +159,7 @@ POWERMINING = {  # Shopify handle
     "nerdaxe-gamma": "nerdaxe-gamma",
     "nerdqaxe-pp":   "nerdqaxe",
     "bitcube":       "bitcube",
+    "avalon-nano-3s": "canaan-avalon-nano-3s",
 }
 
 ALTAIR = {  # product slug -> (variation attribute filter or None)
@@ -175,6 +183,7 @@ BRAIINS = {"braiins-bmm-101": "bmm-101"}       # braiinsforge.com/products/<slug
 DCENTRAL = {"avalon-mini-3": "canaan-avalon-mini-3", "nerdoctaxe": "the-nerdoctaxe-gamma",
             "dcentral-stealthminer": "the-stealthminer"}  # WooCommerce slug
 DTV = {"bitforge-nano": "bitforge-nano"}             # WooCommerce slug
+NMMINER = {"nmqaxe-nexus": ("nmqaxe-nexus", "US")}   # WooCommerce slug, adapter variant
 FUTUREBIT = {"futurebit-apollo-iii": "apollo-iii-standard"}   # Shopify handle (miner-only version)
 # Every listing title for a home miner must contain these words (lower-case), or the listing is skipped as a possible mis-match.
 TITLE_MUST = {
@@ -185,6 +194,7 @@ TITLE_MUST = {
     "bitaxe-gamma-hex": ["hex", "1300"], "bitaxe-naja-duo": ["naja duo"], "nerdoctaxe": ["nerdoctaxe"],
     "bitforge-nano": ["bitforge nano"], "heatbit-bitair": ["bitair"], "heatbit-bitwater": ["bitwater"], "futurebit-apollo-iii": ["apollo iii"],
     "hammer-thor-p2": ["thor p2"], "hammer-bc08": ["bc08"], "gekko-kbox-22": ["kbox"], "dcentral-stealthminer": ["stealthminer"],
+    "nmqaxe-nexus": ["nmqaxe", "nexus"],
 }
 TITLE_NOT = {  # words that mean a different product (accessory, other edition)
     "bitforge-nano": ["ghost"], "nerdoctaxe": ["stand", "screen", "fan", "heatsink", "hydro"], "bitaxe-naja-duo": ["stand", ".stl"],
@@ -452,6 +462,7 @@ def collect_powermining(ts):
         ship = (re.search(r"Shipping [^.!]{0,60}\d{4}!?", text) or re.search(r"Christmas delivery", text, flags=re.I)) if pre else None
         status = "preorder" if pre else ("in_stock" if avail else "out_of_stock")
         cfg = (f"Variant: {v['title']}; USB-C power supply and cable in the box; US price, no VAT (EU buyers pay 21% VAT on top); shipping extra" if model == "bitcube"
+               else f"Variant: {v['title']}; page says a 140 W power supply is included; US price, no VAT (EU buyers pay 21% VAT on top); shipping extra" if model == "avalon-nano-3s"
                else f"Variant: {v['title']}; page lists power supply + stand in the box; US price, no VAT (EU buyers pay 21% VAT on top); shipping extra")
         out.append(offer("powermining", model, p["title"], url, v["price"], "EUR", status,
                          bool(avail) and not pre, cfg, ts, url,
@@ -590,6 +601,28 @@ def collect_dtv(ts):
     return out, missing
 
 
+def collect_nmminer(ts):
+    base = SELLERS["nmminer"]["url"]
+    api = f"{base}/wp-json/wc/store/v1/products"
+    out, missing = [], []
+    for model, (slug, plug) in NMMINER.items():
+        res = get_json(f"{api}?slug={urllib.parse.quote(slug)}")
+        if not res or not title_ok(model, res[0]["name"]): missing.append(model); continue
+        p = res[0]
+        # product-level is_in_stock can be wrong for variable products: read the US-adapter variation itself
+        var = next((v for v in p.get("variations", []) if any(a["value"] == plug for a in v["attributes"])), None)
+        d = get_json(f"{api}/{var['id']}") if var else p
+        pr = d["prices"]
+        price = int(pr["price"]) / 10 ** pr["currency_minor_unit"]
+        if pr["currency_code"] != "USD" or price <= 0: missing.append(model); continue
+        status = woo_status(d)
+        reg = int(pr.get("regular_price") or 0) / 10 ** pr["currency_minor_unit"]
+        out.append(offer("nmminer", model, re.sub(r"&#8212;|&#8211;", "-", p["name"]), p["permalink"], price, "USD", status, status == "in_stock",
+                         f"Adapter: {plug}; sold direct by the maker; shipping and tax extra", ts, f"{api}?slug={slug}",
+                         {"compare_at": reg if reg > price else None, "image_src": (p.get("images") or [{}])[0].get("src")}))
+    return out, missing
+
+
 def collect_futurebit(ts):
     base = SELLERS["futurebit"]["url"]
     by_handle = {p["handle"]: p for p in fetch_shopify_all(base)}
@@ -612,7 +645,7 @@ def collect_futurebit(ts):
 ADAPTERS = {"bitcoinmerch": collect_bitcoinmerch, "solosatoshi": collect_solosatoshi,
             "bitaxede": collect_bitaxede, "powermining": collect_powermining,
             "altair": collect_altair, "heatbit": collect_heatbit, "braiins": collect_braiins, "dcentral": collect_dcentral,
-            "dtv": collect_dtv, "futurebit": collect_futurebit}
+            "dtv": collect_dtv, "futurebit": collect_futurebit, "nmminer": collect_nmminer}
 
 
 def fetch_fx():

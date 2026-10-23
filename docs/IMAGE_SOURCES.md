@@ -66,3 +66,9 @@ No photo (drawn placeholder kept):
 | File | Model | Seller | Product title checked | Original image URL |
 |---|---|---|---|---|
 | heatbit-bitwater.webp | Heatbit Bitwater (element with controller board) | Heatbit, the maker (Shopify `products/bitwater.json`, "02-bitwater-element" image; white background removed, trimmed) | Bitwater – Water Heater Element That Mines Bitcoin | https://cdn.shopify.com/s/files/1/0382/4127/1943/files/02-bitwater-element_8bf2aecb-c998-4ad4-9185-bab65de56737.jpg |
+
+## NMQAxe++ Nexus (added 2026-10-23)
+
+| File | Model | Seller | Product title checked | Original image URL |
+|---|---|---|---|---|
+| nmqaxe-nexus.webp | NMMiner NMQAxe++ Nexus (front, screen and cooler) | NMMiner, the maker (WooCommerce Store API, first image, already transparent; trimmed) | NMQAxe++ Nexus — Powerful Dual BM1373 Bitcoin Miner | https://www.nmminer.com/wp-content/uploads/2026/09/NMQAxe-Nexus-01-Front.png |

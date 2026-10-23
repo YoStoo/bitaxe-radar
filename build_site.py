@@ -192,7 +192,7 @@ SHORT = {"bitaxe-supra": "Bitaxe Supra", "bitaxe-ultra": "Bitaxe Ultra", "bitaxe
          "heatbit-maxi": "Heatbit Maxi", "heatbit-canvas": "Heatbit Canvas", "braiins-bmm-101": "Braiins Mini Miner", "hammer-bc04": "Hammer BC04",
          "bitaxe-gamma-hex": "Bitaxe Gamma Hex", "bitaxe-naja-duo": "Bitaxe Naja Duo", "nerdoctaxe": "NerdOCTaxe Gamma", "bitforge-nano": "BitForge Nano",
          "heatbit-bitair": "Heatbit Bitair", "futurebit-apollo-iii": "FutureBit Apollo III", "hammer-thor-p2": "Hammer Thor P2", "hammer-bc08": "Hammer BC08",
-         "gekko-kbox-22": "GekkoScience KBox 22", "dcentral-stealthminer": "D-Central StealthMiner", "bitcube": "Bitcube", "heatbit-bitwater": "Heatbit Bitwater"}
+         "gekko-kbox-22": "GekkoScience KBox 22", "dcentral-stealthminer": "D-Central StealthMiner", "bitcube": "Bitcube", "heatbit-bitwater": "Heatbit Bitwater", "nmqaxe-nexus": "NMQAxe++ Nexus"}
 NOINDEX_MODELS = {"bitaxe-supra", "bitaxe-ultra"}   # older generations: pages exist for completeness but stay out of the index/sitemap
 
 MODEL_COPY = {
@@ -371,6 +371,13 @@ NEW_COPY = {   # added 2026-10-21 (docs/MINER_CATALOG.md). Stock settings only; 
                "It replaces the lower element; the upper element and thermostat stay. Heatbit says install takes 30 to 45 minutes, and the controller plugs into a normal outlet.",
                "It only mines while your tank needs heat, so real hashrate depends on how much hot water you use.",
                "Mines solo to your own address by default, or to any pool. 1-year warranty."]),
+    "nmqaxe-nexus": dict(
+        intro="The NMQAxe++ Nexus is a desk miner from NMMiner with two Bitmain BM1373 chips, a color screen and a big tower cooler. NMMiner states three modes: Eco about 6 TH/s at about 63 W, Normal about 8.5 TH/s at about 110 W, and Turbo about 11 TH/s at about 172 W. We use the Normal figures here.",
+        who="Someone who wants a step up from a Bitaxe or NerdQaxe++ for solo mining, or a small, steady pool miner, on a normal desk outlet.",
+        check=["It's sold direct by NMMiner. Its store page says it's available now and ships within 24 hours.",
+               "Its listing says it runs on a 12 V / 15 A adapter (180 W max), and you pick the plug type (US, EU, UK or AUS) at checkout.",
+               "The shop's pages don't say where orders ship from, and we couldn't find a warranty stated. Ask the shop before you buy.",
+               "Turbo mode means more heat and fan noise. The listing doesn't state a noise level."]),
 }
 MODEL_COPY.update(NEW_COPY)
 
@@ -441,6 +448,11 @@ SELLER_COPY = {
         region="USD prices (sold direct)",
         about="FutureBit's own store. FutureBit designs and assembles the Apollo home miners in the USA.",
         notes=["Some Apollo listings ship in several weeks; the listing says how long.", "Prices are before shipping and sales tax."]),
+    "nmminer": dict(
+        region="USD prices (sold direct)",
+        about="NMMiner's own store. NMMiner makes the NMAxe and NMQAxe++ miners and the NMMiner ESP32 lottery miners, and sells them in US dollars.",
+        notes=["We track the US-plug version.", "Its pages don't say where orders ship from, so check delivery time and any import fees at checkout.",
+               "Prices are before shipping and sales tax."]),
     "dcentral": dict(
         region="CAD prices (ships from Canada)",
         about="A Canadian shop that sells miners, heater builds and parts, priced in Canadian dollars.",
@@ -465,6 +477,7 @@ SELLER_FACTS = {
     "braiins": dict(ships="Warehouses in the US and the EU", warranty="2 years from delivery", returns=None, src="https://braiinsforge.com/terms"),
     "dtv": dict(ships="United States", warranty=None, returns=None, src=None),
     "futurebit": dict(ships="United States", warranty=None, returns="14 days", src="https://shop.futurebit.io/policies/refund-policy"),
+    "nmminer": dict(ships=None, warranty=None, returns="30 days, unused and in original packaging", src="https://www.nmminer.com/refund_returns/"),
     "dcentral": dict(ships="Montreal, Canada", warranty="Defects reported within 30 days of delivery; in-house repair bench", returns="30 days for DOA or defects", src="https://d-central.tech/warranty/"),
     "bitaxede": dict(ships="Europe (EU, Switzerland, Norway, Iceland, Liechtenstein only)", warranty=None, returns=None, src=None),
 }
@@ -510,9 +523,9 @@ NAV_SECTIONS = {"/miners/": ("/miners/", "/solo-miners/", "/pool-miners/", "/hea
 # Browse-by-type categories. Any miner can solo or pool mine; these say what each is best suited to. A miner can be in several.
 SOLO_SET = ["bitaxe-gamma", "bitaxe-gamma-duo", "bitaxe-gt-801", "nerdaxe-gamma", "nerdaxe-gaia", "nerdqaxe-pp",
             "braiins-bmm-101", "avalon-nano-3s", "hammer-bc04", "bitaxe-supra", "bitaxe-ultra",
-            "bitaxe-naja-duo", "bitforge-nano", "heatbit-bitair", "bitaxe-gamma-hex", "nerdoctaxe", "hammer-thor-p2", "hammer-bc08", "futurebit-apollo-iii", "bitcube"]
+            "bitaxe-naja-duo", "bitforge-nano", "heatbit-bitair", "bitaxe-gamma-hex", "nerdoctaxe", "hammer-thor-p2", "hammer-bc08", "futurebit-apollo-iii", "bitcube", "nmqaxe-nexus"]
 POOL_SET = ["avalon-nano-3s", "hammer-bc04", "heatbit-canvas", "heatbit-trio", "avalon-mini-3", "heatbit-maxi", "avalon-q",
-            "bitaxe-gamma-hex", "nerdoctaxe", "hammer-thor-p2", "hammer-bc08", "futurebit-apollo-iii", "gekko-kbox-22", "dcentral-stealthminer", "heatbit-bitwater"]
+            "bitaxe-gamma-hex", "nerdoctaxe", "hammer-thor-p2", "hammer-bc08", "futurebit-apollo-iii", "gekko-kbox-22", "dcentral-stealthminer", "heatbit-bitwater", "nmqaxe-nexus"]
 HEAT_SET = ["avalon-nano-3s", "heatbit-canvas", "heatbit-trio", "avalon-mini-3", "heatbit-maxi", "avalon-q", "gekko-kbox-22", "dcentral-stealthminer"]
 CATS = [  # key, path, nav/tag label, h1, set, photo for the browse tile
     ("solo", "/solo-miners/", "Solo", "Best for solo mining", SOLO_SET, "bitaxe-gamma"),
@@ -562,6 +575,7 @@ MODEL_IMG = {
     "hammer-bc08": (800, 738, "Hammer Miner BC08 desktop Bitcoin miner with touchscreen"),
     "gekko-kbox-22": (800, 457, "GekkoScience KBox 22 all-in-one Bitcoin miner and heater"),
     "heatbit-bitwater": (800, 639, "Heatbit Bitwater water heater element with a built-in Bitcoin miner"),
+    "nmqaxe-nexus": (495, 800, "NMMiner NMQAxe++ Nexus desk Bitcoin miner with a color screen and tower cooler"),
     "bitcube": (800, 613, "Power Mining Bitcube cube Bitcoin miner with 777 GH/s on its touchscreen"),
 }
 MODEL_IMG = {k: v for k, v in MODEL_IMG.items() if (SITE / "img" / "models" / f"{k}.webp").exists()}
@@ -1458,7 +1472,7 @@ def build_black_friday():
 # HEATER & HOME MINERS hub + plain-language guides
 # ---------------------------------------------------------------------------------------------
 HEATER_GROUP = ["avalon-mini-3", "avalon-q", "heatbit-trio", "heatbit-maxi", "heatbit-canvas", "gekko-kbox-22", "dcentral-stealthminer"]
-DESK_GROUP = ["avalon-nano-3s", "hammer-bc04", "braiins-bmm-101", "heatbit-bitair", "bitcube", "futurebit-apollo-iii", "hammer-thor-p2", "hammer-bc08"]
+DESK_GROUP = ["avalon-nano-3s", "hammer-bc04", "braiins-bmm-101", "heatbit-bitair", "bitcube", "futurebit-apollo-iii", "hammer-thor-p2", "hammer-bc08", "nmqaxe-nexus"]
 GUIDE_UPDATED = "2026-10-21"
 NETWORK_EH_SEEN = "about 1,050 EH/s"       # mempool.space /api/v1/mining/hashrate/3d on 2026-10-21 (see docs/HOME_MINING_HUB_PLAN.md)
 
