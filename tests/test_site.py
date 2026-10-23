@@ -102,7 +102,7 @@ class SiteTests(unittest.TestCase):
             titles[p.title] = path
             d = p.meta.get("description", "")
             self.assertFalse(p.title.endswith("…"), f"{path} title was truncated")
-            if path in ("/404.html", "/home-miners/"):     # 404 and the redirect stub (canonical points at /miners/)
+            if path in ("/404.html", "/home-miners/", "/about/"):     # 404 and the redirect stub (canonical points at /miners/)
                 continue
             self.assertFalse(d.endswith("…"), f"{path} description was truncated")
             self.assertTrue(70 <= len(d) <= 165, f"{path} description length {len(d)}")
@@ -273,7 +273,7 @@ class SiteTests(unittest.TestCase):
         # one menu on every page: All miners · Deals · Find my miner · Guides + Alerts, no sideways scroller
         want = ["/miners/", "/deals/", "/find-my-miner/", "/guides/", "/alerts/"]
         for f in list(SITE.rglob("*.html")):
-            if f.parent.name == "home-miners":
+            if f.parent.name in ("home-miners", "about"):
                 continue
             nav = re.search(r'<nav aria-label="Main">(.*?)</nav>', f.read_text(), re.S)
             self.assertIsNotNone(nav, str(f))
@@ -347,9 +347,9 @@ class SiteTests(unittest.TestCase):
         self.assertIn("Estimate. Changes with Bitcoin price and network difficulty.", g)
         self.assertIn("$0.15/kWh", g)
         q = (SITE / "models" / "avalon-q" / "index.html").read_text()
-        self.assertIn("heat offsets part", q)
+        self.assertIn("heat offsets this", q)
         self.assertNotIn("Solo block chance", q)
-        self.assertIn('class="earn"', (SITE / "index.html").read_text())
+        self.assertIn('class="cardline"', (SITE / "index.html").read_text())
 
     def test_best_for_pages_and_llms(self):
         best = sorted(p for p in self.pages if p.startswith("/best/") and p != "/best/")
@@ -416,7 +416,7 @@ class NavBuildTests(unittest.TestCase):
         self.assertGreaterEqual(m.count("data-price="), 20)
         self.assertIn('id="signup"', self.read("/alerts/"))
         home = self.read("/")
-        self.assertIn("Every home Bitcoin miner, <span", home)
+        self.assertRegex(home, r"<h1>Home Bitcoin miners, <span class=\"hl\">price-checked</span> across \d+ shops\.</h1>")
         self.assertIn('href="/find-my-miner/"', home.split("</section>")[0])
 
     def test_seller_facts_table(self):

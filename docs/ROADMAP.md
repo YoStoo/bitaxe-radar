@@ -11,6 +11,7 @@ Updated: Oct 23, 2026
 ## 🔨 Now
 
 - Add more home miners: 79 found, 29 on the site so far.
+- Add next: Bitaxe 702, NerdQX, Avalon Nano 3.
 
 ## ⏭️ Next up (in order)
 
@@ -77,6 +78,16 @@ Later:
 - Oct 22: Shop facts table (/sellers/ and each shop page): where each shop ships from, its warranty and returns as stated on its own site, and how often its miners were in stock when we checked.
 - Oct 23: NMQAxe++ Nexus added (NMMiner's new 2-chip desk miner, ~8.5 TH/s at ~110 W, $399, in stock): /models/nmqaxe-nexus/. NMMiner is our 11th shop (/sellers/nmminer/).
 - Oct 23: Avalon Nano 3S now also tracked at Power Mining (our paying affiliate) and Bitcoin Merch, so it shows 4 shops.
+- Oct 23: Fixes from a fresh-eyes site review:
+  - Miner cards show a plain grey line ("≈$2/mo power · 1 in 17,000/yr block odds") instead of a red "costs more than it earns". The pool-vs-power figure is now only on model pages, labelled "If you pool mine".
+  - Heater math uses mining watts. Heatbit Trio: 400 W, not 1,500 W, so its break-even price is about $0.03/kWh, not $0.008. Heater pages show one net number once the heat you'd buy anyway is counted.
+  - "Today's best prices" on the home page: one Bitaxe-class miner per size, best price per TH/s, US shops first, no same-spec copies.
+  - Find my miner keeps to your budget and skips same-spec copies.
+  - Headline: "Home Bitcoin miners, price-checked across 11 shops". Miner and shop counts come from the data.
+  - Times shown in US Eastern (ET) instead of UTC.
+  - /about/ now goes to /how-we-track/.
+  - Black Friday page wording toned down until we have more price history.
+  - Shop pages: the "Store" link now uses our affiliate code where we have one (Power Mining).
 - Oct 21: Room heat calculator (/heat-calculator/): type your room size, see how much heat it needs and which miners can heat it, with today's prices.
 
 ## 📊 Numbers (Oct 23)

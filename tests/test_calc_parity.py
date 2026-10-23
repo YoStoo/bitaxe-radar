@@ -23,7 +23,7 @@ def miners():
     latest = json.loads((ROOT / "data" / "latest.json").read_text())
     out = []
     for m in latest["models"].values():
-        out.append((float(m["hashrate_ths"]), float(m.get("heat_watts", m["watts"]))))
+        out.append((float(m["hashrate_ths"]), float(m["watts"])))   # economics use mining watts, never heater-mode draw
     return out + [(0.5, 5.0), (1000.0, 3000.0), (0.0001, 1.0)]
 
 
@@ -92,14 +92,19 @@ class CalcPages(unittest.TestCase):
             self.assertIn(" hidden>", h.split('<form class="ratebox"')[1][:30], p)     # hidden until JS runs
             self.assertIn('src="/calc.js"', h, p)
             self.assertIn("window.RADAR_NET=", h, p)
-            self.assertRegex(h, r'data-calc="net(num)?"[^>]*>(Costs about|Earns about|About breaks even|[+−$])', p)
+            if p.startswith(("/models/", "/guides/")):     # the pool-vs-power net only appears on model pages and guides
+                self.assertRegex(h, r'data-calc="net(num)?"[^>]*>(Costs about|Earns about|About breaks even|[+−$])', p)
+            else:                                            # cards: a neutral running-cost line, no red verdict
+                self.assertIn('data-calc="power"', h, p)
+                self.assertNotRegex(h, r'class="card[^"]*".*?data-calc="net"', p)
         self.assertIn("Break-even power price: <b>about $", g)
-        self.assertNotIn("Heat you'd pay for anyway", g)
+        self.assertNotIn("heat you'd pay for anyway", g)
         q = self.read("/models/avalon-q/")
-        self.assertIn("Heat you'd pay for anyway", q)
+        self.assertIn("As a heater: power", q)
+        self.assertIn("heat you'd pay for anyway", q)
         self.assertIn("space heater", q)
         heat = self.read("/heater-miners/")
-        self.assertIn("Heat you'd pay for anyway", heat)
+        self.assertIn("as a heater, nets", heat)
         # the no-JS default matches the Python math
         net = json.loads((ROOT / "data" / "network.json").read_text())
         self.assertIn(E.net_words(1.2, 18.0, net, 0.15), g)

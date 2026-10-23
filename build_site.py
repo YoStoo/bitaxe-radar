@@ -19,6 +19,7 @@ import html as _html
 import json
 import math
 import re
+from zoneinfo import ZoneInfo
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -87,9 +88,13 @@ def money(v, cur="USD"):
     return {"USD": "$", "EUR": "€", "CAD": "CA$"}.get(cur, cur + " ") + f"{v:,.2f}"
 
 
+ET = ZoneInfo("America/New_York")
+
+
 def fmt_time(iso):
-    d = parse_t(iso)
-    return f"{d:%b} {d.day}, {d.year} {d:%H:%M} UTC"
+    """Shown in US Eastern, where most visitors are: 'Oct 23, 2026 8:44 AM ET'."""
+    d = parse_t(iso).astimezone(ET)
+    return f"{d:%b} {d.day}, {d.year} {d.hour % 12 or 12}:{d:%M} {'AM' if d.hour < 12 else 'PM'} ET"
 
 
 def fmt_day(iso_or_dt):
@@ -136,6 +141,16 @@ def aff_param(sid):
 def offer_href(o):
     p = aff_param(o["seller"])
     return o["url"] + (("&" if "?" in o["url"] else "?") + p) if p else o["url"]
+
+
+def store_link(sid):
+    """Link to a shop's home page, with its affiliate code when it has one (same logic as product links)."""
+    s = SELLERS[sid]
+    aff = aff_param(sid)
+    rel = "sponsored nofollow noopener" if aff else "nofollow noopener"
+    href = offer_href(dict(seller=sid, url=s["url"]))
+    return (f'<a href="{esc(href)}" rel="{rel}" target="_blank">{esc(s["url"].replace("https://", "").rstrip("/"))}</a>'
+            + (' <span class="ph">affiliate link</span>' if aff else ""))
 
 
 def offer_link(o, text=None, cls="btn"):
@@ -1232,7 +1247,7 @@ def build_seller_page(sid):
 <header class="hero"><h1>{esc(s['name'])}: prices and stock</h1><p class="lede">{esc(cp['about'])}</p>
 <p class="meta">{summary}</p></header>
 <section aria-labelledby="h-p"><h2 id="h-p">What {esc(s['name'])} has right now</h2>{tbl}
-<p class="hint">Store: <a href="{esc(s['url'])}" rel="nofollow noopener" target="_blank">{esc(s['url'].replace('https://', ''))}</a>. Prices are before shipping and tax.</p></section>
+<p class="hint">Store: {store_link(sid)}. Prices are before shipping and tax.</p></section>
 <section aria-labelledby="h-f"><h2 id="h-f">Shop facts</h2>{facts_table([sid])}{src_txt}{FACTS_NOTE}</section>
 <section aria-labelledby="h-n"><h2 id="h-n">Good to know</h2><ul>{notes}</ul>{unverified}{aff_txt}</section>
 <section aria-labelledby="h-l"><h2 id="h-l">Price log</h2><details class="more"><summary>Show price log</summary>{log}</details></section>
@@ -1268,6 +1283,7 @@ def model_summary_table(models, *, usd_only=False):
 
 
 CURRENT_MODELS = [m for m in CORE_TRACKED if m not in NOINDEX_MODELS]
+N_MODELS = len([m for m in TRACKED if m not in NOINDEX_MODELS])   # the one model count shown anywhere on the site
 
 
 def build_where_to_buy():
@@ -1318,7 +1334,7 @@ def build_where_to_buy():
 <section><h2>Browse by miner</h2><ul>{"".join(f'<li><a href="/models/{m}/">{esc(SHORT[m])}</a></li>' for m in CURRENT_MODELS)}</ul>
 <p><a href="/in-stock/">Everything in stock now</a> · <a href="/deals/">Best deals</a> · <a href="/how-we-track/">How we track</a></p></section>
 </article>"""
-    items = [(SHORT[m], f"/models/{m}/") for m in CURRENT_MODELS]
+    items = [(SHORT[m], f"/models/{m}/") for m in home_picks()]
     layout(path, title, desc, body, crumbs=trail, jsonld=[itemlist("Bitaxe-class miners tracked by Bitaxe Radar", items)])
 
 
@@ -1429,6 +1445,8 @@ def build_black_friday():
     path = "/bitaxe-black-friday/"
     trail = [("Home", "/"), ("Black Friday 2026", path)]
     rows, n_at_low = [], 0
+    first = min((pts[0]["t"] for pts in history.values() if pts), default=latest["generated_at"])
+    days = max(0, (GEN - parse_t(first)).days)
     for mid in [m for m in CURRENT_MODELS if m in TRACKED]:
         st, b = STATS[mid], STATS[mid]["best"]
         logged = [to_usd(dict(price=pt["price"], currency=o["currency"])) for o in st["offers"] for pt in hist_pts(o["id"]) if pt.get("in_stock")]
@@ -1436,26 +1454,25 @@ def build_black_friday():
         lo = min(logged) if logged else None
         now = usd(b) if b else None
         if now is not None and lo is not None and now <= lo + 0.005:
-            verdict, n_at_low = '<span class="badge in">At our lowest logged price</span>', n_at_low + 1
+            verdict, n_at_low = '<span class="badge in">Same as our low so far</span>', n_at_low + 1
         elif now is not None and lo is not None:
-            verdict = f"{money(now - lo)} above our lowest logged"
+            verdict = f"{money(now - lo)} above our low so far"
         else:
             verdict = "Sold out everywhere we check"
         alert_a = f'<a href="/models/{mid}/#alerts">Get alert</a>'
         rows.append(f'<tr><td><a href="/models/{mid}/">{esc(SHORT[mid])}</a></td><td class="num">{money(now) if now is not None else "&ndash;"}</td>'
                     f'<td>{esc(sname(b["seller"])) if b else "&ndash;"}</td><td class="num">{money(lo) if lo is not None else "&ndash;"}</td><td>{verdict}</td>'
                     f'<td>{offer_link(b, "View ↗") if b else alert_a}</td></tr>')
-    tbl = ('<div class="tablewrap"><table><thead><tr><th>Miner</th><th class="num">Cheapest in stock now</th><th>Shop</th><th class="num">Lowest in-stock price we have logged</th><th>Today vs our low</th><th>Buy</th></tr></thead>'
+    tbl = (f'<div class="tablewrap"><table><thead><tr><th>Miner</th><th class="num">Cheapest in stock now</th><th>Shop</th><th class="num">Lowest in-stock price since {esc(fmt_day(first))}</th><th>Today vs that low</th><th>Buy</th></tr></thead>'
            f'<tbody>{"".join(rows)}</tbody></table></div>')
-    first = min((pts[0]["t"] for pts in history.values() if pts), default=latest["generated_at"])
-    title = "Bitaxe Black Friday 2026 deals: live prices vs our lowest logged | Bitaxe Radar"
-    desc = "Bitaxe and NerdQaxe Black Friday 2026 deals: live in-stock prices from US and EU shops vs the lowest price we have logged."
+    title = "Bitaxe Black Friday 2026 deals: live prices and our price history | Bitaxe Radar"
+    desc = "Bitaxe and NerdQaxe Black Friday 2026 deals: live in-stock prices from US and EU shops, with the price history we have so far."
     body = f"""<article>
 <header class="hero"><h1>Bitaxe Black Friday 2026 deals</h1>
-<p class="lede">Black Friday is November 27 and Cyber Monday is November 30. We check every shop every 6 hours, so this page shows whether today's price is actually a deal compared with what we've seen.</p>
+<p class="lede">Black Friday is November 27 and Cyber Monday is November 30. We check every shop every 6 hours, so this page shows how today's price compares with what we've seen so far.</p>
 <p class="meta">Prices checked {tag_time(latest['generated_at'])} · tracking since {esc(fmt_day(first))}</p></header>
-<section aria-labelledby="h-t"><h2 id="h-t">Today's price vs our lowest logged</h2>{tbl}
-<p class="hint">{n_at_low} of {len(rows)} miners are at the lowest in-stock price we've logged. Prices are before shipping and tax; euro prices are converted to dollars as an estimate.</p></section>
+<section aria-labelledby="h-t"><h2 id="h-t">Today's price vs the lowest we've seen</h2>{tbl}
+<p class="hint">We started tracking on {esc(fmt_day(first))}, so "our low" only covers the last {plural(days, "day")}. Treat it as a rough guide until we have a few months of history. Prices are before shipping and tax; euro prices are converted to dollars as an estimate.</p></section>
 <section aria-labelledby="h-a"><h2 id="h-a">Get a Black Friday price alert</h2><p>Pick a miner and your target price. We email you once when it's in stock at or under that price, so you don't have to refresh shop pages all week.</p>{signup_html("any")}</section>
 <section aria-labelledby="h-h"><h2 id="h-h">How to spot a real Black Friday deal</h2><ul>
 <li>Compare against the price history on each miner's page, not the shop's "was" price.</li>
@@ -1481,51 +1498,68 @@ NETWORK_EH_SEEN = "about 1,050 EH/s"       # mempool.space /api/v1/mining/hashra
 # earnings estimates (live network inputs via earnings.py; hidden when the inputs are stale)
 # ---------------------------------------------------------------------------------------------
 def draw_watts(mid):
-    """Total wall draw at full power (Heatbit Trio adds plain heating on top of mining)."""
+    """Most heat it can put out (Heatbit Trio adds plain electric heating on top of mining). For room-heat fit only."""
     m = MODELS[mid]
     return m.get("heat_watts", m["watts"])
+
+
+def mine_watts(mid):
+    """Watts used by mining. All earnings, power-cost and break-even figures use this, never the extra heater-mode draw."""
+    return MODELS[mid]["watts"]
 
 
 def earn(mid):
     if not (NET and NET_OK):
         return None
     m = MODELS[mid]
-    return dict(pool=E.pool_estimate(m["hashrate_ths"], NET), power=E.power_shown(draw_watts(mid)),
+    return dict(pool=E.pool_estimate(m["hashrate_ths"], NET), power=E.power_shown(mine_watts(mid)),
                 solo=E.solo_odds(m["hashrate_ths"], NET))
 
 
 def calc_attrs(mid):
-    return f' data-th="{float(MODELS[mid]["hashrate_ths"])!r}" data-w="{float(draw_watts(mid))!r}"'
+    return f' data-th="{float(MODELS[mid]["hashrate_ths"])!r}" data-w="{float(mine_watts(mid))!r}"'
 
 
 def net_cls(mid):
-    n = E.net_month(MODELS[mid]["hashrate_ths"], draw_watts(mid), NET)
+    n = E.net_month(MODELS[mid]["hashrate_ths"], mine_watts(mid), NET)
     return "pos" if n >= 0.01 else "neg" if n <= -0.01 else ""
 
 
 def net_text(mid):
-    return E.net_words(MODELS[mid]["hashrate_ths"], draw_watts(mid), NET)
+    return E.net_words(MODELS[mid]["hashrate_ths"], mine_watts(mid), NET)
 
 
-def heat_line(mid, short=False):
+def heater_net(mid):
+    """Net monthly figure when the miner replaces electric heat: power cost minus the heat you'd buy anyway minus the pool estimate.
+    The heat is worth exactly the power it uses, so the net is the pool estimate coming back to you, at any power price."""
+    e = earn(mid)
+    return e["pool"]["usd_month_shown"] if e else None
+
+
+def heat_line(mid):
     a = calc_attrs(mid)
-    y = E.fmt_usd(E.heat_value_month(draw_watts(mid)))
-    if short:
-        return f'<div class="heatv">Heat you\'d pay for anyway: about <span data-calc="heat"{a}>{y}</span>/mo (estimate)</div>'
-    return (f'<p class="heatv">Heat you\'d pay for anyway: about <b data-calc="heat"{a}>{y}</b>/mo</p>'
-            f'<p class="hint">Estimate: what a {draw_watts(mid):,g} W electric space heater would cost running 24/7 at <span data-calc="rate">{E.fmt_rate(E.POWER_RATE)}</span>/kWh. '
-            "It only counts if you'd heat the room with electric heat anyway; a heat pump or gas is usually cheaper.</p>")
+    e = earn(mid)
+    m = MODELS[mid]
+    extra = (f" Its extra heater mode (up to {m['heat_watts']:,g} W) is plain electric heat and isn't counted here." if m.get("heat_watts") else "")
+    return (f'<p class="heatv">As a heater: power ≈ <span data-calc="power"{a}>{E.fmt_usd(e["power"])}</span> − heat you\'d pay for anyway '
+            f'≈ <span data-calc="heat"{a}>{E.fmt_usd(E.heat_value_month(mine_watts(mid)))}</span> = <b>net ≈ {E.fmt_usd(heater_net(mid))}/mo back</b> from mining</p>'
+            f'<p class="hint">Only if it replaces an electric space heater you\'d run anyway, and only while you need the heat. '
+            f"A heat pump or gas is usually cheaper per unit of heat.{extra}</p>")
 
 
 def earn_line(mid, heat=False):
+    """One neutral line for cards: running cost, plus block odds (or, for heaters, the net once the heat is counted)."""
     e = earn(mid)
     if not e:
         return ""
     a = calc_attrs(mid)
-    return (f'<div class="earn" title="Estimate before electricity; changes with Bitcoin price and network difficulty">'
-            f'Pool ≈ {E.fmt_usd(e["pool"]["usd_month_shown"])}/mo <span>· power ≈ <span data-calc="power"{a}>{E.fmt_usd(e["power"])}</span>/mo</span></div>'
-            f'<div class="net {net_cls(mid)}" data-calc="net"{a}>{esc(net_text(mid))}</div>'
-            + (heat_line(mid, short=True) if heat and mid in HEAT_SET else ""))
+    parts = [f'≈<span data-calc="power"{a}>{E.fmt_usd(e["power"])}</span>/mo power']
+    if heat and mid in HEAT_SET:
+        parts.append(f'as a heater, nets ≈{E.fmt_usd(e["pool"]["usd_month_shown"])}/mo back')
+    else:
+        parts.append(f'1 in {E.fmt_big(e["solo"]["one_in_year"])}/yr block odds')
+    return (f'<div class="cardline" title="Estimates at your electricity price; change with Bitcoin price and network difficulty">'
+            + " · ".join(parts) + "</div>")
 
 
 def rate_box(anchor=False):
@@ -1546,10 +1580,10 @@ def calc_scripts():
 
 
 def breakeven_line(mid):
-    be = E.breakeven_rate(MODELS[mid]["hashrate_ths"], draw_watts(mid), NET)
+    be = E.breakeven_rate(MODELS[mid]["hashrate_ths"], mine_watts(mid), NET)
     txt = f"about {E.fmt_rate(be)}/kWh" if be >= 0.001 else "under $0.001/kWh"
     return (f'<p class="beline">Break-even power price: <b>{txt}</b></p>'
-            '<p class="hint">Above this price the power costs more than the pool estimate.</p>')
+            '<p class="hint">If you pool mine: above this price the power costs more than the pool estimate.</p>')
 
 
 def block_usd_text(so):
@@ -1564,17 +1598,17 @@ def earn_box(mid):
     if not e:
         return ""
     pe, solo_best, heater = e["pool"], mid in SOLO_SET, mid in HEAT_SET
-    tiles = [("In a mining pool", f'{E.fmt_usd(pe["usd_month_shown"])}<small>/month</small>',
+    tiles = [("If you pool mine", f'{E.fmt_usd(pe["usd_month_shown"])}<small>/month</small>',
               f'about {E.fmt_usd(pe["usd_day_shown"])} a day, before electricity' + (". Tiny, so most owners solo mine" if solo_best and mid not in POOL_SET else "")),
              ("Power cost", f'<span data-calc="power"{calc_attrs(mid)}>{E.fmt_usd(e["power"])}</span><small>/month</small>',
-              f'≈ {draw_watts(mid):,g} W, 24/7 at <span data-calc="rate">{E.fmt_rate(E.POWER_RATE)}</span>/kWh' + (". The heat offsets part of this" if heater else ""))]
+              f'≈ {mine_watts(mid):,g} W{" mining" if MODELS[mid].get("heat_watts") else ""}, 24/7 at <span data-calc="rate">{E.fmt_rate(E.POWER_RATE)}</span>/kWh' + (". The heat offsets this" if heater else ""))]
     if solo_best:
         so = e["solo"]
         tiles.append(("Solo block chance", f'1 in {E.fmt_big(so["one_in_year"])}<small>/year</small>',
                       f'about 1 in {E.fmt_big(so["one_in_day"])} a day. A block is worth ≈ {block_usd_text(so)}'))
     t = "".join(f'<div class="etile"><small>{esc(a)}</small><b>{b}</b><span>{c if "data-calc" in c else esc(c)}</span></div>' for a, b, c in tiles)
-    nets = (f'<p class="netline {net_cls(mid)}" data-calc="net"{calc_attrs(mid)}>{esc(net_text(mid))}</p>'
-            + (heat_line(mid) if heater else "") + breakeven_line(mid))
+    nets = (f'<p class="netline-wrap"><small>If you pool mine:</small> <span class="netline {net_cls(mid)}" data-calc="net"{calc_attrs(mid)}>{esc(net_text(mid))}</span></p>'
+            + breakeven_line(mid) + (heat_line(mid) if heater else ""))
     basis = (f'Uses BTC ≈ ${NET["btc_usd"]:,.0f}, network ≈ {NET["network_hashrate_hs"] / 1e18:,.0f} EH/s and the seller-stated hashrate, '
              f'minus a 2% pool fee and a 10% safety margin, rounded down. Updated {fmt_time(NET["fetched_at"])}.')
     return (f'<section class="earnbox" aria-labelledby="h-earn"><h2 id="h-earn">What it could earn</h2>{rate_box()}<div class="etiles">{t}</div>{nets}'
@@ -1631,7 +1665,8 @@ def hub_card(mid, heat=True, rank=None, why="", attrs=""):
     return (f'<article class="{cls}"{attrs}>{rib}<div class="art{" photo" if mid in MODEL_IMG else ""}">{model_img(mid)}</div><div class="body">'
             f'<h3><a href="/models/{mid}/">{esc(SHORT[mid])}</a></h3>'
             + (f'<div class="why">{esc(why)}</div>' if why else "") +
-            f'<div class="spec">≈{m["hashrate_ths"]:g} TH/s · ≈{m["watts"]:,g} W' + (f' · ≈{btu(hw):,.0f} BTU/h heat' if heat else "") + '</div>'
+            f'<div class="spec">≈{m["hashrate_ths"]:g} TH/s · ≈{m["watts"]:,g} W' + (f' · ≈{btu(m["watts"]):,.0f} BTU/h heat' if heat else "")
+            + (f' (up to {btu(hw):,.0f} with heater on)' if heat and hw != m["watts"] else "") + '</div>'
             f'<div class="price">{price}</div><div class="where">{where}</div>{earn_line(mid, heat)}'
             f'<div class="row">{status}<a class="btn sm" href="/models/{mid}/" aria-label="See {esc(SHORT[mid])} prices">See prices</a></div>'
             "</div></article>")
@@ -2016,8 +2051,8 @@ def build_guide_worth():
     ex = [m for m in ("bitaxe-gamma", "nerdqaxe-pp", "avalon-nano-3s", "hammer-thor-p2", "gekko-kbox-22", "avalon-mini-3", "avalon-q") if m in TRACKED]
     rows = "".join(f'<tr><td><a href="/models/{m}/">{esc(SHORT[m])}</a></td><td class="num">{E.fmt_usd(earn(m)["pool"]["usd_month_shown"])}</td>'
                    f'<td class="num" data-calc="power"{calc_attrs(m)}>{E.fmt_usd(earn(m)["power"])}</td>'
-                   f'<td class="num net {net_cls(m)}" data-calc="netnum"{calc_attrs(m)}>{E.net_short(MODELS[m]["hashrate_ths"], draw_watts(m), NET)}</td>'
-                   f'<td class="num">{E.fmt_rate(E.breakeven_rate(MODELS[m]["hashrate_ths"], draw_watts(m), NET))}</td></tr>' for m in ex)
+                   f'<td class="num net {net_cls(m)}" data-calc="netnum"{calc_attrs(m)}>{E.net_short(MODELS[m]["hashrate_ths"], mine_watts(m), NET)}</td>'
+                   f'<td class="num">{E.fmt_rate(E.breakeven_rate(MODELS[m]["hashrate_ths"], mine_watts(m), NET))}</td></tr>' for m in ex)
     tbl = (f'<div class="tablewrap"><table class="calc-tbl"><thead><tr><th>Miner</th><th class="num">Pool /mo</th><th class="num">Power /mo</th><th class="num">Net /mo</th><th class="num">Break-even /kWh</th></tr></thead>'
            f'<tbody>{rows}</tbody></table></div>')
     g = "bitaxe-gamma" if "bitaxe-gamma" in TRACKED else ex[0]
@@ -2025,12 +2060,12 @@ def build_guide_worth():
     h = next((m for m in ("avalon-mini-3", "heatbit-maxi", "avalon-q") if m in TRACKED), None)
     heat_p = ""
     if h:
-        heat_p = (f"<p>Example: the {esc(SHORT[h])} draws about {draw_watts(h):,g} W. An electric space heater of the same size would cost about "
-                  f'<b data-calc="heat"{calc_attrs(h)}>{E.fmt_usd(E.heat_value_month(draw_watts(h)))}</b>/mo to run 24/7 at <span data-calc="rate">{E.fmt_rate(E.POWER_RATE)}</span>/kWh. '
+        heat_p = (f"<p>Example: the {esc(SHORT[h])} draws about {mine_watts(h):,g} W. An electric space heater of the same size would cost about "
+                  f'<b data-calc="heat"{calc_attrs(h)}>{E.fmt_usd(E.heat_value_month(mine_watts(h)))}</b>/mo to run 24/7 at <span data-calc="rate">{E.fmt_rate(E.POWER_RATE)}</span>/kWh. '
                   f"The miner makes the same heat and its pool estimate is about {E.fmt_usd(earn(h)['pool']['usd_month_shown'])}/mo back. That's an estimate, and only real if you'd run electric heat anyway.</p>")
     faq = [("Is home Bitcoin mining worth it?", "Usually not for the money at typical US power prices. A small miner's pool estimate is often less than its power bill. It can make sense with very cheap power, as a heater you'd run anyway, or as a hobby and a solo lottery ticket."),
            ("What electricity price makes mining break even?", "It depends on the miner's efficiency. Each miner page shows a break-even power price; for the miners we track today it is roughly "
-            f"${min(E.breakeven_rate(MODELS[m]['hashrate_ths'], draw_watts(m), NET) for m in ex):.2f} to ${max(E.breakeven_rate(MODELS[m]['hashrate_ths'], draw_watts(m), NET) for m in ex):.2f} per kWh, and it moves with Bitcoin's price and difficulty."),
+            f"${min(E.breakeven_rate(MODELS[m]['hashrate_ths'], mine_watts(m), NET) for m in ex):.2f} to ${max(E.breakeven_rate(MODELS[m]['hashrate_ths'], mine_watts(m), NET) for m in ex):.2f} per kWh, and it moves with Bitcoin's price and difficulty."),
            ("Does a heater miner save money?", "Only against electric resistance heat you'd use anyway. Then the power is heat you'd pay for regardless and the mining is a small rebate. A heat pump or gas heat is usually cheaper per unit of heat.")]
     body = f"""<article>
 <header class="hero"><h1>Is home mining worth it?</h1>
@@ -2462,7 +2497,7 @@ def build_method():
 def build_advertise():
     path = "/advertise/"
     trail = [("Home", "/"), ("Advertise", path)]
-    n_models = len([m for m in TRACKED if m not in NOINDEX_MODELS])
+    n_models = N_MODELS
     mail = f"mailto:{CONTACT}?subject=" + "Sponsor%20spot%20on%20Bitaxe%20Radar"
     title = "Advertise on Bitaxe Radar: sponsor spots for Bitaxe sellers | Bitaxe Radar"
     desc = "Sponsor spots on Bitaxe Radar, the price and stock tracker for Bitaxe and NerdQaxe miners. For sellers, builders and accessory makers. Always labelled."
@@ -2492,9 +2527,38 @@ def build_404():
 # ---------------------------------------------------------------------------------------------
 # HOME PAGE (template + pre-rendered summary)
 # ---------------------------------------------------------------------------------------------
+HOME_TIERS = [(0, 1.5), (1.5, 2), (2, 3), (3, 5), (5, 9), (9, 1e9)]   # TH/s size bands, one pick each
+
+
+def pick_price(mid):
+    """Offer a home card shows: the cheapest US-dollar listing in stock, else the cheapest anywhere."""
+    st = STATS[mid]
+    return st["best_usd"] or st["best"]
+
+
+def home_picks():
+    """One Bitaxe-class desk miner (no heaters or boxed home miners) per size band by best $/TH, US shops first; never two with the same hashrate and watts."""
+    cands = [m for m in LIVE_TRACKED if m not in NOINDEX_MODELS and MODELS[m].get("category") != "home" and pick_price(m)]
+    def key(m):
+        o = pick_price(m)
+        return (o["currency"] != "USD", usd(o) / MODELS[m]["hashrate_ths"], usd(o))
+    seen, uniq = set(), []
+    for m in sorted(cands, key=key):
+        spec = (MODELS[m]["hashrate_ths"], MODELS[m]["watts"])
+        if spec not in seen:
+            seen.add(spec)
+            uniq.append(m)
+    picks = []
+    for lo, hi in HOME_TIERS:
+        tier = [m for m in uniq if lo <= MODELS[m]["hashrate_ths"] < hi]
+        if tier:
+            picks.append(min(tier, key=key))
+    return sorted(picks, key=lambda m: (pick_price(m)["currency"] != "USD", MODELS[m]["hashrate_ths"]))
+
+
 def home_card(mid, best_value):
     st, m = STATS[mid], MODELS[mid]
-    b = st["best"]
+    b = pick_price(mid)
     ribbon = '<span class="ribbon" title="Most hashrate per dollar">Best value</span>' if mid == best_value else ""
     if b:
         eu = b["currency"] != "USD"
@@ -2515,10 +2579,10 @@ def home_card(mid, best_value):
 
 
 def build_home():
-    tpl = (ROOT / "templates" / "home.html").read_text()
+    tpl = (ROOT / "templates" / "home.html").read_text().replace("<!--N-SHOPS-->", str(len(SELLERS))).replace("<!--N-MODELS-->", str(N_MODELS))
     t = re.search(r"<title>(.*?)</title>", tpl, re.S).group(1)
     d = re.search(r'<meta name="description" content="(.*?)">', tpl, re.S).group(1)
-    items = [(SHORT[m], f"/models/{m}/") for m in CURRENT_MODELS]
+    items = [(SHORT[m], f"/models/{m}/") for m in home_picks()]
     head = f"""<link rel="canonical" href="{BASE}/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <meta property="og:site_name" content="Bitaxe Radar"><meta property="og:type" content="website">
@@ -2531,15 +2595,17 @@ def build_home():
 {jsonld_tag(itemlist("Bitaxe-class miners tracked by Bitaxe Radar", items))}"""
     ins = [o for o in OFFERS if in_stock(o)]
     chips = (f'<ul class="chips"><li class="live"><strong>{len(ins)}</strong> listings in stock</li>'
-             f'<li><strong>{len(SELLERS)}</strong> shops checked</li>'
+             f'<li><strong>{N_MODELS}</strong> miners tracked</li><li><strong>{len(SELLERS)}</strong> shops checked</li>'
              f'<li>Updated <time id="freshness" datetime="{esc(latest["generated_at"])}">{esc(fmt_time(latest["generated_at"]))}</time></li></ul>')
-    best_value = min((m for m in CURRENT_MODELS if STATS[m]["per_th"]), key=lambda m: STATS[m]["per_th"], default=None)
+    picks = home_picks()
+    best_value = min(picks, key=lambda m: usd(pick_price(m)) / MODELS[m]["hashrate_ths"], default=None)
     older = [m for m in TRACKED if m in NOINDEX_MODELS]
     older_html = ('<p class="older">Older models: ' + " · ".join(
         f'<a href="/models/{m}/">{esc(SHORT[m])}</a>' + (f' from {money(usd(STATS[m]["best"]))}' if STATS[m]["best"] else " (sold out)") for m in older) + "</p>") if older else ""
     cards = f"""<section id="miners" aria-labelledby="h-miners">
     <div class="sec-head"><h2 id="h-miners">Today's best prices</h2><a href="/in-stock/">Everything in stock →</a></div>
-    <div class="cards">{"".join(home_card(m, best_value) for m in CURRENT_MODELS)}</div>
+    <p class="hint">The best price per TH/s in each size, from today's in-stock listings. US shops first.</p>
+    <div class="cards">{"".join(home_card(m, best_value) for m in picks)}</div>
     {older_html}
     <p class="older">Want one that heats a room too? <a href="/heater-miners/">See heater miners →</a></p>
   </section>"""
@@ -2669,7 +2735,7 @@ def build_miners():
 <p class="hint">Hashrate and watts are the sellers' stated figures. Prices are before shipping and tax; euro and Canadian-dollar prices are converted as an estimate. Pool and power figures are estimates; {EARN_NOTE.lower()}</p></section>
 </article>"""
     title = f"All home Bitcoin miners: prices and stock ({fmt_day(GEN)}) | Bitaxe Radar"
-    desc = f"Every home Bitcoin miner we track, Bitaxe to heaters: {len(ms)} miners, {n_in} listings in stock. Filter by type, price and power. Checked every 6 hours."
+    desc = f"All {N_MODELS} home Bitcoin miners we track, Bitaxe to heaters: {n_in} listings in stock. Filter by type, price and power. Checked every 6 hours."
     layout(path, title, desc, body, crumbs=[("Home", "/"), ("All miners", path)], scripts=MINERS_JS,
            jsonld=[itemlist("Home Bitcoin miners tracked by Bitaxe Radar", [(SHORT[m], f"/models/{m}/") for m in ms])])
 
@@ -2687,7 +2753,7 @@ def build_redirect(old, new, label):
 """)
 
 
-QUIZ = [("budget", "What's your budget?", [("100", "Under $100"), ("500", "$100 to $500"), ("any", "$500 or more")]),
+QUIZ = [("budget", "What's your budget?", [("100", "Under $100"), ("500", "$100 to $500"), ("500up", "$500 or more")]),
         ("goal", "What do you want it to do?", [("solo", "Take a lottery shot at a whole block"), ("pool", "Earn small, steady payouts"), ("heat", "Heat a room while it mines")]),
         ("place", "Where will it live?", [("desk", "On my desk or in a bedroom (quiet)"), ("room", "A room I use (some fan noise is OK)"), ("garage", "Garage or basement (noise is fine)")])]
 
@@ -2698,24 +2764,28 @@ f.hidden=false;
 function v(k){var e=f.querySelector('[name="'+k+'"]:checked');return e?e.value:null;}
 function money(x){return '$'+Math.round(x).toLocaleString('en-US');}
 function quiet(d,place){var db=d.db===''?null:+d.db,w=+d.w;if(place==='desk')return db!==null?db<=40:w<=60;if(place==='room')return db!==null?db<=50:w<=200;return true;}
+function inBudget(b,x){return b==='500up'?x>=500:x<=+b;}
 function pick(b,g,p,relax){return pool.filter(function(c){var d=c.dataset;if(d.price==='')return false;
-  if(d.type.split(' ').indexOf(g)<0)return false;if(relax<2&&b!=='any'&&+d.price>+b)return false;if(relax<1&&!quiet(d,p))return false;return true;});}
+  if(d.type.split(' ').indexOf(g)<0)return false;if(relax<2&&!inBudget(b,+d.price))return false;if(relax<1&&!quiet(d,p))return false;return true;});}
 function score(d,g){return g==='heat'?+d.hw:+d.th;}
 function why(d,g,b,p){var s=[];
   if(g==='solo')s.push((+d.th).toLocaleString('en-US')+' TH/s of lottery tickets for '+money(+d.price));
-  if(g==='pool')s.push('Most hashrate'+(b==='any'?'':' under '+money(+b))+': '+(+d.th).toLocaleString('en-US')+' TH/s');
+  if(g==='pool')s.push('Most hashrate'+(b==='500up'?'':' under '+money(+b))+': '+(+d.th).toLocaleString('en-US')+' TH/s');
   if(g==='heat')s.push('About '+Math.round(+d.hw*3.412).toLocaleString('en-US')+' BTU/h of heat');
   if(d.db!==''&&p!=='garage')s.push(+d.db===0?'silent, no fans':d.db+' dB stated');
   if(d.stock!=='2')s.push('not in stock yet');return s.join(' · ');}
 f.addEventListener('submit',function(e){e.preventDefault();var b=v('budget'),g=v('goal'),p=v('place');
   if(!b||!g||!p){out.innerHTML='<p class="hint">Pick one answer for each question.</p>';return;}
   function rank(l,byPrice){return l.sort(function(A,B){var a=A.dataset,c=B.dataset;return (c.stock-a.stock)||(byPrice?(a.price-c.price):(score(c,g)-score(a,g)))||(a.price-c.price);});}
-  var list=rank(pick(b,g,p,0)),relax=0;
-  function add(more,byPrice){rank(more.filter(function(c){return list.indexOf(c)<0;}),byPrice).forEach(function(c){if(list.length<3)list.push(c);});}
-  if(list.length<3){relax=1;add(pick(b,g,p,1),false);}
-  if(list.length<3){relax=list.length?1:2;var nb=pick(b,g,p,2).filter(function(c){return b==='any'||+c.dataset.price>+b;});if(nb.length&&relax===1)relax=3;add(nb,true);}
-  out.innerHTML='';var h=document.createElement('h2');h.textContent='Your top '+Math.min(3,list.length);out.appendChild(h);
-  if(relax){var n=document.createElement('p');n.className='hint';n.textContent=relax===1?'Fewer than 3 matched every answer, so some picks may be louder than you asked for.':relax===2?'Nothing matched your budget, so these are the cheapest picks above it.':'Fewer than 3 matched, so we added the cheapest picks just over your budget.';out.appendChild(n);}
+  var list=[],seen={},relax=0;
+  function add(more){more.forEach(function(c){var k=c.dataset.th+'|'+c.dataset.w;if(list.length<3&&list.indexOf(c)<0&&!seen[k]){seen[k]=1;list.push(c);}});}
+  add(rank(pick(b,g,p,0),false));
+  if(list.length<3){var n0=list.length;add(rank(pick(b,g,p,1),false));if(list.length>n0)relax=1;}
+  if(!list.length){relax=2;var edge=b==='500up'?500:+b;
+    add(pick(b,g,p,2).sort(function(A,B){return (B.dataset.stock-A.dataset.stock)||(Math.abs(A.dataset.price-edge)-Math.abs(B.dataset.price-edge));}));}
+  out.innerHTML='';var h=document.createElement('h2');h.textContent=list.length===1?'Your best match':'Your top '+list.length;out.appendChild(h);
+  var note=relax===1?'Some picks may be louder than you asked for, because fewer than 3 matched every answer.':relax===2?'Nothing matched your budget, so these are the closest picks outside it.':list.length<3?'Only '+list.length+' miner'+(list.length===1?'':'s')+' matched all your answers.':'';
+  if(note){var n=document.createElement('p');n.className='hint';n.textContent=note;out.appendChild(n);}
   var g2=document.createElement('div');g2.className='cards';
   list.slice(0,3).forEach(function(c,i){var k=c.cloneNode(true);var w=k.querySelector('.why');w.textContent=why(c.dataset,g,b,p);w.hidden=false;
    var r=k.querySelector('.ribbon');r.textContent='#'+(i+1);g2.appendChild(k);});
@@ -2734,7 +2804,7 @@ def build_quiz():
                     for m in miners_sorted() if show_price(m) is not None)
     body = f"""<article>
 <header class="hero"><h1>Find my miner</h1>
-<p class="lede">Three quick questions. We show the 3 best matches from today's prices.</p></header>
+<p class="lede">Three quick questions. We show up to 3 best matches from today's prices.</p></header>
 <form id="quiz" class="quiz" hidden>{qs}<button type="submit" class="btn">Show my top 3</button></form>
 <noscript><p>The quiz needs JavaScript. Try <a href="/miners/">All miners</a> or the <a href="/best/">best-for lists</a> instead.</p></noscript>
 <section id="qres" aria-live="polite"></section>
@@ -2839,7 +2909,7 @@ def build_indexes():
     body = f"""<article><header class="hero"><h1>Every model, A to Z</h1>
 <p class="lede">Want filters and photos? Use <a href="/miners/">All miners</a>.</p></header>
 <ul class="az">{rows}</ul>{f'<p class="older">Older models: {older}</p>' if older else ""}</article>"""
-    layout("/models/", "All home Bitcoin miner models A to Z | Bitaxe Radar", f"An A to Z list of the {len(LIVE_TRACKED)} home Bitcoin miners Bitaxe Radar tracks, with today's lowest price.",
+    layout("/models/", "All home Bitcoin miner models A to Z | Bitaxe Radar", f"An A to Z list of the {N_MODELS} home Bitcoin miners Bitaxe Radar tracks, with today's lowest price.",
            body, crumbs=[("Home", "/"), ("All miners", "/miners/"), ("Models A to Z", "/models/")])
     # /sellers/
     shops, shop_ids = [], []
@@ -2908,6 +2978,7 @@ def main():
     build_price_per_th()
     build_black_friday()
     build_redirect("/home-miners/", "/miners/", "All miners")
+    build_redirect("/about/", "/how-we-track/", "About & how we track")
     build_miners()
     build_quiz()
     build_alerts()
