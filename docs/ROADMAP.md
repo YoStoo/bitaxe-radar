@@ -15,10 +15,9 @@ Updated: Oct 23, 2026
 
 ## ⏭️ Next up (in order)
 
-1. Price-drop posts on X when the leaderboard shows a new low.
-2. Daily X posts and replies on @BitaxeRadar.
-3. Black Friday push in November (deals page live by about Nov 10, Black Friday is Nov 27).
-4. Energy guides that bring in buyers (roadmap only, not built yet):
+1. Daily X posts and replies on @BitaxeRadar.
+2. Black Friday push in November (deals page live by about Nov 10, Black Friday is Nov 27).
+3. Energy guides that bring in buyers (roadmap only, not built yet):
    - "Can solar power a Bitcoin miner?": home solar with a Bitaxe or other small miner. Watts per miner vs what a typical panel makes, battery vs daytime-only mining, links to the miners we track (affiliate links where we have them). Use real watt figures from our data, no made-up numbers.
    - "Mining to heat your home": heat reuse. Links to the heater miners page, the room heat calculator (/heat-calculator/) and Heatbit Bitwater (/models/heatbit-bitwater/).
    - Why: people asking these questions are often ready to buy. Energy (solar, heat reuse) is your main interest. And it doubles as an energy project for your AI/ML portfolio.
@@ -93,6 +92,7 @@ Later:
   - /about/ now goes to /how-we-track/.
   - Black Friday page wording toned down until we have more price history.
   - Shop pages: the "Store" link now uses our affiliate code where we have one (Power Mining).
+- Oct 23: Price-drop posts for X: a "New lows this week" box at the top of /price-per-th/ (miners whose cheapest in-stock price just fell below every in-stock price we logged before, shown only while it stays that low), and a script that turns each new low into a ready X post draft for the afternoon X slot. First one found: Bitaxe Gamma back in stock at Solo Satoshi for $67, under our earlier $119.99 low.
 - Oct 21: Room heat calculator (/heat-calculator/): type your room size, see how much heat it needs and which miners can heat it, with today's prices.
 
 ## 📊 Numbers (Oct 23)

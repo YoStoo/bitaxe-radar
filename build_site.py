@@ -25,6 +25,7 @@ from pathlib import Path
 
 import earnings as E
 import newsletter as NL
+import newlows
 
 ROOT = Path(__file__).resolve().parent
 SITE = ROOT / "site"
@@ -2406,6 +2407,22 @@ def price_check(mid):
     return "pc-high", f"{pct:.0f}% above our low of {money(lo)} ({fmt_day(lo_t)})"
 
 
+def new_lows_box():
+    """'New lows this week' on /price-per-th/: miners whose cheapest in-stock price fell below every in-stock price we logged before, and still is."""
+    lows = newlows.new_lows(MODELS, OFFERS, history, GEN, days=7, live=LIVE_TRACKED)
+    if not lows:
+        return ('<section aria-labelledby="h-lows" class="newlows"><h2 id="h-lows">New lows this week</h2>'
+                '<p>No miner hit a new low price in the last 7 days. We check every 6 hours.</p></section>')
+    items = []
+    for d in lows:
+        c = d["current"]
+        how = "Price dropped" if d["kind"] == "drop" else "Back in stock"
+        items.append(f'<li><a href="/models/{d["model"]}/"><b>{esc(SHORT[d["model"]])}</b></a> {"≈ " if c["currency"] != "USD" else ""}<b>{money(usd(c))}</b> at {esc(sname(c["seller"]))}. '
+                     f'{how} {esc(fmt_day(d["t"]))}, {money(d["old_low"] - usd(c))} under our previous low of {money(d["old_low"])}. {offer_link(c, "View ↗", cls="lnk")}</li>')
+    return (f'<section aria-labelledby="h-lows" class="newlows"><h2 id="h-lows">New lows this week</h2><ul>{"".join(items)}</ul>'
+            '<p class="hint">Compared with the lowest in-stock price we have logged for that miner at any shop we track. Shown only while the price is still that low.</p></section>')
+
+
 PTH_GROUPS = [("bitaxe", "Bitaxe and open-source miners", "Small boards and desk miners, mostly bought as a solo lottery ticket."),
               ("home", "Home, heater and bigger miners", "Finished boxes, heaters and 10 TH/s+ home miners.")]
 
@@ -2453,6 +2470,7 @@ def build_price_per_th():
 <p class="lede">Which miners give you the most hashrate per dollar today, and whether today's price is a good one.</p>
 <p>{lead}</p>
 <p class="meta">Checked {tag_time(latest['generated_at'])} · updated every 6 hours · hashrate is the maker's stated figure</p></header>
+{new_lows_box()}
 {"".join(sections)}
 {pre_html}
 <section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
