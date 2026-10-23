@@ -18,6 +18,10 @@ Updated: Oct 23, 2026
 1. Price-drop posts on X when the leaderboard shows a new low.
 2. Daily X posts and replies on @BitaxeRadar.
 3. Black Friday push in November (deals page live by about Nov 10, Black Friday is Nov 27).
+4. Energy guides that bring in buyers (roadmap only, not built yet):
+   - "Can solar power a Bitcoin miner?": home solar with a Bitaxe or other small miner. Watts per miner vs what a typical panel makes, battery vs daytime-only mining, links to the miners we track (affiliate links where we have them). Use real watt figures from our data, no made-up numbers.
+   - "Mining to heat your home": heat reuse. Links to the heater miners page, the room heat calculator (/heat-calculator/) and Heatbit Bitwater (/models/heatbit-bitwater/).
+   - Why: people asking these questions are often ready to buy. Energy (solar, heat reuse) is your main interest. And it doubles as an energy project for your AI/ML portfolio.
 
 ## 💰 Money
 
@@ -43,6 +47,7 @@ Later:
 - Bitcoin nodes section.
 - Mining news and network stats.
 - Videos.
+- Instagram account for more traffic.
 
 ## 🙋 Waiting on the owner
 
