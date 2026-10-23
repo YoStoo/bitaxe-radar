@@ -42,7 +42,7 @@ class ReviewFixes(unittest.TestCase):
         self.assertIn('data-w="400.0"', t)
         rate = float(re.search(r"Break-even power price: <b>about \$([\d.]+)/kWh", t).group(1))
         self.assertGreater(rate, 0.02)                            # was a nonsensical $0.008 when 1,500 W was used
-        self.assertIn("net ≈", t)
+        self.assertIn("so the pool estimate is your net", t)
         self.assertIn("isn't counted here", t)
         self.assertIn("(up to 5,118 with heater on)", read("/heater-miners/"))
 

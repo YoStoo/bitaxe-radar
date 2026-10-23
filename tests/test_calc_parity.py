@@ -100,7 +100,7 @@ class CalcPages(unittest.TestCase):
         self.assertIn("Break-even power price: <b>about $", g)
         self.assertNotIn("heat you'd pay for anyway", g)
         q = self.read("/models/avalon-q/")
-        self.assertIn("As a heater: power", q)
+        self.assertIn("As a heater: the ≈", q)
         self.assertIn("heat you'd pay for anyway", q)
         self.assertIn("space heater", q)
         heat = self.read("/heater-miners/")

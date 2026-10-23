@@ -1541,8 +1541,8 @@ def heat_line(mid):
     e = earn(mid)
     m = MODELS[mid]
     extra = (f" Its extra heater mode (up to {m['heat_watts']:,g} W) is plain electric heat and isn't counted here." if m.get("heat_watts") else "")
-    return (f'<p class="heatv">As a heater: power ≈ <span data-calc="power"{a}>{E.fmt_usd(e["power"])}</span> − heat you\'d pay for anyway '
-            f'≈ <span data-calc="heat"{a}>{E.fmt_usd(E.heat_value_month(mine_watts(mid)))}</span> = <b>net ≈ {E.fmt_usd(heater_net(mid))}/mo back</b> from mining</p>'
+    return (f'<p class="heatv">As a heater: the ≈<span data-calc="power"{a}>{E.fmt_usd(e["power"])}</span>/mo of power is heat you\'d pay for anyway, '
+            f'so the pool estimate is your net: <b>about {E.fmt_usd(heater_net(mid))}/mo back</b></p>'
             f'<p class="hint">Only if it replaces an electric space heater you\'d run anyway, and only while you need the heat. '
             f"A heat pump or gas is usually cheaper per unit of heat.{extra}</p>")
 
@@ -1583,7 +1583,7 @@ def breakeven_line(mid):
     be = E.breakeven_rate(MODELS[mid]["hashrate_ths"], mine_watts(mid), NET)
     txt = f"about {E.fmt_rate(be)}/kWh" if be >= 0.001 else "under $0.001/kWh"
     return (f'<p class="beline">Break-even power price: <b>{txt}</b></p>'
-            '<p class="hint">If you pool mine: above this price the power costs more than the pool estimate.</p>')
+            '<p class="hint">Above this price the power costs more than the pool estimate.</p>')
 
 
 def block_usd_text(so):
