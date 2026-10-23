@@ -1945,5 +1945,32 @@
    "in_stock": false,
    "status": "preorder"
   }
+ ],
+ "bitcoinmerch:avalon-nano-3s": [
+  {
+   "t": "2026-10-23T12:44:15Z",
+   "price": 349.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  }
+ ],
+ "powermining:avalon-nano-3s": [
+  {
+   "t": "2026-10-23T12:44:15Z",
+   "price": 280.98,
+   "currency": "EUR",
+   "in_stock": true,
+   "status": "in_stock"
+  }
+ ],
+ "nmminer:nmqaxe-nexus": [
+  {
+   "t": "2026-10-23T12:44:15Z",
+   "price": 399.0,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  }
  ]
 }
