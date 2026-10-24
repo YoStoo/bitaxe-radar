@@ -1941,6 +1941,7 @@ Bitaxe Radar is independent. Some shop links are affiliate links; they never cha
 - [Is home mining worth it?]({BASE}/guides/is-home-mining-worth-it/): depends on your electricity price; each miner page has a break-even power price.
 - [Solo odds calculator]({BASE}/solo-odds/): chance of finding a block per day, per year and over 5 years for any hashrate, from the live network hashrate. Solo mining is a lottery.
 - [Solo block wins]({BASE}/solo-wins/): recent Bitcoin blocks found by solo miners, with date, pool (the service the winner mined through), reward and device (only when the winner shared it).{solo_llms()}
+- [Can solar power a Bitcoin miner?]({BASE}/guides/solar-bitcoin-mining/): how many 400 W panels each miner needs (example: 4 peak sun hours, 14% losses), daytime-only vs batteries.
 - [Solo vs pool mining]({BASE}/guides/solo-vs-pool-mining/): solo is a lottery for a whole block; pool pays small, steady amounts.
 - [How heater miners work]({BASE}/guides/how-heater-miners-work/): a miner turns its electricity into heat like a space heater.
 - [Room heat calculator]({BASE}/heat-calculator/): room size in, heat needed (about 10 W per sq ft as a rule of thumb) and which tracked miners can heat it.
@@ -2088,6 +2089,72 @@ def build_guide_worth():
 <section><p class="hint">Not financial advice. Earnings aren't guaranteed and change with Bitcoin's price and network difficulty.</p></section>
 </article>"""
     layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Is home Bitcoin mining worth it?", desc), faq_ld(faq)], lastmod=GUIDE_UPDATED, og_type="article")
+
+
+# Solar guide (/guides/solar-bitcoin-mining/). Assumptions are stated on the page and sourced:
+# NREL PVWatts default 14% system losses; US peak sun hours roughly 3 to 6.5 a day (we use 4 as a middle-of-the-road example);
+# a 400 W panel as an example of a common modern residential panel. Watts are each miner's maker-stated figure.
+SOLAR_PANEL_W = 400
+SOLAR_SUN_HOURS = 4
+SOLAR_LOSS = 0.14
+
+
+def solar_panel_kwh_day():
+    return SOLAR_PANEL_W * SOLAR_SUN_HOURS * (1 - SOLAR_LOSS) / 1000
+
+
+def build_guide_solar():
+    path = "/guides/solar-bitcoin-mining/"
+    trail = [("Home", "/"), ("Guides", "/guides/"), ("Solar mining", path)]
+    title = "Can solar power a Bitcoin miner? Panels needed per miner | Bitaxe Radar"
+    desc = "Can you run a Bitaxe or home Bitcoin miner on solar? Plain-words math: how many 400 W panels each miner needs, daytime-only vs batteries, and today's prices."
+    pk = solar_panel_kwh_day()
+    ex = [m for m in ("bitaxe-gamma", "nerdqaxe-pp", "avalon-nano-3s", "nmqaxe-nexus", "hammer-thor-p2", "avalon-mini-3", "heatbit-maxi", "avalon-q") if m in TRACKED]
+
+    def price_cell(m):
+        c = cheapest([o for o in offers_for(m) if in_stock(o)])
+        return f'<a href="/models/{m}/">from ${usd(c):,.0f}</a>' if c else f'<a href="/models/{m}/">see shops</a>'
+    rows = "".join(f'<tr><td><a href="/models/{m}/">{esc(SHORT[m])}</a></td><td class="num">≈{mine_watts(m):,g} W</td>'
+                   f'<td class="num">{mine_watts(m) * 24 / 1000:,.1f}</td><td class="num">{max(1, math.ceil(mine_watts(m) * 24 / 1000 / pk)):,}</td>'
+                   f'<td class="num">{price_cell(m)}</td></tr>' for m in ex)
+    tbl = (f'<div class="tablewrap"><table><thead><tr><th>Miner</th><th class="num">Stated power</th><th class="num">kWh a day (24/7)</th>'
+           f'<th class="num">400 W panels for 24/7*</th><th class="num">Price today</th></tr></thead><tbody>{rows}</tbody></table></div>'
+           f'<p class="hint">*Example only: one {SOLAR_PANEL_W} W panel × {SOLAR_SUN_HOURS} peak sun hours × (1 − {SOLAR_LOSS:.0%} losses) ≈ {pk:.2f} kWh a day. '
+           'Running 24/7 also needs a battery big enough to cover the night, and winter or cloudy days make less. Rounded up to whole panels. '
+           'Prices are the cheapest in-stock listing we found, before shipping and tax.</p>')
+    g = "bitaxe-gamma" if "bitaxe-gamma" in TRACKED else (ex[0] if ex else None)
+    small = ""
+    if g:
+        small = (f"<p>A {esc(SHORT[g])} draws about {mine_watts(g):,g} W. That's tiny: a single {SOLAR_PANEL_W} W panel in full sun makes many times more than it needs. "
+                 f"Over a whole day it uses about {mine_watts(g) * 24 / 1000:.1f} kWh, which one panel can cover on a decent day, as long as a battery carries it through the night.</p>")
+    faq = [("Can a solar panel run a Bitaxe?", "Yes. A Bitaxe-class miner draws around 15 to 25 W, so one normal home panel makes more than enough in daylight. For night-time mining you need a battery and a charge controller or a small power station."),
+           ("Can I mine only when the sun is out?", "Yes. A miner can be switched on and off, so daytime-only mining with no battery works. It just mines fewer hours, so it earns less and has lower solo odds than running 24/7."),
+           ("Is solar mining free?", "Not quite. The panels and batteries cost money, and power you'd otherwise use in your home or sell back to the grid has value. Solar makes the most sense with spare power you can't use or sell for much."),
+           ("How many panels does a big home miner need?", f"Roughly the miner's watts × 24 hours, divided by what one panel makes in a day. With our example of about {pk:.2f} kWh per {SOLAR_PANEL_W} W panel a day, a 500 W miner needs about 9 panels plus a battery to run around the clock.")]
+    body = f"""<article>
+<header class="hero"><h1>Can solar power a Bitcoin miner?</h1>
+<p class="lede">Short answer: yes. Small miners like a Bitaxe need only one panel. Big heater-size miners need a whole roof, plus batteries if you want them running at night.</p>
+<p class="meta">Updated <time datetime="2026-10-24">Oct 24, 2026</time> · 3-minute read · live prices</p></header>
+<section aria-labelledby="h-1"><h2 id="h-1">1. The simple math</h2>
+<p>Every miner draws a steady number of watts. Run it all day and it uses watts × 24 hours of energy. A solar panel makes its rated watts only in full sun, so what it makes in a day depends on how many hours of strong sun you get.</p>
+<p>Solar people call that <strong>peak sun hours</strong>. Across the US it ranges from about 3 to 6.5 a day depending on where you live (see <a href="https://www.unboundsolar.com/solar-information/sun-hours-us-map" rel="nofollow noopener" target="_blank">this US sun-hours map</a>). Real systems also lose a bit to dust, wiring and shade. NREL's PVWatts calculator uses <a href="https://pvwatts.nlr.gov/docs/help_system_sysloss.php" rel="nofollow noopener" target="_blank">14% losses</a> by default.</p>
+<p>So in our example, one {SOLAR_PANEL_W} W panel with {SOLAR_SUN_HOURS} peak sun hours makes about <strong>{pk:.2f} kWh a day</strong>.</p>
+{tbl}</section>
+<section aria-labelledby="h-2"><h2 id="h-2">2. Small miners: easy</h2>
+{small}
+<p>That makes a Bitaxe a fun first solar project: a panel, a small battery or power station, and a USB-C or 5 V supply. It's a solo lottery ticket powered by the sun. <a href="/solo-odds/">Check the solo odds</a>.</p></section>
+<section aria-labelledby="h-3"><h2 id="h-3">3. Big miners: a roof's worth</h2>
+<p>Heater-size miners draw hundreds of watts or more, so running one 24/7 takes many panels and a large battery. Most home solar owners with a big miner run it in the daytime only, when the panels make more than the house uses, instead of sending that power back to the grid for a low buy-back rate.</p>
+<p>In winter the sun is weaker but you need heat anyway, so a <a href="/heater-miners/">heater miner</a> can still make sense on grid power. <a href="/guides/how-heater-miners-work/">How heater miners work</a> · <a href="/heat-calculator/">Room heat calculator</a>.</p></section>
+<section aria-labelledby="h-4"><h2 id="h-4">4. Daytime only or 24/7?</h2>
+<ul><li><strong>Daytime only:</strong> no battery, cheapest setup. The miner runs fewer hours, so it earns less and gets fewer solo chances.</li>
+<li><strong>24/7 with a battery:</strong> more hours mining, but batteries cost money and lose some energy charging and discharging.</li>
+<li><strong>Grid-tied panels:</strong> if you already have solar on the roof, the real question is what your spare power is worth. Compare it with the break-even power price on each <a href="/miners/">miner page</a>.</li></ul></section>
+<section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
+<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/is-home-mining-worth-it/">Is home mining worth it?</a></li><li><a href="/price-per-th/">Most hashrate per dollar</a></li><li><a href="/miners/">All miner prices</a></li></ul>
+<p class="hint">Not financial advice. These are rough examples; a solar installer or NREL's PVWatts calculator can estimate your own roof. Earnings aren't guaranteed.</p></section>
+</article>"""
+    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Can solar power a Bitcoin miner?", desc), faq_ld(faq)], lastmod="2026-10-24", og_type="article")
 
 
 # ---------------------------------------------------------------------------------------------
@@ -2966,6 +3033,7 @@ def build_indexes():
           ("/solo-wins/", "Solo block wins", "Recent blocks won by solo miners."),
           ("/heat-calculator/", "Room heat calculator", "Which heater miner fits your room."),
           ("/price-per-th/", "Price per TH/s leaderboard", "Most hashrate per dollar, and is today's price good?"),
+          ("/guides/solar-bitcoin-mining/", "Can solar power a miner?", "Panels needed for each miner."),
           ("/guides/solo-vs-pool-mining/", "Solo vs pool mining", "Lottery shot or small steady payouts?"),
           ("/guides/how-heater-miners-work/", "How heater miners work", "A miner that warms the room."),
           ("/where-to-buy-bitaxe/", "Where to buy a Bitaxe", "Every shop, ranked by today's price."),
@@ -3010,6 +3078,7 @@ def main():
     build_guide_heaters()
     build_guide_pool()
     build_guide_worth()
+    build_guide_solar()
     build_solo_odds()
     build_heat_calc()
     build_solo_wins()
