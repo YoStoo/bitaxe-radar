@@ -1942,6 +1942,7 @@ Bitaxe Radar is independent. Some shop links are affiliate links; they never cha
 - [Solo odds calculator]({BASE}/solo-odds/): chance of finding a block per day, per year and over 5 years for any hashrate, from the live network hashrate. Solo mining is a lottery.
 - [Solo block wins]({BASE}/solo-wins/): recent Bitcoin blocks found by solo miners, with date, pool (the service the winner mined through), reward and device (only when the winner shared it).{solo_llms()}
 - [Can solar power a Bitcoin miner?]({BASE}/guides/solar-bitcoin-mining/): how many 400 W panels each miner needs (example: 4 peak sun hours, 14% losses), daytime-only vs batteries.
+- [Mining to heat your home]({BASE}/guides/bitcoin-mining-heat-your-home/): a miner heats like an electric space heater and pays a little back; it beats a space heater but usually not a heat pump (DOE: about 50% less electricity).
 - [Solo vs pool mining]({BASE}/guides/solo-vs-pool-mining/): solo is a lottery for a whole block; pool pays small, steady amounts.
 - [How heater miners work]({BASE}/guides/how-heater-miners-work/): a miner turns its electricity into heat like a space heater.
 - [Room heat calculator]({BASE}/heat-calculator/): room size in, heat needed (about 10 W per sq ft as a rule of thumb) and which tracked miners can heat it.
@@ -2008,7 +2009,8 @@ def build_guide_heaters():
 <li><strong>Circuit:</strong> a US 15 A, 120 V circuit should carry about 1,440 W continuously. Put big units on their own circuit, and follow the maker's guidance.</li>
 <li><strong>Noise:</strong> fans are louder in high-heat modes. Check the stated decibels.</li>
 <li><strong>Stock:</strong> many heater miners sell out before winter, and pre-orders ship later. Check the badge on each listing.</li></ul></section>
-<section><h2>Compare heater miners</h2><p><a class="btn" href="/heater-miners/">See heater miners</a> <a class="btn ghost" href="/heat-calculator/">Which one fits my room?</a></p></section>
+<section><h2>Compare heater miners</h2><p><a class="btn" href="/heater-miners/">See heater miners</a> <a class="btn ghost" href="/heat-calculator/">Which one fits my room?</a></p>
+<p><a href="/guides/bitcoin-mining-heat-your-home/">Does it save money? Miner vs space heater vs heat pump →</a></p></section>
 </article>"""
     layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "How a Bitcoin heater miner works", desc)], lastmod=GUIDE_UPDATED, og_type="article")
 
@@ -2084,7 +2086,7 @@ def build_guide_worth():
 <section aria-labelledby="h-h"><h2 id="h-h">3. Heat changes the math</h2>
 <p>A miner turns almost all its power into heat, like an electric space heater. If you'd heat a room with electric heat anyway, that power is a cost you'd have paid regardless, and the mining earns a little of it back.</p>
 {heat_p}
-<p><a href="/heater-miners/">Heater miners</a> · <a href="/best/heating-a-room/">Best for heating a room</a> · <a href="/guides/how-heater-miners-work/">How heater miners work</a></p></section>
+<p><a href="/heater-miners/">Heater miners</a> · <a href="/best/heating-a-room/">Best for heating a room</a> · <a href="/guides/how-heater-miners-work/">How heater miners work</a> · <a href="/guides/bitcoin-mining-heat-your-home/">Mining to heat your home</a></p></section>
 <section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
 <section><p class="hint">Not financial advice. Earnings aren't guaranteed and change with Bitcoin's price and network difficulty.</p></section>
 </article>"""
@@ -2155,6 +2157,86 @@ def build_guide_solar():
 <p class="hint">Not financial advice. These are rough examples; a solar installer or NREL's PVWatts calculator can estimate your own roof. Earnings aren't guaranteed.</p></section>
 </article>"""
     layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Can solar power a Bitcoin miner?", desc), faq_ld(faq)], lastmod="2026-10-24", og_type="article")
+
+
+# Heat-reuse guide (/guides/bitcoin-mining-heat-your-home/). The heat-pump comparison uses the US DOE's statement that modern
+# air-source heat pumps cut electricity use for heating by about 50% vs electric resistance heat (energy.gov "Pump Up Your Savings
+# with Heat Pumps"). So a heat pump makes the same heat for about half the power, and a heater miner (power cost minus its pool
+# estimate) is cheaper only while the pool estimate is more than half its power bill: below 2 x its break-even power price.
+HEAT_PUMP_POWER_SHARE = 0.5
+HEAT_GUIDE_PATH = "/guides/bitcoin-mining-heat-your-home/"
+
+
+def heat_pump_beat_rate(mid):
+    """Power price ($/kWh) below which a heater miner's net heat cost is lower than a heat pump making the same heat."""
+    return E.breakeven_rate(MODELS[mid]["hashrate_ths"], mine_watts(mid), NET) / HEAT_PUMP_POWER_SHARE
+
+
+def build_guide_heat_home():
+    if not (NET and NET_OK):
+        return
+    path = HEAT_GUIDE_PATH
+    trail = [("Home", "/"), ("Guides", "/guides/"), ("Heat your home", path)]
+    title = "Mining Bitcoin to heat your home: does it save money? | Bitaxe Radar"
+    desc = "Can a Bitcoin miner heat your home for less? Plain-words math with live numbers: miner vs space heater vs heat pump, and which heater miners fit."
+    ex = [m for m in HEAT_SET if m in TRACKED]
+    ex.sort(key=lambda m: mine_watts(m))
+
+    def price_cell(m):
+        c = cheapest([o for o in offers_for(m) if in_stock(o)])
+        return f'<a href="/models/{m}/">from ${usd(c):,.0f}</a>' if c else f'<a href="/models/{m}/">see shops</a>'
+    rows = "".join(f'<tr><td><a href="/models/{m}/">{esc(SHORT[m])}</a></td><td class="num">≈{btu(mine_watts(m)):,.0f}</td>'
+                   f'<td class="num" data-calc="power"{calc_attrs(m)}>{E.fmt_usd(earn(m)["power"])}</td>'
+                   f'<td class="num">{E.fmt_usd(earn(m)["pool"]["usd_month_shown"])}</td>'
+                   f'<td class="num">{E.fmt_rate(heat_pump_beat_rate(m))}</td><td class="num">{price_cell(m)}</td></tr>' for m in ex)
+    tbl = (f'<div class="tablewrap"><table class="calc-tbl"><thead><tr><th>Miner</th><th class="num">Heat (BTU/h)</th><th class="num">Power /mo</th>'
+           f'<th class="num">Mining pays back /mo</th><th class="num">Beats a heat pump below</th><th class="num">Price today</th></tr></thead><tbody>{rows}</tbody></table></div>'
+           f'<p class="hint">Running 24/7 at the stated mining watts. Heat = watts × 3.412. "Mining pays back" is the pool estimate, which changes with Bitcoin\'s price and network difficulty. '
+           '"Beats a heat pump below" is the power price under which the miner\'s heat, after the mining payback, costs less than a heat pump making the same heat with about half the electricity. '
+           'Prices are the cheapest in-stock listing we found, before shipping and tax.</p>') if ex else ""
+    h = next((m for m in ("avalon-mini-3", "heatbit-maxi", "avalon-q") if m in ex), ex[0] if ex else None)
+    worked = ""
+    if h:
+        e = earn(h)
+        p, back = e["power"], e["pool"]["usd_month_shown"]
+        worked = (f"<p>Take the {esc(SHORT[h])}. It mines at about {mine_watts(h):,g} W, so running it all month costs about "
+                  f"<b>{E.fmt_usd(p)}</b> at {E.fmt_rate(E.POWER_RATE)}/kWh. "
+                  f"{'An' if str(int(mine_watts(h)))[0] == '8' else 'A'} {mine_watts(h):,g} W space heater would cost the same and give the same heat. The miner also pays back about {E.fmt_usd(back)}/mo from pool mining, "
+                  f"so your heat costs about {E.fmt_usd(max(0, p - back))}/mo instead of {E.fmt_usd(p)}.</p>")
+    bw = ""
+    if "heatbit-bitwater" in TRACKED:
+        bw = (f'<p>Hot water is the other big heat bill. The <a href="/models/heatbit-bitwater/">Heatbit Bitwater</a> swaps the lower element in an electric tank water heater for mining chips, '
+              "so the tank heats your water while it mines. It's a pre-order that Heatbit says ships in early 2027, and it only fits standard electric tank heaters.</p>")
+    faq = [("Can a Bitcoin miner heat a room?", "Yes. Nearly every watt a miner uses comes out as heat, like an electric space heater, so a 1,000 W miner warms a room about as much as a 1,000 W heater."),
+           ("Is a heater miner cheaper than a space heater?", "Usually a little. Both turn the same power into the same heat, and the miner also earns a small amount from pool mining, so your heat costs a bit less. How much depends on Bitcoin's price and the network."),
+           ("Is a heater miner cheaper than a heat pump?", "Usually not at typical US power prices. The US Department of Energy says a modern heat pump uses about half the electricity of electric resistance heat for the same warmth. The table shows the power price below which each miner wins."),
+           ("What about summer?", "If you don't need the heat, the power is just a mining cost. Most owners turn heater miners down or off in warm months, or run them only on cheap power.")]
+    body = f"""<article>
+<header class="hero"><h1>Mining to heat your home</h1>
+<p class="lede">Short answer: a miner heats a room exactly like an electric space heater, and pays a little back while it does. It beats a plain space heater, but usually not a heat pump.</p>
+<p class="meta">Updated <time datetime="2026-10-24">Oct 24, 2026</time> · 3-minute read · live numbers</p>
+{rate_box()}</header>
+<section aria-labelledby="h-1"><h2 id="h-1">1. The heat isn't wasted</h2>
+<p>A mining chip turns almost all of its electricity into heat. In a data center that heat is a problem someone pays to blow away. In your home in winter, it's heat you'd pay for anyway. That's the whole idea: use one bill twice, once for warmth and once for mining.</p>
+{worked}</section>
+<section aria-labelledby="h-2"><h2 id="h-2">2. Heater miners side by side</h2>
+<p>Type your power price above and the power column updates.</p>
+{tbl}
+<p><a href="/heat-calculator/">Which one fits my room?</a> · <a href="/heater-miners/">All heater miners</a></p></section>
+<section aria-labelledby="h-3"><h2 id="h-3">3. What it beats, and what it doesn't</h2>
+<ul><li><strong>Beats a plain electric space heater or baseboard heat:</strong> same power, same heat, plus the mining payback.</li>
+<li><strong>Usually loses to a heat pump:</strong> a heat pump moves heat in from outside instead of making it, and the <a href="https://www.energy.gov/articles/pump-your-savings-heat-pumps" rel="nofollow noopener" target="_blank">US Department of Energy</a> says that cuts electricity for heating by about 50%. A miner only wins with cheap power, as the last column shows.</li>
+<li><strong>Gas heat:</strong> depends on your gas and power prices. Compare your bills before switching.</li></ul></section>
+<section aria-labelledby="h-4"><h2 id="h-4">4. Other ways to reuse the heat</h2>
+{bw}
+<ul><li><strong>Run it only in heating season:</strong> on in the cold months, down or off in summer, so you only pay for heat you want.</li>
+<li><strong>Put it where you need warmth:</strong> a cold bedroom, a home office, a basement or a garage workshop.</li>
+<li><strong>Use a thermostat or low mode:</strong> most heater miners can run cooler, so a big one won't overheat a small room.</li></ul></section>
+<section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
+<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/how-heater-miners-work/">How a heater miner works</a></li><li><a href="/guides/solar-bitcoin-mining/">Can solar power a miner?</a></li><li><a href="/guides/is-home-mining-worth-it/">Is home mining worth it?</a></li><li><a href="/best/heating-a-room/">Best for heating a room</a></li></ul>
+<p class="hint">Not financial advice. These are estimates; mining earnings aren't guaranteed and change with Bitcoin's price and network difficulty. Follow the maker's guidance on circuits and placement.</p></section>
+</article>"""
+    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Mining Bitcoin to heat your home", desc), faq_ld(faq)], lastmod="2026-10-24", og_type="article")
 
 
 # ---------------------------------------------------------------------------------------------
@@ -3034,6 +3116,7 @@ def build_indexes():
           ("/heat-calculator/", "Room heat calculator", "Which heater miner fits your room."),
           ("/price-per-th/", "Price per TH/s leaderboard", "Most hashrate per dollar, and is today's price good?"),
           ("/guides/solar-bitcoin-mining/", "Can solar power a miner?", "Panels needed for each miner."),
+          ("/guides/bitcoin-mining-heat-your-home/", "Mining to heat your home", "Miner vs space heater vs heat pump."),
           ("/guides/solo-vs-pool-mining/", "Solo vs pool mining", "Lottery shot or small steady payouts?"),
           ("/guides/how-heater-miners-work/", "How heater miners work", "A miner that warms the room."),
           ("/where-to-buy-bitaxe/", "Where to buy a Bitaxe", "Every shop, ranked by today's price."),
@@ -3079,6 +3162,7 @@ def main():
     build_guide_pool()
     build_guide_worth()
     build_guide_solar()
+    build_guide_heat_home()
     build_solo_odds()
     build_heat_calc()
     build_solo_wins()

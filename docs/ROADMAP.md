@@ -19,7 +19,7 @@ Updated: Oct 24, 2026
 2. Black Friday push in November (deals page live by about Nov 10, Black Friday is Nov 27).
 3. Energy guides that bring in buyers (solar one is live):
    - ✅ "Can solar power a Bitcoin miner?": live Oct 24 at /guides/solar-bitcoin-mining/.
-   - "Mining to heat your home": heat reuse. Links to the heater miners page, the room heat calculator (/heat-calculator/) and Heatbit Bitwater (/models/heatbit-bitwater/).
+   - ✅ "Mining to heat your home": live Oct 24 at /guides/bitcoin-mining-heat-your-home/.
    - Why: people asking these questions are often ready to buy. Energy (solar, heat reuse) is your main interest. And it doubles as an energy project for your AI/ML portfolio.
 
 ## 💰 Money
@@ -27,7 +27,7 @@ Updated: Oct 24, 2026
 Affiliate programs (we earn when someone buys through our link):
 
 - ✅ Power Mining: live since Oct 16.
-- ✅ Bitaxe.de: approved Oct 24 (5%). Not linked yet: their referral code is your real name, so it waits until they give us a brand code (email draft waiting on your OK).
+- ✅ Bitaxe.de: approved Oct 24 (5%). Brand code bitaxeradar set by their support; links live since Oct 24.
 - ⏳ Solo Satoshi: applied Oct 16, waiting.
 - ⏳ D-Central: applied Oct 21, waiting.
 - ⏳ DTV Electronics: applied Oct 21, waiting.
@@ -52,7 +52,7 @@ Later:
 ## 🙋 Waiting on the owner
 
 - Heatbit affiliate: click the verify link (in the contact@ inbox).
-- Bitaxe.de: OK the email asking for a brand referral code, and add payout details in their dashboard.
+- Bitaxe.de: add payout details in their affiliate dashboard (bitaxe.de/affiliate/dashboard).
 - Rename decision (no rush).
 - PO Box address before the first newsletter email goes out.
 
@@ -96,6 +96,8 @@ Later:
   - Shop pages: the "Store" link now uses our affiliate code where we have one (Power Mining).
 - Oct 23: Price-drop posts for X: a "New lows this week" box at the top of /price-per-th/ (miners whose cheapest in-stock price just fell below every in-stock price we logged before, shown only while it stays that low), and a script that turns each new low into a ready X post draft for the afternoon X slot. First one found: Bitaxe Gamma back in stock at Solo Satoshi for $67, under our earlier $119.99 low.
 - Oct 24: Solar guide (/guides/solar-bitcoin-mining/): how many 400 W panels each miner needs to run 24/7, daytime-only vs batteries, with today's prices. Example assumptions shown on the page (4 peak sun hours, NREL's 14% losses).
+- Oct 24: Bitaxe.de affiliate links live (code bitaxeradar).
+- Oct 24: Heat guide (/guides/bitcoin-mining-heat-your-home/): miner vs space heater vs heat pump with live numbers. Each heater miner shows its power cost, what mining pays back, and the power price below which it beats a heat pump (DOE: heat pumps use about 50% less electricity). Also hot-water heating (Heatbit Bitwater) and winter-only tips.
 - Oct 21: Room heat calculator (/heat-calculator/): type your room size, see how much heat it needs and which miners can heat it, with today's prices.
 
 ## 📊 Numbers (Oct 24)
@@ -106,4 +108,4 @@ Later:
 - X: 1 follower, 4 to 12 views per post
 - Miners tracked: 29
 - Sellers tracked: 11
-- Pages on the site: 75
+- Pages on the site: 76
