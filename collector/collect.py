@@ -97,7 +97,7 @@ SELLERS = {
     "solosatoshi":  {"name": "Solo Satoshi", "url": "https://www.solosatoshi.com", "currency": "USD", "method": "WooCommerce Store API (variation-level stock)",
                      "affiliate": "Unknown - not checked"},
     "bitaxede":     {"name": "Bitaxe.de", "url": "https://bitaxe.de", "currency": "EUR", "method": "Product-page schema.org JSON-LD",
-                     "affiliate": "Reported via third-party article; not yet confirmed with seller"},
+                     "affiliate": "Affiliate program joined Oct 24, 2026 (5%, ref=bitaxeradar)"},
     "powermining":  {"name": "Power Mining", "url": "https://powermining.io", "currency": "EUR", "method": "Shopify products.json (US storefront via localization cookie: ex-VAT prices)",
                      "affiliate": "Up to 10% via GoAffPro (powermining.io/pages/affiliate); not yet joined"},
     "altair":       {"name": "Altair Technology", "url": "https://altairtech.io", "currency": "USD", "method": "Product page (WooCommerce variation data / JSON-LD)",
