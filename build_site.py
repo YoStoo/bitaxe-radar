@@ -1510,8 +1510,12 @@ def bf_row(mid):
     now_cell = (("≈ " if b["currency"] != "USD" else "") + money(now)) if b else "&ndash;"
     lo_cell = f'{money(lo)}<br><small>{esc(fmt_day(lo_t))}</small>' if lo is not None else "&ndash;"
     buy = offer_link(b, "View ↗") if b else f'<a href="/models/{mid}/#alerts">Get alert</a>'
-    return (f'<tr><td><a href="/models/{mid}/">{esc(SHORT[mid])}</a></td><td class="num">{now_cell}</td><td>{esc(sname(b["seller"])) if b else "&ndash;"}</td>'
-            f'<td class="num">{lo_cell}</td><td>{verdict}</td><td>{buy}</td></tr>'), at_low
+    # data-label = the column name, shown above each value when the row turns into a card on phones (see .bf-table in style.css)
+    return (f'<tr><td class="bf-miner"><a href="/models/{mid}/">{esc(SHORT[mid])}</a></td>'
+            f'<td class="num bf-now" data-label="Cheapest in stock">{now_cell}</td>'
+            f'<td class="bf-shop" data-label="Shop">{esc(sname(b["seller"])) if b else "&ndash;"}</td>'
+            f'<td class="num bf-low" data-label="Lowest we\'ve logged">{lo_cell}</td>'
+            f'<td class="bf-vs" data-label="Today vs that low">{verdict}</td><td class="bf-buy">{buy}</td></tr>'), at_low
 
 
 def bf_sort_key(mid):
@@ -1526,7 +1530,8 @@ def build_black_friday():
     trail = [("Home", "/"), ("Deals", "/deals/"), ("Black Friday 2026", path)]
     first = min((pts[0]["t"] for pts in history.values() if pts), default=latest["generated_at"])
     days = max(0, (GEN - parse_t(first)).days)
-    head = ('<thead><tr><th>Miner</th><th class="num">Cheapest in stock now</th><th>Shop</th><th class="num">Lowest in-stock price we\'ve logged so far</th>'
+    head = ('<thead><tr><th>Miner</th><th class="num">Cheapest in stock</th><th>Shop</th>'
+            '<th class="num" title="Lowest in-stock price we\'ve logged so far">Lowest we\'ve logged</th>'
             '<th>Today vs that low</th><th>Buy</th></tr></thead>')
     sections, jump, items, n_all, n_low_all = [], [], [], 0, 0
     for key, h, blurb in BF_GROUPS:
@@ -1541,7 +1546,7 @@ def build_black_friday():
         jump.append(f'<a href="#bf-{key}">{esc(h)} ({len(mids)})</a>')
         sections.append(f'<section aria-labelledby="bf-{key}" class="bf-group"><h2 id="bf-{key}">{esc(h)}</h2><p>{esc(blurb)}</p>'
                         f'<p class="meta">{len(mids)} miners · {n_ins} in stock now · {n_low} at the lowest in-stock price we\'ve logged so far</p>'
-                        f'<div class="tablewrap"><table>{head}<tbody>{"".join(r for r, _ in rows)}</tbody></table></div></section>')
+                        f'<div class="tablewrap bf-wrap"><table class="bf-table">{head}<tbody>{"".join(r for r, _ in rows)}</tbody></table></div></section>')
     title = "Bitaxe & home miner Black Friday 2026 deals: live prices vs our price log | Bitaxe Radar"
     desc = f"Black Friday 2026 deals on {n_all} home Bitcoin miners (Bitaxe, desk and heater miners): today's price vs the lowest we've logged so far."
     body = f"""<article>

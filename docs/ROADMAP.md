@@ -19,6 +19,7 @@ Updated: Oct 25, 2026 (evening)
 2. Black Friday push in November (deals page live by about Nov 10, Black Friday is Nov 27).
    - ✅ Black Friday page covers every miner type: live Oct 25 at /bitaxe-black-friday/ (Bitaxe-class, home/desk and heater miners, today's price vs the lowest we've logged so far).
    - ✅ Black Friday banner on the home and deals pages: built Oct 25, turns itself on Nov 20 and off after Dec 1.
+   - ✅ Black Friday tables fit phones: Oct 25, each miner is a card on phones (Buy button visible, no sideways scroll); tidier columns on desktop.
    - Still to do: X posts pointing at the page in November, and a Black Friday newsletter issue on the site.
 3. Energy guides that bring in buyers (solar one is live):
    - ✅ "Can solar power a Bitcoin miner?": live Oct 24 at /guides/solar-bitcoin-mining/.

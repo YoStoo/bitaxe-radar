@@ -404,3 +404,29 @@ details .tablewrap{margin-bottom:14px}
 .bf-banner p{margin:0;display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
 .bf-banner b{color:var(--accent-2)}
 .bf-group h2{margin-bottom:4px}
+/* Black Friday tracker tables: balanced columns on desktop, one card per miner on phones (no sideways scroll) */
+.bf-table td.bf-miner,.bf-table td.bf-shop{white-space:nowrap}
+.bf-table td.bf-miner{font-weight:700}
+.bf-table td.bf-vs{min-width:150px;max-width:260px}
+.bf-table td.bf-buy{white-space:nowrap}
+.bf-table td.bf-buy .ph{font-size:11px}
+@media (min-width:641px) and (max-width:1100px){
+  .bf-table th,.bf-table td{padding:10px 8px}
+  .bf-table th,.bf-table td.bf-miner,.bf-table td.bf-shop,.bf-table td.bf-vs .badge{white-space:normal}
+  .bf-table td.bf-vs{min-width:120px}
+}
+@media (max-width:640px){
+  .bf-wrap{overflow-x:visible}
+  .bf-table thead{display:none}
+  .bf-table,.bf-table tbody,.bf-table tr,.bf-table td{display:block;width:100%}
+  .bf-table tr{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;padding:14px;border-bottom:1px solid var(--line)}
+  .bf-table tr:last-child{border-bottom:0}
+  .bf-table td{border:0;padding:0;text-align:left;white-space:normal;max-width:none;min-width:0}
+  .bf-table td[data-label]::before{content:attr(data-label);display:block;color:var(--faint);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+  .bf-table td.bf-miner{grid-column:1/-1;font-size:16.5px}
+  .bf-table td.bf-now{font-weight:800;font-size:17px}
+  .bf-table td.bf-low br{display:none}
+  .bf-table td.bf-low small{color:var(--muted);margin-left:6px}
+  .bf-table td.bf-vs,.bf-table td.bf-buy{grid-column:1/-1}
+  .bf-table td.bf-buy .btn{display:block;width:100%;text-align:center}
+}

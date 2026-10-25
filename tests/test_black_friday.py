@@ -88,7 +88,7 @@ class TrackerPage(unittest.TestCase):
         hist = json.loads((ROOT / "data" / "history.json").read_text())
         offers = self.latest["offers"]
         for mid in ("bitaxe-gamma", "nerdqaxe-pp", "avalon-q"):
-            row = re.search(rf'<tr><td><a href="/models/{mid}/">.*?</tr>', self.html).group(0)
+            row = re.search(rf'<tr><td[^>]*><a href="/models/{mid}/">.*?</tr>', self.html).group(0)
             cells = re.findall(r"<td[^>]*>(.*?)</td>", row)
             m = re.match(r"\$([\d,]+\.\d\d)", cells[3])
             if not m:
@@ -104,6 +104,26 @@ class TrackerPage(unittest.TestCase):
         self.assertIn('href="/heater-miners/"', self.html)
         for page in ("deals", "in-stock", "price-per-th"):   # Black Friday tab on every deals page
             self.assertIn('href="/bitaxe-black-friday/"', re.search(r'aria-label="Deals filter">(.*?)</nav>', (SITE / page / "index.html").read_text()).group(1), page)
+
+    def test_phone_cards_and_desktop_columns(self):
+        """Phones get one stacked card per miner (no sideways scroll to reach Buy); desktop gets a short low-price header."""
+        css = (SITE / "style.css").read_text()
+        m = re.search(r"@media \(max-width:640px\)\{(.*?)\n\}", css, re.S)
+        self.assertIsNotNone(m, "missing the <=640px Black Friday card block")
+        phone = m.group(1)
+        for rule in (".bf-table thead{display:none}", ".bf-table tr{display:grid", "content:attr(data-label)",
+                     ".bf-wrap{overflow-x:visible}", ".bf-table td.bf-buy .btn{display:block;width:100%"):
+            self.assertIn(rule, phone, rule)
+        self.assertIn(".bf-table td.bf-miner,.bf-table td.bf-shop{white-space:nowrap}", css)
+        self.assertEqual(self.html.count('<table class="bf-table">'), self.html.count('class="bf-group"'))
+        rows = re.findall(r'<tr><td class="bf-miner">.*?</tr>', self.html)
+        self.assertGreaterEqual(len(rows), 20)
+        for row in rows:
+            for cls, label in (("bf-now", "Cheapest in stock"), ("bf-shop", "Shop"), ("bf-low", "Lowest we&#x27;ve logged"), ("bf-vs", "Today vs that low")):
+                self.assertRegex(H.unescape(row), rf'class="[^"]*{cls}" data-label="{H.unescape(label)}"')
+            self.assertIn('class="bf-buy"', row)
+        self.assertIn("Lowest we've logged</th>", H.unescape(self.html))
+        self.assertNotIn("all-time", css.lower())
 
     def test_banner_matches_build_date(self):
         """The built pages carry the banner exactly when the data date is in the window (today, before Nov 20, they don't)."""
