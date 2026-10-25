@@ -87,6 +87,9 @@ MODELS = {
     "nmqaxe-nexus":     {"name": "NMMiner NMQAxe++ Nexus", "category": "home", "kind": "Desk miner", "maker": "NMMiner",
                          "chip": "2x BM1373", "hashrate_ths": 8.5, "watts": 110,
                          "note": "Maker-stated ~8.5 TH/s at ~110 W in Normal mode (Eco ~6 TH/s at ~63 W; Turbo ~11 TH/s at ~172 W)"},
+    # added 2026-10-25 from docs/MINER_CATALOG.md: four-chip AxeOS board sold by Bitcoin Merch (maker not named on the listing)
+    "nerdqx":           {"name": "NerdQX (8.1 TH/s)", "category": "board", "chip": "4x BM1370", "hashrate_ths": 8.1, "watts": 138,
+                         "note": "Seller-stated up to 8.1 TH/s at about 138 W (Bitcoin Merch); the listing does not name the maker"},
 }
 # hashrate_ths / watts above are typical VENDOR-STATED figures used only for the cost estimate.
 # They are approximate and must be labelled as such on the site.
@@ -133,6 +136,7 @@ BITCOINMERCH = {  # Shopify handle
     "hammer-thor-p2":   "bitcoin-merch®-hammer-miner-thor-p2-10th-s-lottery-miner-w-power-supply",
     "gekko-kbox-22":    "bitcoin-merch®-gekkoscience-kbox-22th-s-bitcoin-miner-heater",
     "avalon-nano-3s":   "bitcoin-merch-avalon-nano-3s-bitcoin-miner-6-th-s",
+    "nerdqx":           "bitcoin-merch®-nerdqx-8th-s-home-miner-w-power-supply",
 }
 SOLOSATOSHI = {  # WooCommerce slug
     "bitaxe-supra":     "bitaxe-supra",
@@ -194,7 +198,7 @@ TITLE_MUST = {
     "bitaxe-gamma-hex": ["hex", "1300"], "bitaxe-naja-duo": ["naja duo"], "nerdoctaxe": ["nerdoctaxe"],
     "bitforge-nano": ["bitforge nano"], "heatbit-bitair": ["bitair"], "heatbit-bitwater": ["bitwater"], "futurebit-apollo-iii": ["apollo iii"],
     "hammer-thor-p2": ["thor p2"], "hammer-bc08": ["bc08"], "gekko-kbox-22": ["kbox"], "dcentral-stealthminer": ["stealthminer"],
-    "nmqaxe-nexus": ["nmqaxe", "nexus"],
+    "nmqaxe-nexus": ["nmqaxe", "nexus"], "nerdqx": ["nerdqx"],
 }
 TITLE_NOT = {  # words that mean a different product (accessory, other edition)
     "bitforge-nano": ["ghost"], "nerdoctaxe": ["stand", "screen", "fan", "heatsink", "hydro"], "bitaxe-naja-duo": ["stand", ".stl"],

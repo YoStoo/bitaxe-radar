@@ -208,7 +208,7 @@ SHORT = {"bitaxe-supra": "Bitaxe Supra", "bitaxe-ultra": "Bitaxe Ultra", "bitaxe
          "heatbit-maxi": "Heatbit Maxi", "heatbit-canvas": "Heatbit Canvas", "braiins-bmm-101": "Braiins Mini Miner", "hammer-bc04": "Hammer BC04",
          "bitaxe-gamma-hex": "Bitaxe Gamma Hex", "bitaxe-naja-duo": "Bitaxe Naja Duo", "nerdoctaxe": "NerdOCTaxe Gamma", "bitforge-nano": "BitForge Nano",
          "heatbit-bitair": "Heatbit Bitair", "futurebit-apollo-iii": "FutureBit Apollo III", "hammer-thor-p2": "Hammer Thor P2", "hammer-bc08": "Hammer BC08",
-         "gekko-kbox-22": "GekkoScience KBox 22", "dcentral-stealthminer": "D-Central StealthMiner", "bitcube": "Bitcube", "heatbit-bitwater": "Heatbit Bitwater", "nmqaxe-nexus": "NMQAxe++ Nexus"}
+         "gekko-kbox-22": "GekkoScience KBox 22", "dcentral-stealthminer": "D-Central StealthMiner", "bitcube": "Bitcube", "heatbit-bitwater": "Heatbit Bitwater", "nmqaxe-nexus": "NMQAxe++ Nexus", "nerdqx": "NerdQX"}
 NOINDEX_MODELS = {"bitaxe-supra", "bitaxe-ultra"}   # older generations: pages exist for completeness but stay out of the index/sitemap
 
 MODEL_COPY = {
@@ -394,6 +394,13 @@ NEW_COPY = {   # added 2026-10-21 (docs/MINER_CATALOG.md). Stock settings only; 
                "Its listing says it runs on a 12 V / 15 A adapter (180 W max), and you pick the plug type (US, EU, UK or AUS) at checkout.",
                "The shop's pages don't say where orders ship from, and we couldn't find a warranty stated. Ask the shop before you buy.",
                "Turbo mode means more heat and fan noise. The listing doesn't state a noise level."]),
+    "nerdqx": dict(
+        intro="The NerdQX is a four-chip open-source style board (four Bitmain BM1370 chips) that runs AxeOS, the same web dashboard as a Bitaxe. Bitcoin Merch states up to 8.1 TH/s at about 138 W, with three fans.",
+        who="Someone who wants NerdQaxe++-class hashrate or more in one box for solo mining, and is happy to buy from one US shop.",
+        check=["Right now only Bitcoin Merch sells it among the shops we track, and its listing says it ships in 2-3 weeks.",
+               "The listing doesn't name who makes the board, so ask the shop about warranty before you buy.",
+               "The power supply is included, per the listing title.",
+               "Compare the price per TH/s with the NerdQaxe++ and the Naja Duo before you buy."]),
 }
 MODEL_COPY.update(NEW_COPY)
 
@@ -539,7 +546,7 @@ NAV_SECTIONS = {"/miners/": ("/miners/", "/solo-miners/", "/pool-miners/", "/hea
 # Browse-by-type categories. Any miner can solo or pool mine; these say what each is best suited to. A miner can be in several.
 SOLO_SET = ["bitaxe-gamma", "bitaxe-gamma-duo", "bitaxe-gt-801", "nerdaxe-gamma", "nerdaxe-gaia", "nerdqaxe-pp",
             "braiins-bmm-101", "avalon-nano-3s", "hammer-bc04", "bitaxe-supra", "bitaxe-ultra",
-            "bitaxe-naja-duo", "bitforge-nano", "heatbit-bitair", "bitaxe-gamma-hex", "nerdoctaxe", "hammer-thor-p2", "hammer-bc08", "futurebit-apollo-iii", "bitcube", "nmqaxe-nexus"]
+            "bitaxe-naja-duo", "bitforge-nano", "heatbit-bitair", "bitaxe-gamma-hex", "nerdoctaxe", "hammer-thor-p2", "hammer-bc08", "futurebit-apollo-iii", "bitcube", "nmqaxe-nexus", "nerdqx"]
 POOL_SET = ["avalon-nano-3s", "hammer-bc04", "heatbit-canvas", "heatbit-trio", "avalon-mini-3", "heatbit-maxi", "avalon-q",
             "bitaxe-gamma-hex", "nerdoctaxe", "hammer-thor-p2", "hammer-bc08", "futurebit-apollo-iii", "gekko-kbox-22", "dcentral-stealthminer", "heatbit-bitwater", "nmqaxe-nexus"]
 HEAT_SET = ["avalon-nano-3s", "heatbit-canvas", "heatbit-trio", "avalon-mini-3", "heatbit-maxi", "avalon-q", "gekko-kbox-22", "dcentral-stealthminer"]
@@ -560,7 +567,7 @@ RADAR_BG = ('<svg class="radar-bg" viewBox="0 0 200 200" aria-hidden="true" focu
             '<circle cx="100" cy="100" r="96"/><circle cx="100" cy="100" r="72"/><circle cx="100" cy="100" r="48"/><circle cx="100" cy="100" r="24"/>'
             '<path d="M100 0v200M0 100h200" stroke-opacity=".5"/></g><path d="M100 100 L132.8 9.8 A96 96 0 0 1 178.6 45 Z" fill="#f7931a" fill-opacity=".8"/></svg>')
 CHIPS = {"bitaxe-supra": 1, "bitaxe-ultra": 1, "bitaxe-gamma": 1, "bitaxe-gamma-duo": 2, "bitaxe-gt-801": 2,
-         "nerdaxe-gamma": 1, "nerdaxe-gaia": 1, "nerdqaxe-pp": 4, "nerdoctaxe": 4, "dcentral-stealthminer": 4}
+         "nerdaxe-gamma": 1, "nerdaxe-gaia": 1, "nerdqaxe-pp": 4, "nerdoctaxe": 4, "nerdqx": 4, "dcentral-stealthminer": 4}
 SCREEN = {"nerdaxe-gamma", "nerdaxe-gaia"}
 
 

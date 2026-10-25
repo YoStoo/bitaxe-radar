@@ -81,7 +81,7 @@ Internal research doc. This doc doesn't change any site code.
 | NerdQaxe+ (4x BM1368) | Open-source | ~2.4-2.5 TH/s | ? | $375-380 | solo | bitcoinmerch.com $379.99, D-Central CA$529.99, solosatoshi.com (OOS) | ❌ | JSON | Being superseded by the ++ |
 | NerdQaxe++ (incl. Hydro) | Open-source | 4.8-6 TH/s | ~80-100 W | $190-462 | solo | solosatoshi.com Rev 7 $189.99 (OOS), bitcoinmerch.com $274.99 (Hydro $299.99), powermining.io €363 | ✅ | JSON | |
 | NerdOCTaxe Gamma (8x BM1370) | Open-source | 9-12 TH/s | ~160-200 W | $449.99-600 | pool | bitcoinmerch.com $449.99 (Hydro $599.99), D-Central CA$849.99 (OOS), luckyminerclub.com $458 | ❌ | JSON | |
-| NerdQX 8T | ? | 8.1 TH/s | 138 W | $299-450 | solo | bitcoinmerch.com $449.99, luckyminerclub.com $299 | ❌ | JSON | ⚠ Maker unclear |
+| NerdQX 8T | ? | 8.1 TH/s | 138 W | $299-450 | solo | bitcoinmerch.com $449.99, luckyminerclub.com $299 | ✅ | JSON | ⚠ Maker unclear |
 | NerdNOS | Open-source | ? | ? | $69-95 | solo | altairtech.io $69.42, D-Central CA$94.99 | ❌ | HTML/JSON | Specs not checked |
 | NerdMiner V2 (ESP32) | Open-source | kH/s range (no ASIC) | <1 W | $30-50 | solo (toy) | bitcoinmerch.com $34.99-44.99, altairtech.io $44.99, powermining.io €50, D-Central CA$49.99 | ❌ | JSON | A novelty with effectively zero odds. It gets high search volume. |
 

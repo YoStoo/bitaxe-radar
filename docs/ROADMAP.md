@@ -1,6 +1,6 @@
 # Bitaxe Radar Roadmap
 
-Updated: Oct 24, 2026
+Updated: Oct 25, 2026
 
 ## 🎯 Goal
 
@@ -10,8 +10,8 @@ Updated: Oct 24, 2026
 
 ## 🔨 Now
 
-- Add more home miners: 79 found, 29 on the site so far.
-- Add next: Bitaxe 702, NerdQX, Avalon Nano 3.
+- Add more home miners: 79 found, 30 on the site so far.
+- Add next: Bitaxe 702, Avalon Nano 3.
 
 ## ⏭️ Next up (in order)
 
@@ -57,6 +57,8 @@ Later:
 - PO Box address before the first newsletter email goes out.
 
 ## ✅ Done
+
+- Oct 25: Added the NerdQX (4x BM1370, about 8.1 TH/s at 138 W) at /models/nerdqx/, tracked at Bitcoin Merch ($449.99, ships in 2-3 weeks).
 
 - Oct 16: Site launched. Price and stock tracking every 6 hours.
 - Oct 16: Power Mining affiliate link added.

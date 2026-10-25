@@ -14,7 +14,8 @@ class CollectorRules(unittest.TestCase):
               ("hammer-thor-p2", "Thor P2 Bitcoin Miner – 10 TH/s Dual BM1373 ASIC Miner"),
               ("futurebit-apollo-iii", "Apollo III - Standard Version - Miner Only - Ships in 4-6 Weeks"),
               ("bitaxe-gamma-hex", "Bitaxe Gamma Hex Bitcoin Solo Miner (1300 Model)"),
-              ("nmqaxe-nexus", "NMQAxe++ Nexus — Powerful Dual BM1373 Bitcoin Miner")]
+              ("nmqaxe-nexus", "NMQAxe++ Nexus — Powerful Dual BM1373 Bitcoin Miner"),
+              ("nerdqx", "Bitcoin Merch® - NerdQX 8TH/s Home Miner w/ Power Supply")]
         bad = [("bitforge-nano", "BitForge Nano Bitcoin Solo Miner (Ghost Edition)"),
                ("nerdoctaxe", "Bitcoin Merch® - NerdOCTaxe Stand"),
                ("nerdoctaxe", "Bitcoin Merch® - NerdOCTaxe Hydro 12TH/s BTC Miner"),
@@ -34,7 +35,8 @@ class CollectorRules(unittest.TestCase):
         self.assertEqual(C.MODELS["nerdoctaxe"]["hashrate_ths"], 9.6)          # 12 TH/s is an overclock
         self.assertEqual(C.MODELS["bitaxe-gamma-hex"]["hashrate_ths"], 8.4)
         self.assertNotIn("bitaxe-touch", C.MODELS)                             # sellers list different hardware under one name
-        self.assertEqual(C.MODELS["nmqaxe-nexus"]["hashrate_ths"], 8.5)        # Normal mode; ~11 TH/s is Turbo
+        self.assertEqual(C.MODELS["nmqaxe-nexus"]["hashrate_ths"], 8.5)
+        self.assertEqual(C.MODELS["nerdqx"]["hashrate_ths"], 8.1)        # Normal mode; ~11 TH/s is Turbo
         for m in ("dtv", "futurebit", "nmminer"):
             self.assertIn(m, C.SELLERS)
             self.assertIn(m, C.ADAPTERS)
