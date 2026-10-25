@@ -106,12 +106,12 @@ Later:
 - Oct 24: Heat guide (/guides/bitcoin-mining-heat-your-home/): miner vs space heater vs heat pump with live numbers. Each heater miner shows its power cost, what mining pays back, and the power price below which it beats a heat pump (DOE: heat pumps use about 50% less electricity). Also hot-water heating (Heatbit Bitwater) and winter-only tips.
 - Oct 21: Room heat calculator (/heat-calculator/): type your room size, see how much heat it needs and which miners can heat it, with today's prices.
 
-## 📊 Numbers (Oct 24)
+## 📊 Numbers (Oct 25)
 
 - Revenue: $0 (no commission emails yet)
 - Visitors: unknown today (Cloudflare stats not readable from here)
 - Subscribers: 1 confirmed (from the 6-hourly alert run)
 - X: 1 follower, 4 to 12 views per post
-- Miners tracked: 29
+- Miners tracked: 30
 - Sellers tracked: 11
-- Pages on the site: 76
+- Pages on the site: 77
