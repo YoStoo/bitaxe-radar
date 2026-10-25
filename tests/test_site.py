@@ -281,7 +281,7 @@ class SiteTests(unittest.TestCase):
         css = (SITE / "style.css").read_text()
         self.assertNotRegex(re.search(r"\.top nav\{[^}]*\}", css).group(0), "overflow-x")
         # Bitaxe-only home sections still exclude home miners (Deals and In stock now cover everything)
-        for page in ["bitaxe-black-friday/index.html", "where-to-buy-bitaxe/index.html"]:
+        for page in ["where-to-buy-bitaxe/index.html"]:   # (the Black Friday tracker covers every miner type since Oct 25)
             txt = (SITE / page).read_text()
             for mid in home_ids:
                 self.assertNotIn(f'href="/models/{mid}/"', txt.split('<footer')[0].split('id="alerts"')[0], f"{page} lists {mid}")
