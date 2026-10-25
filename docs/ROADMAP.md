@@ -1,6 +1,6 @@
 # Bitaxe Radar Roadmap
 
-Updated: Oct 25, 2026
+Updated: Oct 25, 2026 (evening)
 
 ## 🎯 Goal
 
@@ -17,6 +17,9 @@ Updated: Oct 25, 2026
 
 1. Daily X posts and replies on @BitaxeRadar.
 2. Black Friday push in November (deals page live by about Nov 10, Black Friday is Nov 27).
+   - ✅ Black Friday page covers every miner type: live Oct 25 at /bitaxe-black-friday/ (Bitaxe-class, home/desk and heater miners, today's price vs the lowest we've logged so far).
+   - ✅ Black Friday banner on the home and deals pages: built Oct 25, turns itself on Nov 20 and off after Dec 1.
+   - Still to do: X posts pointing at the page in November, and a Black Friday newsletter issue on the site.
 3. Energy guides that bring in buyers (solar one is live):
    - ✅ "Can solar power a Bitcoin miner?": live Oct 24 at /guides/solar-bitcoin-mining/.
    - ✅ "Mining to heat your home": live Oct 24 at /guides/bitcoin-mining-heat-your-home/.
@@ -58,6 +61,7 @@ Later:
 
 ## ✅ Done
 
+- Oct 25: Black Friday page now covers all 28 current miners in three groups (Bitaxe-class, home/desk, heater), each with today's price next to the lowest we've logged so far. Plus a Black Friday tab on the deals pages and a banner that shows Nov 20 to Dec 1.
 - Oct 25: Added the NerdQX (4x BM1370, about 8.1 TH/s at 138 W) at /models/nerdqx/, tracked at Bitcoin Merch ($449.99, ships in 2-3 weeks).
 
 - Oct 16: Site launched. Price and stock tracking every 6 hours.
