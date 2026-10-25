@@ -1,9 +1,9 @@
 {
- "network_hashrate_hs": 1.070962199552069e+21,
+ "network_hashrate_hs": 1.070577891761633e+21,
  "difficulty": 140577680051919.6,
  "subsidy_btc": 3.125,
- "avg_fees_btc": 0.01381768,
- "btc_usd": 80820.0,
- "fetched_at": "2026-10-25T04:42:55Z",
+ "avg_fees_btc": 0.01204254,
+ "btc_usd": 80334.0,
+ "fetched_at": "2026-10-25T11:31:02Z",
  "source": "mempool.space"
 }
