@@ -2028,6 +2028,7 @@ Bitaxe Radar is independent. Some shop links are affiliate links; they never cha
 - [Can solar power a Bitcoin miner?]({BASE}/guides/solar-bitcoin-mining/): how many 400 W panels each miner needs (example: 4 peak sun hours, 14% losses), daytime-only vs batteries.
 - [Mining to heat your home]({BASE}/guides/bitcoin-mining-heat-your-home/): a miner heats like an electric space heater and pays a little back; it beats a space heater but usually not a heat pump (DOE: about 50% less electricity).
 - [Solo vs pool mining]({BASE}/guides/solo-vs-pool-mining/): solo is a lottery for a whole block; pool pays small, steady amounts.
+- [Which mining pool should I use?]({BASE}/guides/bitcoin-mining-pools/): Public Pool (solo, no fee), Solo CKPool (solo, 2%), Parasite Pool (hybrid: 1 BTC to the block finder, no fee), OCEAN (shared, 2%, 1% with DATUM), Braiins Pool (FPPS, 2.5%), with live sats per day per miner.
 - [How heater miners work]({BASE}/guides/how-heater-miners-work/): a miner turns its electricity into heat like a space heater.
 - [Room heat calculator]({BASE}/heat-calculator/): room size in, heat needed (about 10 W per sq ft as a rule of thumb) and which tracked miners can heat it.
 - [Price per TH/s leaderboard]({BASE}/price-per-th/): miners ranked by price per stated TH/s at today's cheapest in-stock price, with J/TH and a check against the lowest price we have logged.
@@ -2123,7 +2124,7 @@ def build_guide_pool():
 <ul><li><strong>Bitaxe and other tiny miners:</strong> usually solo. A pool would pay them very little, so the long-shot is the fun part. <a href="/solo-miners/">Best for solo mining</a>.</li>
 <li><strong>Heater miners:</strong> usually pool, so the heat you'd pay for anyway earns a little back. <a href="/pool-miners/">Best for pool mining</a> · <a href="/heater-miners/">Heater miners</a>.</li>
 <li><strong>You can switch anytime.</strong> It's a setting in the miner (the pool address), not a different device.</li></ul></section>
-<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/how-heater-miners-work/">How a heater miner works</a></li><li><a href="/miners/">All miner prices</a></li><li><a href="/#miners">Bitaxe prices</a></li></ul>
+<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/bitcoin-mining-pools/">Which mining pool should I use?</a></li><li><a href="/guides/how-heater-miners-work/">How a heater miner works</a></li><li><a href="/miners/">All miner prices</a></li><li><a href="/#miners">Bitaxe prices</a></li></ul>
 <p class="hint">Not financial advice. Mining costs electricity, and earnings aren't guaranteed.</p></section>
 </article>"""
     layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Solo vs pool mining, explained simply", desc)], lastmod=GUIDE_UPDATED, og_type="article")
@@ -2321,6 +2322,113 @@ def build_guide_heat_home():
 <p class="hint">Not financial advice. These are estimates; mining earnings aren't guaranteed and change with Bitcoin's price and network difficulty. Follow the maker's guidance on circuits and placement.</p></section>
 </article>"""
     layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Mining Bitcoin to heat your home", desc), faq_ld(faq)], lastmod="2026-10-24", og_type="article")
+
+
+# Pool guide (/guides/bitcoin-mining-pools/). Pool facts as published on each pool's own page, checked 2026-10-26:
+# Public Pool web.public-pool.io ("NO FEES", Solo and PPLNS modes); solo.ckpool.org ("2% fee", solo, no registration);
+# ocean.xyz ("2% fee, 1% fee for miners who make their own blocks using DATUM", TIDES, payout threshold 0.01048576 BTC);
+# Braiins Academy rewards-and-payouts (FPPS, pool fee 2.5%, Lightning payouts from 1 sat, on-chain minimum 0.0002 BTC);
+# Parasite Pool (1 BTC to the block finder, rest split by shares since the pool's last block, no fee, Lightning payouts)
+# per CoinDesk, Apr 18 2026 (parasite.space itself is a JS app with no readable terms).
+POOL_GUIDE_PATH = "/guides/bitcoin-mining-pools/"
+POOLS_CHECKED = "2026-10-26"
+OCEAN_THRESHOLD_BTC = 0.01048576
+POOLS = [
+    # name, url, type, fee text, how you get paid, best for
+    ("Public Pool", "https://web.public-pool.io/", "Solo (also a shared mode)", "No fee",
+     "Solo: if your miner finds a block, the reward goes straight to your Bitcoin address.", "Bitaxe-class solo miners who want zero fees"),
+    ("Solo CKPool", "https://solo.ckpool.org/", "Solo", "2% of a block you find",
+     "Only if your miner finds a block, paid to your address. No account needed.", "Solo miners who want a long-running service (since 2014)"),
+    ("Parasite Pool", "https://parasite.space/", "Hybrid", "No fee",
+     "The miner that finds a block gets 1 BTC. The rest is split by work done since the pool's last block, paid over Lightning.", "Small miners who want a lottery shot plus a share"),
+    ("OCEAN", "https://ocean.xyz/", "Shared (TIDES)", "2% (1% with DATUM)",
+     "Paid from blocks the pool finds, once you pass about 0.0105 BTC.", "Bigger miners who want payouts straight from the block"),
+    ("Braiins Pool", "https://braiins.com/pool", "Shared (FPPS)", "2.5%",
+     "Steady daily payouts whether or not the pool found a block. Lightning payouts from 1 sat.", "Heater and home miners who want small, steady sats"),
+]
+
+
+def build_guide_pools():
+    if not (NET and NET_OK):
+        return
+    path = POOL_GUIDE_PATH
+    trail = [("Home", "/"), ("Guides", "/guides/"), ("Which pool?", path)]
+    title = "Best Bitcoin mining pool for a Bitaxe or home miner (fees compared) | Bitaxe Radar"
+    desc = "Which Bitcoin mining pool should a home miner use? Public Pool, CKPool, Parasite, OCEAN and Braiins compared: fees, payouts and live sats per miner."
+    # data-label = column name shown above each value when the row becomes a card on phones (.pool-tbl in style.css)
+    prow = "".join(f'<tr><td class="pool-name"><a href="{esc(u)}" rel="nofollow noopener" target="_blank">{esc(n)}</a></td><td data-label="Type">{esc(t)}</td>'
+                   f'<td data-label="Fee">{esc(f)}</td><td class="pool-wide" data-label="How you get paid">{esc(how)}</td><td class="pool-wide" data-label="Good for">{esc(best)}</td></tr>'
+                   for n, u, t, f, how, best in POOLS)
+    ptbl = (f'<div class="tablewrap pool-wrap"><table class="pool-tbl"><thead><tr><th>Pool</th><th>Type</th><th>Fee</th><th>How you get paid</th><th>Good for</th></tr></thead><tbody>{prow}</tbody></table></div>'
+            f'<p class="hint">Fees and payout rules as each pool states them on its own site, checked <time datetime="{POOLS_CHECKED}">Oct 26, 2026</time>. Parasite Pool\'s rules are as reported by CoinDesk (Apr 2026). Pools can change their terms, so check before you switch. Bitcoin only.</p>')
+    ex = [m for m in ("bitaxe-gamma", "nerdqaxe-pp", "avalon-nano-3s", "avalon-mini-3", "avalon-q") if m in TRACKED]
+
+    def sats(btc):
+        s = btc * 1e8
+        return f"{s:,.0f}" if s >= 100 else f"{s:.0f}"
+    rows = []
+    for m in ex:
+        th = MODELS[m]["hashrate_ths"]
+        fpps = E.pool_estimate(th, NET, fee=0.025)
+        tides = E.pool_estimate(th, NET, fee=0.02)
+        wait = E.fmt_wait(OCEAN_THRESHOLD_BTC / tides["btc_day"]) if tides["btc_day"] > 0 else "n/a"
+        rows.append(f'<tr><td><a href="/models/{m}/">{esc(SHORT[m])}</a></td><td class="num">≈{th:g} TH/s</td>'
+                    f'<td class="num">≈{sats(fpps["btc_day"])} sats</td><td class="num">{wait}</td>'
+                    f'<td class="num">{E.fmt_wait(1 / E.solo_rate(th, NET))}</td></tr>')
+    ltbl = (f'<div class="tablewrap"><table><thead><tr><th>Miner</th><th class="num">Stated hashrate</th><th class="num">Shared pool, per day</th>'
+            f'<th class="num">To reach OCEAN\'s payout</th><th class="num">Avg. wait for a solo block</th></tr></thead><tbody>{"".join(rows)}</tbody></table></div>'
+            f'<p class="hint">Live estimate from mempool.space network data (BTC ≈ ${NET["btc_usd"]:,.0f}, network ≈ {NET["network_hashrate_hs"] / 1e18:,.0f} EH/s). '
+            "Shared-pool sats use Braiins' 2.5% fee, the OCEAN column its 2% fee, both with a 10% safety margin, so real payouts can be a bit higher or lower and change every day. "
+            "The solo wait is an average: a block could come tomorrow or never.</p>") if rows else ""
+    g = "bitaxe-gamma" if "bitaxe-gamma" in TRACKED else (ex[0] if ex else None)
+    gline = ""
+    if g:
+        so = E.solo_odds(MODELS[g]["hashrate_ths"], NET)
+        gline = (f"<p>Example: a {esc(SHORT[g])} has about a 1 in {E.fmt_big(so['one_in_year'])} chance a year of finding a block. "
+                 f"Solo, that win is the whole reward, about {block_usd_text(so)} minus any fee. On Parasite Pool the same win pays 1 BTC, "
+                 "and each time the pool finds a block you also get a small share of it. Same odds, different prize.</p>")
+    picks = []
+    for m, why in (("bitaxe-gamma", "the usual first solo miner"), ("avalon-nano-3s", "a quiet desk miner and small heater"), ("avalon-mini-3", "a room heater that pool-mines")):
+        if m in TRACKED and STATS[m]["best"]:
+            o = STATS[m]["best"]
+            picks.append(f'<li><p><a href="/models/{m}/"><b>{esc(SHORT[m])}</b></a>: {esc(why)}. From {money(o["price"], o["currency"])} at {esc(sname(o["seller"]))} today.</p>{offer_link(o, "Go to " + sname(o["seller"]) + " ↗", cls="btn ghost")}</li>')
+    pick_sec = (f'<section aria-labelledby="h-buy"><h2 id="h-buy">Still picking a miner?</h2><ul class="pool-picks">{"".join(picks)}</ul>'
+                '<p><a href="/solo-miners/">Best for solo</a> · <a href="/pool-miners/">Best for pool</a> · <a href="/find-my-miner/">Find my miner</a></p></section>') if picks else ""
+    faq = [("What is the best mining pool for a Bitaxe?", "Most Bitaxe owners mine solo, because a shared pool pays a tiny miner only a few sats a day. Public Pool (no fee) and Solo CKPool (2% of a block you find) are the common solo picks. Parasite Pool is a middle ground: 1 BTC if your miner finds the block, plus a share of every block the pool finds."),
+           ("Which pool should a heater miner use?", "Usually a shared pool, so the heat you'd pay for anyway earns a little back each day. An FPPS pool like Braiins pays daily whether or not it found a block. OCEAN pays from the blocks it finds, once you pass its payout threshold."),
+           ("Does the pool change my chance of finding a block?", "No. Your chance depends on your miner's hashrate versus the whole network. The pool only decides how a block's reward is shared and what fee you pay."),
+           ("Can I switch pools?", "Yes, anytime. It's a setting in your miner (the pool address and your Bitcoin address). Most miners also have a fallback pool setting in case the main one goes down."),
+           ("Do I need an account?", "Not for Public Pool, Solo CKPool or OCEAN: you use your Bitcoin address as the username. Braiins Pool uses an account.")]
+    body = f"""<article>
+<header class="hero"><h1>Which mining pool should I use?</h1>
+<p class="lede">Short answer: tiny miners like a Bitaxe usually go solo, heater miners usually join a shared pool, and a hybrid pool sits in between. Here's how the popular Bitcoin pools compare.</p>
+<p class="meta">Updated <time datetime="{POOLS_CHECKED}">Oct 26, 2026</time> · 3-minute read · live numbers</p></header>
+<section aria-labelledby="h-1"><h2 id="h-1">1. Three kinds of pool</h2>
+<ul><li><strong>Solo:</strong> your miner works alone. Find a block and you keep the whole reward; otherwise you get nothing. A lottery ticket.</li>
+<li><strong>Shared:</strong> thousands of miners split every block the pool finds, minus a fee. Small, steady payouts.</li>
+<li><strong>Hybrid:</strong> the miner that finds a block gets a big prize, and everyone else shares the rest.</li></ul>
+<p>The pool never changes your odds of finding a block. It only decides who gets paid what. <a href="/guides/solo-vs-pool-mining/">Solo vs pool, in plain words</a>.</p></section>
+<section aria-labelledby="h-2"><h2 id="h-2">2. Popular pools side by side</h2>
+{ptbl}</section>
+<section aria-labelledby="h-3"><h2 id="h-3">3. What each choice means for your miner</h2>
+<p>How many sats a shared pool would pay each miner, how long it takes to reach OCEAN's payout threshold, and the average wait for a solo block.</p>
+{ltbl}
+{gline}</section>
+<section aria-labelledby="h-4"><h2 id="h-4">4. Which should you pick?</h2>
+<ul><li><strong>Bitaxe or another tiny miner:</strong> solo on Public Pool or Solo CKPool, or Parasite Pool if you'd like a few sats along the way. A shared pool pays these miners only pennies.</li>
+<li><strong>Desk miner (5–10 TH/s):</strong> either. Solo is still a long shot; a shared pool like Braiins pays a small amount every day over Lightning (see the table).</li>
+<li><strong>Heater miner:</strong> a shared pool, so your heat earns a little back. Braiins for daily payouts, OCEAN if you're fine waiting for its threshold.</li></ul></section>
+<section aria-labelledby="h-5"><h2 id="h-5">5. Safety tips</h2>
+<ul><li><strong>Use your own Bitcoin address</strong> from a wallet you control. Never type in an address someone sends you.</li>
+<li><strong>Set a fallback pool.</strong> New pools sometimes go offline, so give your miner a second pool to switch to.</li>
+<li><strong>Watch for hidden fees in firmware.</strong> Some modified firmware on used miners sends part of your hashrate elsewhere. Stick to the maker's firmware or open-source builds.</li>
+<li><strong>Be wary of "pools" that sell tokens or cloud contracts.</strong> A real Bitcoin pool just needs your miner and your address.</li></ul></section>
+{pick_sec}
+<section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
+<section><h2>Keep reading</h2><ul class="links"><li><a href="/solo-odds/">Solo odds calculator</a></li><li><a href="/solo-wins/">Recent solo block wins</a></li><li><a href="/guides/is-home-mining-worth-it/">Is home mining worth it?</a></li></ul>
+<p class="hint">Not financial advice. We're not paid by any pool. Earnings aren't guaranteed and change with Bitcoin's price and network difficulty.</p></section>
+</article>"""
+    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Which Bitcoin mining pool should I use?", desc), faq_ld(faq)], lastmod=POOLS_CHECKED, og_type="article")
 
 
 # ---------------------------------------------------------------------------------------------
@@ -3203,6 +3311,7 @@ def build_indexes():
           ("/guides/solar-bitcoin-mining/", "Can solar power a miner?", "Panels needed for each miner."),
           ("/guides/bitcoin-mining-heat-your-home/", "Mining to heat your home", "Miner vs space heater vs heat pump."),
           ("/guides/solo-vs-pool-mining/", "Solo vs pool mining", "Lottery shot or small steady payouts?"),
+          ("/guides/bitcoin-mining-pools/", "Which mining pool?", "Popular Bitcoin pools compared: fees and payouts."),
           ("/guides/how-heater-miners-work/", "How heater miners work", "A miner that warms the room."),
           ("/where-to-buy-bitaxe/", "Where to buy a Bitaxe", "Every shop, ranked by today's price."),
           ("/how-we-track/", "How we track prices", "Where the numbers come from.")]
@@ -3248,6 +3357,7 @@ def main():
     build_guide_worth()
     build_guide_solar()
     build_guide_heat_home()
+    build_guide_pools()
     build_solo_odds()
     build_heat_calc()
     build_solo_wins()

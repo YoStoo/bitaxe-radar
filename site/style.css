@@ -430,3 +430,21 @@ details .tablewrap{margin-bottom:14px}
   .bf-table td.bf-vs,.bf-table td.bf-buy{grid-column:1/-1}
   .bf-table td.bf-buy .btn{display:block;width:100%;text-align:center}
 }
+/* Pool guide: pool table becomes one card per pool on phones; miner picks with a buy button */
+.pool-tbl td.pool-name{font-weight:700;white-space:nowrap}
+.pool-tbl td.pool-wide{min-width:180px}
+.pool-picks{list-style:none;padding:0;margin:8px 0;display:grid;gap:10px}
+.pool-picks li{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 14px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
+.pool-picks li p{margin:0;flex:1 1 260px}
+.pool-picks .ph{font-size:11px}
+@media (max-width:640px){
+  .pool-wrap{overflow-x:visible}
+  .pool-tbl thead{display:none}
+  .pool-tbl,.pool-tbl tbody,.pool-tbl tr,.pool-tbl td{display:block;width:100%}
+  .pool-tbl tr{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;padding:14px;border-bottom:1px solid var(--line)}
+  .pool-tbl tr:last-child{border-bottom:0}
+  .pool-tbl td{border:0;padding:0;text-align:left;white-space:normal;min-width:0}
+  .pool-tbl td[data-label]::before{content:attr(data-label);display:block;color:var(--faint);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+  .pool-tbl td.pool-name{grid-column:1/-1;font-size:16.5px}
+  .pool-tbl td.pool-wide{grid-column:1/-1}
+}
