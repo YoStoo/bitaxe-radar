@@ -1,11 +1,22 @@
 {
- "fetched_at": "2026-10-26T13:04:22Z",
- "checked_at": "2026-10-26T13:04:22Z",
+ "fetched_at": "2026-10-26T22:41:45Z",
+ "checked_at": "2026-10-26T22:41:45Z",
  "status": {
   "mempool.space": "ok",
   "sololuck.io": "ok"
  },
  "wins": [
+  {
+   "height": 973262,
+   "hash": null,
+   "time": "2026-10-26T00:00:00Z",
+   "pool": "FutureBit Apollo Solo",
+   "reward_btc": 3.1542,
+   "source": "sololuck.io",
+   "hashrate_hs": null,
+   "hardware": null,
+   "rented": false
+  },
   {
    "height": 970904,
    "hash": "000000000000000000016d3757f864a84f128ba95e5bb883904546a4ecb1c862",
