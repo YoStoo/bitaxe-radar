@@ -1,6 +1,6 @@
 # Bitaxe Radar Roadmap
 
-Updated: Oct 25, 2026 (evening)
+Updated: Oct 26, 2026 (morning)
 
 ## 🎯 Goal
 
@@ -25,6 +25,9 @@ Updated: Oct 25, 2026 (evening)
    - ✅ "Can solar power a Bitcoin miner?": live Oct 24 at /guides/solar-bitcoin-mining/.
    - ✅ "Mining to heat your home": live Oct 24 at /guides/bitcoin-mining-heat-your-home/.
    - Why: people asking these questions are often ready to buy. Energy (solar, heat reuse) is your main interest. And it doubles as an energy project for your AI/ML portfolio.
+4. Owner questions from Reddit (people who just bought or are about to buy):
+   - ✅ "Which mining pool should I use?": live Oct 26 at /guides/bitcoin-mining-pools/ (Public Pool, Solo CKPool, Parasite, OCEAN, Braiins: fees, payouts, live sats per miner, links to miner pages).
+   - Next: best-difficulty input on /solo-odds/ (evening build Oct 26), used-miner "is it normal?" guide, firmware roundup.
 
 ## 💰 Money
 
@@ -62,6 +65,7 @@ Later:
 
 ## ✅ Done
 
+- Oct 26: Mining pool guide (/guides/bitcoin-mining-pools/): five popular pools compared (fees, how payouts work, who each suits), live sats per day and solo odds for five miners, safety tips, and miner picks with shop links. Cards on phones. Sent to search engines via IndexNow.
 - Oct 25: Black Friday page now covers all 28 current miners in three groups (Bitaxe-class, home/desk, heater), each with today's price next to the lowest we've logged so far. Plus a Black Friday tab on the deals pages and a banner that shows Nov 20 to Dec 1.
 - Oct 25: Added the NerdQX (4x BM1370, about 8.1 TH/s at 138 W) at /models/nerdqx/, tracked at Bitcoin Merch ($449.99, ships in 2-3 weeks).
 
@@ -107,12 +111,12 @@ Later:
 - Oct 24: Heat guide (/guides/bitcoin-mining-heat-your-home/): miner vs space heater vs heat pump with live numbers. Each heater miner shows its power cost, what mining pays back, and the power price below which it beats a heat pump (DOE: heat pumps use about 50% less electricity). Also hot-water heating (Heatbit Bitwater) and winter-only tips.
 - Oct 21: Room heat calculator (/heat-calculator/): type your room size, see how much heat it needs and which miners can heat it, with today's prices.
 
-## 📊 Numbers (Oct 25)
+## 📊 Numbers (Oct 26)
 
 - Revenue: $0 (no commission emails yet)
 - Visitors: unknown today (Cloudflare stats not readable from here)
-- Subscribers: 1 confirmed (from the 6-hourly alert run)
-- X: 1 follower, 4 to 12 views per post
+- Subscribers: 1 confirmed (from the alert run)
+- X: no post this morning (no posting tool available in this run)
 - Miners tracked: 30
 - Sellers tracked: 11
-- Pages on the site: 77
+- Pages on the site: 78

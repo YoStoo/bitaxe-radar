@@ -212,3 +212,5 @@ This ranking is an ESTIMATE. It weighs search interest seen in seller guides, re
 - **DTV Electronics** (Woo Store API works) and **shop.futurebit.io** (Shopify works) are the two new sellers worth adding. Every other top-15 model is already at sellers we scrape.
 - Filter out D-Central "Planned Board" CA$0 items.
 - Lucky Miner can't be tracked at a vetted seller. luckyminer.com was unreachable, and luckyminerclub.com is UNVETTED. Either list Lucky Miner as "specs only" or vet a seller first.
+
+Note (Oct 26): Harlo B30 seen on Reddit, not added. Seller not vetted yet (trust complaints in threads). Revisit if a known shop lists it.
