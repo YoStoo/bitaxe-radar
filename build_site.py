@@ -2372,10 +2372,10 @@ def build_guide_pools():
         fpps = E.pool_estimate(th, NET, fee=0.025)
         tides = E.pool_estimate(th, NET, fee=0.02)
         wait = E.fmt_wait(OCEAN_THRESHOLD_BTC / tides["btc_day"]) if tides["btc_day"] > 0 else "n/a"
-        rows.append(f'<tr><td><a href="/models/{m}/">{esc(SHORT[m])}</a></td><td class="num">≈{th:g} TH/s</td>'
-                    f'<td class="num">≈{sats(fpps["btc_day"])} sats</td><td class="num">{wait}</td>'
-                    f'<td class="num">{E.fmt_wait(1 / E.solo_rate(th, NET))}</td></tr>')
-    ltbl = (f'<div class="tablewrap"><table><thead><tr><th>Miner</th><th class="num">Stated hashrate</th><th class="num">Shared pool, per day</th>'
+        rows.append(f'<tr><td class="pool-name"><a href="/models/{m}/">{esc(SHORT[m])}</a></td><td class="num" data-label="Stated hashrate">≈{th:g} TH/s</td>'
+                    f'<td class="num" data-label="Shared pool, per day">≈{sats(fpps["btc_day"])} sats</td><td class="num" data-label="To reach OCEAN\'s payout">{wait}</td>'
+                    f'<td class="num" data-label="Avg. wait for a solo block">{E.fmt_wait(1 / E.solo_rate(th, NET))}</td></tr>')
+    ltbl = (f'<div class="tablewrap pool-wrap"><table class="pool-tbl"><thead><tr><th>Miner</th><th class="num">Stated hashrate</th><th class="num">Shared pool, per day</th>'
             f'<th class="num">To reach OCEAN\'s payout</th><th class="num">Avg. wait for a solo block</th></tr></thead><tbody>{"".join(rows)}</tbody></table></div>'
             f'<p class="hint">Live estimate from mempool.space network data (BTC ≈ ${NET["btc_usd"]:,.0f}, network ≈ {NET["network_hashrate_hs"] / 1e18:,.0f} EH/s). '
             "Shared-pool sats use Braiins' 2.5% fee, the OCEAN column its 2% fee, both with a 10% safety margin, so real payouts can be a bit higher or lower and change every day. "
