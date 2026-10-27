@@ -1,4 +1,4 @@
-var AFFILIATE = { powermining: "ref=bitaxeradar", bitaxede: "ref=bitaxeradar" };
+var AFFILIATE = { powermining: "ref=bitaxeradar", bitaxede: "ref=bitaxeradar", solosatoshi: "aff=8840" };
 
 // ---- email alerts config -------------------------------------------------------------------
 // build_site.py reads these (single source of truth) and passes them to signup.js on every page with the alert form.
