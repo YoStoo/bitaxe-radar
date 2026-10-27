@@ -182,6 +182,17 @@ class SiteTests(unittest.TestCase):
                     self.assertNotIn("ref=", href, f"{path}: unexpected tracking param {href}")
         self.assertGreater(seen, 0)
 
+    def test_solosatoshi_affiliate_links(self):
+        """Solo Satoshi approved us Oct 26, 2026 (affiliate 8840): product links carry aff=8840 and rel sponsored."""
+        seen = 0
+        for path, p in self.pages.items():
+            for href, rel in p.hrefs_rel:
+                if "solosatoshi.com/product/" in href:
+                    seen += 1
+                    self.assertIn("aff=8840", href, path)
+                    self.assertIn("sponsored", rel, path)
+        self.assertGreater(seen, 0)
+
     def test_model_pages_have_signup_and_prerendered_prices(self):
         for mid in ["bitaxe-gamma", "nerdqaxe-pp", "bitaxe-gt-801"]:
             p = self.pages[f"/models/{mid}/"]
@@ -300,7 +311,7 @@ class SiteTests(unittest.TestCase):
         """Only Power Mining carries an affiliate param; links to shops we are not approved with stay plain."""
         for path, p in self.pages.items():
             for href, rel in p.hrefs_rel:
-                if any(d in href for d in ("altairtech.io", "heatbit.com", "d-central.tech", "solosatoshi.com", "braiinsforge.com", "bitcoinmerch.com")):
+                if any(d in href for d in ("altairtech.io", "heatbit.com", "d-central.tech", "braiinsforge.com", "bitcoinmerch.com")):
                     self.assertNotRegex(href, r"[?&](ref|aff|affiliate|sca_ref|wpam_id)=", f"{path}: {href}")
                     self.assertNotIn("sponsored", rel, f"{path}: {href}")
 
