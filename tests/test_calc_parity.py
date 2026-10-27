@@ -149,6 +149,41 @@ class SoloParity(unittest.TestCase):
         self.assertEqual(E.solo_rows(1e7, net)[0][0][2], "better than even")
 
 
+BEST_JS = """
+const fs = require('fs');
+const input = JSON.parse(fs.readFileSync(0, 'utf8'));
+global.window = {RADAR_SOLO: {network_hashrate_hs: input.net.network_hashrate_hs, difficulty: input.net.difficulty}};
+eval(fs.readFileSync(%s, 'utf8'));
+const S = window.RadarSolo;
+process.stdout.write(JSON.stringify({parse: input.texts.map(t => S.parseDiff(t)), fmt: input.diffs.map(d => S.fmtDiff(d)),
+  words: input.ths.flatMap(th => input.diffs.map(d => S.bestWords(d, th))), ms: input.ths.map(th => S.milestones(th))}));
+"""
+BEST_TEXTS = ["4.29G", "240k", "1,234,567", "130 T", "abc", "0", ".5M", "12.", "1e9", "", "3.2P", "7E", "-5G", "1.5GG"]
+BEST_DIFFS = [1, 999, 1000, 240e3, 999.6e3, 1.234567e6, 4.29e9, 99.96e9, 1.3e14, 1.4e14, 2e14, 3.2e15]
+
+
+@unittest.skipUnless(shutil.which("node"), "node not installed")
+class BestDiffParity(unittest.TestCase):
+    def test_js_matches_python(self):
+        js = BEST_JS % json.dumps(str(SITE / "solo.js"))
+        for net in NETS[:1] + [dict(NETS[1], difficulty=1.0e14)]:
+            got = json.loads(subprocess.run(["node", "-e", js], input=json.dumps({"net": net, "ths": SOLO_THS, "texts": BEST_TEXTS, "diffs": BEST_DIFFS}),
+                                            capture_output=True, text=True, check=True).stdout)
+            self.assertEqual(got["parse"], [E.parse_diff(t) for t in BEST_TEXTS])
+            self.assertEqual(got["fmt"], [E.fmt_diff(d) for d in BEST_DIFFS])
+            self.assertEqual(got["words"], [E.best_diff_words(d, th, net) for th in SOLO_THS for d in BEST_DIFFS])
+            self.assertEqual(got["ms"], json.loads(json.dumps([E.milestone_rows(th) for th in SOLO_THS])))
+
+    def test_best_diff_sense(self):
+        net = NETS[0]
+        self.assertEqual(E.parse_diff("4.29G"), 4.29e9)
+        self.assertIsNone(E.parse_diff("-5G"))
+        self.assertEqual(E.fmt_diff(999.6e9), "1T")
+        self.assertIn("that would be a block", E.best_diff_words(net["difficulty"], 1.2, net)[1])
+        # a 1G share at 1.2 TH/s: 2^32 x 1e9 / 1.2e12 seconds, about 41 days
+        self.assertEqual(E.milestone_rows(1.2)[2], ["1G", "about 41 days"])
+
+
 class SoloPages(unittest.TestCase):
     def read(self, p):
         return (SITE / p.strip("/") / "index.html").read_text()
@@ -163,6 +198,10 @@ class SoloPages(unittest.TestCase):
         net = json.loads((ROOT / "data" / "network.json").read_text())
         rows, wait = E.solo_rows(1.2, net)
         self.assertIn(f'data-solo="year-in">{rows[1][2]}<', h)      # no-JS default = Python math for a 1.2 TH/s Bitaxe Gamma
+        self.assertIn('<form class="solobox" id="best-form" hidden>', h)
+        self.assertIn(f"which is <b>{E.fmt_diff(net['difficulty'])}</b> right now", h)
+        self.assertIn(f'data-solo="ms2">{E.milestone_rows(1.2)[2][1]}<', h)
+        self.assertIn('"difficulty":', h.split("window.RADAR_SOLO=")[1][:200])
         for bad in ["guaranteed", "passive income", "you will win", "get rich"]:
             self.assertNotIn(bad, h.lower())
         for p in ["/solo-miners/", "/guides/", "/models/bitaxe-gamma/"]:

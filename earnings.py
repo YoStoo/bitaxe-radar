@@ -6,6 +6,7 @@ All figures are estimates and are labelled as such on the site.
 """
 import json
 import math
+import re
 import urllib.request
 from datetime import datetime, timezone
 
@@ -196,6 +197,53 @@ def solo_rows(hashrate_ths, net):
     """[period, percent, 1-in-N] for a day, a year and 5 years, plus the average wait."""
     rows = [[k, fmt_pct(solo_chance(hashrate_ths, net, d)), fmt_one_in(solo_chance(hashrate_ths, net, d))] for k, d in SOLO_PERIODS]
     return rows, fmt_wait(1 / solo_rate(hashrate_ths, net))
+
+
+# ---- best difficulty ("best diff") on /solo-odds/. site/solo.js mirrors these (tests/test_calc_parity.py). ----
+DIFF_UNITS = (("E", 1e18), ("P", 1e15), ("T", 1e12), ("G", 1e9), ("M", 1e6), ("K", 1e3))
+DIFF_MILESTONES = (1e6, 1e8, 1e9, 1e10, 1e11, 1e12)
+
+
+def parse_diff(text):
+    """'4.29G', '240k', '1,234,567', '130 T' -> a number; None if it isn't one."""
+    t = str(text).replace(",", "").replace(" ", "").upper()
+    m = re.fullmatch(r"(\d+(?:\.\d*)?|\.\d+)([KMGTPE]?)", t)
+    if not m:
+        return None
+    v = float(m.group(1)) * dict(DIFF_UNITS).get(m.group(2), 1)
+    return v if 0 < v < 1e30 else None
+
+
+def fmt_diff(d):
+    """Difficulty the way miners write it: 4.29G, 141T, 240K."""
+    for u, v in DIFF_UNITS:
+        if d >= v * 0.9995:
+            return f"{float(f'{d / v:.3g}'):g}{u}"
+    return f"{d:,.0f}"
+
+
+def share_wait_days(hashrate_ths, diff):
+    """Average days until one share at least this difficulty (diff x 2^32 hashes per try)."""
+    return diff * 2 ** 32 / (hashrate_ths * 1e12) / 86400
+
+
+def fmt_often(days):
+    """Like fmt_wait, but also says minutes for very short waits."""
+    mins = math.floor(days * 1440 + 0.5)
+    if mins < 60:
+        return "under a minute" if mins < 1 else f"about {mins} minute" + ("" if mins == 1 else "s")
+    return fmt_wait(days)
+
+
+def best_diff_words(best, hashrate_ths, net):
+    """[network difficulty, how many times higher a block needs, how often a share this high shows up] in plain words."""
+    nd = net["difficulty"]
+    times = "at or above it: that would be a block" if best >= nd else f"about {fmt_big(nd / best)} times higher than your best"
+    return [fmt_diff(nd), times, fmt_often(share_wait_days(hashrate_ths, best))]
+
+
+def milestone_rows(hashrate_ths):
+    return [[fmt_diff(d), fmt_often(share_wait_days(hashrate_ths, d))] for d in DIFF_MILESTONES]
 
 
 def fmt_usd(x):

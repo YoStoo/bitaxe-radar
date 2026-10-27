@@ -2561,6 +2561,8 @@ def build_solo_odds():
             "No. Every block is a fresh draw, and past attempts don't add up. The 5-year figure is the chance of at least one block in 5 years if the network stayed the same size. It usually grows, which makes the odds worse."),
            ("Is solo mining worth it?",
             "Not as income. Think of it as a lottery ticket you pay for with electricity. A tiny miner costs a few dollars a month to run, and the most likely result is no block at all."),
+           ("What is best difficulty (best diff)?",
+            f"It's the highest-scoring share your miner has found since it started, shown on its dashboard (for example 240K or 4.29G). Think of it as a high score. A block needs a share at network difficulty, about {E.fmt_diff(NET['difficulty'])} right now. A high best diff doesn't bring you closer: every hash is a fresh try."),
            ("Why do the odds change?",
             "They depend on the network's total hashrate, which changes daily as miners join or leave. Bitcoin's difficulty adjusts about every two weeks to keep blocks near 10 minutes apart.")]
     body = f"""<article>
@@ -2572,6 +2574,7 @@ def build_solo_odds():
 <div class="etiles four">{odds_tiles(gth)}</div>
 <p class="netline">A block pays about {block_usd_text(so)} right now (≈{E.block_btc(NET):.3f} BTC), all to the one miner who finds it.</p>
 <p class="hint">The math: your share of the network's hashrate × 144 blocks a day. Assumes the network stays its current size. Odds, not a forecast. Not financial advice.</p></section>
+{best_diff_section(gth)}
 <section aria-labelledby="h-ours"><h2 id="h-ours">Odds for the solo miners we track</h2>{tbl}
 <p class="hint">Seller-stated hashrate. <a href="/solo-miners/">Prices for solo miners →</a></p></section>
 <section aria-labelledby="h-wins"><h2 id="h-wins">People do win, sometimes</h2>
@@ -2579,10 +2582,27 @@ def build_solo_odds():
 <section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}
 <p><a href="/guides/solo-vs-pool-mining/">Solo vs pool, in plain words</a> · <a href="/guides/is-home-mining-worth-it/">Is home mining worth it?</a></p></section>
 </article>"""
-    scripts = f'<script>window.RADAR_SOLO={json.dumps({"network_hashrate_hs": NET["network_hashrate_hs"]})};</script>\n<script src="/solo.js" defer></script>\n'
+    scripts = f'<script>window.RADAR_SOLO={json.dumps({"network_hashrate_hs": NET["network_hashrate_hs"], "difficulty": NET["difficulty"]})};</script>\n<script src="/solo.js" defer></script>\n'
     app = {"@context": "https://schema.org", "@type": "WebApplication", "name": "Solo mining odds calculator", "url": BASE + path, "applicationCategory": "UtilitiesApplication",
            "operatingSystem": "Any", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "description": desc}
     layout(path, title, desc, body, crumbs=trail, jsonld=[app, faq_ld(faq)], scripts=scripts)
+
+
+def best_diff_section(th):
+    """'What does my best difficulty mean?' box on /solo-odds/. The hashrate comes from the calculator above (site/solo.js)."""
+    nd = E.fmt_diff(NET["difficulty"])
+    ms = "".join(f'<tr><td>{d}</td><td class="num nw" data-solo="ms{i}">{esc(w)}</td></tr>' for i, (d, w) in enumerate(E.milestone_rows(th)))
+    return f"""<section class="earnbox" aria-labelledby="h-best"><h2 id="h-best">What does my best difficulty mean?</h2>
+<p>Your miner's dashboard shows a <b>best difficulty</b> (often "best diff"), like 240K or 4.29G. It's your miner's high score: the luckiest share it has found. To win a block, one share has to reach the network difficulty, which is <b>{nd}</b> right now.</p>
+<form class="solobox" id="best-form" hidden><label for="best-d">Type your best difficulty</label>
+<input id="best-d" type="text" inputmode="decimal" autocomplete="off" placeholder="e.g. 4.29G or 240K" spellcheck="false">
+<p class="hint" id="best-bad" hidden>Type a number, with K, M, G or T after it if your dashboard shows one.</p></form>
+<div id="best-out" class="bestout" hidden><p>Your best: <b id="best-you"></b>. A block needs <b id="best-net">{nd}</b>, <span id="best-times"></span>.</p>
+<p>At <span data-solo="th">{fmt_ths(th)}</span>, a share this high shows up <b id="best-often"></b> on average.</p></div>
+<p class="hint">A high best diff isn't progress toward a block. Every hash is a fresh try, so a lucky high score last week doesn't make the next block any closer.</p>
+<h3>How often a share this high turns up at <span data-solo="th">{fmt_ths(th)}</span></h3>
+<div class="tablewrap"><table class="calc-tbl"><thead><tr><th>Best difficulty</th><th class="num">Average wait</th></tr></thead><tbody>{ms}</tbody></table></div>
+<p class="hint">Average wait = difficulty × 2³² hashes ÷ your hashrate. Change the hashrate at the top to update it. K = thousand, M = million, G = billion, T = trillion.</p></section>"""
 
 
 def solo_wins_line():

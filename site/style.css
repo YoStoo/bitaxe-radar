@@ -448,3 +448,5 @@ details .tablewrap{margin-bottom:14px}
   .pool-tbl td.pool-name{grid-column:1/-1;font-size:16.5px}
   .pool-tbl td.pool-wide{grid-column:1/-1}
 }
+.bestout{margin:10px 0;padding:10px 14px;background:var(--panel2);border-left:3px solid #f7931a;border-radius:10px}.bestout[hidden]{display:none}.bestout p{margin:4px 0}
+.earnbox h3{font-size:16px;margin:16px 0 6px}
