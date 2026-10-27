@@ -1,6 +1,6 @@
 # Bitaxe Radar Roadmap
 
-Updated: Oct 26, 2026 (morning)
+Updated: Oct 27, 2026 (evening)
 
 ## 🎯 Goal
 
@@ -27,7 +27,8 @@ Updated: Oct 26, 2026 (morning)
    - Why: people asking these questions are often ready to buy. Energy (solar, heat reuse) is your main interest. And it doubles as an energy project for your AI/ML portfolio.
 4. Owner questions from Reddit (people who just bought or are about to buy):
    - ✅ "Which mining pool should I use?": live Oct 26 at /guides/bitcoin-mining-pools/ (Public Pool, Solo CKPool, Parasite, OCEAN, Braiins: fees, payouts, live sats per miner, links to miner pages).
-   - Next: best-difficulty input on /solo-odds/ (evening build Oct 26), used-miner "is it normal?" guide, firmware roundup.
+   - ✅ Best difficulty box on /solo-odds/: live Oct 27 (type your best diff, see it next to live network difficulty and how often a share that high turns up).
+   - Next: used-miner "is it normal?" guide, firmware roundup.
 
 ## 💰 Money
 
@@ -35,7 +36,7 @@ Affiliate programs (we earn when someone buys through our link):
 
 - ✅ Power Mining: live since Oct 16.
 - ✅ Bitaxe.de: approved Oct 24 (5%). Brand code bitaxeradar set by their support; links live since Oct 24.
-- ⏳ Solo Satoshi: applied Oct 16, waiting.
+- ✅ Solo Satoshi: approved Oct 26 (affiliate ID 8840). Links live since Oct 27. Commission rate shows once you sign in to their affiliate account.
 - ⏳ D-Central: applied Oct 21, waiting.
 - ⏳ DTV Electronics: applied Oct 21, waiting.
 - ⏳ Altair: account activated Oct 23; affiliate approval still pending.
@@ -65,6 +66,8 @@ Later:
 
 ## ✅ Done
 
+- Oct 27: Best difficulty box on the solo odds page (/solo-odds/#h-best): type the best diff from your miner's dashboard (like 240K or 4.29G) and see network difficulty right now (141T), how many times higher a block needs, and how often a share that high turns up at your hashrate. Plus a table of how long 1M, 100M, 1G, 10G, 100G and 1T usually take, and a FAQ answer on what best diff means. Idea from Reddit newcomers asking whether their best diff means they're close.
+- Oct 27: Solo Satoshi affiliate links live (ID 8840).
 - Oct 26: Mining pool guide (/guides/bitcoin-mining-pools/): five popular pools compared (fees, how payouts work, who each suits), live sats per day and solo odds for five miners, safety tips, and miner picks with shop links. Cards on phones. Sent to search engines via IndexNow.
 - Oct 25: Black Friday page now covers all 28 current miners in three groups (Bitaxe-class, home/desk, heater), each with today's price next to the lowest we've logged so far. Plus a Black Friday tab on the deals pages and a banner that shows Nov 20 to Dec 1.
 - Oct 25: Added the NerdQX (4x BM1370, about 8.1 TH/s at 138 W) at /models/nerdqx/, tracked at Bitcoin Merch ($449.99, ships in 2-3 weeks).
@@ -111,12 +114,12 @@ Later:
 - Oct 24: Heat guide (/guides/bitcoin-mining-heat-your-home/): miner vs space heater vs heat pump with live numbers. Each heater miner shows its power cost, what mining pays back, and the power price below which it beats a heat pump (DOE: heat pumps use about 50% less electricity). Also hot-water heating (Heatbit Bitwater) and winter-only tips.
 - Oct 21: Room heat calculator (/heat-calculator/): type your room size, see how much heat it needs and which miners can heat it, with today's prices.
 
-## 📊 Numbers (Oct 26)
+## 📊 Numbers (Oct 27)
 
 - Revenue: $0 (no commission emails yet)
-- Visitors: unknown today (Cloudflare stats not readable from here)
-- Subscribers: 1 confirmed (from the alert run)
-- X: no post this morning (no posting tool available in this run)
+- Subscribers: 1 confirmed
 - Miners tracked: 30
 - Sellers tracked: 11
-- Pages on the site: 78
+- Paying affiliate programs: 3 (Power Mining, Bitaxe.de, Solo Satoshi)
+- Tests: 87 passing
+- Pages on the site: 82
