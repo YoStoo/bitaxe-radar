@@ -28,7 +28,8 @@ jobs:
       - run: |
           git config user.name "radar-bot"; git config user.email "radar-bot@users.noreply.github.com"
           git add data site/data.js
-          git diff --cached --quiet || (git commit -m "data: update prices" && git push)
+          # Retry with a rebase so a docs/code push made during the run can't fail the deploy.
+          git diff --cached --quiet || { git commit -m "data: update prices"; for i in 1 2 3; do git pull --rebase -q origin main && git push && exit 0; sleep 10; done; exit 1; }
       # Price-drop alert emails. No-op until the RESEND_API_KEY repo secret exists. A failure here never blocks the deploy.
       - name: send-alerts
         continue-on-error: true
