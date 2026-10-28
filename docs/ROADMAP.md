@@ -1,6 +1,6 @@
 # Bitaxe Radar Roadmap
 
-Updated: Oct 27, 2026 (evening)
+Updated: Oct 28, 2026 (morning)
 
 ## 🎯 Goal
 
@@ -28,7 +28,8 @@ Updated: Oct 27, 2026 (evening)
 4. Owner questions from Reddit (people who just bought or are about to buy):
    - ✅ "Which mining pool should I use?": live Oct 26 at /guides/bitcoin-mining-pools/ (Public Pool, Solo CKPool, Parasite, OCEAN, Braiins: fees, payouts, live sats per miner, links to miner pages).
    - ✅ Best difficulty box on /solo-odds/: live Oct 27 (type your best diff, see it next to live network difficulty and how often a share that high turns up).
-   - Next: used-miner "is it normal?" guide, firmware roundup.
+   - ✅ "Is my Bitaxe normal?": live Oct 28 at /guides/is-my-bitaxe-normal/ (stock hashrate per board from the Bitaxe firmware, temps, used-miner checks, today's new prices).
+   - Next: firmware roundup.
 
 ## 💰 Money
 
@@ -66,6 +67,8 @@ Later:
 
 ## ✅ Done
 
+- Oct 28: "Is my Bitaxe normal?" guide (/guides/is-my-bitaxe-normal/): for new and used Bitaxe owners. Stock settings and expected hashrate for 7 boards (Ultra, Supra, Gamma 601/602, Gamma Duo, GT 801, Naja Duo, Gamma Hex), taken from the open-source AxeOS firmware (e.g. Gamma ≈1.07 TH/s at 525 MHz; self-test passes from ≈910 GH/s). Temps (fan aims for 60°C, mining stops above 75°C), what to check if hashrate is low, used-miner checks (firmware, hidden fees, pool settings, power supply), and today's new prices with shop links. Bitaxe model pages got a "What hashrate is normal?" answer too.
+- Oct 28: Fixed the deploy failure that happened when a docs push landed during a price update (the price bot now rebases and retries).
 - Oct 27: Best difficulty box on the solo odds page (/solo-odds/#h-best): type the best diff from your miner's dashboard (like 240K or 4.29G) and see network difficulty right now (141T), how many times higher a block needs, and how often a share that high turns up at your hashrate. Plus a table of how long 1M, 100M, 1G, 10G, 100G and 1T usually take, and a FAQ answer on what best diff means. Idea from Reddit newcomers asking whether their best diff means they're close.
 - Oct 27: Solo Satoshi affiliate links live (ID 8840).
 - Oct 26: Mining pool guide (/guides/bitcoin-mining-pools/): five popular pools compared (fees, how payouts work, who each suits), live sats per day and solo odds for five miners, safety tips, and miner picks with shop links. Cards on phones. Sent to search engines via IndexNow.
@@ -114,12 +117,12 @@ Later:
 - Oct 24: Heat guide (/guides/bitcoin-mining-heat-your-home/): miner vs space heater vs heat pump with live numbers. Each heater miner shows its power cost, what mining pays back, and the power price below which it beats a heat pump (DOE: heat pumps use about 50% less electricity). Also hot-water heating (Heatbit Bitwater) and winter-only tips.
 - Oct 21: Room heat calculator (/heat-calculator/): type your room size, see how much heat it needs and which miners can heat it, with today's prices.
 
-## 📊 Numbers (Oct 27)
+## 📊 Numbers (Oct 28)
 
 - Revenue: $0 (no commission emails yet)
 - Subscribers: 1 confirmed
 - Miners tracked: 30
 - Sellers tracked: 11
 - Paying affiliate programs: 3 (Power Mining, Bitaxe.de, Solo Satoshi)
-- Tests: 87 passing
-- Pages on the site: 82
+- Tests: 90 passing
+- Pages on the site: 83
