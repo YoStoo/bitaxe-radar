@@ -1064,6 +1064,13 @@ def build_model_page(mid):
     faq.append((f"Is the {short} in stock?", f"At the last check: {stock_lines}. Stock changes fast, so confirm on the shop's page.", False))
     faq.append((f"How much electricity does the {short} use?",
                 f"Sellers state about {m['watts']:g} W, roughly {kwh:,.0f} kWh a year if it runs 24/7. At $0.10, $0.15 and $0.25 per kWh that's about ${kwh * 0.10:,.0f}, ${kwh * 0.15:,.0f} and ${kwh * 0.25:,.0f} a year.", False))
+    ax = next((b for b in AXEOS_BOARDS if b[0] == mid), None)
+    if ax:
+        exp = axeos_expected_ghs(ax[3], ax[5], ax[6])
+        faq.append((f"What hashrate is normal for a {short}?",
+                    f"At stock settings ({ax[3]} MHz) the AxeOS firmware expects about {fmt_ghs(exp)}, and its self-test passes from about {fmt_ghs(exp * ax[7])}. "
+                    "Read the 10-minute average, not the live number. "
+                    f'<a href="{NORMAL_GUIDE_PATH}">Is my Bitaxe normal?</a>', True))
     if home:
         hw = m.get("heat_watts", m["watts"])
         faq.append((f"How much heat does the {short} give off?",
@@ -2029,6 +2036,7 @@ Bitaxe Radar is independent. Some shop links are affiliate links; they never cha
 - [Mining to heat your home]({BASE}/guides/bitcoin-mining-heat-your-home/): a miner heats like an electric space heater and pays a little back; it beats a space heater but usually not a heat pump (DOE: about 50% less electricity).
 - [Solo vs pool mining]({BASE}/guides/solo-vs-pool-mining/): solo is a lottery for a whole block; pool pays small, steady amounts.
 - [Which mining pool should I use?]({BASE}/guides/bitcoin-mining-pools/): Public Pool (solo, no fee), Solo CKPool (solo, 2%), Parasite Pool (hybrid: 1 BTC to the block finder, no fee), OCEAN (shared, 2%, 1% with DATUM), Braiins Pool (FPPS, 2.5%), with live sats per day per miner.
+- [Is my Bitaxe normal?]({BASE}/guides/is-my-bitaxe-normal/): stock hashrate per board from the AxeOS firmware (Gamma 601/602 about 1.07 TH/s at 525 MHz), fan target 60°C, overheat stop above 75°C; checks for used miners.
 - [How heater miners work]({BASE}/guides/how-heater-miners-work/): a miner turns its electricity into heat like a space heater.
 - [Room heat calculator]({BASE}/heat-calculator/): room size in, heat needed (about 10 W per sq ft as a rule of thumb) and which tracked miners can heat it.
 - [Price per TH/s leaderboard]({BASE}/price-per-th/): miners ranked by price per stated TH/s at today's cheapest in-stock price, with J/TH and a check against the lowest price we have logged.
@@ -2425,10 +2433,120 @@ def build_guide_pools():
 <li><strong>Be wary of "pools" that sell tokens or cloud contracts.</strong> A real Bitcoin pool just needs your miner and your address.</li></ul></section>
 {pick_sec}
 <section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
-<section><h2>Keep reading</h2><ul class="links"><li><a href="/solo-odds/">Solo odds calculator</a></li><li><a href="/solo-wins/">Recent solo block wins</a></li><li><a href="/guides/is-home-mining-worth-it/">Is home mining worth it?</a></li></ul>
+<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a></li><li><a href="/solo-odds/">Solo odds calculator</a></li><li><a href="/solo-wins/">Recent solo block wins</a></li><li><a href="/guides/is-home-mining-worth-it/">Is home mining worth it?</a></li></ul>
 <p class="hint">Not financial advice. We're not paid by any pool. Earnings aren't guaranteed and change with Bitcoin's price and network difficulty.</p></section>
 </article>"""
     layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Which Bitcoin mining pool should I use?", desc), faq_ld(faq)], lastmod=POOLS_CHECKED, og_type="article")
+
+
+# "Is my Bitaxe normal?" guide (/guides/is-my-bitaxe-normal/). Stock numbers come from the open-source AxeOS firmware
+# (github.com/bitaxeorg/ESP-Miner, main/device_config.h and main/tasks/power_management_task.c at commit bb4fd0c, Oct 21 2026):
+# expected hashrate = frequency (MHz) x small cores x chips / 1000 GH/s; the self-test passes at 85% of that (80% for BM1368);
+# auto fan targets 60 C by default; mining stops ("overheat mode") above 75 C ASIC or 105 C voltage regulator.
+NORMAL_GUIDE_PATH = "/guides/is-my-bitaxe-normal/"
+AXEOS_CHECKED = "2026-10-28"
+AXEOS_SRC = "https://github.com/bitaxeorg/ESP-Miner"
+AXEOS_TEMP_TARGET, AXEOS_ASIC_STOP, AXEOS_VR_STOP = 60, 75, 105
+AXEOS_BOARDS = [
+    # model id, board numbers, chip text, stock MHz, stock mV, small cores per chip, chips, self-test pass share, input volts
+    ("bitaxe-ultra", "204 / 205", "BM1366", 485, 1200, 894, 1, 0.85, 5),
+    ("bitaxe-supra", "401 / 403", "BM1368", 490, 1166, 1276, 1, 0.80, 5),
+    ("bitaxe-gamma", "601 / 602", "BM1370", 525, 1150, 2040, 1, 0.85, 5),
+    ("bitaxe-gamma-duo", "650", "2x BM1370", 400, 1150, 2040, 2, 0.85, 5),
+    ("bitaxe-gt-801", "801", "2x BM1370", 525, 1150, 2040, 2, 0.85, 12),
+    ("bitaxe-naja-duo", "1201", "2x BM1373", 327, 1000, 6725, 2, 0.85, 12),
+    ("bitaxe-gamma-hex", "1300", "6x BM1370", 690, 1200, 2040, 6, 0.85, 12),
+]
+
+
+def axeos_expected_ghs(mhz, cores, chips):
+    """AxeOS's own expected-hashrate formula (GH/s)."""
+    return mhz * cores * chips / 1000.0
+
+
+def fmt_ghs(g):
+    return f"{g / 1000:.2f} TH/s" if g >= 1000 else f"{g:,.0f} GH/s"
+
+
+def build_guide_normal():
+    path = NORMAL_GUIDE_PATH
+    trail = [("Home", "/"), ("Guides", "/guides/"), ("Is my Bitaxe normal?", path)]
+    title = "Is my Bitaxe normal? Stock hashrate, temps and checks (new or used) | Bitaxe Radar"
+    desc = "New or used Bitaxe? Check its hashrate, temps and settings against the stock numbers in the AxeOS firmware, board by board, and what to fix first."
+    rows = []
+    for m, boards, chip, mhz, mv, cores, chips, share, volts in AXEOS_BOARDS:
+        exp = axeos_expected_ghs(mhz, cores, chips)
+        name = f'<a href="/models/{m}/">{esc(SHORT[m])}</a>' if m in TRACKED else esc(SHORT[m])
+        watts = f"≈{MODELS[m]['watts']:g} W" if m in MODELS else "?"
+        rows.append(f'<tr><td class="pool-name">{name} <small>({esc(boards)})</small></td><td data-label="Chip">{esc(chip)}</td>'
+                    f'<td class="num" data-label="Stock settings">{mhz} MHz · {mv / 1000:.3g} V</td>'
+                    f'<td class="num" data-label="Expected at stock"><b>≈{fmt_ghs(exp)}</b></td>'
+                    f'<td class="num" data-label="Self-test pass mark">{fmt_ghs(exp * share)} ({share:.0%})</td>'
+                    f'<td class="num" data-label="Seller-stated power">{watts}</td><td class="num" data-label="Power input">{volts} V</td></tr>')
+    tbl = (f'<div class="tablewrap pool-wrap"><table class="pool-tbl"><thead><tr><th>Board</th><th>Chip</th><th class="num">Stock settings</th>'
+           f'<th class="num">Expected at stock</th><th class="num">Self-test pass mark</th><th class="num">Seller-stated power</th><th class="num">Power input</th></tr></thead>'
+           f'<tbody>{"".join(rows)}</tbody></table></div>'
+           f'<p class="hint">Stock frequency, voltage and the expected-hashrate formula (frequency × cores × chips) are from the open-source '
+           f'<a href="{AXEOS_SRC}" rel="nofollow noopener" target="_blank">AxeOS firmware (ESP-Miner)</a>, checked <time datetime="{AXEOS_CHECKED}">Oct 28, 2026</time>. '
+           "The pass mark is the share of that number the firmware's own self-test asks for. Power is what sellers state for the model, so your reading can differ a little. "
+           "Shop listings often quote higher hashrates than these because they assume a higher frequency.</p>")
+    picks = []
+    for m, why in (("bitaxe-gamma", "the usual first miner"), ("bitaxe-gt-801", "two chips, about twice the hashrate"), ("bitaxe-naja-duo", "the newest two-chip board")):
+        if m in TRACKED and STATS[m]["best"]:
+            o = STATS[m]["best"]
+            picks.append(f'<li><p><a href="/models/{m}/"><b>{esc(SHORT[m])}</b></a>: {esc(why)}. New from {money(o["price"], o["currency"])} at {esc(sname(o["seller"]))} today.</p>'
+                         f'{offer_link(o, "Go to " + sname(o["seller"]) + " ↗", cls="btn ghost")}</li>')
+    pick_sec = (f'<section aria-labelledby="h-new"><h2 id="h-new">Thinking of buying used? Check today\'s new price first</h2>'
+                "<p>A used miner usually comes without the shop's warranty, so compare its price with a new one. Here's what new costs today:</p>"
+                f'<ul class="pool-picks">{"".join(picks)}</ul><p><a href="/where-to-buy-bitaxe/">Every shop, ranked by today\'s price</a> · <a href="/alerts/">Get a price-drop alert</a></p></section>') if picks else ""
+    faq = [("Why is my Bitaxe Gamma under 1.2 TH/s?",
+            "At stock settings (525 MHz) the firmware expects about 1.07 TH/s from a Gamma 601 or 602. Many listings quote 1.2 TH/s or more, which assumes a higher frequency. "
+            "Look at the 10-minute or 1-hour average, not the live number, which jumps around."),
+           ("What temperature is normal for a Bitaxe?",
+            f"AxeOS's automatic fan aims for an ASIC temperature of {AXEOS_TEMP_TARGET}°C by default, so readings around there are by design. "
+            f"If the ASIC goes above {AXEOS_ASIC_STOP}°C, or the voltage regulator above {AXEOS_VR_STOP}°C, the firmware stops mining and runs the fan at full speed."),
+           ("What does the error percentage mean?",
+            "It's the share of the chip's work that came back wrong. A small number is normal. A high or rising number usually means the chip is too hot, or the voltage is too low for the frequency it's set to."),
+           ("Does a higher best difficulty mean I'm closer to a block?",
+            "No. Every share is a fresh draw, so past shares don't move you closer. The solo odds page shows what your best difficulty means next to the network's."),
+           ("Is a used Bitaxe worth it?",
+            "It can be, if it hits the stock numbers above, runs official open-source firmware and the price is well under a new one. Check the pool settings yourself before you trust it.")]
+    body = f"""<article>
+<header class="hero"><h1>Is my Bitaxe normal?</h1>
+<p class="lede">Just got a Bitaxe, new or used, and not sure the numbers look right? Here are the stock numbers from the Bitaxe's own firmware, board by board, and what to check first.</p>
+<p class="meta">Updated <time datetime="{AXEOS_CHECKED}">Oct 28, 2026</time> · 4-minute read</p></header>
+<section aria-labelledby="h-1"><h2 id="h-1">1. The one-minute check</h2>
+<p>Open your miner's dashboard (type its IP address into a browser on the same Wi-Fi). Look at five things:</p>
+<ul><li><strong>Hashrate:</strong> use the 10-minute or 1-hour average. The live number swings a lot.</li>
+<li><strong>ASIC temperature:</strong> the automatic fan aims for {AXEOS_TEMP_TARGET}°C by default.</li>
+<li><strong>Power:</strong> close to the seller-stated figure in the table below.</li>
+<li><strong>Frequency and core voltage</strong> (Settings): stock values are in the table. A used miner may have been overclocked.</li>
+<li><strong>Pool and fallback pool</strong> (Settings): both should be pools you chose, paying a Bitcoin address you own.</li></ul></section>
+<section aria-labelledby="h-2"><h2 id="h-2">2. Stock numbers for each Bitaxe</h2>
+<p>At stock settings, a healthy board's average hashrate lands near "Expected at stock". The firmware's own self-test passes a board that reaches the pass mark.</p>
+{tbl}</section>
+<section aria-labelledby="h-3"><h2 id="h-3">3. Hashrate lower than it should be?</h2>
+<ol><li><strong>Wait 10 minutes</strong> and read the average, not the live number.</li>
+<li><strong>Check the power supply.</strong> The 600-series and older boards run on 5 V; the 801, 1201 and 1300 run on 12 V. A weak or wrong supply is a common cause of low hashrate and restarts.</li>
+<li><strong>Put settings back to stock</strong> (table above). Overclocks from a previous owner can make a chip unstable.</li>
+<li><strong>Check the fan and heatsink.</strong> Dust, a loose heatsink or dried-out thermal paste make the chip run hot and slow.</li>
+<li><strong>Update to the latest official AxeOS</strong> from the <a href="{AXEOS_SRC}/releases" rel="nofollow noopener" target="_blank">ESP-Miner releases page</a>.</li></ol></section>
+<section aria-labelledby="h-4"><h2 id="h-4">4. Running hot?</h2>
+<ul><li>Around {AXEOS_TEMP_TARGET}°C with the fan on auto is normal: that's what the fan aims for.</li>
+<li>Above {AXEOS_ASIC_STOP}°C on the chip (or {AXEOS_VR_STOP}°C on the voltage regulator), AxeOS stops mining, sets the fan to 100% and shows an overheat message. Fix the cooling before you turn it back on.</li>
+<li>Give it open air: not in a cupboard, not against a wall, not in direct sun.</li>
+<li>A louder fan is the trade-off for a cooler chip. Lowering the frequency a little cuts both heat and noise.</li></ul></section>
+<section aria-labelledby="h-5"><h2 id="h-5">5. Bought it used? Check these too</h2>
+<ul><li><strong>Firmware:</strong> the System page shows the version. Official AxeOS is open source; if it's a build you can't find on the releases page, reflash the official one.</li>
+<li><strong>Hidden fees:</strong> some modified firmware on resold miners sends part of the hashrate to someone else. Official firmware plus your own pool settings avoids this.</li>
+<li><strong>Pool settings:</strong> re-enter the pool, the fallback pool and your own Bitcoin address yourself.</li>
+<li><strong>Power supply:</strong> make sure it came with the right one (5 V or 12 V, see the table) and that it isn't a no-name brick that runs hot.</li></ul></section>
+{pick_sec}
+<section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
+<section><h2>Keep reading</h2><ul class="links"><li><a href="/solo-odds/#h-best">What your best difficulty means</a></li><li><a href="/guides/bitcoin-mining-pools/">Which mining pool should I use?</a></li><li><a href="/guides/is-home-mining-worth-it/">Is home mining worth it?</a></li></ul>
+<p class="hint">General guidance only. Follow the maker's instructions for your board and power supply. We're not paid by any firmware project.</p></section>
+</article>"""
+    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Is my Bitaxe normal?", desc), faq_ld(faq)], lastmod=AXEOS_CHECKED, og_type="article")
 
 
 # ---------------------------------------------------------------------------------------------
@@ -3332,6 +3450,7 @@ def build_indexes():
           ("/guides/bitcoin-mining-heat-your-home/", "Mining to heat your home", "Miner vs space heater vs heat pump."),
           ("/guides/solo-vs-pool-mining/", "Solo vs pool mining", "Lottery shot or small steady payouts?"),
           ("/guides/bitcoin-mining-pools/", "Which mining pool?", "Popular Bitcoin pools compared: fees and payouts."),
+          ("/guides/is-my-bitaxe-normal/", "Is my Bitaxe normal?", "Stock hashrate and temps, board by board."),
           ("/guides/how-heater-miners-work/", "How heater miners work", "A miner that warms the room."),
           ("/where-to-buy-bitaxe/", "Where to buy a Bitaxe", "Every shop, ranked by today's price."),
           ("/how-we-track/", "How we track prices", "Where the numbers come from.")]
@@ -3378,6 +3497,7 @@ def main():
     build_guide_solar()
     build_guide_heat_home()
     build_guide_pools()
+    build_guide_normal()
     build_solo_odds()
     build_heat_calc()
     build_solo_wins()
