@@ -183,14 +183,18 @@ class SiteTests(unittest.TestCase):
         self.assertGreater(seen, 0)
 
     def test_solosatoshi_affiliate_links(self):
-        """Solo Satoshi approved us Oct 26, 2026 (affiliate 8840): product links carry aff=8840 and rel sponsored."""
+        """Solo Satoshi approved us Oct 26, 2026 (affiliate 8840): product links use their path style .../aff/8840/ (from their
+        dashboard's link generator), exactly one slash, with rel sponsored and the 'affiliate link' label."""
         seen = 0
         for path, p in self.pages.items():
             for href, rel in p.hrefs_rel:
                 if "solosatoshi.com/product/" in href:
                     seen += 1
-                    self.assertIn("aff=8840", href, path)
+                    url = href.split("?")[0].split("#")[0]
+                    self.assertRegex(url, r"^https://www\.solosatoshi\.com/product/[^?#]*[^/]/aff/8840/$", path)
+                    self.assertNotIn("aff=", href, path)
                     self.assertIn("sponsored", rel, path)
+                    self.assertIn("nofollow", rel, path)
         self.assertGreater(seen, 0)
 
     def test_model_pages_have_signup_and_prerendered_prices(self):

@@ -72,11 +72,28 @@ def load_affiliates(app_js):
     m = re.search(r"var\s+AFFILIATE\s*=\s*\{(.*?)\}\s*;", src, re.S)
     return dict(re.findall(r'["\']?([\w-]+)["\']?\s*:\s*"([^"]*)"', m.group(1))) if m else {}
 
+def with_aff(url, code):
+    """Add a shop's affiliate code to a URL. Codes ending in "/" are path style (Solo Satoshi: .../product/x/aff/8840/),
+    appended to the path with exactly one slash, keeping any query string; anything else is a query param (?ref=...)."""
+    if not code:
+        return url
+    if code.endswith("/"):
+        base, sep, rest = url.partition("?")
+        frag = ""
+        if not sep:
+            base, sep2, f = base.partition("#")
+            frag = sep2 + f
+        code = code.strip("/") + "/"
+        if not base.rstrip("/").endswith("/" + code.rstrip("/")):
+            base = base.rstrip("/") + "/" + code
+        return base + (sep + rest if sep else "") + frag
+    return url + ("&" if "?" in url else "?") + code
+
 def offer_link(o, aff):
     p = aff.get(o["seller"])
     if not p:
         return o["url"], False
-    return o["url"] + ("&" if "?" in o["url"] else "?") + p, True
+    return with_aff(o["url"], p), True
 
 def contact_props(c):
     """Return flat {key: value} from either Resend's {key: {value, type}} shape or a flat dict."""

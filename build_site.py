@@ -139,9 +139,26 @@ def aff_param(sid):
     return AFFILIATE.get(sid)
 
 
+def with_aff(url, code):
+    """Add a shop's affiliate code to a URL. Codes ending in "/" are path style (Solo Satoshi: .../product/x/aff/8840/),
+    appended to the path with exactly one slash, keeping any query string; anything else is a query param (?ref=...)."""
+    if not code:
+        return url
+    if code.endswith("/"):
+        base, sep, rest = url.partition("?")
+        frag = ""
+        if not sep:
+            base, sep2, f = base.partition("#")
+            frag = sep2 + f
+        code = code.strip("/") + "/"
+        if not base.rstrip("/").endswith("/" + code.rstrip("/")):
+            base = base.rstrip("/") + "/" + code
+        return base + (sep + rest if sep else "") + frag
+    return url + ("&" if "?" in url else "?") + code
+
+
 def offer_href(o):
-    p = aff_param(o["seller"])
-    return o["url"] + (("&" if "?" in o["url"] else "?") + p) if p else o["url"]
+    return with_aff(o["url"], aff_param(o["seller"]))
 
 
 def store_link(sid):
