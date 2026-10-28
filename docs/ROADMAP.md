@@ -1,6 +1,6 @@
 # Bitaxe Radar Roadmap
 
-Updated: Oct 28, 2026 (afternoon)
+Updated: Oct 28, 2026 (evening)
 
 ## 🎯 Goal
 
@@ -29,7 +29,8 @@ Updated: Oct 28, 2026 (afternoon)
    - ✅ "Which mining pool should I use?": live Oct 26 at /guides/bitcoin-mining-pools/ (Public Pool, Solo CKPool, Parasite, OCEAN, Braiins: fees, payouts, live sats per miner, links to miner pages).
    - ✅ Best difficulty box on /solo-odds/: live Oct 27 (type your best diff, see it next to live network difficulty and how often a share that high turns up).
    - ✅ "Is my Bitaxe normal?": live Oct 28 at /guides/is-my-bitaxe-normal/ (stock hashrate per board from the Bitaxe firmware, temps, used-miner checks, today's new prices).
-   - Next: firmware roundup.
+   - ✅ Firmware roundup: live Oct 28 at /guides/bitaxe-firmware/ (AxeOS, NerdQAxe firmware, AxeForge, NerdMiner v2: boards, license, latest release, how to update safely).
+   - Next: first-hour setup checklist (low priority).
 
 ## 💰 Money
 
@@ -67,6 +68,7 @@ Later:
 
 ## ✅ Done
 
+- Oct 28 (evening): Firmware guide (/guides/bitaxe-firmware/): which firmware runs on which home miner. AxeOS v2.15.4 (official Bitaxe, Oct 21), NerdQAxe firmware v1.1.0.1 (official Nerd*axe family, Sep 24), AxeForge v1.4.2 (community NerdQaxe++ firmware, Oct 28) and NerdMiner v2 V1.8.3 (ESP32 toy), all open source, with license and board lists from each GitHub page, web flasher links and a 5-step safe update checklist. Linked from the guides page and the 'Is my Bitaxe normal?' guide.
 - Oct 28: Solo Satoshi links switched to the path style their dashboard generates (…/product/bitaxe-gamma/aff/8840/ instead of ?aff=8840). Signed in to their affiliate dashboard: 5% commission, 30-day cookie, payout email set, 2 visits so far.
 - Oct 28: Power Mining reply sent asking them to set our coupon code to BITAXERADAR; awaiting their confirmation.
 - Oct 28: "Is my Bitaxe normal?" guide (/guides/is-my-bitaxe-normal/): for new and used Bitaxe owners. Stock settings and expected hashrate for 7 boards (Ultra, Supra, Gamma 601/602, Gamma Duo, GT 801, Naja Duo, Gamma Hex), taken from the open-source AxeOS firmware (e.g. Gamma ≈1.07 TH/s at 525 MHz; self-test passes from ≈910 GH/s). Temps (fan aims for 60°C, mining stops above 75°C), what to check if hashrate is low, used-miner checks (firmware, hidden fees, pool settings, power supply), and today's new prices with shop links. Bitaxe model pages got a "What hashrate is normal?" answer too.
