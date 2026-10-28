@@ -2054,6 +2054,7 @@ Bitaxe Radar is independent. Some shop links are affiliate links; they never cha
 - [Solo vs pool mining]({BASE}/guides/solo-vs-pool-mining/): solo is a lottery for a whole block; pool pays small, steady amounts.
 - [Which mining pool should I use?]({BASE}/guides/bitcoin-mining-pools/): Public Pool (solo, no fee), Solo CKPool (solo, 2%), Parasite Pool (hybrid: 1 BTC to the block finder, no fee), OCEAN (shared, 2%, 1% with DATUM), Braiins Pool (FPPS, 2.5%), with live sats per day per miner.
 - [Is my Bitaxe normal?]({BASE}/guides/is-my-bitaxe-normal/): stock hashrate per board from the AxeOS firmware (Gamma 601/602 about 1.07 TH/s at 525 MHz), fan target 60°C, overheat stop above 75°C; checks for used miners.
+- [Bitaxe and NerdQaxe firmware compared]({BASE}/guides/bitaxe-firmware/): AxeOS (official Bitaxe firmware, GPL-3.0, v2.15.4), the NerdQAxe firmware (official for Nerd*axe boards, v1.1.0.1), AxeForge (community NerdQaxe++ firmware) and NerdMiner v2 (ESP32-only toy); how to update safely.
 - [How heater miners work]({BASE}/guides/how-heater-miners-work/): a miner turns its electricity into heat like a space heater.
 - [Room heat calculator]({BASE}/heat-calculator/): room size in, heat needed (about 10 W per sq ft as a rule of thumb) and which tracked miners can heat it.
 - [Price per TH/s leaderboard]({BASE}/price-per-th/): miners ranked by price per stated TH/s at today's cheapest in-stock price, with J/TH and a check against the lowest price we have logged.
@@ -2560,10 +2561,80 @@ def build_guide_normal():
 <li><strong>Power supply:</strong> make sure it came with the right one (5 V or 12 V, see the table) and that it isn't a no-name brick that runs hot.</li></ul></section>
 {pick_sec}
 <section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
-<section><h2>Keep reading</h2><ul class="links"><li><a href="/solo-odds/#h-best">What your best difficulty means</a></li><li><a href="/guides/bitcoin-mining-pools/">Which mining pool should I use?</a></li><li><a href="/guides/is-home-mining-worth-it/">Is home mining worth it?</a></li></ul>
+<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/bitaxe-firmware/">Bitaxe firmware compared</a></li><li><a href="/solo-odds/#h-best">What your best difficulty means</a></li><li><a href="/guides/bitcoin-mining-pools/">Which mining pool should I use?</a></li><li><a href="/guides/is-home-mining-worth-it/">Is home mining worth it?</a></li></ul>
 <p class="hint">General guidance only. Follow the maker's instructions for your board and power supply. We're not paid by any firmware project.</p></section>
 </article>"""
     layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Is my Bitaxe normal?", desc), faq_ld(faq)], lastmod=AXEOS_CHECKED, og_type="article")
+
+
+# Firmware roundup (/guides/bitaxe-firmware/). Facts come from each project's GitHub repo and latest release (checked Oct 28 2026):
+# license, latest release tag and date, and which boards the release ships images for. No fee or speed claims we can't source.
+FIRMWARE_GUIDE_PATH = "/guides/bitaxe-firmware/"
+FIRMWARE_CHECKED = "2026-10-28"
+FIRMWARE = [
+    # name, who makes it, repo, license, latest release, release date, boards it ships for, model ids we track, plain note
+    ("AxeOS (ESP-Miner)", "the Bitaxe project (Open Source Miners United)", "https://github.com/bitaxeorg/ESP-Miner", "GPL-3.0", "v2.15.4", "Oct 21, 2026",
+     "Bitaxe boards 102 to 801, plus 1201 (Naja Duo) and 1300 (Gamma Hex)", ("bitaxe-gamma", "bitaxe-gt-801", "bitaxe-naja-duo", "bitaxe-gamma-hex"),
+     "The official firmware every Bitaxe ships with. Start here.", "https://bitaxeorg.github.io/bitaxe-web-flasher/"),
+    ("NerdQAxe firmware", "shufps, the NerdQAxe designer (a fork of ESP-Miner)", "https://github.com/shufps/ESP-Miner-NerdQAxePlus", "GPL-3.0", "v1.1.0.1", "Sep 24, 2026",
+     "NerdAxe, NerdAxe Gamma, NerdQAxe+, NerdQAxe++, NerdOCTAXE, NerdQX, NerdEKO, NerdHaxe Gamma", ("nerdaxe-gamma", "nerdqaxe-pp", "nerdoctaxe", "nerdqx"),
+     "The official firmware for the Nerd*axe family.", "https://shufps.github.io/nerdqaxe-web-flasher/"),
+    ("AxeForge", "IsSasoriDev, a community developer", "https://github.com/IsSasoriDev/AxeForge", "GPL-3.0", "v1.4.2", "Oct 28, 2026",
+     "NerdQaxe++ only", ("nerdqaxe-pp",),
+     "A new custom firmware with its own screen layouts. Small and young project, so expect changes.", ""),
+    ("NerdMiner v2", "BitMaker", "https://github.com/BitMaker-hub/NerdMiner_v2", "MIT", "V1.8.3", "Sep 13, 2025",
+     "Plain ESP32 dev boards (LILYGO T-Display S3 and others), no mining chip", (),
+     "A lottery-ticket toy: it mines on the ESP32 itself, so its hashrate is tiny. Fun to learn on, not to earn.", ""),
+]
+
+
+def build_guide_firmware():
+    path = FIRMWARE_GUIDE_PATH
+    trail = [("Home", "/"), ("Guides", "/guides/"), ("Bitaxe firmware", path)]
+    title = "Bitaxe and NerdQaxe firmware compared (AxeOS, AxeForge) | Bitaxe Radar"
+    desc = "AxeOS, NerdQAxe, AxeForge and NerdMiner compared: which boards each runs on, license, latest release, and how to update safely."
+    rows, cards = [], []
+    for name, who, repo, lic, ver, date, boards, mids, note, flasher in FIRMWARE:
+        links = ", ".join(f'<a href="/models/{m}/">{esc(SHORT[m])}</a>' for m in mids if m in TRACKED)
+        rows.append(f'<tr><td class="pool-name"><a href="{repo}" rel="nofollow noopener" target="_blank">{esc(name)}</a></td>'
+                    f'<td data-label="Runs on">{esc(boards)}</td><td data-label="Open source">Yes ({esc(lic)})</td>'
+                    f'<td class="num" data-label="Latest release">{esc(ver)} <small>({esc(date)})</small></td><td data-label="Good to know">{esc(note)}</td></tr>')
+        fl = f' Easiest way to install: the <a href="{flasher}" rel="nofollow noopener" target="_blank">web flasher</a> (works in Chrome or Edge over USB).' if flasher else ""
+        cards.append(f'<h3>{esc(name)}</h3><p>Made by {esc(who)}. {esc(note)}{fl}</p>' + (f"<p>Miners we track that run it: {links}.</p>" if links else ""))
+    tbl = (f'<div class="tablewrap pool-wrap"><table class="pool-tbl"><thead><tr><th>Firmware</th><th>Runs on</th><th>Open source</th><th class="num">Latest release</th><th>Good to know</th></tr></thead>'
+           f'<tbody>{"".join(rows)}</tbody></table></div>'
+           f'<p class="hint">License, latest release and supported boards are from each project\'s GitHub page, checked <time datetime="{FIRMWARE_CHECKED}">Oct 28, 2026</time>. New versions come out often, so check the releases page before you flash.</p>')
+    faq = [("Which firmware should I run on my Bitaxe?",
+            "The official AxeOS from the Bitaxe project's releases page. Pick the file that matches the board number printed on your Bitaxe (for example 601 or 602 for a Gamma)."),
+           ("Which firmware runs on a NerdQaxe++?",
+            "The NerdQAxe firmware from shufps is the official one. AxeForge is a newer community alternative for the NerdQaxe++ only."),
+           ("Can I put AxeOS on a NerdQaxe?",
+            "No. Use the firmware made for your board. Flashing a file built for a different board can stop it mining until you flash the right one."),
+           ("How do I know my firmware has no hidden fee?",
+            "Install it yourself from the project's official GitHub releases page, then set your own pool and Bitcoin address. Some resold miners come with modified firmware that sends part of the hashrate elsewhere."),
+           ("Will updating erase my settings?",
+            "A normal update from the miner's own dashboard keeps your Wi-Fi and pool settings. A full 'factory' flash over USB can reset them, so write them down first.")]
+    body = f"""<article>
+<header class="hero"><h1>Bitaxe and NerdQaxe firmware, compared</h1>
+<p class="lede">Firmware is the software inside your miner. It runs the chip, the fan and the dashboard you open in your browser. Here's which firmware runs on which home miner, and how to update without trouble.</p>
+<p class="meta">Updated <time datetime="{FIRMWARE_CHECKED}">Oct 28, 2026</time> · 3-minute read</p></header>
+<section aria-labelledby="h-1"><h2 id="h-1">1. The short answer</h2>
+<ul><li><strong>Bitaxe:</strong> run the official AxeOS.</li>
+<li><strong>NerdAxe, NerdQaxe, NerdOCTAXE, NerdQX:</strong> run the official NerdQAxe firmware.</li>
+<li><strong>Custom firmware</strong> like AxeForge can be fun, but stick to open-source projects and download only from their own GitHub page.</li></ul></section>
+<section aria-labelledby="h-2"><h2 id="h-2">2. Every option side by side</h2>{tbl}</section>
+<section aria-labelledby="h-3"><h2 id="h-3">3. What each one is</h2>{"".join(cards)}</section>
+<section aria-labelledby="h-4"><h2 id="h-4">4. How to update safely</h2>
+<ol><li><strong>Find your board number</strong> on the miner or its System page (for example 602 or 801).</li>
+<li><strong>Download only from the official releases page</strong> of the firmware's GitHub project, or use its web flasher.</li>
+<li><strong>Write down your Wi-Fi, pool and Bitcoin address</strong> in case a full flash resets them.</li>
+<li><strong>Update from the miner's dashboard</strong> when you can (upload the firmware file, then the web file if the project ships one).</li>
+<li><strong>After it restarts, check the pool settings</strong> and that your hashrate looks right: see <a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a></li></ol></section>
+<section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
+<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a></li><li><a href="/guides/bitcoin-mining-pools/">Which mining pool should I use?</a></li><li><a href="/where-to-buy-bitaxe/">Where to buy a Bitaxe</a></li></ul>
+<p class="hint">General guidance only. Flashing firmware is at your own risk; follow each project's instructions. We're not paid by any firmware project.</p></section>
+</article>"""
+    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Bitaxe and NerdQaxe firmware compared", desc), faq_ld(faq)], lastmod=FIRMWARE_CHECKED, og_type="article")
 
 
 # ---------------------------------------------------------------------------------------------
@@ -3468,6 +3539,7 @@ def build_indexes():
           ("/guides/solo-vs-pool-mining/", "Solo vs pool mining", "Lottery shot or small steady payouts?"),
           ("/guides/bitcoin-mining-pools/", "Which mining pool?", "Popular Bitcoin pools compared: fees and payouts."),
           ("/guides/is-my-bitaxe-normal/", "Is my Bitaxe normal?", "Stock hashrate and temps, board by board."),
+          ("/guides/bitaxe-firmware/", "Bitaxe firmware compared", "AxeOS, NerdQAxe, AxeForge and NerdMiner."),
           ("/guides/how-heater-miners-work/", "How heater miners work", "A miner that warms the room."),
           ("/where-to-buy-bitaxe/", "Where to buy a Bitaxe", "Every shop, ranked by today's price."),
           ("/how-we-track/", "How we track prices", "Where the numbers come from.")]
@@ -3515,6 +3587,7 @@ def main():
     build_guide_heat_home()
     build_guide_pools()
     build_guide_normal()
+    build_guide_firmware()
     build_solo_odds()
     build_heat_calc()
     build_solo_wins()
