@@ -1,6 +1,6 @@
 # Bitaxe Radar Roadmap
 
-Updated: Oct 28, 2026 (morning)
+Updated: Oct 28, 2026 (afternoon)
 
 ## 🎯 Goal
 
@@ -35,7 +35,7 @@ Updated: Oct 28, 2026 (morning)
 
 Affiliate programs (we earn when someone buys through our link):
 
-- ✅ Power Mining: live since Oct 16.
+- ✅ Power Mining: live since Oct 16. Oct 28: sent our reply asking them to set our coupon code to BITAXERADAR (they can't change the account email); awaiting their confirmation.
 - ✅ Bitaxe.de: approved Oct 24 (5%). Brand code bitaxeradar set by their support; links live since Oct 24.
 - ✅ Solo Satoshi: approved Oct 26 (affiliate ID 8840). 5% commission, 30-day cookie, payout email set (Oct 28). 2 visits so far (Oct 28). Links use their path style from the dashboard's link generator: product URL + aff/8840/ (plain referral link: https://www.solosatoshi.com/aff/8840/). Switched from ?aff=8840 on Oct 28.
 - ⏳ D-Central: applied Oct 21, waiting.
@@ -68,6 +68,7 @@ Later:
 ## ✅ Done
 
 - Oct 28: Solo Satoshi links switched to the path style their dashboard generates (…/product/bitaxe-gamma/aff/8840/ instead of ?aff=8840). Signed in to their affiliate dashboard: 5% commission, 30-day cookie, payout email set, 2 visits so far.
+- Oct 28: Power Mining reply sent asking them to set our coupon code to BITAXERADAR; awaiting their confirmation.
 - Oct 28: "Is my Bitaxe normal?" guide (/guides/is-my-bitaxe-normal/): for new and used Bitaxe owners. Stock settings and expected hashrate for 7 boards (Ultra, Supra, Gamma 601/602, Gamma Duo, GT 801, Naja Duo, Gamma Hex), taken from the open-source AxeOS firmware (e.g. Gamma ≈1.07 TH/s at 525 MHz; self-test passes from ≈910 GH/s). Temps (fan aims for 60°C, mining stops above 75°C), what to check if hashrate is low, used-miner checks (firmware, hidden fees, pool settings, power supply), and today's new prices with shop links. Bitaxe model pages got a "What hashrate is normal?" answer too.
 - Oct 28: Fixed the deploy failure that happened when a docs push landed during a price update (the price bot now rebases and retries).
 - Oct 27: Best difficulty box on the solo odds page (/solo-odds/#h-best): type the best diff from your miner's dashboard (like 240K or 4.29G) and see network difficulty right now (141T), how many times higher a block needs, and how often a share that high turns up at your hashrate. Plus a table of how long 1M, 100M, 1G, 10G, 100G and 1T usually take, and a FAQ answer on what best diff means. Idea from Reddit newcomers asking whether their best diff means they're close.
