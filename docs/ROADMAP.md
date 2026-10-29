@@ -30,7 +30,7 @@ Updated: Oct 29, 2026 (evening)
    - ✅ Best difficulty box on /solo-odds/: live Oct 27 (type your best diff, see it next to live network difficulty and how often a share that high turns up).
    - ✅ "Is my Bitaxe normal?": live Oct 28 at /guides/is-my-bitaxe-normal/ (stock hashrate per board from the Bitaxe firmware, temps, used-miner checks, today's new prices).
    - ✅ Firmware roundup: live Oct 28 at /guides/bitaxe-firmware/ (AxeOS, NerdQAxe firmware, AxeForge, NerdMiner v2: boards, license, latest release, how to update safely).
-   - ✅ First-hour setup checklist: live Oct 29 at /guides/bitaxe-setup/ (setup Wi-Fi, home Wi-Fi, pool and your own Bitcoin address, first checks).
+   - 🟡 First-hour setup checklist (/guides/bitaxe-setup/): built and tested Oct 29 evening, not live yet. Why: uploading it to the site was stopped by an error in the automatic safety check, so it goes live with the next run.
    - Next: watch Reddit for the next owner question (weekly scan on Mondays).
 
 ## 💰 Money
@@ -69,7 +69,6 @@ Later:
 
 ## ✅ Done
 
-- Oct 29 (evening): First-hour setup checklist (/guides/bitaxe-setup/): for people who just unboxed a Bitaxe. Join its Bitaxe_XXXX setup Wi-Fi (scan the QR code on its screen), put it on 2.4 GHz home Wi-Fi, find the dashboard at the IP on its screen, set the pool and your own Bitcoin address on both the main and backup pool (the firmware ships with Public Pool, port 21496, and Solo CKPool, port 3333, as backup), then check shares, hashrate and temps. All steps checked against the open-source AxeOS firmware. Linked from the guides page, 'Is my Bitaxe normal?' and the firmware guide.
 - Oct 29: Two new miners, both tracked at Bitaxe.de (our 5% affiliate shop). Nerdaxe Gaia Copper Pro (/models/nerdaxe-gaia-copper-pro/): new pre-order, about 3 TH/s at 33 W, €299, ships from Nov 7. Bitaxe 702 / Supra Hex (/models/bitaxe-702/): six BM1368 chips, about 4.2 TH/s at 90 W, €249, sold out right now.
 
 - Oct 28 (evening): Firmware guide (/guides/bitaxe-firmware/): which firmware runs on which home miner. AxeOS v2.15.4 (official Bitaxe, Oct 21), NerdQAxe firmware v1.1.0.1 (official Nerd*axe family, Sep 24), AxeForge v1.4.2 (community NerdQaxe++ firmware, Oct 28) and NerdMiner v2 V1.8.3 (ESP32 toy), all open source, with license and board lists from each GitHub page, web flasher links and a 5-step safe update checklist. Linked from the guides page and the 'Is my Bitaxe normal?' guide.
