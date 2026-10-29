@@ -2068,6 +2068,7 @@ Bitaxe Radar is independent. Some shop links are affiliate links; they never cha
 - [Solo vs pool mining]({BASE}/guides/solo-vs-pool-mining/): solo is a lottery for a whole block; pool pays small, steady amounts.
 - [Which mining pool should I use?]({BASE}/guides/bitcoin-mining-pools/): Public Pool (solo, no fee), Solo CKPool (solo, 2%), Parasite Pool (hybrid: 1 BTC to the block finder, no fee), OCEAN (shared, 2%, 1% with DATUM), Braiins Pool (FPPS, 2.5%), with live sats per day per miner.
 - [Is my Bitaxe normal?]({BASE}/guides/is-my-bitaxe-normal/): stock hashrate per board from the AxeOS firmware (Gamma 601/602 about 1.07 TH/s at 525 MHz), fan target 60°C, overheat stop above 75°C; checks for used miners.
+- [Bitaxe setup: first-hour checklist]({BASE}/guides/bitaxe-setup/): join the Bitaxe_XXXX setup Wi-Fi (2.4 GHz only), set the pool and your own Bitcoin address (default pool public-pool.io:21496, backup solo.ckpool.org:3333), then check shares, hashrate and temps.
 - [Bitaxe and NerdQaxe firmware compared]({BASE}/guides/bitaxe-firmware/): AxeOS (official Bitaxe firmware, GPL-3.0, v2.15.4), the NerdQAxe firmware (official for Nerd*axe boards, v1.1.0.1), AxeForge (community NerdQaxe++ firmware) and NerdMiner v2 (ESP32-only toy); how to update safely.
 - [How heater miners work]({BASE}/guides/how-heater-miners-work/): a miner turns its electricity into heat like a space heater.
 - [Room heat calculator]({BASE}/heat-calculator/): room size in, heat needed (about 10 W per sq ft as a rule of thumb) and which tracked miners can heat it.
@@ -2575,7 +2576,7 @@ def build_guide_normal():
 <li><strong>Power supply:</strong> make sure it came with the right one (5 V or 12 V, see the table) and that it isn't a no-name brick that runs hot.</li></ul></section>
 {pick_sec}
 <section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
-<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/bitaxe-firmware/">Bitaxe firmware compared</a></li><li><a href="/solo-odds/#h-best">What your best difficulty means</a></li><li><a href="/guides/bitcoin-mining-pools/">Which mining pool should I use?</a></li><li><a href="/guides/is-home-mining-worth-it/">Is home mining worth it?</a></li></ul>
+<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/bitaxe-setup/">First-hour setup checklist</a></li><li><a href="/guides/bitaxe-firmware/">Bitaxe firmware compared</a></li><li><a href="/solo-odds/#h-best">What your best difficulty means</a></li><li><a href="/guides/bitcoin-mining-pools/">Which mining pool should I use?</a></li><li><a href="/guides/is-home-mining-worth-it/">Is home mining worth it?</a></li></ul>
 <p class="hint">General guidance only. Follow the maker's instructions for your board and power supply. We're not paid by any firmware project.</p></section>
 </article>"""
     layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Is my Bitaxe normal?", desc), faq_ld(faq)], lastmod=AXEOS_CHECKED, og_type="article")
@@ -2645,10 +2646,77 @@ def build_guide_firmware():
 <li><strong>Update from the miner's dashboard</strong> when you can (upload the firmware file, then the web file if the project ships one).</li>
 <li><strong>After it restarts, check the pool settings</strong> and that your hashrate looks right: see <a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a></li></ol></section>
 <section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
-<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a></li><li><a href="/guides/bitcoin-mining-pools/">Which mining pool should I use?</a></li><li><a href="/where-to-buy-bitaxe/">Where to buy a Bitaxe</a></li></ul>
+<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/bitaxe-setup/">First-hour setup checklist</a></li><li><a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a></li><li><a href="/guides/bitcoin-mining-pools/">Which mining pool should I use?</a></li><li><a href="/where-to-buy-bitaxe/">Where to buy a Bitaxe</a></li></ul>
 <p class="hint">General guidance only. Flashing firmware is at your own risk; follow each project's instructions. We're not paid by any firmware project.</p></section>
 </article>"""
     layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Bitaxe and NerdQaxe firmware compared", desc), faq_ld(faq)], lastmod=FIRMWARE_CHECKED, og_type="article")
+
+
+# First-hour setup checklist (/guides/bitaxe-setup/). Facts from the open-source AxeOS firmware (ESP-Miner), checked Oct 29 2026:
+# setup hotspot named Bitaxe_XXXX (last 4 hex digits of its MAC), open network with a captive portal; the screen shows a QR code for it
+# and, once connected, the miner's IP address; the ESP32-S3 chip it runs on has 2.4 GHz Wi-Fi only; default pool public-pool.io port 21496,
+# default fallback solo.ckpool.org port 3333; the Pool page warns when the User field is still the default factory Bitcoin address.
+SETUP_GUIDE_PATH = "/guides/bitaxe-setup/"
+SETUP_CHECKED = "2026-10-29"
+SETUP_DEFAULT_POOL = ("public-pool.io", 21496)
+SETUP_DEFAULT_FALLBACK = ("solo.ckpool.org", 3333)
+
+
+def build_guide_setup():
+    path = SETUP_GUIDE_PATH
+    trail = [("Home", "/"), ("Guides", "/guides/"), ("First-hour setup", path)]
+    title = "Bitaxe setup: your first-hour checklist (Wi-Fi, pool, address) | Bitaxe Radar"
+    desc = "Just unboxed a Bitaxe? Connect it to Wi-Fi, point it at a pool with your own Bitcoin address, and check it's running right, step by step."
+    pu, pp = SETUP_DEFAULT_POOL
+    fu, fp = SETUP_DEFAULT_FALLBACK
+    faq = [("Why can't my Bitaxe find my Wi-Fi?",
+            "The Bitaxe's chip only works with 2.4 GHz Wi-Fi. If your router puts 2.4 and 5 GHz under one name, it usually still works; if not, turn on a separate 2.4 GHz network in your router settings."),
+           ("What do I put in the User field?",
+            "Your own Bitcoin address, often followed by a dot and a name for the miner, like youraddress.bitaxe1. The Password field can usually stay as x. Check your pool's own page, since a few pools ask for something different."),
+           ("Do I need an account with the pool?",
+            "Not for solo pools like Public Pool or Solo CKPool: your Bitcoin address is your login. Some shared pools, like Braiins, ask you to sign up."),
+           ("How do I find my Bitaxe's dashboard later?",
+            "Its IP address is on the miner's little screen once it's on your Wi-Fi. Type that number into a browser on a phone or computer connected to the same network."),
+           ("My Bitaxe is on, but the hashrate is 0. What's wrong?",
+            "Usually the pool address or port has a typo, or the miner isn't on Wi-Fi yet. Open the Pool settings, check every field, save, and let it restart.")]
+    body = f"""<article>
+<header class="hero"><h1>Bitaxe setup: your first-hour checklist</h1>
+<p class="lede">Just unboxed your Bitaxe? Here's everything to do in the first hour: get it on Wi-Fi, point it at a pool that pays <em>your</em> Bitcoin address, and check it's running right.</p>
+<p class="meta">Updated <time datetime="{SETUP_CHECKED}">Oct 29, 2026</time> · 4-minute read</p></header>
+<section aria-labelledby="h-0"><h2 id="h-0">Before you start</h2>
+<ul><li><strong>A Bitcoin address you own</strong>, from your own wallet. This is where a block reward would go.</li>
+<li><strong>Your Wi-Fi name and password.</strong> The Bitaxe only works with 2.4 GHz Wi-Fi.</li>
+<li><strong>The power supply that came with it.</strong> Some boards take 5 V and others 12 V (see <a href="/guides/is-my-bitaxe-normal/">the board table</a>), so don't swap in a random one.</li>
+<li><strong>A spot with airflow</strong>, away from curtains, with the fan side clear.</li></ul></section>
+<section aria-labelledby="h-1"><h2 id="h-1">1. Plug it in and join its setup Wi-Fi</h2>
+<ol><li>Plug in the power supply. The screen lights up and shows a setup Wi-Fi name like <strong>Bitaxe_1A2B</strong> (the last four characters differ on every miner), plus a QR code.</li>
+<li>On your phone, scan the QR code or pick that Wi-Fi name in your Wi-Fi settings. It has no password.</li>
+<li>A setup page should pop up on its own. If it doesn't, open your phone's browser.</li></ol></section>
+<section aria-labelledby="h-2"><h2 id="h-2">2. Put it on your home Wi-Fi</h2>
+<ol><li>On the setup page, choose your home Wi-Fi (2.4 GHz) and type its password.</li>
+<li>Save. The miner restarts, joins your network, and shows its new IP address on the screen, something like 192.168.1.57. Write it down.</li>
+<li>Reconnect your phone to your normal Wi-Fi and type that IP address into the browser. That's your miner's dashboard (AxeOS).</li></ol></section>
+<section aria-labelledby="h-3"><h2 id="h-3">3. Set the pool and your Bitcoin address</h2>
+<p>This is the step people skip, and the one that matters most. Open <strong>Pool</strong> settings in the dashboard.</p>
+<ul><li><strong>Pool address and port:</strong> the firmware comes set to Public Pool ({esc(pu)}, port {pp}) with Solo CKPool ({esc(fu)}, port {fp}) as the backup. Both are solo pools. Keep them or pick another from <a href="/guides/bitcoin-mining-pools/">our pool comparison</a>.</li>
+<li><strong>User:</strong> replace it with your own Bitcoin address, plus a dot and a miner name if you like (youraddress.bitaxe1). If AxeOS shows a warning that you're using the default factory Bitcoin address, this field still needs changing.</li>
+<li><strong>Password:</strong> usually just x.</li>
+<li><strong>Do the backup pool too.</strong> Its User field should also be your address, or a reward found while it's on the backup won't reach you.</li></ul>
+<p>Save and let it restart.</p></section>
+<section aria-labelledby="h-4"><h2 id="h-4">4. Check it's mining</h2>
+<ul><li><strong>Shares accepted</strong> goes up within a few minutes.</li>
+<li><strong>Hashrate:</strong> give it 10 minutes, then compare the average with the stock numbers in <a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a> (a Gamma lands near 1.07 TH/s at stock).</li>
+<li><strong>Temperature:</strong> the fan aims for about {AXEOS_TEMP_TARGET}°C on the chip. If it goes above {AXEOS_ASIC_STOP}°C the firmware stops mining to protect it.</li>
+<li><strong>Best difficulty</strong> climbs over the first hours. See <a href="/solo-odds/#h-best">what your best difficulty means</a>.</li></ul></section>
+<section aria-labelledby="h-5"><h2 id="h-5">5. Nice to do in week one</h2>
+<ul><li><strong>Firmware:</strong> check you're on the latest official release. See <a href="/guides/bitaxe-firmware/">Bitaxe firmware compared</a> for how to update safely.</li>
+<li><strong>Power cost:</strong> see what it costs to run at your electricity price with <a href="/guides/is-home-mining-worth-it/">Is home mining worth it?</a></li>
+<li><strong>Odds:</strong> see your real chance of a block on the <a href="/solo-odds/">solo odds calculator</a>.</li></ul></section>
+<section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
+<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a></li><li><a href="/guides/bitcoin-mining-pools/">Which mining pool should I use?</a></li><li><a href="/guides/bitaxe-firmware/">Bitaxe firmware compared</a></li></ul>
+<p class="hint">Steps follow the official open-source <a href="{AXEOS_SRC}" rel="nofollow noopener" target="_blank">AxeOS firmware</a>, checked <time datetime="{SETUP_CHECKED}">Oct 29, 2026</time>. Menus can move between versions, and other boards (like NerdQaxe) run their own firmware with similar steps. General guidance only; follow your maker's instructions.</p></section>
+</article>"""
+    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Bitaxe setup: your first-hour checklist", desc), faq_ld(faq)], lastmod=SETUP_CHECKED, og_type="article")
 
 
 # ---------------------------------------------------------------------------------------------
@@ -3553,6 +3621,7 @@ def build_indexes():
           ("/guides/solo-vs-pool-mining/", "Solo vs pool mining", "Lottery shot or small steady payouts?"),
           ("/guides/bitcoin-mining-pools/", "Which mining pool?", "Popular Bitcoin pools compared: fees and payouts."),
           ("/guides/is-my-bitaxe-normal/", "Is my Bitaxe normal?", "Stock hashrate and temps, board by board."),
+          ("/guides/bitaxe-setup/", "First-hour setup checklist", "Wi-Fi, pool and your Bitcoin address."),
           ("/guides/bitaxe-firmware/", "Bitaxe firmware compared", "AxeOS, NerdQAxe, AxeForge and NerdMiner."),
           ("/guides/how-heater-miners-work/", "How heater miners work", "A miner that warms the room."),
           ("/where-to-buy-bitaxe/", "Where to buy a Bitaxe", "Every shop, ranked by today's price."),
@@ -3602,6 +3671,7 @@ def main():
     build_guide_pools()
     build_guide_normal()
     build_guide_firmware()
+    build_guide_setup()
     build_solo_odds()
     build_heat_calc()
     build_solo_wins()
