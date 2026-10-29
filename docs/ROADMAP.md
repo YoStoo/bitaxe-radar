@@ -1,6 +1,6 @@
 # Bitaxe Radar Roadmap
 
-Updated: Oct 28, 2026 (evening)
+Updated: Oct 29, 2026 (morning)
 
 ## 🎯 Goal
 
@@ -10,8 +10,8 @@ Updated: Oct 28, 2026 (evening)
 
 ## 🔨 Now
 
-- Add more home miners: 79 found, 30 on the site so far.
-- Add next: Bitaxe 702, Avalon Nano 3.
+- Add more home miners: 79 found, 32 on the site so far.
+- Bitaxe 702 added Oct 29. Avalon Nano 3 skipped for now (replaced by the 3S and sold out where we looked).
 
 ## ⏭️ Next up (in order)
 
@@ -39,7 +39,7 @@ Affiliate programs (we earn when someone buys through our link):
 - ✅ Power Mining: live since Oct 16. Oct 28: sent our reply asking them to set our coupon code to BITAXERADAR (they can't change the account email); awaiting their confirmation.
 - ✅ Bitaxe.de: approved Oct 24 (5%). Brand code bitaxeradar set by their support; links live since Oct 24.
 - ✅ Solo Satoshi: approved Oct 26 (affiliate ID 8840). 5% commission, 30-day cookie, payout email set (Oct 28). 2 visits so far (Oct 28). Links use their path style from the dashboard's link generator: product URL + aff/8840/ (plain referral link: https://www.solosatoshi.com/aff/8840/). Switched from ?aff=8840 on Oct 28.
-- ⏳ D-Central: applied Oct 21, waiting.
+- ⏳ D-Central: applied Oct 21. Oct 28: asked support whether it went through; they opened a ticket and created a support-site account (activation link waiting in the contact@ inbox, needs a password from you).
 - ⏳ DTV Electronics: applied Oct 21, waiting.
 - ⏳ Altair: account activated Oct 23; affiliate approval still pending.
 - ⏳ Bitcoin Merch: emailed Oct 16, no reply. Follow-up planned Oct 23 (needs your OK).
@@ -67,6 +67,8 @@ Later:
 - PO Box address before the first newsletter email goes out.
 
 ## ✅ Done
+
+- Oct 29: Two new miners, both tracked at Bitaxe.de (our 5% affiliate shop). Nerdaxe Gaia Copper Pro (/models/nerdaxe-gaia-copper-pro/): new pre-order, about 3 TH/s at 33 W, €299, ships from Nov 7. Bitaxe 702 / Supra Hex (/models/bitaxe-702/): six BM1368 chips, about 4.2 TH/s at 90 W, €249, sold out right now.
 
 - Oct 28 (evening): Firmware guide (/guides/bitaxe-firmware/): which firmware runs on which home miner. AxeOS v2.15.4 (official Bitaxe, Oct 21), NerdQAxe firmware v1.1.0.1 (official Nerd*axe family, Sep 24), AxeForge v1.4.2 (community NerdQaxe++ firmware, Oct 28) and NerdMiner v2 V1.8.3 (ESP32 toy), all open source, with license and board lists from each GitHub page, web flasher links and a 5-step safe update checklist. Linked from the guides page and the 'Is my Bitaxe normal?' guide.
 - Oct 28: Solo Satoshi links switched to the path style their dashboard generates (…/product/bitaxe-gamma/aff/8840/ instead of ?aff=8840). Signed in to their affiliate dashboard: 5% commission, 30-day cookie, payout email set, 2 visits so far.

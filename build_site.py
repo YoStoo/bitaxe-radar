@@ -225,7 +225,7 @@ SHORT = {"bitaxe-supra": "Bitaxe Supra", "bitaxe-ultra": "Bitaxe Ultra", "bitaxe
          "heatbit-maxi": "Heatbit Maxi", "heatbit-canvas": "Heatbit Canvas", "braiins-bmm-101": "Braiins Mini Miner", "hammer-bc04": "Hammer BC04",
          "bitaxe-gamma-hex": "Bitaxe Gamma Hex", "bitaxe-naja-duo": "Bitaxe Naja Duo", "nerdoctaxe": "NerdOCTaxe Gamma", "bitforge-nano": "BitForge Nano",
          "heatbit-bitair": "Heatbit Bitair", "futurebit-apollo-iii": "FutureBit Apollo III", "hammer-thor-p2": "Hammer Thor P2", "hammer-bc08": "Hammer BC08",
-         "gekko-kbox-22": "GekkoScience KBox 22", "dcentral-stealthminer": "D-Central StealthMiner", "bitcube": "Bitcube", "heatbit-bitwater": "Heatbit Bitwater", "nmqaxe-nexus": "NMQAxe++ Nexus", "nerdqx": "NerdQX"}
+         "gekko-kbox-22": "GekkoScience KBox 22", "dcentral-stealthminer": "D-Central StealthMiner", "bitcube": "Bitcube", "heatbit-bitwater": "Heatbit Bitwater", "nmqaxe-nexus": "NMQAxe++ Nexus", "nerdqx": "NerdQX", "bitaxe-702": "Bitaxe 702", "nerdaxe-gaia-copper-pro": "Gaia Copper Pro"}
 NOINDEX_MODELS = {"bitaxe-supra", "bitaxe-ultra"}   # older generations: pages exist for completeness but stay out of the index/sitemap
 
 MODEL_COPY = {
@@ -418,6 +418,20 @@ NEW_COPY = {   # added 2026-10-21 (docs/MINER_CATALOG.md). Stock settings only; 
                "The listing doesn't name who makes the board, so ask the shop about warranty before you buy.",
                "The power supply is included, per the listing title.",
                "Compare the price per TH/s with the NerdQaxe++ and the Naja Duo before you buy."]),
+    "bitaxe-702": dict(
+        intro="The Bitaxe 702 (also sold as the Supra Hex 702) puts six Bitmain BM1368 chips on one Bitaxe board. Bitaxe.de states about 4.2 TH/s at about 90 W, around 21.4 J/TH, and it runs AxeOS like every Bitaxe. The BM1368 is the chip generation before the Gamma's BM1370, so you get a lot of hashrate for the price but pay more for power per TH.",
+        who="Someone who wants roughly NerdQaxe++ hashrate for less money up front and has cheap electricity, or wants the heat in winter.",
+        check=["It uses about 90 W around the clock, roughly 65 kWh a month, so check the yearly power cost on this page at your own rate.",
+               "It needs a 12 V / 10 A power supply. Check whether the listing includes one.",
+               "Compare it with the NerdQaxe++ (newer chips, about 4.8 TH/s at about 80 W) before you buy.",
+               "Stock comes and goes, so check the stock badge first."]),
+    "nerdaxe-gaia-copper-pro": dict(
+        intro="The Nerdaxe Gaia Copper Pro is the Nerdaxe Gaia board (one Bitmain BM1373 chip) with a big Thermalright AXP60 copper cooler fitted at the factory. Bitaxe.de states about 3 TH/s at about 33 W, around 11 J/TH, up from about 2.6 TH/s on the regular Gaia. It has the same 1.9-inch color screen and runs NerdOS, the Nerdaxe version of the open AxeOS firmware.",
+        who="Someone who wants the most hashrate from a single-chip desk miner without overclocking it themselves.",
+        check=["It's a pre-order: the shop says shipping starts on November 7, 2026, in order of purchase.",
+               "A 12 V / 6 A power supply and a stand are included, per the listing.",
+               "Compare it with the regular Nerdaxe Gaia: the Copper Pro trades a little efficiency for about 15% more hashrate.",
+               "The hashrate and power figures are the seller's, not our measurements."]),
 }
 MODEL_COPY.update(NEW_COPY)
 
@@ -563,7 +577,7 @@ NAV_SECTIONS = {"/miners/": ("/miners/", "/solo-miners/", "/pool-miners/", "/hea
 # Browse-by-type categories. Any miner can solo or pool mine; these say what each is best suited to. A miner can be in several.
 SOLO_SET = ["bitaxe-gamma", "bitaxe-gamma-duo", "bitaxe-gt-801", "nerdaxe-gamma", "nerdaxe-gaia", "nerdqaxe-pp",
             "braiins-bmm-101", "avalon-nano-3s", "hammer-bc04", "bitaxe-supra", "bitaxe-ultra",
-            "bitaxe-naja-duo", "bitforge-nano", "heatbit-bitair", "bitaxe-gamma-hex", "nerdoctaxe", "hammer-thor-p2", "hammer-bc08", "futurebit-apollo-iii", "bitcube", "nmqaxe-nexus", "nerdqx"]
+            "bitaxe-naja-duo", "bitforge-nano", "heatbit-bitair", "bitaxe-gamma-hex", "nerdoctaxe", "hammer-thor-p2", "hammer-bc08", "futurebit-apollo-iii", "bitcube", "nmqaxe-nexus", "nerdqx", "bitaxe-702", "nerdaxe-gaia-copper-pro"]
 POOL_SET = ["avalon-nano-3s", "hammer-bc04", "heatbit-canvas", "heatbit-trio", "avalon-mini-3", "heatbit-maxi", "avalon-q",
             "bitaxe-gamma-hex", "nerdoctaxe", "hammer-thor-p2", "hammer-bc08", "futurebit-apollo-iii", "gekko-kbox-22", "dcentral-stealthminer", "heatbit-bitwater", "nmqaxe-nexus"]
 HEAT_SET = ["avalon-nano-3s", "heatbit-canvas", "heatbit-trio", "avalon-mini-3", "heatbit-maxi", "avalon-q", "gekko-kbox-22", "dcentral-stealthminer"]
@@ -584,8 +598,8 @@ RADAR_BG = ('<svg class="radar-bg" viewBox="0 0 200 200" aria-hidden="true" focu
             '<circle cx="100" cy="100" r="96"/><circle cx="100" cy="100" r="72"/><circle cx="100" cy="100" r="48"/><circle cx="100" cy="100" r="24"/>'
             '<path d="M100 0v200M0 100h200" stroke-opacity=".5"/></g><path d="M100 100 L132.8 9.8 A96 96 0 0 1 178.6 45 Z" fill="#f7931a" fill-opacity=".8"/></svg>')
 CHIPS = {"bitaxe-supra": 1, "bitaxe-ultra": 1, "bitaxe-gamma": 1, "bitaxe-gamma-duo": 2, "bitaxe-gt-801": 2,
-         "nerdaxe-gamma": 1, "nerdaxe-gaia": 1, "nerdqaxe-pp": 4, "nerdoctaxe": 4, "nerdqx": 4, "dcentral-stealthminer": 4}
-SCREEN = {"nerdaxe-gamma", "nerdaxe-gaia"}
+         "nerdaxe-gamma": 1, "nerdaxe-gaia": 1, "nerdqaxe-pp": 4, "nerdoctaxe": 4, "nerdqx": 4, "dcentral-stealthminer": 4, "bitaxe-702": 6, "nerdaxe-gaia-copper-pro": 1}
+SCREEN = {"nerdaxe-gamma", "nerdaxe-gaia", "nerdaxe-gaia-copper-pro"}
 
 
 # Product photos: each one is the seller's own product image for that exact model (sources in docs/IMAGE_SOURCES.md),

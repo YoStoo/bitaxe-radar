@@ -90,6 +90,11 @@ MODELS = {
     # added 2026-10-25 from docs/MINER_CATALOG.md: four-chip AxeOS board sold by Bitcoin Merch (maker not named on the listing)
     "nerdqx":           {"name": "NerdQX (8.1 TH/s)", "category": "board", "chip": "4x BM1370", "hashrate_ths": 8.1, "watts": 138,
                          "note": "Seller-stated up to 8.1 TH/s at about 138 W (Bitcoin Merch); the listing does not name the maker"},
+    # added 2026-10-29: six-chip BM1368 Bitaxe (Supra Hex 702) and the new Gaia Copper Pro (pre-order, ships from Nov 7, 2026), both at Bitaxe.de
+    "bitaxe-702":       {"name": "Bitaxe 702 (Supra Hex)", "category": "board", "chip": "6x BM1368", "hashrate_ths": 4.2, "watts": 90,
+                         "note": "Seller-stated ~4.2 TH/s at ~90 W (about 21.4 J/TH), older BM1368 chip generation"},
+    "nerdaxe-gaia-copper-pro": {"name": "Nerdaxe Gaia Copper Pro", "category": "board", "chip": "BM1373", "hashrate_ths": 3.0, "watts": 33,
+                         "note": "Seller-stated ~3 TH/s at ~33 W (about 11 J/TH) from the factory, Gaia board with an AXP60 copper cooler"},
 }
 # hashrate_ths / watts above are typical VENDOR-STATED figures used only for the cost estimate.
 # They are approximate and must be labelled as such on the site.
@@ -157,6 +162,8 @@ BITAXEDE = {  # product page slug
     "nerdaxe-gamma": "nerdaxe-gamma-601",
     "nerdaxe-gaia":  "nerdaxe-gaia-bitcoin-miner",
     "nerdqaxe-pp":   "nerdqaxe-plus-plus-48th",
+    "bitaxe-702":    "bitaxe-702",
+    "nerdaxe-gaia-copper-pro": "nerdaxe-gaia-pro-bitcoin-miner",
 }
 POWERMINING = {  # Shopify handle
     "bitaxe-gamma":  "bitaxe-gamma",
