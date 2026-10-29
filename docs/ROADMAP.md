@@ -133,4 +133,4 @@ Later:
 - Sellers tracked: 11
 - Paying affiliate programs: 3 (Power Mining, Bitaxe.de, Solo Satoshi)
 - Tests: 97 passing
-- Pages on the site: 84 in the sitemap
+- Pages on the site: 83 in the sitemap
