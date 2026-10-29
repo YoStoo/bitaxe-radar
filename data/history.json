@@ -1204,6 +1204,13 @@
    "currency": "USD",
    "in_stock": false,
    "status": "out_of_stock"
+  },
+  {
+   "t": "2026-10-29T22:45:22Z",
+   "price": 210.99,
+   "currency": "USD",
+   "in_stock": false,
+   "status": "out_of_stock"
   }
  ],
  "bitaxede:bitaxe-gamma": [
@@ -2956,6 +2963,13 @@
    "currency": "USD",
    "in_stock": false,
    "status": "preorder"
+  },
+  {
+   "t": "2026-10-29T22:45:22Z",
+   "price": 599.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
   }
  ],
  "bitcoinmerch:nerdoctaxe": [
@@ -3223,6 +3237,13 @@
    "currency": "USD",
    "in_stock": false,
    "status": "backorder"
+  },
+  {
+   "t": "2026-10-29T22:45:22Z",
+   "price": 589.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
   }
  ],
  "bitcoinmerch:gekko-kbox-22": [
@@ -3288,6 +3309,13 @@
    "currency": "USD",
    "in_stock": false,
    "status": "preorder"
+  },
+  {
+   "t": "2026-10-29T22:45:22Z",
+   "price": 899.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
   }
  ],
  "solosatoshi:bitaxe-gamma-hex": [
@@ -4395,6 +4423,13 @@
    "currency": "USD",
    "in_stock": false,
    "status": "backorder"
+  },
+  {
+   "t": "2026-10-29T22:45:22Z",
+   "price": 449.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
   }
  ],
  "bitaxede:bitaxe-702": [
