@@ -135,6 +135,9 @@ def email_html(issue):
         + f'<br><span style="color:{MUTED}">{esc(n["blurb"])}</span></li>' for n in issue["new_miners"])
     ex = issue["explainer"]
     paras = "".join(f'<p style="margin:0 0 12px">{esc(t)}</p>' for t in ex["paras"])
+    ft = issue.get("feature")
+    feature_html = (f'<h2 style="{h2}">{esc(ft["title"])}</h2>' + "".join(f'<p style="margin:0 0 12px">{esc(t)}</p>' for t in ft["paras"])
+                    + f'<p style="margin:0"><a href="{BASE}{ft["link"]}" style="{btn}">{esc(ft["button"])}</a></p>') if ft else ""
     return f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light"><title>{esc(issue["subject"])}</title></head>
@@ -153,7 +156,8 @@ def email_html(issue):
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:15px">{rows}</table>
 <p style="margin:8px 0 0;color:{MUTED};font-size:13px">Cheapest in-stock listing we found, checked {esc(et_time(issue["snapshot_at"]))}. Prices change fast. <a href="{BASE}/deals/" style="color:{MUTED}">See today's live prices</a>.</p>
 
-<h2 style="{h2}">3 new miners on the site</h2>
+{feature_html}
+<h2 style="{h2}">{len(issue["new_miners"])} new miner{"s" if len(issue["new_miners"]) != 1 else ""} on the site</h2>
 <ul style="margin:0;padding-left:20px">{new}</ul>
 <p style="margin:4px 0 0"><a href="{BASE}/miners/" style="color:{INK}">Browse all miners →</a></p>
 
@@ -184,7 +188,12 @@ def email_text(issue):
     L = [f"HOME MINING WEEKLY #{issue['num']} · {pretty_date(issue['date'])}", "Bitaxe Radar", "", issue["intro"], "",
          "THIS WEEK'S BEST PRICES", f"(cheapest in-stock listing, checked {et_time(issue['snapshot_at'])})"]
     L += [f"- {p['name']}: {price_label(p)} at {p['seller_name']}\n  {href(p)}" for p in issue["prices"]]
-    L += [f"Live prices: {BASE}/deals/", "", "3 NEW MINERS ON THE SITE"]
+    L += [f"Live prices: {BASE}/deals/", ""]
+    ft = issue.get("feature")
+    if ft:
+        L += [ft["title"].upper()] + ft["paras"] + [f"{ft['button']}: {BASE}{ft['link']}", ""]
+    n_new = len(issue["new_miners"])
+    L += [f"{n_new} NEW MINER{'S' if n_new != 1 else ''} ON THE SITE"]
     L += [f"- {n['name']}" + (f" (from {money(n['from_usd'])})" if n.get("from_usd") else "") + f": {n['blurb']}\n  {BASE}/models/{n['model']}/"
           for n in issue["new_miners"]]
     ex = issue["explainer"]

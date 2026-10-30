@@ -3594,6 +3594,9 @@ def build_newsletter():
         new = "".join(f'<li><a href="/models/{n["model"]}/"><b>{esc(SHORT.get(n["model"], n["name"]))}</b>'
                       + (f' · from {money(n["from_usd"])}' if n.get("from_usd") else "") + f'</a> {esc(n["blurb"])}</li>' for n in i["new_miners"])
         ex = i["explainer"]
+        ft = i.get("feature")
+        feature = (f'<section aria-labelledby="h-f"><h2 id="h-f">{esc(ft["title"])}</h2>' + "".join(f"<p>{esc(x)}</p>" for x in ft["paras"])
+                   + f'<p><a class="btn" href="{esc(ft["link"])}">{esc(ft["button"])}</a></p></section>') if ft else ""
         body = f"""<article>
 <header class="hero"><h1>{esc(i["title"])}</h1>
 <p class="lede">{esc(i["intro"])}</p>
@@ -3601,6 +3604,7 @@ def build_newsletter():
 <section aria-labelledby="h-p"><h2 id="h-p">This week's best prices</h2>
 <div class="tablewrap"><table><thead><tr><th>Miner</th><th class="num">Price</th><th></th></tr></thead><tbody>{rows}</tbody></table></div>
 <p class="hint">Cheapest in-stock listing we found, checked {esc(NL.et_time(i["snapshot_at"]))}. These were the prices when the issue went out; they change fast. <a href="/deals/">See today's live prices</a>.</p></section>
+{feature}
 <section aria-labelledby="h-n"><h2 id="h-n">{plural(len(i["new_miners"]), "new miner")} on the site</h2><ul>{new}</ul><p><a href="/miners/">Browse all miners →</a></p></section>
 <section aria-labelledby="h-q"><h2 id="h-q">Not sure which one fits you?</h2><p>Answer 3 quick questions and we'll suggest a miner.</p><p><a class="btn" href="/find-my-miner/">Take the Find my miner quiz</a></p></section>
 <section aria-labelledby="h-e"><h2 id="h-e">{esc(ex["title"])}</h2>{"".join(f"<p>{esc(t)}</p>" for t in ex["paras"])}<p><a href="{esc(ex["link"])}">Read the 2-minute guide →</a></p></section>

@@ -1,0 +1,150 @@
+{
+  "num": 2,
+  "slug": "issue-002",
+  "title": "Home Mining Weekly #2",
+  "subject": "Home Mining Weekly #2: miner gift ideas and your first hour with a Bitaxe",
+  "preheader": "Gift ideas by budget, this week's best prices, 3 new miners, and a first-hour Bitaxe setup checklist.",
+  "date": "2026-10-30",
+  "intro": "The holidays are coming, and a small home miner makes a fun gift for anyone curious about Bitcoin. This week: gift ideas by budget, the best prices we found, 3 new miners, and what to do in your first hour with a Bitaxe.",
+  "price_models": [
+    "bitaxe-gamma",
+    "bitaxe-gamma-duo",
+    "avalon-nano-3s",
+    "hammer-bc04",
+    "nerdqaxe-pp",
+    "braiins-bmm-101",
+    "avalon-q"
+  ],
+  "feature": {
+    "title": "Gift ideas by budget",
+    "paras": [
+      "We grouped the miners that are in stock right now by price: under $100, $100 to $300, and $300 and up. Each one has a line on who it suits, so you can pick for someone who just likes gadgets or someone who wants to heat a room.",
+      "Pre-order miners get their own section with a ship-date warning, so a gift doesn't arrive after the holidays. Black Friday is November 27, and our Black Friday page shows each miner's price today next to the lowest we've logged."
+    ],
+    "link": "/best/gifts/",
+    "button": "See the gift guide"
+  },
+  "new_miners": [
+    {
+      "model": "nerdqx",
+      "blurb": "Four chips for about 8.1 TH/s at 138 W, a big step up from a single-chip Bitaxe.",
+      "name": "NerdQX (8.1 TH/s)",
+      "from_usd": 449.99
+    },
+    {
+      "model": "nerdaxe-gaia-copper-pro",
+      "blurb": "A new pre-order: about 3 TH/s at 33 W, €299 at Bitaxe.de, shipping from November 7.",
+      "name": "Nerdaxe Gaia Copper Pro",
+      "from_usd": null
+    },
+    {
+      "model": "bitaxe-702",
+      "blurb": "Six chips on one Bitaxe board, about 4.2 TH/s at 90 W. Sold out right now, so set an alert.",
+      "name": "Bitaxe 702 (Supra Hex)",
+      "from_usd": null
+    }
+  ],
+  "explainer": {
+    "title": "Your first hour with a Bitaxe",
+    "paras": [
+      "Plug it in and the screen shows a setup Wi-Fi name and a QR code. Join it from your phone and put the miner on your home Wi-Fi. It only works with 2.4 GHz Wi-Fi.",
+      "Then open the miner's dashboard and change the pool's User field to your own Bitcoin address. Do the backup pool too. This is the step people skip, and it's where a block reward would go.",
+      "After about 10 minutes, check that accepted shares are going up and the hashrate looks normal for your board."
+    ],
+    "link": "/guides/bitaxe-setup/"
+  },
+  "prices": [
+    {
+      "model": "bitaxe-gamma",
+      "name": "Bitaxe Gamma (601/602)",
+      "hashrate_ths": 1.2,
+      "watts": 18,
+      "seller": "solosatoshi",
+      "seller_name": "Solo Satoshi",
+      "price": 67.0,
+      "currency": "USD",
+      "price_usd": 67.0,
+      "url": "https://www.solosatoshi.com/product/bitaxe-gamma/",
+      "checked_at": "2026-10-30T22:20:33Z"
+    },
+    {
+      "model": "bitaxe-gamma-duo",
+      "name": "Bitaxe Gamma Duo (650)",
+      "hashrate_ths": 1.63,
+      "watts": 26,
+      "seller": "solosatoshi",
+      "seller_name": "Solo Satoshi",
+      "price": 111.69,
+      "currency": "USD",
+      "price_usd": 111.69,
+      "url": "https://www.solosatoshi.com/product/bitaxe-duo-bitcoin-solo-miner-650-model/",
+      "checked_at": "2026-10-30T22:20:33Z"
+    },
+    {
+      "model": "hammer-bc04",
+      "name": "Hammer Miner BC04",
+      "hashrate_ths": 6,
+      "watts": 96,
+      "seller": "altair",
+      "seller_name": "Altair Technology",
+      "price": 215.0,
+      "currency": "USD",
+      "price_usd": 215.0,
+      "url": "https://altairtech.io/product/hammer-miner-bc04-home-bitcoin-miner/",
+      "checked_at": "2026-10-30T22:20:33Z"
+    },
+    {
+      "model": "avalon-nano-3s",
+      "name": "Canaan Avalon Nano 3S",
+      "hashrate_ths": 6,
+      "watts": 140,
+      "seller": "solosatoshi",
+      "seller_name": "Solo Satoshi",
+      "price": 219.0,
+      "currency": "USD",
+      "price_usd": 219.0,
+      "url": "https://www.solosatoshi.com/product/avalon-nano-3s-bitcoin-solo-miner/",
+      "checked_at": "2026-10-30T22:20:33Z"
+    },
+    {
+      "model": "nerdqaxe-pp",
+      "name": "NerdQaxe++ (4.8 TH/s)",
+      "hashrate_ths": 4.8,
+      "watts": 80,
+      "seller": "bitcoinmerch",
+      "seller_name": "Bitcoin Merch",
+      "price": 229.99,
+      "currency": "USD",
+      "price_usd": 229.99,
+      "url": "https://bitcoinmerch.com/products/nerdqaxe-plus-plus",
+      "checked_at": "2026-10-30T22:20:33Z"
+    },
+    {
+      "model": "braiins-bmm-101",
+      "name": "Braiins Mini Miner BMM 101",
+      "hashrate_ths": 1,
+      "watts": 40,
+      "seller": "braiins",
+      "seller_name": "Braiins Forge",
+      "price": 299.0,
+      "currency": "USD",
+      "price_usd": 299.0,
+      "url": "https://braiinsforge.com/products/bmm-101",
+      "checked_at": "2026-10-30T22:20:33Z"
+    },
+    {
+      "model": "avalon-q",
+      "name": "Canaan Avalon Q (90 TH/s)",
+      "hashrate_ths": 90,
+      "watts": 1674,
+      "seller": "solosatoshi",
+      "seller_name": "Solo Satoshi",
+      "price": 1349.0,
+      "currency": "USD",
+      "price_usd": 1349.0,
+      "url": "https://www.solosatoshi.com/product/canaan-avalon-q-90th-bitcoin-home-miner/",
+      "checked_at": "2026-10-30T22:20:33Z"
+    }
+  ],
+  "snapshot_at": "2026-10-30T22:20:33Z"
+}

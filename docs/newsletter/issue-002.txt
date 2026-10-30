@@ -1,0 +1,55 @@
+HOME MINING WEEKLY #2 · October 30, 2026
+Bitaxe Radar
+
+The holidays are coming, and a small home miner makes a fun gift for anyone curious about Bitcoin. This week: gift ideas by budget, the best prices we found, 3 new miners, and what to do in your first hour with a Bitaxe.
+
+THIS WEEK'S BEST PRICES
+(cheapest in-stock listing, checked Oct 30, 2026, 6:20 PM ET)
+- Bitaxe Gamma (601/602): $67.00 at Solo Satoshi
+  https://www.solosatoshi.com/product/bitaxe-gamma/aff/8840/
+- Bitaxe Gamma Duo (650): $111.69 at Solo Satoshi
+  https://www.solosatoshi.com/product/bitaxe-duo-bitcoin-solo-miner-650-model/aff/8840/
+- Hammer Miner BC04: $215.00 at Altair Technology
+  https://altairtech.io/product/hammer-miner-bc04-home-bitcoin-miner/
+- Canaan Avalon Nano 3S: $219.00 at Solo Satoshi
+  https://www.solosatoshi.com/product/avalon-nano-3s-bitcoin-solo-miner/aff/8840/
+- NerdQaxe++ (4.8 TH/s): $229.99 at Bitcoin Merch
+  https://bitcoinmerch.com/products/nerdqaxe-plus-plus
+- Braiins Mini Miner BMM 101: $299.00 at Braiins Forge
+  https://braiinsforge.com/products/bmm-101
+- Canaan Avalon Q (90 TH/s): $1,349.00 at Solo Satoshi
+  https://www.solosatoshi.com/product/canaan-avalon-q-90th-bitcoin-home-miner/aff/8840/
+Live prices: https://bitaxeradar.com/deals/
+
+GIFT IDEAS BY BUDGET
+We grouped the miners that are in stock right now by price: under $100, $100 to $300, and $300 and up. Each one has a line on who it suits, so you can pick for someone who just likes gadgets or someone who wants to heat a room.
+Pre-order miners get their own section with a ship-date warning, so a gift doesn't arrive after the holidays. Black Friday is November 27, and our Black Friday page shows each miner's price today next to the lowest we've logged.
+See the gift guide: https://bitaxeradar.com/best/gifts/
+
+3 NEW MINERS ON THE SITE
+- NerdQX (8.1 TH/s) (from $449.99): Four chips for about 8.1 TH/s at 138 W, a big step up from a single-chip Bitaxe.
+  https://bitaxeradar.com/models/nerdqx/
+- Nerdaxe Gaia Copper Pro: A new pre-order: about 3 TH/s at 33 W, €299 at Bitaxe.de, shipping from November 7.
+  https://bitaxeradar.com/models/nerdaxe-gaia-copper-pro/
+- Bitaxe 702 (Supra Hex): Six chips on one Bitaxe board, about 4.2 TH/s at 90 W. Sold out right now, so set an alert.
+  https://bitaxeradar.com/models/bitaxe-702/
+
+NOT SURE WHICH ONE FITS YOU?
+Take the 3-question Find my miner quiz: https://bitaxeradar.com/find-my-miner/
+
+YOUR FIRST HOUR WITH A BITAXE
+Plug it in and the screen shows a setup Wi-Fi name and a QR code. Join it from your phone and put the miner on your home Wi-Fi. It only works with 2.4 GHz Wi-Fi.
+Then open the miner's dashboard and change the pool's User field to your own Bitcoin address. Do the backup pool too. This is the step people skip, and it's where a block reward would go.
+After about 10 minutes, check that accepted shares are going up and the hashrate looks normal for your board.
+Guide: https://bitaxeradar.com/guides/bitaxe-setup/
+
+PRICE-DROP ALERTS
+Get one email when a miner hits your price: https://bitaxeradar.com/alerts/
+
+--
+Some shop links are affiliate links. If you buy through one, Bitaxe Radar may earn a commission at no extra cost to you. It never changes how prices are ranked.
+Mining earnings are never guaranteed. Prices change fast, so check the shop's page before buying. Not financial advice.
+You're getting this because you signed up for Home Mining Weekly on bitaxeradar.com. Questions? Reply or write contact@bitaxeradar.com.
+Bitaxe Radar · [mailing address goes here before sending]
+Unsubscribe: {{NL_UNSUBSCRIBE_URL}}
+View on the web: https://bitaxeradar.com/newsletter/issue-002/
