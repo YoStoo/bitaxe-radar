@@ -1,6 +1,6 @@
 # Bitaxe Radar Roadmap
 
-Updated: Oct 29, 2026 (evening)
+Updated: Oct 30, 2026 (morning)
 
 ## 🎯 Goal
 
@@ -20,6 +20,7 @@ Updated: Oct 29, 2026 (evening)
    - ✅ Black Friday page covers every miner type: live Oct 25 at /bitaxe-black-friday/ (Bitaxe-class, home/desk and heater miners, today's price vs the lowest we've logged so far).
    - ✅ Black Friday banner on the home and deals pages: built Oct 25, turns itself on Nov 20 and off after Dec 1.
    - ✅ Black Friday tables fit phones: Oct 25, each miner is a card on phones (Buy button visible, no sideways scroll); tidier columns on desktop.
+   - ✅ Gift guide: live Oct 30 at /best/gifts/ (in-stock miners grouped under $100, $100 to $300 and $300+, plus pre-order-only picks with a ship-date warning). Why: holiday gift shoppers are ready to buy, and the bigger picks earn more per sale.
    - Still to do: X posts pointing at the page in November, and a Black Friday newsletter issue on the site.
 3. Energy guides that bring in buyers (solar one is live):
    - ✅ "Can solar power a Bitcoin miner?": live Oct 24 at /guides/solar-bitcoin-mining/.
@@ -30,7 +31,7 @@ Updated: Oct 29, 2026 (evening)
    - ✅ Best difficulty box on /solo-odds/: live Oct 27 (type your best diff, see it next to live network difficulty and how often a share that high turns up).
    - ✅ "Is my Bitaxe normal?": live Oct 28 at /guides/is-my-bitaxe-normal/ (stock hashrate per board from the Bitaxe firmware, temps, used-miner checks, today's new prices).
    - ✅ Firmware roundup: live Oct 28 at /guides/bitaxe-firmware/ (AxeOS, NerdQAxe firmware, AxeForge, NerdMiner v2: boards, license, latest release, how to update safely).
-   - 🟡 First-hour setup checklist (/guides/bitaxe-setup/): built and tested Oct 29 evening, not live yet. Why: uploading it to the site was stopped by an error in the automatic safety check, so it goes live with the next run.
+   - ✅ First-hour setup checklist: live Oct 30 at /guides/bitaxe-setup/ (built Oct 29 evening; the upload was held up by a safety-check error and went through on Oct 30).
    - Next: watch Reddit for the next owner question (weekly scan on Mondays).
 
 ## 💰 Money
@@ -69,6 +70,7 @@ Later:
 
 ## ✅ Done
 
+- Oct 30: Gift guide (/best/gifts/): Bitcoin miner gift ideas by budget, from today's in-stock prices (e.g. Bitaxe Gamma $67 at Solo Satoshi, Avalon Nano 3S $219, Avalon Q $1,349), each with a one-line reason, a pre-order section (Bitcube, Gaia Copper Pro) that warns to check the ship date, and FAQs on setup and whether a miner pays back. Linked from the Best-for row on every page. Also: the Oct 29 setup checklist (/guides/bitaxe-setup/) is now live.
 - Oct 29: Two new miners, both tracked at Bitaxe.de (our 5% affiliate shop). Nerdaxe Gaia Copper Pro (/models/nerdaxe-gaia-copper-pro/): new pre-order, about 3 TH/s at 33 W, €299, ships from Nov 7. Bitaxe 702 / Supra Hex (/models/bitaxe-702/): six BM1368 chips, about 4.2 TH/s at 90 W, €249, sold out right now.
 
 - Oct 28 (evening): Firmware guide (/guides/bitaxe-firmware/): which firmware runs on which home miner. AxeOS v2.15.4 (official Bitaxe, Oct 21), NerdQAxe firmware v1.1.0.1 (official Nerd*axe family, Sep 24), AxeForge v1.4.2 (community NerdQaxe++ firmware, Oct 28) and NerdMiner v2 V1.8.3 (ESP32 toy), all open source, with license and board lists from each GitHub page, web flasher links and a 5-step safe update checklist. Linked from the guides page and the 'Is my Bitaxe normal?' guide.
@@ -124,12 +126,12 @@ Later:
 - Oct 24: Heat guide (/guides/bitcoin-mining-heat-your-home/): miner vs space heater vs heat pump with live numbers. Each heater miner shows its power cost, what mining pays back, and the power price below which it beats a heat pump (DOE: heat pumps use about 50% less electricity). Also hot-water heating (Heatbit Bitwater) and winter-only tips.
 - Oct 21: Room heat calculator (/heat-calculator/): type your room size, see how much heat it needs and which miners can heat it, with today's prices.
 
-## 📊 Numbers (Oct 29)
+## 📊 Numbers (Oct 30)
 
 - Revenue: $0 (no commission emails yet)
 - Subscribers: 1 confirmed (last counted Oct 28)
 - Miners tracked: 32
 - Sellers tracked: 11
 - Paying affiliate programs: 3 (Power Mining, Bitaxe.de, Solo Satoshi)
-- Tests: 97 passing
-- Pages on the site: 83 in the sitemap
+- Tests: 99 passing
+- Pages on the site: 84 in the sitemap

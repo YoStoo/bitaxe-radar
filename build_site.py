@@ -1912,6 +1912,42 @@ def under_price(limit):
     return sorted(ms, key=lambda m: usd(STATS[m]["best"]))
 
 
+GIFT_WHY = {   # gift-friendly picks; each lands in a budget group by its live in-stock price
+    "bitaxe-gamma": "Small, open-source and about 18 W. A fun first miner for anyone curious about Bitcoin.",
+    "nerdaxe-gamma": "Same class as the Bitaxe Gamma, with a color screen that shows what it's doing on a desk.",
+    "bitaxe-gamma-duo": "Two chips for about 1.6 TH/s at 26 W. A step up from the Gamma for not much more.",
+    "heatbit-bitair": "An air purifier with a tiny miner inside. Useful every day, even if they never check the stats.",
+    "bitforge-nano": "About 2.6 TH/s at 40 W, and about 29 dB stated, so it suits a desk.",
+    "bitaxe-gt-801": "About 2.15 TH/s at 43 W. For someone who already likes to tinker.",
+    "hammer-bc04": "About 6 TH/s at 96 W, 32–36 dB stated, one of the quieter desk miners we track.",
+    "avalon-nano-3s": "Finished box with an app, Wi-Fi and the power adapter in the box. Doubles as a small desk heater.",
+    "braiins-bmm-101": "Metal case and touchscreen with Braiins OS already set up. No tinkering.",
+    "bitaxe-naja-duo": "About 4.4 TH/s at 42 W: lots of hashrate for the power, from the open-source Bitaxe family.",
+    "nmqaxe-nexus": "About 8.5 TH/s at 110 W in one box, for someone serious about solo mining.",
+    "nerdoctaxe": "About 9.6 TH/s at 160 W. The big open-source NerdQaxe-family board.",
+    "dcentral-stealthminer": "A room heater that mines: about 860 W through quiet Noctua fans on a normal 120 V outlet. Refurbished, ships from Canada.",
+    "avalon-q": "The big one: about 90 TH/s and up to about 1,674 W of heat for a garage or basement this winter.",
+}
+GIFT_BANDS = [("under-100", "Under $100", 0, 100), ("100-300", "$100 to $300", 100, 300), ("300-up", "$300 and up", 300, 10 ** 9)]
+
+
+def gift_groups():
+    """[(id, label, [(mid, why)])] for in-stock gift picks, cheapest first inside each budget band."""
+    ms = [m for m in GIFT_WHY if m in TRACKED and m not in NOINDEX_MODELS and STATS[m]["best"] and usd(STATS[m]["best"]) is not None]
+    out = []
+    for gid, label, lo, hi in GIFT_BANDS:
+        xs = sorted([m for m in ms if lo <= usd(STATS[m]["best"]) < hi], key=lambda m: usd(STATS[m]["best"]))
+        if xs:
+            out.append((gid, label, [(m, GIFT_WHY[m]) for m in xs]))
+    return out
+
+
+def gift_preorders():
+    """Small, gift-sized miners that can only be pre-ordered right now."""
+    return [m for m in TRACKED if m not in NOINDEX_MODELS and not STATS[m]["best"] and MODELS[m]["watts"] <= 150
+            and any(o["stock_status"] == "preorder" and usd(o) is not None for o in STATS[m]["offers"])]
+
+
 def best_defs():
     """slug -> dict(h1, label, lede, picks=[(mid, why)], faq=[(q, a)], title, desc). Pages without honest picks are skipped."""
     d = {}
@@ -1964,6 +2000,22 @@ def best_defs():
              ("Does a heater miner heat as well as a space heater?", "Yes, watt for watt. Nearly all the electricity becomes heat, just like an electric heater."),
              ("Will it pay my heating bill?", "Part of it at best, and nothing is guaranteed. In a pool it earns small amounts that offset some of the power cost.")],
         hint="Smaller heater miners like the Heatbit Canvas and Avalon Nano 3S warm a person or desk rather than a whole room: see all heater miners.")
+    g = gift_groups()
+    if g:
+        cheap = g[0][2][0][0]
+        nano = "avalon-nano-3s" if STATS.get("avalon-nano-3s", {}).get("best") else None
+        d["gifts"] = dict(label="Gifts", h1="Bitcoin miner gift ideas by budget",
+            lede="Home Bitcoin miners that make a fun gift for someone curious about Bitcoin, grouped by today's in-stock price. Small, low-power and easy to set up first.",
+            picks=[x for _, _, xs in g for x in xs], groups=g, pre=gift_preorders(),
+            title="Bitcoin miner gift ideas 2026: home miners by budget, in stock",
+            what="Bitcoin miner gift ideas by budget (under $100, $100 to $300, $300 and up), in stock now",
+            faq=[("What is a good Bitcoin miner to give as a gift?", f"For a small budget, the {SHORT[cheap]}, in stock for {money(usd(STATS[cheap]['best']))} at {sname(STATS[cheap]['best']['seller'])}."
+                  + (f" For a finished box with an app and the power adapter included, the {SHORT[nano]} at {money(usd(STATS[nano]['best']))}." if nano and nano != cheap else "") + " Prices change, so check the shop."),
+                 ("What does the person need to set it up?", "Home Wi-Fi (Bitaxe-style miners only join 2.4 GHz networks), a power outlet, and their own Bitcoin address to receive any rewards. Setup takes about an hour the first time."),
+                 ("Will a miner pay for itself?", "Don't count on it. A small miner earns tiny amounts in a pool, or takes a long-shot chance at a whole block when solo mining. It's a hobby gift and a hands-on way to learn how Bitcoin works."),
+                 ("Is a power supply included?", "Often, but not always. Check the listing details on each miner's page before you buy."),
+                 ("Will it arrive before the holidays?", "In-stock miners usually ship within days, but shipping times depend on the shop and where you live. Pre-orders ship later, so check the ship date on the shop's page before you count on it.")],
+            hint="Prices are today's cheapest in-stock price we found and move between groups as prices change.")
     for k, v in d.items():
         v["faq"] = [(a, b) for a, b in v["faq"] if b]
     return {k: v for k, v in d.items() if v["picks"]}
@@ -1985,18 +2037,27 @@ def build_best(slug):
     trail = [("Home", "/"), ("Best for", "/best/"), (b["label"], path)]
     title = f"{b['title']} ({fmt_day(GEN)}) | Bitaxe Radar"
     desc = shorten(f"Ranked picks: {b['what']}. Live prices and stock, updated every 6 hours.", 158)
-    cards = "".join(hub_card(m, heat=b.get("heat", False), rank=i + 1, why=why) for i, (m, why) in enumerate(b["picks"]))
+    if b.get("groups"):
+        cards = "".join(f'<h2 id="h-{gid}">{esc(label)}</h2><div class="cards">' + "".join(hub_card(m, heat=False, rank=i + 1, why=why) for i, (m, why) in enumerate(xs)) + "</div>"
+                        for gid, label, xs in b["groups"])
+        if b.get("pre"):
+            cards += ('<h2 id="h-pre">Pre-order only</h2><p class="hint">These can be ordered now but ship later. Check the ship date on the shop before counting on it for a holiday.</p><div class="cards">'
+                      + "".join(hub_card(m, heat=False) for m in b["pre"]) + "</div>")
+    else:
+        cards = '<div class="cards">' + "".join(hub_card(m, heat=b.get("heat", False), rank=i + 1, why=why) for i, (m, why) in enumerate(b["picks"])) + "</div>"
     more = b.get("more") or []
     more_html = (f'<section aria-labelledby="h-more"><h2 id="h-more">Just over $100</h2><div class="cards">{"".join(hub_card(m, heat=False) for m in more)}</div></section>') if more else ""
     faq_html = "".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in b["faq"])
     hint = f'<p class="hint">{esc(b["hint"])}</p>' if b.get("hint") else ""
+    if slug == "gifts":
+        hint += '<p class="hint">Next steps for a new owner: <a href="/guides/bitaxe-setup/">first-hour setup checklist</a> · <a href="/guides/bitcoin-mining-pools/">which pool to use</a> · <a href="/bitaxe-black-friday/">Black Friday prices</a></p>'
     body = f"""<article>
 <header class="hero"><h1>{esc(b['h1'])}</h1>
 <p class="lede">{esc(b['lede'])}</p>
 <p class="meta">checked {tag_time(latest['generated_at'])}</p>
 {best_pills(slug)}
 {rate_box()}</header>
-<section aria-label="Ranked picks"><div class="cards">{cards}</div>{hint}</section>
+<section aria-label="Ranked picks">{cards}{hint}</section>
 {more_html}
 <section id="faq" aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{faq_html}</section>
 <section class="guides-line"><p>Browse: <a href="/miners/">All miners</a> · <a href="/solo-miners/">Solo</a> · <a href="/pool-miners/">Pool</a> · <a href="/heater-miners/">Heaters</a> · <a href="/guides/solo-vs-pool-mining/">Solo vs pool</a></p>
@@ -3602,7 +3663,7 @@ def build_indexes():
 <div class="btiles wide">{tiles}</div>
 <p class="older">Not sure? <a href="/find-my-miner/">Find my miner</a> asks 3 questions.</p></article>"""
     layout("/best/", "Best home Bitcoin miners by need: beginners, quiet, cheap, heating | Bitaxe Radar",
-           "Ranked picks of home Bitcoin miners for beginners, quiet rooms, under $100 and heating a room, from today's prices.", body, crumbs=[("Home", "/"), ("Best for", "/best/")])
+           "Ranked picks of home Bitcoin miners for beginners, quiet rooms, under $100, heating a room and gifts, from today's prices.", body, crumbs=[("Home", "/"), ("Best for", "/best/")])
     # /compare/
     pairs = [(a, b) for a, b in COMPARE_PAIRS if STATS[a]["offers"] and STATS[b]["offers"]]
     body = f"""<article><header class="hero"><h1>Compare miners</h1>
