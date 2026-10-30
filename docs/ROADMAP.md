@@ -1,6 +1,6 @@
 # Bitaxe Radar Roadmap
 
-Updated: Oct 30, 2026 (morning)
+Updated: Oct 30, 2026 (evening)
 
 ## 🎯 Goal
 
@@ -21,7 +21,8 @@ Updated: Oct 30, 2026 (morning)
    - ✅ Black Friday banner on the home and deals pages: built Oct 25, turns itself on Nov 20 and off after Dec 1.
    - ✅ Black Friday tables fit phones: Oct 25, each miner is a card on phones (Buy button visible, no sideways scroll); tidier columns on desktop.
    - ✅ Gift guide: live Oct 30 at /best/gifts/ (in-stock miners grouped under $100, $100 to $300 and $300+, plus pre-order-only picks with a ship-date warning). Why: holiday gift shoppers are ready to buy, and the bigger picks earn more per sale.
-   - Still to do: X posts pointing at the page in November, and a Black Friday newsletter issue on the site.
+   - ✅ Newsletter #2 on the site: live Oct 30 at /newsletter/issue-002/ (gift ideas by budget, the Black Friday date, this week's best prices, 3 new miners, first-hour setup tips).
+   - Still to do: X posts pointing at the deals pages in November, and a Black Friday newsletter issue on the site around Nov 20.
 3. Energy guides that bring in buyers (solar one is live):
    - ✅ "Can solar power a Bitcoin miner?": live Oct 24 at /guides/solar-bitcoin-mining/.
    - ✅ "Mining to heat your home": live Oct 24 at /guides/bitcoin-mining-heat-your-home/.
@@ -70,6 +71,7 @@ Later:
 
 ## ✅ Done
 
+- Oct 30 (evening): Home Mining Weekly #2 on the site (/newsletter/issue-002/): gift ideas by budget with a button to the gift guide, the Black Friday date (Nov 27), this week's best in-stock prices (Bitaxe Gamma $67 at Solo Satoshi up to Avalon Q $1,349), 3 new miners (NerdQX, Gaia Copper Pro, Bitaxe 702) and a short first-hour Bitaxe setup explainer. The email version is ready too but isn't sent (we wait for 25 to 50 subscribers and a mailing address). Issue #1 was Oct 21, so the archive no longer looks stalled.
 - Oct 30: Gift guide (/best/gifts/): Bitcoin miner gift ideas by budget, from today's in-stock prices (e.g. Bitaxe Gamma $67 at Solo Satoshi, Avalon Nano 3S $219, Avalon Q $1,349), each with a one-line reason, a pre-order section (Bitcube, Gaia Copper Pro) that warns to check the ship date, and FAQs on setup and whether a miner pays back. Linked from the Best-for row on every page. Also: the Oct 29 setup checklist (/guides/bitaxe-setup/) is now live.
 - Oct 29: Two new miners, both tracked at Bitaxe.de (our 5% affiliate shop). Nerdaxe Gaia Copper Pro (/models/nerdaxe-gaia-copper-pro/): new pre-order, about 3 TH/s at 33 W, €299, ships from Nov 7. Bitaxe 702 / Supra Hex (/models/bitaxe-702/): six BM1368 chips, about 4.2 TH/s at 90 W, €249, sold out right now.
 
@@ -133,5 +135,5 @@ Later:
 - Miners tracked: 32
 - Sellers tracked: 11
 - Paying affiliate programs: 3 (Power Mining, Bitaxe.de, Solo Satoshi)
-- Tests: 99 passing
-- Pages on the site: 84 in the sitemap
+- Tests: 102 passing
+- Pages on the site: 85 in the sitemap
