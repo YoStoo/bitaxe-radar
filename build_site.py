@@ -2144,6 +2144,7 @@ Bitaxe Radar is independent. Some shop links are affiliate links; they never cha
 - [Is my Bitaxe normal?]({BASE}/guides/is-my-bitaxe-normal/): stock hashrate per board from the AxeOS firmware (Gamma 601/602 about 1.07 TH/s at 525 MHz), fan target 60°C, overheat stop above 75°C; checks for used miners.
 - [Bitaxe setup: first-hour checklist]({BASE}/guides/bitaxe-setup/): join the Bitaxe_XXXX setup Wi-Fi (2.4 GHz only), set the pool and your own Bitcoin address (default pool public-pool.io:21496, backup solo.ckpool.org:3333), then check shares, hashrate and temps.
 - [Bitaxe and NerdQaxe firmware compared]({BASE}/guides/bitaxe-firmware/): AxeOS (official Bitaxe firmware, GPL-3.0, v2.15.4), the NerdQAxe firmware (official for Nerd*axe boards, v1.1.0.1), AxeForge (community NerdQaxe++ firmware) and NerdMiner v2 (ESP32-only toy); how to update safely.
+- [Bitaxe chips compared]({BASE}/guides/bitaxe-chips/): which BM1366, BM1368, BM1370 or BM1373 chip each home miner uses, power per TH/s (J/TH) and today's cheapest price.
 - [How heater miners work]({BASE}/guides/how-heater-miners-work/): a miner turns its electricity into heat like a space heater.
 - [Room heat calculator]({BASE}/heat-calculator/): room size in, heat needed (about 10 W per sq ft as a rule of thumb) and which tracked miners can heat it.
 - [Price per TH/s leaderboard]({BASE}/price-per-th/): miners ranked by price per stated TH/s at today's cheapest in-stock price, with J/TH and a check against the lowest price we have logged.
@@ -2720,10 +2721,110 @@ def build_guide_firmware():
 <li><strong>Update from the miner's dashboard</strong> when you can (upload the firmware file, then the web file if the project ships one).</li>
 <li><strong>After it restarts, check the pool settings</strong> and that your hashrate looks right: see <a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a></li></ol></section>
 <section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
-<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/bitaxe-setup/">First-hour setup checklist</a></li><li><a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a></li><li><a href="/guides/bitcoin-mining-pools/">Which mining pool should I use?</a></li><li><a href="/where-to-buy-bitaxe/">Where to buy a Bitaxe</a></li></ul>
+<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/bitaxe-setup/">First-hour setup checklist</a></li><li><a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a></li><li><a href="/guides/bitcoin-mining-pools/">Which mining pool should I use?</a></li><li><a href="/guides/bitaxe-chips/">Bitaxe chips compared</a></li><li><a href="/where-to-buy-bitaxe/">Where to buy a Bitaxe</a></li></ul>
 <p class="hint">General guidance only. Flashing firmware is at your own risk; follow each project's instructions. We're not paid by any firmware project.</p></section>
 </article>"""
     layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Bitaxe and NerdQaxe firmware compared", desc), faq_ld(faq)], lastmod=FIRMWARE_CHECKED, og_type="article")
+
+
+# Chip guide (/guides/bitaxe-chips/): which Bitmain BM-series chip each home miner uses, grouped by chip, with the
+# seller-stated hashrate and power from our model data, efficiency (J/TH = watts / TH/s) and today's cheapest in-stock price.
+# No claims beyond our own data: no release dates or future-chip rumours.
+CHIP_GUIDE_PATH = "/guides/bitaxe-chips/"
+CHIP_FAMILIES = ("BM1366", "BM1368", "BM1370", "BM1373")
+CHIP_RATE = 0.15   # $/kWh example rate, same as the compare pages
+
+
+def chip_family(mid):
+    c = MODELS[mid].get("chip") or ""
+    m = re.search(r"BM13\d\d", c)
+    return m.group(0) if m else None
+
+
+def chip_count(mid):
+    c = MODELS[mid].get("chip") or ""
+    m = re.search(r"(\d+)\s*x\b|x\s*(\d+)", c)
+    return int(m.group(1) or m.group(2)) if m else 1
+
+
+def chip_groups():
+    g = {f: [] for f in CHIP_FAMILIES}
+    for mid in TRACKED:
+        f = chip_family(mid)
+        if f in g:
+            g[f].append(mid)
+    for f in g:
+        g[f].sort(key=lambda m: (jth(m), MODELS[m]["hashrate_ths"]))
+    return {f: ms for f, ms in g.items() if ms}
+
+
+def build_guide_chips():
+    path = CHIP_GUIDE_PATH
+    trail = [("Home", "/"), ("Guides", "/guides/"), ("Miner chips", path)]
+    title = "BM1366 vs BM1368 vs BM1370 vs BM1373: Bitaxe chips compared | Bitaxe Radar"
+    desc = "Which chip is in each Bitaxe and NerdQaxe, how much power each chip uses per TH/s, and what each one costs today."
+    groups = chip_groups()
+    summary, sections = [], []
+    for f, ms in groups.items():
+        effs = [jth(m) for m in ms]
+        priced = [m for m in ms if STATS[m]["best"]]
+        cheap = min(priced, key=lambda m: usd(STATS[m]["best"])) if priced else None
+        cheap_txt = (f'{money(STATS[cheap]["best"]["price"], STATS[cheap]["best"]["currency"])} (<a href="/models/{cheap}/">{esc(SHORT[cheap])}</a>)' if cheap else "none in stock today")
+        summary.append(f'<tr><td class="pool-name"><b>{f}</b></td><td class="num" data-label="Miners we track">{len(ms)}</td>'
+                       f'<td class="num" data-label="Power per TH/s">{min(effs):.0f} to {max(effs):.0f} J/TH</td><td data-label="Cheapest in stock">{cheap_txt}</td></tr>')
+        rows = []
+        for m in ms:
+            mm, st = MODELS[m], STATS[m]
+            b = st["best"]
+            price = f'{money(b["price"], b["currency"])} <small>at {esc(sname(b["seller"]))}</small>' if b else "Out of stock"
+            per = f'${st["per_th"]:,.0f}' if st["per_th"] else "–"
+            rows.append(f'<tr><td class="pool-name"><a href="/models/{m}/">{esc(SHORT[m])}</a></td><td class="num" data-label="Chips">{chip_count(m)}</td>'
+                        f'<td class="num" data-label="Hashrate">{mm["hashrate_ths"]:g} TH/s</td><td class="num" data-label="Power">{mm["watts"]:g} W</td>'
+                        f'<td class="num" data-label="Efficiency"><b>{jth(m):.0f} J/TH</b></td><td class="num" data-label="Power cost a year">${kwh_year(m) * CHIP_RATE:,.0f}</td>'
+                        f'<td class="num" data-label="Cheapest in stock">{price}</td><td class="num" data-label="Price per TH/s">{per}</td></tr>')
+        sections.append(f'<h3 id="{f.lower()}">{f} miners</h3><div class="tablewrap pool-wrap"><table class="pool-tbl"><thead><tr><th>Miner</th><th class="num">Chips</th>'
+                        f'<th class="num">Hashrate</th><th class="num">Power</th><th class="num">Efficiency</th><th class="num">Power cost a year</th>'
+                        f'<th class="num">Cheapest in stock</th><th class="num">Price per TH/s</th></tr></thead><tbody>{"".join(rows)}</tbody></table></div>')
+    stbl = (f'<div class="tablewrap pool-wrap"><table class="pool-tbl"><thead><tr><th>Chip</th><th class="num">Miners we track</th><th class="num">Power per TH/s</th>'
+            f'<th>Cheapest in stock</th></tr></thead><tbody>{"".join(summary)}</tbody></table></div>')
+    g = "bitaxe-gamma"
+    ex = ""
+    new = groups.get("BM1373", [])
+    if g in TRACKED and new:
+        n = new[0]
+        ex = (f"<p>Example: a {esc(SHORT[g])} (BM1370) uses about {jth(g):.0f} joules per TH/s, and a {esc(SHORT[n])} (BM1373) about {jth(n):.0f}. "
+              f"For the same hashrate, the {esc(SHORT[n])} uses about {1 - jth(n) / jth(g):.0%} less electricity.</p>")
+    faq = [("Which chip does the Bitaxe Gamma use?",
+            "One BM1370. Most current Bitaxe and NerdQaxe boards use the BM1370; boards with more chips simply have more of them."),
+           ("What does J/TH mean?",
+            "Joules per terahash: how much electricity a miner uses for each unit of work. Lower is better. It's the stated watts divided by the stated TH/s."),
+           ("Should I wait for a newer chip?",
+            "Newer chips use less power per TH/s, but they don't always cost less per TH/s, so compare both columns above. If your electricity is cheap, the cheapest price per TH/s matters most. If it's expensive, a lower J/TH saves more over a year."),
+           ("Is a BM1366 Bitaxe Ultra still worth buying?",
+            "Only if it's cheap. It uses noticeably more power per TH/s than a BM1370 board, so compare its price per TH/s and yearly power cost in the tables above."),
+           ("Why are these numbers different from my miner's dashboard?",
+            "They're what sellers state for each model. Your miner's real hashrate and power depend on its frequency, voltage, cooling and power supply.")]
+    body = f"""<article>
+<header class="hero"><h1>BM1366, BM1368, BM1370, BM1373: which chip is in your miner?</h1>
+<p class="lede">Every Bitaxe-style miner is built around one or more Bitmain mining chips. The chip decides how much power the miner needs for each unit of work. Here's which chip is in each home miner we track, and what it costs today.</p>
+<p class="meta">Prices updated {fmt_time(latest["generated_at"])} · 3-minute read</p></header>
+<section aria-labelledby="h-1"><h2 id="h-1">1. The short answer</h2>
+<ul><li><strong>The chip number goes up with each new generation.</strong> In our data, each newer chip uses less electricity per TH/s.</li>
+<li><strong>More chips means more hashrate,</strong> not better efficiency. A 4-chip board makes about 4 times the hashrate and uses about 4 times the power.</li>
+<li><strong>Most boards on sale today use the BM1370.</strong> The BM1373 is the newest chip we see in shops.</li></ul>
+{ex}</section>
+<section aria-labelledby="h-2"><h2 id="h-2">2. The chips side by side</h2>{stbl}
+<p class="hint">Efficiency is the seller-stated power divided by the seller-stated hashrate. Lower J/TH means less electricity for the same work.</p></section>
+<section aria-labelledby="h-3"><h2 id="h-3">3. Every miner, by chip</h2>{"".join(sections)}
+<p class="hint">Hashrate and power are what sellers state for each model. Power cost assumes ${CHIP_RATE:.2f}/kWh, running 24/7. Prices are the cheapest in-stock offer we found at {fmt_time(latest["generated_at"])}.</p></section>
+<section aria-labelledby="h-4"><h2 id="h-4">4. How to pick</h2>
+<ul><li><strong>Cheap electricity</strong> (under about $0.10/kWh): go for the lowest price per TH/s. See the <a href="/price-per-th/">price per TH/s leaderboard</a>.</li>
+<li><strong>Expensive electricity</strong>: a lower J/TH saves money every month. Check the power cost column.</li>
+<li><strong>Just want a lottery ticket</strong>: any single-chip board works. See <a href="/best/under-100/">best under $100</a>.</li></ul></section>
+<section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
+<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a></li><li><a href="/guides/bitaxe-firmware/">Bitaxe firmware compared</a></li><li><a href="/guides/is-home-mining-worth-it/">Is home mining worth it?</a></li><li><a href="/compare/">Compare two miners</a></li></ul></section>
+</article>"""
+    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Bitaxe chips compared: BM1366, BM1368, BM1370, BM1373", desc), faq_ld(faq)], og_type="article")
 
 
 # First-hour setup checklist (/guides/bitaxe-setup/). Facts from the open-source AxeOS firmware (ESP-Miner), checked Oct 29 2026:
@@ -3701,6 +3802,7 @@ def build_indexes():
           ("/guides/is-my-bitaxe-normal/", "Is my Bitaxe normal?", "Stock hashrate and temps, board by board."),
           ("/guides/bitaxe-setup/", "First-hour setup checklist", "Wi-Fi, pool and your Bitcoin address."),
           ("/guides/bitaxe-firmware/", "Bitaxe firmware compared", "AxeOS, NerdQAxe, AxeForge and NerdMiner."),
+          ("/guides/bitaxe-chips/", "Bitaxe chips compared", "BM1366 to BM1373: power per TH/s and today's prices."),
           ("/guides/how-heater-miners-work/", "How heater miners work", "A miner that warms the room."),
           ("/where-to-buy-bitaxe/", "Where to buy a Bitaxe", "Every shop, ranked by today's price."),
           ("/how-we-track/", "How we track prices", "Where the numbers come from.")]
@@ -3750,6 +3852,7 @@ def main():
     build_guide_normal()
     build_guide_firmware()
     build_guide_setup()
+    build_guide_chips()
     build_solo_odds()
     build_heat_calc()
     build_solo_wins()
