@@ -436,7 +436,8 @@ NEW_COPY = {   # added 2026-10-21 (docs/MINER_CATALOG.md). Stock settings only; 
 MODEL_COPY.update(NEW_COPY)
 
 COMPARE_PAIRS = [("bitaxe-gamma", "nerdqaxe-pp"), ("bitaxe-gamma", "bitaxe-gt-801"), ("bitaxe-gamma", "nerdaxe-gamma"),
-                 ("bitaxe-gamma", "bitaxe-supra"), ("nerdqaxe-pp", "nerdaxe-gaia")]
+                 ("bitaxe-gamma", "bitaxe-supra"), ("nerdqaxe-pp", "nerdaxe-gaia"),
+                 ("bitaxe-gamma", "nerdaxe-gaia"), ("nerdqaxe-pp", "avalon-nano-3s"), ("bitaxe-gamma-hex", "nerdoctaxe")]
 COMPARE_COPY = {
     ("bitaxe-gamma", "nerdqaxe-pp"): dict(
         angle="One chip versus four: the Gamma is the small, quiet, cheap option; the NerdQaxe++ buys roughly four times the hashrate for a much larger power bill and a louder, hotter box.",
@@ -458,6 +459,18 @@ COMPARE_COPY = {
         angle="Both are premium small miners, but they get there differently: the NerdQaxe++ uses four BM1370 chips, while the Gaia uses one newer BM1373 chip and states a much lower power draw along with a lower hashrate.",
         a_for="you want the highest hashrate and do not mind the power draw.",
         b_for="you care more about hashrate per watt and want a quieter, cooler device."),
+    ("bitaxe-gamma", "nerdaxe-gaia"): dict(
+        angle="Old favorite versus the new chip: the Gaia runs one newer BM1373 chip and states about twice the Gamma's hashrate for only a few more watts, but it costs more and is still a pre-order at some shops.",
+        a_for="you want the cheapest way in, shipped today.",
+        b_for="you want the most hashrate per watt from a single-chip desk miner and can wait for a pre-order or pay more for stock."),
+    ("nerdqaxe-pp", "avalon-nano-3s"): dict(
+        angle="Two ways to get roughly 5 to 6 TH/s at home: the NerdQaxe++ is an open-source board running AxeOS-based firmware, while the Avalon Nano 3S is Canaan's finished desk miner that doubles as a small heater.",
+        a_for="you want open-source firmware you can tune, and a much lower power draw for a bit less hashrate.",
+        b_for="you want a finished, enclosed box from a big manufacturer and like using its heat in a room."),
+    ("bitaxe-gamma-hex", "nerdoctaxe"): dict(
+        angle="The two biggest open-source BM1370 boards: six chips in the Gamma Hex (sold with a liquid cooler) versus eight in the NerdOCTaxe, with similar efficiency, so it mostly comes down to price, cooling and noise.",
+        a_for="you want liquid cooling for a quieter room and a big hashrate jump over a single Gamma.",
+        b_for="you want the most stated hashrate in an open-source home miner and have airflow for about 160 W of heat."),
 }
 
 SELLER_COPY = {
@@ -1206,7 +1219,7 @@ def build_compare_page(a, b):
 
     def col(mid, t):
         b_ = t["best"]
-        return [f'<a href="/models/{mid}/">{esc(SHORT[mid])}</a>', esc(MODELS[mid]["chip"]), f"≈ {MODELS[mid]['hashrate_ths']:g} TH/s", f"≈ {MODELS[mid]['watts']:g} W", f"≈ {jth(mid):.1f} J/TH",
+        return [f'<a href="/models/{mid}/">{esc(SHORT[mid])}</a>', esc(MODELS[mid].get("chip") or "not stated by the maker"), f"≈ {MODELS[mid]['hashrate_ths']:g} TH/s", f"≈ {MODELS[mid]['watts']:g} W", f"≈ {jth(mid):.1f} J/TH",
                 (money(usd(b_)) + f" ({esc(sname(b_['seller']))})") if b_ else "none in stock",
                 money(t["per_th"]) if t["per_th"] else "n/a",
                 f"${kwh_year(mid) * 0.15:,.0f}", f"{len(t['in_stock'])} of {t['sellers']}"]
