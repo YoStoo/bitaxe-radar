@@ -1,9 +1,9 @@
 {
- "fetched_at": "2026-10-31T23:04:11Z",
- "checked_at": "2026-10-31T23:04:11Z",
+ "fetched_at": "2026-10-31T23:07:15Z",
+ "checked_at": "2026-10-31T23:07:15Z",
  "status": {
   "mempool.space": "ok",
-  "sololuck.io": "failed: URLError"
+  "sololuck.io": "ok"
  },
  "wins": [
   {
