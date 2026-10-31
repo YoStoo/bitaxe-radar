@@ -2771,7 +2771,7 @@ def build_guide_chips():
         cheap = min(priced, key=lambda m: usd(STATS[m]["best"])) if priced else None
         cheap_txt = (f'{money(STATS[cheap]["best"]["price"], STATS[cheap]["best"]["currency"])} (<a href="/models/{cheap}/">{esc(SHORT[cheap])}</a>)' if cheap else "none in stock today")
         summary.append(f'<tr><td class="pool-name"><b>{f}</b></td><td class="num" data-label="Miners we track">{len(ms)}</td>'
-                       f'<td class="num" data-label="Power per TH/s">{min(effs):.0f} to {max(effs):.0f} J/TH</td><td data-label="Cheapest in stock">{cheap_txt}</td></tr>')
+                       f'<td class="num" data-label="Power per TH/s">{(f"{min(effs):.0f} to {max(effs):.0f}" if round(min(effs)) != round(max(effs)) else f"{min(effs):.0f}")} J/TH</td><td data-label="Cheapest in stock">{cheap_txt}</td></tr>')
         rows = []
         for m in ms:
             mm, st = MODELS[m], STATS[m]
