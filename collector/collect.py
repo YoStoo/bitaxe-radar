@@ -21,7 +21,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
-UA = "BitaxeRadarPrototype/0.1 (+price comparison; read-only; contact TBD)"
+UA = "BitaxeRadar/1.0 (+https://bitaxeradar.com; price comparison; read-only; contact@bitaxeradar.com)"
 TIMEOUT = 30
 
 # --------------------------------------------------------------------------------------
@@ -254,7 +254,7 @@ def http_get(url, accept="*/*", headers=None):
                 return r.read().decode("utf-8", "replace")
         except urllib.error.HTTPError as e:
             last = e
-            if e.code in (429, 503):
+            if e.code in (429, 503) or (e.code == 403 and attempt == 0):  # one slow retry on 403 (often a transient edge block)
                 time.sleep(5 * (attempt + 1)); continue
             raise
         except Exception as e:  # network error

@@ -2145,6 +2145,7 @@ Bitaxe Radar is independent. Some shop links are affiliate links; they never cha
 - [Bitaxe setup: first-hour checklist]({BASE}/guides/bitaxe-setup/): join the Bitaxe_XXXX setup Wi-Fi (2.4 GHz only), set the pool and your own Bitcoin address (default pool public-pool.io:21496, backup solo.ckpool.org:3333), then check shares, hashrate and temps.
 - [Bitaxe and NerdQaxe firmware compared]({BASE}/guides/bitaxe-firmware/): AxeOS (official Bitaxe firmware, GPL-3.0, v2.15.4), the NerdQAxe firmware (official for Nerd*axe boards, v1.1.0.1), AxeForge (community NerdQaxe++ firmware) and NerdMiner v2 (ESP32-only toy); how to update safely.
 - [Bitaxe chips compared]({BASE}/guides/bitaxe-chips/): which BM1366, BM1368, BM1370 or BM1373 chip each home miner uses, power per TH/s (J/TH) and today's cheapest price.
+- [What power supply does a Bitaxe need?]({BASE}/guides/bitaxe-power-supply/): 5V barrel (Gamma, Gamma Duo, Nerdaxe Gamma) vs 12V XT30 (GT 801, Naja Duo, NerdQaxe++), supply size per model, cheapest listing with the supply in the box.
 - [How heater miners work]({BASE}/guides/how-heater-miners-work/): a miner turns its electricity into heat like a space heater.
 - [Room heat calculator]({BASE}/heat-calculator/): room size in, heat needed (about 10 W per sq ft as a rule of thumb) and which tracked miners can heat it.
 - [Price per TH/s leaderboard]({BASE}/price-per-th/): miners ranked by price per stated TH/s at today's cheapest in-stock price, with J/TH and a check against the lowest price we have logged.
@@ -2822,9 +2823,103 @@ def build_guide_chips():
 <li><strong>Expensive electricity</strong>: a lower J/TH saves money every month. Check the power cost column.</li>
 <li><strong>Just want a lottery ticket</strong>: any single-chip board works. See <a href="/best/under-100/">best under $100</a>.</li></ul></section>
 <section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
-<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a></li><li><a href="/guides/bitaxe-firmware/">Bitaxe firmware compared</a></li><li><a href="/guides/is-home-mining-worth-it/">Is home mining worth it?</a></li><li><a href="/compare/">Compare two miners</a></li></ul></section>
+<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a></li><li><a href="/guides/bitaxe-firmware/">Bitaxe firmware compared</a></li><li><a href="/guides/is-home-mining-worth-it/">Is home mining worth it?</a></li><li><a href="/guides/bitaxe-power-supply/">Which power supply?</a></li><li><a href="/compare/">Compare two miners</a></li></ul></section>
 </article>"""
     layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Bitaxe chips compared: BM1366, BM1368, BM1370, BM1373", desc), faq_ld(faq)], og_type="article")
+
+
+# Power supply guide (/guides/bitaxe-power-supply/). Input voltage, connector and the supply each seller ships, taken from
+# Solo Satoshi's own product pages (checked Nov 1 2026). Wattage comes from our model data. Per-listing "power supply in the
+# box" comes only from what each listing says (the collector's config note); anything else shows as "check the listing".
+PSU_GUIDE_PATH = "/guides/bitaxe-power-supply/"
+PSU_CHECKED = "2026-11-01"
+# mid: (input, connector, supply the seller offers or ships, note)
+PSU_SPECS = {
+    "bitaxe-supra": ("5V DC", "Barrel jack", "5V 6A (30 W) adapter", ""),
+    "bitaxe-gamma": ("5V DC", "5.5 × 2.1 mm barrel, center-positive", "Optional 5V supply", "Draws about 18 to 20 W, so about 4 A at 5V. A 5V 6A (30 W) supply leaves room to spare."),
+    "nerdaxe-gamma": ("5V DC", "5.5 × 2.1 mm barrel, center-positive", "Optional 5V supply", "Seller states 5 A minimum and more than 25 W."),
+    "bitaxe-gamma-duo": ("5V DC", "5.5 × 2.1 mm barrel, center-positive", "Optional 5V 8A (40 W) supply", "Seller states at least 6 A for stock settings."),
+    "bitaxe-gt-801": ("12V DC", "XT30", "Optional 12.4V 10A (124 W) supply", "Don't plug in a 5V Bitaxe Gamma supply."),
+    "bitaxe-naja-duo": ("12V DC", "XT30", "Optional 12.4V 10A (124 W) supply", ""),
+    "nerdqaxe-pp": ("12V DC", "XT30 (rated to 15 A)", "Optional 124 W supply", "Seller rates the 124 W supply for about 99 W continuous, fine at stock (about 70 W) but not for heavy overclocking."),
+    "bitaxe-gamma-hex": ("12V DC", "6-pin (Molex 39-01-2060)", "Optional Mean Well 12V 21A (252 W) supply", ""),
+    "avalon-nano-3s": ("USB-C PD (28V)", "USB-C", "28V 5A (140 W) adapter in the box", ""),
+}
+# Listings where the seller's own page says the supply is in the box, beyond what the config note shows (checked PSU_CHECKED).
+PSU_IN_BOX = {("solosatoshi", "avalon-nano-3s")}
+PSU_YES = re.compile(r"power supply included|power supply: north americ|power supply \+ stand in the box|power supply is included|power supply and cable in the box|psu included|adapter: us", re.I)
+
+
+def psu_included(o):
+    if (o["seller"], o["model"]) in PSU_IN_BOX:
+        return True
+    cfg = o.get("config") or ""
+    if re.search(r"not mentioned|unverified", cfg, re.I):
+        return False
+    return bool(PSU_YES.search(cfg))
+
+
+def psu_models():
+    return [m for m in PSU_SPECS if m in TRACKED]
+
+
+def psu_best(mid):
+    offs = [o for o in offers_for(mid) if in_stock(o) and psu_included(o) and usd(o) is not None]
+    return min(offs, key=usd) if offs else None
+
+
+def build_guide_psu():
+    path = PSU_GUIDE_PATH
+    trail = [("Home", "/"), ("Guides", "/guides/"), ("Power supplies", path)]
+    title = "What power supply does a Bitaxe need? 5V vs 12V, by model | Bitaxe Radar"
+    desc = "Which voltage and plug each Bitaxe, NerdQaxe and Avalon Nano needs, how big a power supply to get, and where to buy one with the supply in the box."
+    rows, buy = [], []
+    for m in psu_models():
+        v, conn, supply, note = PSU_SPECS[m]
+        w = MODELS[m]["watts"]
+        rows.append(f'<tr><td class="pool-name"><a href="/models/{m}/">{esc(SHORT[m])}</a></td><td data-label="Input"><b>{esc(v)}</b></td>'
+                    f'<td data-label="Plug">{esc(conn)}</td><td class="num" data-label="Stated power">{w:g} W</td>'
+                    f'<td data-label="Supply the seller offers">{esc(supply)}{"<br><small>" + esc(note) + "</small>" if note else ""}</td></tr>')
+        b = psu_best(m)
+        if b:
+            buy.append(f'<tr><td class="pool-name"><a href="/models/{m}/">{esc(SHORT[m])}</a></td>'
+                       f'<td class="num" data-label="Cheapest with a supply in the box">{money(b["price"], b["currency"])} <small>at {esc(sname(b["seller"]))}</small></td>'
+                       f'<td data-label="">{offer_link(b, "View ↗")}</td></tr>')
+        else:
+            buy.append(f'<tr><td class="pool-name"><a href="/models/{m}/">{esc(SHORT[m])}</a></td>'
+                       f'<td class="num" data-label="Cheapest with a supply in the box">none in stock today</td><td data-label=""><a href="/models/{m}/">All prices</a></td></tr>')
+    spec_tbl = (f'<div class="tablewrap pool-wrap"><table class="pool-tbl"><thead><tr><th>Miner</th><th>Input</th><th>Plug</th><th class="num">Stated power</th>'
+                f'<th>Supply the seller offers</th></tr></thead><tbody>{"".join(rows)}</tbody></table></div>')
+    buy_tbl = (f'<div class="tablewrap pool-wrap"><table class="pool-tbl"><thead><tr><th>Miner</th><th class="num">Cheapest with a supply in the box</th><th></th></tr></thead>'
+               f'<tbody>{"".join(buy)}</tbody></table></div>')
+    faq = [("Can I use a phone charger for my Bitaxe Gamma?",
+            "No. The Gamma needs a steady 5V supply with a 5.5 × 2.1 mm barrel plug and about 4 A or more. Phone chargers don't have that plug and most can't deliver that current for hours."),
+           ("Can I plug a 12V supply into a 5V Bitaxe?",
+            "No. 5V boards like the Gamma, Gamma Duo and Nerdaxe Gamma can be damaged by 12V. Boards with an XT30 plug (GT 801, Naja Duo, NerdQaxe++) need 12V, and a 5V supply won't run them."),
+           ("How big a power supply should I get?",
+            "Pick one rated well above what the miner draws. A simple rule: at least a quarter more than the stated watts, and more if you plan to overclock."),
+           ("Do all shops include the power supply?",
+            "No. Some sell the miner alone and the supply as an add-on. The second table only counts listings that say the supply is in the box."),
+           ("Why does overclocking need a bigger supply?",
+            "Overclocking raises the power the miner draws. If the supply runs near its limit for hours it gets hot and can shut off or fail.")]
+    body = f"""<article>
+<header class="hero"><h1>What power supply does a Bitaxe need?</h1>
+<p class="lede">Small Bitaxe boards run on 5 volts. Bigger ones, like the GT, Naja Duo and NerdQaxe++, run on 12 volts and use a different plug. Using the wrong supply can damage the board, so here's what each miner needs and where to buy one with the right supply in the box.</p>
+<p class="meta">Prices updated {fmt_time(latest["generated_at"])} · 3-minute read</p></header>
+<section aria-labelledby="h-1"><h2 id="h-1">1. The short answer</h2>
+<ul><li><strong>Bitaxe Gamma, Gamma Duo and Nerdaxe Gamma: 5V</strong> through a round 5.5 × 2.1 mm barrel plug.</li>
+<li><strong>Bitaxe GT 801, Naja Duo and NerdQaxe++: 12V</strong> through a yellow XT30 plug. Never use a 5V Gamma supply on these, or a 12V supply on a 5V board.</li>
+<li><strong>Get a supply rated above what the miner draws.</strong> Example: a Gamma draws about 20 W. At 5V that's about 4 A, so a 6 A (30 W) supply has room to spare.</li>
+<li><strong>Easiest option for a gift:</strong> buy a listing that includes the supply (see section 3).</li></ul></section>
+<section aria-labelledby="h-2"><h2 id="h-2">2. Which supply each miner needs</h2>{spec_tbl}
+<p class="hint">Input, plug and supply details are from Solo Satoshi's product pages, checked Nov 1, 2026. Stated power is the seller's stock figure; overclocking draws more.</p></section>
+<section aria-labelledby="h-3"><h2 id="h-3">3. Cheapest with the power supply in the box</h2>{buy_tbl}
+<p class="hint">Only in-stock listings that say the supply is included. Prices checked {fmt_time(latest["generated_at"])}. Some shops sell the supply as an add-on, so the miner-only price can be lower: see each model's page for every price.</p></section>
+<section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
+<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/bitaxe-setup/">First-hour setup checklist</a></li><li><a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a></li><li><a href="/guides/bitaxe-chips/">Bitaxe chips compared</a></li><li><a href="/best/gifts/">Bitcoin miner gift ideas</a></li></ul>
+<p class="hint">General guidance only. Follow the maker's instructions for your board.</p></section>
+</article>"""
+    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "What power supply does a Bitaxe need?", desc), faq_ld(faq)], lastmod=PSU_CHECKED, og_type="article")
 
 
 # First-hour setup checklist (/guides/bitaxe-setup/). Facts from the open-source AxeOS firmware (ESP-Miner), checked Oct 29 2026:
@@ -2888,7 +2983,7 @@ def build_guide_setup():
 <li><strong>Power cost:</strong> see what it costs to run at your electricity price with <a href="/guides/is-home-mining-worth-it/">Is home mining worth it?</a></li>
 <li><strong>Odds:</strong> see your real chance of a block on the <a href="/solo-odds/">solo odds calculator</a>.</li></ul></section>
 <section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
-<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a></li><li><a href="/guides/bitcoin-mining-pools/">Which mining pool should I use?</a></li><li><a href="/guides/bitaxe-firmware/">Bitaxe firmware compared</a></li></ul>
+<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a></li><li><a href="/guides/bitcoin-mining-pools/">Which mining pool should I use?</a></li><li><a href="/guides/bitaxe-firmware/">Bitaxe firmware compared</a></li><li><a href="/guides/bitaxe-power-supply/">Which power supply?</a></li></ul>
 <p class="hint">Steps follow the official open-source <a href="{AXEOS_SRC}" rel="nofollow noopener" target="_blank">AxeOS firmware</a>, checked <time datetime="{SETUP_CHECKED}">Oct 29, 2026</time>. Menus can move between versions, and other boards (like NerdQaxe) run their own firmware with similar steps. General guidance only; follow your maker's instructions.</p></section>
 </article>"""
     layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Bitaxe setup: your first-hour checklist", desc), faq_ld(faq)], lastmod=SETUP_CHECKED, og_type="article")
@@ -3803,6 +3898,7 @@ def build_indexes():
           ("/guides/bitaxe-setup/", "First-hour setup checklist", "Wi-Fi, pool and your Bitcoin address."),
           ("/guides/bitaxe-firmware/", "Bitaxe firmware compared", "AxeOS, NerdQAxe, AxeForge and NerdMiner."),
           ("/guides/bitaxe-chips/", "Bitaxe chips compared", "BM1366 to BM1373: power per TH/s and today's prices."),
+          ("/guides/bitaxe-power-supply/", "Which power supply?", "5V or 12V, plug type and size, by model."),
           ("/guides/how-heater-miners-work/", "How heater miners work", "A miner that warms the room."),
           ("/where-to-buy-bitaxe/", "Where to buy a Bitaxe", "Every shop, ranked by today's price."),
           ("/how-we-track/", "How we track prices", "Where the numbers come from.")]
@@ -3853,6 +3949,7 @@ def main():
     build_guide_firmware()
     build_guide_setup()
     build_guide_chips()
+    build_guide_psu()
     build_solo_odds()
     build_heat_calc()
     build_solo_wins()
