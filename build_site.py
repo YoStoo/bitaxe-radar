@@ -2146,6 +2146,7 @@ Bitaxe Radar is independent. Some shop links are affiliate links; they never cha
 - [Bitaxe and NerdQaxe firmware compared]({BASE}/guides/bitaxe-firmware/): AxeOS (official Bitaxe firmware, GPL-3.0, v2.15.4), the NerdQAxe firmware (official for Nerd*axe boards, v1.1.0.1), AxeForge (community NerdQaxe++ firmware) and NerdMiner v2 (ESP32-only toy); how to update safely.
 - [Bitaxe chips compared]({BASE}/guides/bitaxe-chips/): which BM1366, BM1368, BM1370 or BM1373 chip each home miner uses, power per TH/s (J/TH) and today's cheapest price.
 - [What power supply does a Bitaxe need?]({BASE}/guides/bitaxe-power-supply/): 5V barrel (Gamma, Gamma Duo, Nerdaxe Gamma) vs 12V XT30 (GT 801, Naja Duo, NerdQaxe++), supply size per model, cheapest listing with the supply in the box.
+- [Best Bitaxe monitoring apps]({BASE}/guides/bitaxe-monitoring-apps/): HashWatcher, Bitaxe Baller, Miner Monitor, AxeSentry and Traxe compared (platforms, prices, alerts, remote access).
 - [How heater miners work]({BASE}/guides/how-heater-miners-work/): a miner turns its electricity into heat like a space heater.
 - [Room heat calculator]({BASE}/heat-calculator/): room size in, heat needed (about 10 W per sq ft as a rule of thumb) and which tracked miners can heat it.
 - [Price per TH/s leaderboard]({BASE}/price-per-th/): miners ranked by price per stated TH/s at today's cheapest in-stock price, with J/TH and a check against the lowest price we have logged.
@@ -2652,7 +2653,7 @@ def build_guide_normal():
 <li><strong>Power supply:</strong> make sure it came with the right one (5 V or 12 V, see the table) and that it isn't a no-name brick that runs hot.</li></ul></section>
 {pick_sec}
 <section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
-<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/bitaxe-setup/">First-hour setup checklist</a></li><li><a href="/guides/bitaxe-firmware/">Bitaxe firmware compared</a></li><li><a href="/solo-odds/#h-best">What your best difficulty means</a></li><li><a href="/guides/bitcoin-mining-pools/">Which mining pool should I use?</a></li><li><a href="/guides/is-home-mining-worth-it/">Is home mining worth it?</a></li></ul>
+<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/bitaxe-setup/">First-hour setup checklist</a></li><li><a href="/guides/bitaxe-firmware/">Bitaxe firmware compared</a></li><li><a href="/solo-odds/#h-best">What your best difficulty means</a></li><li><a href="/guides/bitcoin-mining-pools/">Which mining pool should I use?</a></li><li><a href="/guides/is-home-mining-worth-it/">Is home mining worth it?</a></li><li><a href="/guides/bitaxe-monitoring-apps/">Apps to monitor your Bitaxe</a></li></ul>
 <p class="hint">General guidance only. Follow the maker's instructions for your board and power supply. We're not paid by any firmware project.</p></section>
 </article>"""
     layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Is my Bitaxe normal?", desc), faq_ld(faq)], lastmod=AXEOS_CHECKED, og_type="article")
@@ -2922,6 +2923,90 @@ def build_guide_psu():
     layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "What power supply does a Bitaxe need?", desc), faq_ld(faq)], lastmod=PSU_CHECKED, og_type="article")
 
 
+# Monitoring apps roundup (/guides/bitaxe-monitoring-apps/). Platforms, prices and features are taken from each app's own
+# App Store, Google Play or website listing (checked MON_CHECKED). No affiliate deals with any of them; neutral list.
+MON_GUIDE_PATH = "/guides/bitaxe-monitoring-apps/"
+MON_CHECKED = "2026-11-01"
+# (name, url, runs on, price as listed, what it watches, away from home?, best for)
+MON_APPS = [
+    ("HashWatcher", "https://apps.apple.com/us/app/hashwatcher-miner-dashboard/id6753040236",
+     "iPhone, iPad, Mac, Android", "Free; Premium $2.99/mo, $19.99/yr or $39.99 lifetime (US App Store)",
+     "Bitaxe family, NerdQaxe, NMMiner, Avalon Nano 3/3S, Avalon Q and Mini 3, Lucky Miner, plus Antminers on Braiins OS, LuxOS or VNish",
+     "Yes, with their HashWatcher Hub device (sold separately). Alerts for temperature, offline, best difficulty and block found.",
+     "Mixed fleets, including Avalon miners, and solar automation"),
+    ("Bitaxe Baller", "https://bitaxeballer.com/",
+     "Mac (Apple silicon), Windows, Umbrel; phone companion", "Free (open source, MIT); Pro $29/yr",
+     "Bitaxe-family miners on your home network",
+     "Pro sends Discord alerts when a miner goes offline or runs hot. The free version keeps 1 hour of history.",
+     "A free desktop dashboard with tuning tips and power cost"),
+    ("Miner Monitor", "https://www.addictingapps.org/apps/minermonitor/",
+     "iPhone, iPad", "Free for 1 miner and 1 pool; Pro $2.99/mo, $19.99/yr or $49.99 lifetime",
+     "Bitaxe, NerdQaxe and other AxeOS miners, plus your workers on public-pool.io and solo.ckpool.org",
+     "Pool stats by payout address work from anywhere. Miner alerts only fire while the app is open.",
+     "Checking solo pool stats when you're out"),
+    ("AxeSentry", "https://apps.apple.com/us/app/axesentry/id6781810919",
+     "iPhone, iPad", "$0.99 one-time",
+     "Bitaxe, NerdAxe, NerdQAxe and NMAxe miners running AxeOS",
+     "Home Wi-Fi only. Alerts for high temp, low hashrate, offline, new best share and block found; optional auto-reboot.",
+     "A cheap watchdog that reboots a stuck miner"),
+    ("Traxe", "https://apps.apple.com/us/app/traxe-track-bitaxe-hashrate/id6744660207",
+     "iPhone, Apple Watch", "Free; Pro $2.99/mo or $9.99 one-time (5 miners)",
+     "Bitaxe, NerdQAxe and other ESP-Miner (AxeOS) miners",
+     "Finds miners on your Wi-Fi; Lock Screen and Home Screen widgets show total hashrate.",
+     "A simple phone view with widgets"),
+]
+
+
+def build_guide_monitoring():
+    path = MON_GUIDE_PATH
+    trail = [("Home", "/"), ("Guides", "/guides/"), ("Monitoring apps", path)]
+    title = "Best Bitaxe monitoring apps: HashWatcher, Bitaxe Baller and more | Bitaxe Radar"
+    desc = "Five apps that watch your Bitaxe, NerdQaxe or Avalon Nano: what each runs on, what it costs, and which ones can alert you when you're away from home."
+    rows = "".join(
+        f'<tr><td class="pool-name"><a href="{esc(u)}" rel="nofollow noopener" target="_blank">{esc(n)}</a><br><small>{esc(best)}</small></td>'
+        f'<td data-label="Runs on">{esc(plat)}</td><td data-label="Price">{esc(price)}</td>'
+        f'<td data-label="Works with">{esc(works)}</td><td data-label="Away from home">{esc(away)}</td></tr>'
+        for n, u, plat, price, works, away, best in MON_APPS)
+    tbl = (f'<div class="tablewrap pool-wrap"><table class="pool-tbl"><thead><tr><th>App</th><th>Runs on</th><th>Price</th>'
+           f'<th>Works with</th><th>Away from home</th></tr></thead><tbody>{rows}</tbody></table></div>')
+    faq = [("Do I need an app to monitor my Bitaxe?",
+            "No. Every Bitaxe has a built-in dashboard: type its IP address into a browser on the same Wi-Fi. Apps help when you have several miners, want alerts, or want to check from your phone."),
+           ("How can I check my Bitaxe when I'm not home?",
+            "The simplest free way is your pool's page: public-pool.io and solo.ckpool.org show your workers' hashrate when you look up your Bitcoin address. For the miner itself, HashWatcher offers a Hub device for remote access, and Bitaxe Baller Pro can send Discord alerts."),
+           ("Should I open a port on my router to reach my miner?",
+            "We wouldn't. The miner's dashboard has no password, so anyone who finds it could change your pool or settings. Use your pool's stats page or an app's own remote option instead."),
+           ("Will an app slow down my miner?",
+            "No. These apps only read the stats the miner already reports. Changing frequency or voltage from an app is like doing it in the dashboard, so the same care applies."),
+           ("Which app works with the Avalon Nano 3S?",
+            "Of the five here, HashWatcher lists the Avalon Nano 3 and 3S. The others are built for Bitaxe-style miners running AxeOS.")]
+    body = f"""<article>
+<header class="hero"><h1>Best apps to monitor your Bitaxe</h1>
+<p class="lede">Your miner already has a dashboard, but it only works on your home Wi-Fi and won't tell you when something goes wrong. These five apps add a phone or desktop view, alerts and, in some cases, a way to check in from anywhere.</p>
+<p class="meta">Prices and features checked <time datetime="{MON_CHECKED}">Nov 1, 2026</time> on each app's own listing · 3-minute read</p></header>
+<section aria-labelledby="h-1"><h2 id="h-1">1. The short answer</h2>
+<ul><li><strong>One Bitaxe, just curious:</strong> the built-in dashboard (type the miner's IP into your browser) plus your pool's stats page is enough, and free.</li>
+<li><strong>A few miners and an iPhone:</strong> <a href="https://apps.apple.com/us/app/axesentry/id6781810919" rel="nofollow noopener" target="_blank">AxeSentry</a> ($0.99) for alerts and auto-reboot, or <a href="https://www.addictingapps.org/apps/minermonitor/" rel="nofollow noopener" target="_blank">Miner Monitor</a> if you want pool stats on the go.</li>
+<li><strong>Mac or Windows, and free:</strong> <a href="https://bitaxeballer.com/" rel="nofollow noopener" target="_blank">Bitaxe Baller</a>, open source.</li>
+<li><strong>Mixed fleet, Android, or Avalon miners:</strong> <a href="https://apps.apple.com/us/app/hashwatcher-miner-dashboard/id6753040236" rel="nofollow noopener" target="_blank">HashWatcher</a>.</li></ul></section>
+<section aria-labelledby="h-2"><h2 id="h-2">2. The apps side by side</h2>
+{tbl}
+<p class="hint">Prices are as listed in the US App Store or on the maker's site on Nov 1, 2026 and can change. We have no deal with any of these apps.</p></section>
+<section aria-labelledby="h-3"><h2 id="h-3">3. Watching your miner when you're away</h2>
+<ul><li><strong>Free:</strong> look up your Bitcoin address on your pool's site (for example public-pool.io or solo.ckpool.org). If the hashrate there drops to zero, your miner is off or lost Wi-Fi.</li>
+<li><strong>Alerts to your phone:</strong> HashWatcher (with its Hub) and Bitaxe Baller Pro (Discord) can tell you a miner went offline while you're out. AxeSentry and Miner Monitor alert you on your home network.</li>
+<li><strong>Skip port forwarding.</strong> The miner's web page has no login, so opening it to the internet lets strangers change your pool.</li></ul></section>
+<section aria-labelledby="h-4"><h2 id="h-4">4. What to watch for</h2>
+<ul><li><strong>Hashrate</strong> well below normal for your board: see <a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a></li>
+<li><strong>Chip temperature</strong> climbing toward the point where mining stops.</li>
+<li><strong>Offline or zero shares</strong>: usually Wi-Fi or a wrong pool setting. Check the <a href="/guides/bitaxe-setup/">setup checklist</a>.</li>
+<li><strong>Best difficulty</strong> is your luckiest share so far. See what it means on the <a href="/solo-odds/#h-best">solo odds page</a>.</li></ul></section>
+<section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
+<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/bitaxe-setup/">First-hour setup checklist</a></li><li><a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a></li><li><a href="/guides/bitaxe-firmware/">Bitaxe firmware compared</a></li><li><a href="/best/beginners/">Best miners for beginners</a></li></ul>
+<p class="hint">Bitaxe Radar is independent and not paid by any app listed here.</p></section>
+</article>"""
+    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Best apps to monitor your Bitaxe", desc), faq_ld(faq)], lastmod=MON_CHECKED, og_type="article")
+
+
 # First-hour setup checklist (/guides/bitaxe-setup/). Facts from the open-source AxeOS firmware (ESP-Miner), checked Oct 29 2026:
 # setup hotspot named Bitaxe_XXXX (last 4 hex digits of its MAC), open network with a captive portal; the screen shows a QR code for it
 # and, once connected, the miner's IP address; the ESP32-S3 chip it runs on has 2.4 GHz Wi-Fi only; default pool public-pool.io port 21496,
@@ -2983,7 +3068,7 @@ def build_guide_setup():
 <li><strong>Power cost:</strong> see what it costs to run at your electricity price with <a href="/guides/is-home-mining-worth-it/">Is home mining worth it?</a></li>
 <li><strong>Odds:</strong> see your real chance of a block on the <a href="/solo-odds/">solo odds calculator</a>.</li></ul></section>
 <section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
-<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a></li><li><a href="/guides/bitcoin-mining-pools/">Which mining pool should I use?</a></li><li><a href="/guides/bitaxe-firmware/">Bitaxe firmware compared</a></li><li><a href="/guides/bitaxe-power-supply/">Which power supply?</a></li></ul>
+<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a></li><li><a href="/guides/bitcoin-mining-pools/">Which mining pool should I use?</a></li><li><a href="/guides/bitaxe-firmware/">Bitaxe firmware compared</a></li><li><a href="/guides/bitaxe-power-supply/">Which power supply?</a></li><li><a href="/guides/bitaxe-monitoring-apps/">Monitoring apps</a></li></ul>
 <p class="hint">Steps follow the official open-source <a href="{AXEOS_SRC}" rel="nofollow noopener" target="_blank">AxeOS firmware</a>, checked <time datetime="{SETUP_CHECKED}">Oct 29, 2026</time>. Menus can move between versions, and other boards (like NerdQaxe) run their own firmware with similar steps. General guidance only; follow your maker's instructions.</p></section>
 </article>"""
     layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Bitaxe setup: your first-hour checklist", desc), faq_ld(faq)], lastmod=SETUP_CHECKED, og_type="article")
@@ -3899,6 +3984,7 @@ def build_indexes():
           ("/guides/bitaxe-firmware/", "Bitaxe firmware compared", "AxeOS, NerdQAxe, AxeForge and NerdMiner."),
           ("/guides/bitaxe-chips/", "Bitaxe chips compared", "BM1366 to BM1373: power per TH/s and today's prices."),
           ("/guides/bitaxe-power-supply/", "Which power supply?", "5V or 12V, plug type and size, by model."),
+          ("/guides/bitaxe-monitoring-apps/", "Monitoring apps", "Five apps that watch your miner and alert you."),
           ("/guides/how-heater-miners-work/", "How heater miners work", "A miner that warms the room."),
           ("/where-to-buy-bitaxe/", "Where to buy a Bitaxe", "Every shop, ranked by today's price."),
           ("/how-we-track/", "How we track prices", "Where the numbers come from.")]
@@ -3950,6 +4036,7 @@ def main():
     build_guide_setup()
     build_guide_chips()
     build_guide_psu()
+    build_guide_monitoring()
     build_solo_odds()
     build_heat_calc()
     build_solo_wins()

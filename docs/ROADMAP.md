@@ -1,6 +1,6 @@
 # Bitaxe Radar Roadmap
 
-Updated: Nov 1, 2026 (morning)
+Updated: Nov 1, 2026 (evening)
 
 ## 🎯 Goal
 
@@ -35,7 +35,8 @@ Updated: Nov 1, 2026 (morning)
    - ✅ First-hour setup checklist: live Oct 30 at /guides/bitaxe-setup/ (built Oct 29 evening; the upload was held up by a safety-check error and went through on Oct 30).
    - ✅ Chip guide ("buy now or wait for a newer chip?"): live Oct 31 at /guides/bitaxe-chips/ (BM1366, BM1368, BM1370, BM1373: which miners use each, power per TH/s, yearly power cost and today's prices).
    - ✅ Power supply guide: live Nov 1 at /guides/bitaxe-power-supply/ (5V barrel vs 12V XT30 by model, what size supply, cheapest in-stock listing with the supply in the box).
-   - Still open from the Reddit list: monitoring apps roundup, noise table.
+   - ✅ Monitoring apps roundup: live Nov 1 at /guides/bitaxe-monitoring-apps/ (HashWatcher, Bitaxe Baller, Miner Monitor, AxeSentry, Traxe: platforms, prices, alerts, checking in from away).
+   - Still open from the Reddit list: noise table.
    - Next: watch Reddit for the next owner question (weekly scan on Mondays).
 
 ## 💰 Money
@@ -74,6 +75,7 @@ Later:
 
 ## ✅ Done
 
+- Nov 1 (evening): Monitoring apps roundup (/guides/bitaxe-monitoring-apps/): five apps that watch a Bitaxe-style miner, side by side: HashWatcher (iPhone, Mac, Android; free, Premium $2.99/mo, $19.99/yr or $39.99 lifetime; also Avalon miners), Bitaxe Baller (Mac, Windows, Umbrel; free and open source, Pro $29/yr), Miner Monitor (iPhone; free for 1 miner, Pro from $2.99/mo; pool stats from anywhere), AxeSentry (iPhone; $0.99; alerts and auto-reboot) and Traxe (iPhone; free, Pro $9.99 one-time for 5 miners). Prices from each app's own listing on Nov 1. Plus how to check your miner when you're away (pool stats page, app alerts, don't open a router port) and what numbers to watch. Why: "how do you monitor your Bitaxe when away?" is #14 on our Reddit list, and it's neutral content app makers and owners may share. Linked from Guides, the setup checklist, Is my Bitaxe normal? and llms.txt.
 - Nov 1: Power supply guide (/guides/bitaxe-power-supply/): which voltage and plug each miner needs (Bitaxe Gamma, Gamma Duo, Nerdaxe Gamma: 5V barrel; GT 801, Naja Duo, NerdQaxe++: 12V XT30; Gamma Hex: 12V 6-pin; Avalon Nano 3S: USB-C 140 W), what size supply to get, and the cheapest in-stock listing that includes the supply (Bitaxe Gamma $67 at Solo Satoshi, NerdQaxe++ $210.99, Avalon Nano 3S $219). Details from Solo Satoshi's own product pages. Why: "which power supply?" is a common new-owner question, and gift buyers want a complete box, so the page points them to buy links. Also: the price checker now names the site and contact email in its user agent and retries once after a 403 (Solo Satoshi blocked one check from our build box on Oct 31; the scheduled checks were fine).
 - Oct 31 (evening): Chip guide (/guides/bitaxe-chips/): which Bitmain chip is in each chip-based miner we track (BM1366, BM1368, BM1370, BM1373; the tables update with every price check), power per TH/s for each (Ultra 24 J/TH down to 10 J/TH for the Naja Duo and Gaia), yearly power cost at $0.15/kWh, and today's cheapest in-stock price and price per TH/s. Plain advice: cheap power, pick the lowest price per TH/s; expensive power, pick the lowest J/TH. Why: "Buy now or wait for the newer chip?" is a recurring Reddit question (#8 in our research), and chip-number searches come from people comparing boards before buying. Linked from Guides, the firmware guide and llms.txt.
 - Oct 31: Three new comparison pages: Bitaxe Gamma vs Nerdaxe Gaia (/compare/bitaxe-gamma-vs-nerdaxe-gaia/), NerdQaxe++ vs Avalon Nano 3S (/compare/nerdqaxe-pp-vs-avalon-nano-3s/) and Bitaxe Gamma Hex vs NerdOCTaxe (/compare/bitaxe-gamma-hex-vs-nerdoctaxe/), with live prices, efficiency, yearly power cost and buy links. Why: "X vs Y" searches come from people about to buy, and these are the matchups gift and Black Friday shoppers weigh. Our only clicks so far came from a model-name search, so more model-name pages is the cheapest path to traffic.
@@ -134,12 +136,12 @@ Later:
 - Oct 24: Heat guide (/guides/bitcoin-mining-heat-your-home/): miner vs space heater vs heat pump with live numbers. Each heater miner shows its power cost, what mining pays back, and the power price below which it beats a heat pump (DOE: heat pumps use about 50% less electricity). Also hot-water heating (Heatbit Bitwater) and winter-only tips.
 - Oct 21: Room heat calculator (/heat-calculator/): type your room size, see how much heat it needs and which miners can heat it, with today's prices.
 
-## 📊 Numbers (Nov 1)
+## 📊 Numbers (Nov 1, evening)
 
 - Revenue: $0 (no commission emails yet)
 - Subscribers: 1 (Resend contact count in the Nov 1 alert run; it's your own test)
 - Miners tracked: 32
 - Sellers tracked: 11
 - Paying affiliate programs: 3 (Power Mining, Bitaxe.de, Solo Satoshi)
-- Tests: 111 passing
-- Pages on the site: 90 in the sitemap
+- Tests: 115 passing
+- Pages on the site: 91 in the sitemap
