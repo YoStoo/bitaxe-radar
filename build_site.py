@@ -1345,6 +1345,42 @@ CURRENT_MODELS = [m for m in CORE_TRACKED if m not in NOINDEX_MODELS]
 N_MODELS = len([m for m in TRACKED if m not in NOINDEX_MODELS])   # the one model count shown anywhere on the site
 
 
+TRUSTED_AFF_SELLERS = ("solosatoshi", "bitaxede", "powermining")   # tracked shops with affiliate codes, linked from the unknown-shop box
+
+
+def unknown_shop_box():
+    """'Buying on AliExpress or from an unknown shop' box for /where-to-buy-bitaxe/ (from r/BitAxe questions, Nov 2026).
+    Facts only: never names or accuses a specific shop. Ends with today's cheapest in-stock Gamma at a shop we track."""
+    g = STATS["bitaxe-gamma"]
+    pick = g["best_usd"] or g["best"]
+    if pick:
+        p = money(pick["price"], pick["currency"]) + (f" (≈ {money(usd(pick))})" if pick["currency"] != "USD" and usd(pick) is not None else "")
+        cheapest = (f'<div class="buybox-pick"><p><strong>Or buy from a seller we track.</strong> Cheapest Bitaxe Gamma in stock today: '
+                    f'<strong>{p}</strong> at {esc(sname(pick["seller"]))}.</p>{offer_link(pick, "Go to " + sname(pick["seller"]) + " ↗")}</div>')
+    else:
+        cheapest = ('<div class="buybox-pick"><p><strong>Or buy from a seller we track.</strong> No tracked shop has a Bitaxe Gamma in stock at the last check; '
+                    'see the <a href="/models/bitaxe-gamma/">Gamma page</a> for pre-orders.</p></div>')
+    shops = [sid for sid in TRUSTED_AFF_SELLERS if sid in SELLERS]
+    parts = [f'{esc(sname(sid))} ({store_link(sid)})' for sid in shops]
+    shop_line = ('<p class="hint">Shops we check every 6 hours include ' + (", ".join(parts[:-1]) + " and " + parts[-1] if len(parts) > 1 else "".join(parts))
+                 + '. See <a href="#h-s">all shops we check</a>.</p>') if shops else ""
+    return f"""<section class="buybox" aria-labelledby="h-ali"><h2 id="h-ali">Buying a Bitaxe on AliExpress or from an unknown shop</h2>
+<p>Bitaxe is an open-source hardware project, so anyone can build and sell the boards. Words like <em>"official"</em> or <em>"global"</em> in a store name don't mean the store is connected to the Bitaxe project. Judge the listing, not the store name.</p>
+<p><strong>Check these before you pay:</strong></p>
+<ul>
+<li><strong>Exact model and board revision.</strong> For example "Bitaxe Gamma 601" or "NerdQaxe++ Rev 6.1". A listing that only says "Bitaxe miner" could be anything.</li>
+<li><strong>ASIC chip.</strong> The listing should name it (BM1370 for a Gamma). See <a href="/guides/bitaxe-chips/">Bitaxe chips compared</a>.</li>
+<li><strong>Power supply: included, and which voltage.</strong> Gamma-class boards take <strong>5V</strong> through a barrel plug; NerdQaxe-class boards take <strong>12V</strong> through an XT30 plug. The wrong one won't run or can damage the board. See <a href="/guides/bitaxe-power-supply/">which power supply a Bitaxe needs</a>.</li>
+<li><strong>Return terms.</strong> Who pays return shipping if it arrives dead, and how long you have to report it.</li>
+<li><strong>Shipping time and import fees.</strong> Overseas parcels can take weeks, and US import duty or handling fees may be added at delivery.</li>
+<li><strong>Seller ratings.</strong> Look at the store's own rating and recent reviews for this exact item, not only the product's star average.</li>
+<li><strong>Pay with buyer protection.</strong> Pay by card or through the marketplace checkout, never by wire, gift card or crypto sent straight to the seller.</li>
+</ul>
+{cheapest}
+{shop_line}
+</section>"""
+
+
 def build_where_to_buy():
     path = "/where-to-buy-bitaxe/"
     trail = [("Home", "/"), ("Where to buy a Bitaxe", path)]
@@ -1390,6 +1426,7 @@ def build_where_to_buy():
 <li><strong>Total cost.</strong> Add shipping, sales tax or import duty, and the electricity to run it.</li>
 <li><strong>Payment safety.</strong> Be wary of a price far below every other shop, or a shop that only takes wire or crypto.</li>
 <li><strong>Look-alikes.</strong> Prefer sellers that name the exact board and revision in the title.</li></ul></section>
+{unknown_shop_box()}
 <section><h2>Browse by miner</h2><ul>{"".join(f'<li><a href="/models/{m}/">{esc(SHORT[m])}</a></li>' for m in CURRENT_MODELS)}</ul>
 <p><a href="/in-stock/">Everything in stock now</a> · <a href="/deals/">Best deals</a> · <a href="/how-we-track/">How we track</a></p></section>
 </article>"""

@@ -450,3 +450,13 @@ details .tablewrap{margin-bottom:14px}
 }
 .bestout{margin:10px 0;padding:10px 14px;background:var(--panel2);border-left:3px solid #f7931a;border-radius:10px}.bestout[hidden]{display:none}.bestout p{margin:4px 0}
 .earnbox h3{font-size:16px;margin:16px 0 6px}
+/* ---- unknown-shop / AliExpress box (where to buy) ---- */
+.buybox{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--warn);border-radius:var(--r);padding:14px 18px;margin:26px 0}
+.buybox h2{margin-top:4px}
+.buybox ul{padding-left:20px}
+.buybox li{margin:6px 0}
+.buybox-pick{background:var(--panel2);border-radius:var(--r-sm);padding:10px 14px;margin:14px 0 6px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+.buybox-pick p{margin:0}
+.buybox-pick .btn{margin-left:auto}
+.buybox-pick .ph{flex-basis:100%;text-align:right;margin-top:0}
+@media (max-width:520px){.buybox{padding:12px 14px}.buybox-pick .btn{margin-left:0;width:100%}.buybox-pick .ph{text-align:center}}
