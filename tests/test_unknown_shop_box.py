@@ -34,6 +34,8 @@ class UnknownShopBox(unittest.TestCase):
         if pick:
             self.assertTrue(B.in_stock(pick))
             self.assertIn(B.money(pick["price"], pick["currency"]), b)
+            if B.psu_included(pick):
+                self.assertIn("with a power supply", b)
             self.assertIn(B.esc(B.sname(pick["seller"])), b)
             if B.aff_param(pick["seller"]):
                 self.assertIn('rel="sponsored nofollow noopener"', b)

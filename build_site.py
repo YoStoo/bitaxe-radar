@@ -1355,8 +1355,9 @@ def unknown_shop_box():
     pick = g["best_usd"] or g["best"]
     if pick:
         p = money(pick["price"], pick["currency"]) + (f" (≈ {money(usd(pick))})" if pick["currency"] != "USD" and usd(pick) is not None else "")
+        psu = " with a power supply" if psu_included(pick) else ""
         cheapest = (f'<div class="buybox-pick"><p><strong>Or buy from a seller we track.</strong> Cheapest Bitaxe Gamma in stock today: '
-                    f'<strong>{p}</strong> at {esc(sname(pick["seller"]))}.</p>{offer_link(pick, "Go to " + sname(pick["seller"]) + " ↗")}</div>')
+                    f'<strong>{p}</strong>{psu} at {esc(sname(pick["seller"]))}.</p>{offer_link(pick, "Go to " + sname(pick["seller"]) + " ↗")}</div>')
     else:
         cheapest = ('<div class="buybox-pick"><p><strong>Or buy from a seller we track.</strong> No tracked shop has a Bitaxe Gamma in stock at the last check; '
                     'see the <a href="/models/bitaxe-gamma/">Gamma page</a> for pre-orders.</p></div>')
