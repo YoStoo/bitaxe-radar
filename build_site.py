@@ -437,7 +437,8 @@ MODEL_COPY.update(NEW_COPY)
 
 COMPARE_PAIRS = [("bitaxe-gamma", "nerdqaxe-pp"), ("bitaxe-gamma", "bitaxe-gt-801"), ("bitaxe-gamma", "nerdaxe-gamma"),
                  ("bitaxe-gamma", "bitaxe-supra"), ("nerdqaxe-pp", "nerdaxe-gaia"),
-                 ("bitaxe-gamma", "nerdaxe-gaia"), ("nerdqaxe-pp", "avalon-nano-3s"), ("bitaxe-gamma-hex", "nerdoctaxe")]
+                 ("bitaxe-gamma", "nerdaxe-gaia"), ("nerdqaxe-pp", "avalon-nano-3s"), ("bitaxe-gamma-hex", "nerdoctaxe"),
+                 ("avalon-nano-3s", "hammer-bc04")]
 COMPARE_COPY = {
     ("bitaxe-gamma", "nerdqaxe-pp"): dict(
         angle="One chip versus four: the Gamma is the small, quiet, cheap option; the NerdQaxe++ buys roughly four times the hashrate for a much larger power bill and a louder, hotter box.",
@@ -471,6 +472,10 @@ COMPARE_COPY = {
         angle="The two biggest open-source BM1370 boards: six chips in the Gamma Hex (sold with a liquid cooler) versus eight in the NerdOCTaxe, with similar efficiency, so it mostly comes down to price, cooling and noise.",
         a_for="you want liquid cooling for a quieter room and a big hashrate jump over a single Gamma.",
         b_for="you want the most stated hashrate in an open-source home miner and have airflow for about 160 W of heat."),
+    ("avalon-nano-3s", "hammer-bc04"): dict(
+        angle="Same stated ~6 TH/s desk class, different power and design: Avalon Nano 3S is Canaan's enclosed desk miner (up to 140 W, also used as a mini heater); Hammer BC04 states the same hashrate at ~96 W in an open-frame style desk miner.",
+        a_for="you want a finished enclosed box from a big maker and like using its heat.",
+        b_for="you want the same stated hashrate at lower power and are fine with an open-frame desk miner."),
 }
 
 SELLER_COPY = {

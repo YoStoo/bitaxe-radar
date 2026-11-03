@@ -1,6 +1,6 @@
 # Bitaxe Radar Roadmap
 
-Updated: Nov 2, 2026 (morning)
+Updated: Nov 2, 2026 (evening)
 
 ## 🎯 Goal
 
@@ -37,7 +37,8 @@ Updated: Nov 2, 2026 (morning)
    - ✅ Power supply guide: live Nov 1 at /guides/bitaxe-power-supply/ (5V barrel vs 12V XT30 by model, what size supply, cheapest in-stock listing with the supply in the box).
    - ✅ Monitoring apps roundup: live Nov 1 at /guides/bitaxe-monitoring-apps/ (HashWatcher, Bitaxe Baller, Miner Monitor, AxeSentry, Traxe: platforms, prices, alerts, checking in from away).
    - ✅ "Buying on AliExpress or from an unknown shop" box: live Nov 2 on /where-to-buy-bitaxe/ (what to check before buying, plus today's cheapest in-stock Gamma at a shop we track).
-   - Still open from the Reddit list: noise table.
+   - ✅ Avalon Nano 3S vs Hammer BC04 compare: live Nov 2 at /compare/avalon-nano-3s-vs-hammer-bc04/ (same stated ~6 TH/s desk class; Nano enclosed up to 140 W vs BC04 open-frame at ~96 W, with live prices).
+   - Still open from the Reddit list: noise table; optionally a "several miners on one power supply" section for the PSU guide.
    - Next: watch Reddit for the next owner question (weekly scan on Mondays).
 
 ## 💰 Money
@@ -76,6 +77,7 @@ Later:
 
 ## ✅ Done
 
+- Nov 2 (evening): Avalon Nano 3S vs Hammer BC04 compare (/compare/avalon-nano-3s-vs-hammer-bc04/): same stated ~6 TH/s desk class, different power and design. Nano 3S is Canaan's enclosed desk miner (up to 140 W, also used as a mini heater); Hammer BC04 states the same hashrate at ~96 W in an open-frame style. Live cheapest in-stock prices at build ($219 Solo Satoshi vs $215 Altair), efficiency (~23.3 vs ~16.0 J/TH), yearly power at $0.15/kWh, and buy links. Why: #1 idea from the Nov 2 Reddit scan — buyers can get both at about the same price and were weighing enclosed plug-and-play vs open-frame efficiency.
 - Nov 2: "Buying a Bitaxe on AliExpress or from an unknown shop" box on /where-to-buy-bitaxe/: explains that "official" or "global" in a store name doesn't mean a link to the open-source Bitaxe project, and lists what to check before paying (exact model and board revision, ASIC chip, whether a power supply is included and its voltage: 5V barrel for Gamma-class, 12V XT30 for NerdQaxe-class, return terms, shipping time and import fees, seller ratings, paying with buyer protection). Links the chip and power supply guides. Ends with "or buy from a seller we track": today's cheapest in-stock Bitaxe Gamma from our data ($67.00 with a power supply at Solo Satoshi at build time) with an affiliate button, plus links to Solo Satoshi, Bitaxe.de and Power Mining. No shop is named or accused. Why: people asked in r/BitAxe whether AliExpress stores are legit, and steering them to trusted tracked sellers can turn into affiliate sales.
 - Nov 1 (evening): Monitoring apps roundup (/guides/bitaxe-monitoring-apps/): five apps that watch a Bitaxe-style miner, side by side: HashWatcher (iPhone, Mac, Android; free, Premium $2.99/mo, $19.99/yr or $39.99 lifetime; also Avalon miners), Bitaxe Baller (Mac, Windows, Umbrel; free and open source, Pro $29/yr), Miner Monitor (iPhone; free for 1 miner, Pro from $2.99/mo; pool stats from anywhere), AxeSentry (iPhone; $0.99; alerts and auto-reboot) and Traxe (iPhone; free, Pro $9.99 one-time for 5 miners). Prices from each app's own listing on Nov 1. Plus how to check your miner when you're away (pool stats page, app alerts, don't open a router port) and what numbers to watch. Why: "how do you monitor your Bitaxe when away?" is #14 on our Reddit list, and it's neutral content app makers and owners may share. Linked from Guides, the setup checklist, Is my Bitaxe normal? and llms.txt.
 - Nov 1: Power supply guide (/guides/bitaxe-power-supply/): which voltage and plug each miner needs (Bitaxe Gamma, Gamma Duo, Nerdaxe Gamma: 5V barrel; GT 801, Naja Duo, NerdQaxe++: 12V XT30; Gamma Hex: 12V 6-pin; Avalon Nano 3S: USB-C 140 W), what size supply to get, and the cheapest in-stock listing that includes the supply (Bitaxe Gamma $67 at Solo Satoshi, NerdQaxe++ $210.99, Avalon Nano 3S $219). Details from Solo Satoshi's own product pages. Why: "which power supply?" is a common new-owner question, and gift buyers want a complete box, so the page points them to buy links. Also: the price checker now names the site and contact email in its user agent and retries once after a 403 (Solo Satoshi blocked one check from our build box on Oct 31; the scheduled checks were fine).
@@ -138,12 +140,13 @@ Later:
 - Oct 24: Heat guide (/guides/bitcoin-mining-heat-your-home/): miner vs space heater vs heat pump with live numbers. Each heater miner shows its power cost, what mining pays back, and the power price below which it beats a heat pump (DOE: heat pumps use about 50% less electricity). Also hot-water heating (Heatbit Bitwater) and winter-only tips.
 - Oct 21: Room heat calculator (/heat-calculator/): type your room size, see how much heat it needs and which miners can heat it, with today's prices.
 
-## 📊 Numbers (Nov 1, evening)
+## 📊 Numbers (Nov 2, evening)
 
 - Revenue: $0 (no commission emails yet)
 - Subscribers: 1 (Resend contact count in the Nov 1 alert run; it's your own test)
 - Miners tracked: 32
 - Sellers tracked: 11
+- Listings checked: 59
 - Paying affiliate programs: 3 (Power Mining, Bitaxe.de, Solo Satoshi)
-- Tests: 115 passing
-- Pages on the site: 91 in the sitemap
+- Tests: 122 passing
+- Pages on the site: 92 in the sitemap
