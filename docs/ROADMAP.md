@@ -1,6 +1,6 @@
 # Bitaxe Radar Roadmap
 
-Updated: Nov 2, 2026 (evening)
+Updated: Nov 3, 2026 (morning)
 
 ## 🎯 Goal
 
@@ -38,7 +38,8 @@ Updated: Nov 2, 2026 (evening)
    - ✅ Monitoring apps roundup: live Nov 1 at /guides/bitaxe-monitoring-apps/ (HashWatcher, Bitaxe Baller, Miner Monitor, AxeSentry, Traxe: platforms, prices, alerts, checking in from away).
    - ✅ "Buying on AliExpress or from an unknown shop" box: live Nov 2 on /where-to-buy-bitaxe/ (what to check before buying, plus today's cheapest in-stock Gamma at a shop we track).
    - ✅ Avalon Nano 3S vs Hammer BC04 compare: live Nov 2 at /compare/avalon-nano-3s-vs-hammer-bc04/ (same stated ~6 TH/s desk class; Nano enclosed up to 140 W vs BC04 open-frame at ~96 W, with live prices).
-   - Still open from the Reddit list: noise table; optionally a "several miners on one power supply" section for the PSU guide.
+   - ✅ Noise table: live Nov 3 at /guides/bitaxe-noise/ (stated dB by model from maker/seller sources only, quietest first, with today's price and buy links).
+   - Still open from the Reddit list: optionally a "several miners on one power supply" section for the PSU guide.
    - Next: watch Reddit for the next owner question (weekly scan on Mondays).
 
 ## 💰 Money
@@ -77,6 +78,7 @@ Later:
 
 ## ✅ Done
 
+- Nov 3 (morning): Noise table (/guides/bitaxe-noise/): every tracked miner with a published noise figure, quietest first (fanless Heatbit Canvas/Bitwater through ~60 dB StealthMiner). Each row shows the stated dB text, the source label (maker or shop page), today's cheapest in-stock price and a buy button. Plain guide to what 30 / 40 / 50 / 60 dB feels like in a room. Why: "how loud?" is Reddit owner question #10, and quiet buyers are close to a purchase — the table points them at affiliate buy links. Linked from Guides, /best/quiet/, monitoring apps and llms.txt.
 - Nov 2 (evening): Avalon Nano 3S vs Hammer BC04 compare (/compare/avalon-nano-3s-vs-hammer-bc04/): same stated ~6 TH/s desk class, different power and design. Nano 3S is Canaan's enclosed desk miner (up to 140 W, also used as a mini heater); Hammer BC04 states the same hashrate at ~96 W in an open-frame style. Live cheapest in-stock prices at build ($219 Solo Satoshi vs $215 Altair), efficiency (~23.3 vs ~16.0 J/TH), yearly power at $0.15/kWh, and buy links. Why: #1 idea from the Nov 2 Reddit scan — buyers can get both at about the same price and were weighing enclosed plug-and-play vs open-frame efficiency.
 - Nov 2: "Buying a Bitaxe on AliExpress or from an unknown shop" box on /where-to-buy-bitaxe/: explains that "official" or "global" in a store name doesn't mean a link to the open-source Bitaxe project, and lists what to check before paying (exact model and board revision, ASIC chip, whether a power supply is included and its voltage: 5V barrel for Gamma-class, 12V XT30 for NerdQaxe-class, return terms, shipping time and import fees, seller ratings, paying with buyer protection). Links the chip and power supply guides. Ends with "or buy from a seller we track": today's cheapest in-stock Bitaxe Gamma from our data ($67.00 with a power supply at Solo Satoshi at build time) with an affiliate button, plus links to Solo Satoshi, Bitaxe.de and Power Mining. No shop is named or accused. Why: people asked in r/BitAxe whether AliExpress stores are legit, and steering them to trusted tracked sellers can turn into affiliate sales.
 - Nov 1 (evening): Monitoring apps roundup (/guides/bitaxe-monitoring-apps/): five apps that watch a Bitaxe-style miner, side by side: HashWatcher (iPhone, Mac, Android; free, Premium $2.99/mo, $19.99/yr or $39.99 lifetime; also Avalon miners), Bitaxe Baller (Mac, Windows, Umbrel; free and open source, Pro $29/yr), Miner Monitor (iPhone; free for 1 miner, Pro from $2.99/mo; pool stats from anywhere), AxeSentry (iPhone; $0.99; alerts and auto-reboot) and Traxe (iPhone; free, Pro $9.99 one-time for 5 miners). Prices from each app's own listing on Nov 1. Plus how to check your miner when you're away (pool stats page, app alerts, don't open a router port) and what numbers to watch. Why: "how do you monitor your Bitaxe when away?" is #14 on our Reddit list, and it's neutral content app makers and owners may share. Linked from Guides, the setup checklist, Is my Bitaxe normal? and llms.txt.

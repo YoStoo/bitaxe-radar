@@ -2107,6 +2107,8 @@ def build_best(slug):
     hint = f'<p class="hint">{esc(b["hint"])}</p>' if b.get("hint") else ""
     if slug == "gifts":
         hint += '<p class="hint">Next steps for a new owner: <a href="/guides/bitaxe-setup/">first-hour setup checklist</a> · <a href="/guides/bitcoin-mining-pools/">which pool to use</a> · <a href="/bitaxe-black-friday/">Black Friday prices</a></p>'
+    if slug == "quiet":
+        hint += '<p class="hint">Full noise table with sources and buy links: <a href="/guides/bitaxe-noise/">how loud are home Bitcoin miners?</a></p>'
     body = f"""<article>
 <header class="hero"><h1>{esc(b['h1'])}</h1>
 <p class="lede">{esc(b['lede'])}</p>
@@ -2190,6 +2192,7 @@ Bitaxe Radar is independent. Some shop links are affiliate links; they never cha
 - [Bitaxe chips compared]({BASE}/guides/bitaxe-chips/): which BM1366, BM1368, BM1370 or BM1373 chip each home miner uses, power per TH/s (J/TH) and today's cheapest price.
 - [What power supply does a Bitaxe need?]({BASE}/guides/bitaxe-power-supply/): 5V barrel (Gamma, Gamma Duo, Nerdaxe Gamma) vs 12V XT30 (GT 801, Naja Duo, NerdQaxe++), supply size per model, cheapest listing with the supply in the box.
 - [Best Bitaxe monitoring apps]({BASE}/guides/bitaxe-monitoring-apps/): HashWatcher, Bitaxe Baller, Miner Monitor, AxeSentry and Traxe compared (platforms, prices, alerts, remote access).
+- [How loud are home Bitcoin miners?]({BASE}/guides/bitaxe-noise/): stated dB by model (maker/seller figures only), quietest first, with today's price and buy links.
 - [How heater miners work]({BASE}/guides/how-heater-miners-work/): a miner turns its electricity into heat like a space heater.
 - [Room heat calculator]({BASE}/heat-calculator/): room size in, heat needed (about 10 W per sq ft as a rule of thumb) and which tracked miners can heat it.
 - [Price per TH/s leaderboard]({BASE}/price-per-th/): miners ranked by price per stated TH/s at today's cheapest in-stock price, with J/TH and a check against the lowest price we have logged.
@@ -3044,10 +3047,85 @@ def build_guide_monitoring():
 <li><strong>Offline or zero shares</strong>: usually Wi-Fi or a wrong pool setting. Check the <a href="/guides/bitaxe-setup/">setup checklist</a>.</li>
 <li><strong>Best difficulty</strong> is your luckiest share so far. See what it means on the <a href="/solo-odds/#h-best">solo odds page</a>.</li></ul></section>
 <section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
-<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/bitaxe-setup/">First-hour setup checklist</a></li><li><a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a></li><li><a href="/guides/bitaxe-firmware/">Bitaxe firmware compared</a></li><li><a href="/best/beginners/">Best miners for beginners</a></li></ul>
+<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/bitaxe-setup/">First-hour setup checklist</a></li><li><a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a></li><li><a href="/guides/bitaxe-firmware/">Bitaxe firmware compared</a></li><li><a href="/best/beginners/">Best miners for beginners</a></li><li><a href="/guides/bitaxe-noise/">How loud are home miners?</a></li></ul>
 <p class="hint">Bitaxe Radar is independent and not paid by any app listed here.</p></section>
 </article>"""
     layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Best apps to monitor your Bitaxe", desc), faq_ld(faq)], lastmod=MON_CHECKED, og_type="article")
+
+
+
+# Noise comparison table (/guides/bitaxe-noise/). dB figures come only from the NOISE map above
+# (maker/seller stated numbers with a source label). We do not invent or measure dB ourselves.
+NOISE_GUIDE_PATH = "/guides/bitaxe-noise/"
+NOISE_CHECKED = "2026-11-03"
+
+
+def noise_models():
+    """Tracked miners that have a cited noise figure, quietest first (fanless = 0)."""
+    return sorted([m for m in NOISE if m in TRACKED and m not in NOINDEX_MODELS],
+                  key=lambda m: (NOISE[m][0], MODELS[m]["watts"], SHORT[m]))
+
+
+def build_guide_noise():
+    path = NOISE_GUIDE_PATH
+    trail = [("Home", "/"), ("Guides", "/guides/"), ("Noise levels", path)]
+    title = "How loud are home Bitcoin miners? Noise table (dB) | Bitaxe Radar"
+    desc = "Stated noise levels for home Bitcoin miners side by side, quietest first, with today's price and a buy link. Figures are the makers' or sellers' own numbers."
+    rows = []
+    for m in noise_models():
+        db, text, src = NOISE[m]
+        st = STATS[m]
+        best = st["best"]
+        db_cell = "silent (no fans)" if db == 0 else f"{db:g} dB max stated"
+        if best:
+            buy = (f'<td class="num" data-label="Today\'s price">{money(best["price"], best["currency"])}'
+                   f'<br><small>at {esc(sname(best["seller"]))}</small></td>'
+                   f'<td data-label="">{offer_link(best, "Buy ↗")}</td>')
+        else:
+            buy = ('<td class="num" data-label="Today\'s price">not in stock</td>'
+                   f'<td data-label=""><a href="/models/{m}/">See prices</a></td>')
+        rows.append(
+            f'<tr><td class="pool-name"><a href="/models/{m}/">{esc(SHORT[m])}</a>'
+            f'<br><small>{MODELS[m]["hashrate_ths"]:g} TH/s · {MODELS[m]["watts"]:g} W</small></td>'
+            f'<td data-label="Stated noise"><b>{esc(db_cell)}</b><br><small>{esc(text)}</small></td>'
+            f'<td data-label="Source"><small>{esc(src)}</small></td>{buy}</tr>')
+    tbl = (f'<div class="tablewrap pool-wrap"><table class="pool-tbl"><thead><tr>'
+           f'<th>Miner</th><th>Stated noise</th><th>Source</th><th class="num">Today\'s price</th><th></th>'
+           f'</tr></thead><tbody>{"".join(rows)}</tbody></table></div>')
+    faq = [("Are these our measurements?",
+            "No. Every dB figure is what the maker or a shop states on its own page. We label the source. Rooms, distance and power mode change what you hear."),
+           ("How loud is 40 dB?",
+            "About a quiet library or a soft hum. Many people are fine with that on a desk. Under about 35 dB is usually comfortable in a bedroom; over about 50 dB is more of a garage or utility-room sound."),
+           ("Are Bitaxe Gamma boards quiet?",
+            "They're small with one little fan, so most owners find them fairly quiet, but shops don't publish a dB figure for the single-chip Gamma. We only list miners with a published number. See also the quietest miners list."),
+           ("Does a lower power mode make a miner quieter?",
+            "Usually yes. Fans spin slower when the chips run cooler. Heater miners often have a night or eco mode that trades hashrate for less noise."),
+           ("What if I need a silent room?",
+            "Pick a fanless design (Heatbit Canvas or Bitwater state no fans) or a liquid-cooled board with a published low figure, like the Gamma Hex at about 30 dB stated. Or put any miner in another room.")]
+    body = f"""<article>
+<header class="hero"><h1>How loud are home Bitcoin miners?</h1>
+<p class="lede">Noise is the number-one question when a miner will sit in a bedroom or office. Here's every miner we track that publishes a noise figure, quietest first, with today's price and a link to buy.</p>
+<p class="meta">Stated noise figures checked <time datetime="{NOISE_CHECKED}">Nov 3, 2026</time> · prices updated {fmt_time(latest["generated_at"])} · 3-minute read</p></header>
+<section aria-labelledby="h-1"><h2 id="h-1">1. The short answer</h2>
+<ul><li><strong>Want silent:</strong> fanless heaters like the <a href="/models/heatbit-canvas/">Heatbit Canvas</a> or <a href="/models/heatbit-bitwater/">Bitwater</a> (maker-stated: no fans).</li>
+<li><strong>Want a quiet desk miner:</strong> look near <strong>30–40 dB</strong> stated — for example the <a href="/models/bitforge-nano/">BitForge Nano</a> (~29 dB), <a href="/models/bitaxe-gamma-hex/">Gamma Hex</a> (~30 dB, liquid-cooled), <a href="/models/hammer-bc04/">Hammer BC04</a> (32–36 dB) or <a href="/models/avalon-nano-3s/">Avalon Nano 3S</a> (33–40 dB).</li>
+<li><strong>Room heater class:</strong> often <strong>45–60 dB</strong> stated at full power; check for a night or eco mode.</li>
+<li><strong>No published dB?</strong> We don't invent one. Open-board Bitaxe units are usually quiet in practice, but they aren't ranked here without a shop figure. See <a href="/best/quiet/">quietest miners</a> for the ranked shortlist.</li></ul></section>
+<section aria-labelledby="h-2"><h2 id="h-2">2. Noise table (stated dB)</h2>
+{tbl}
+<p class="hint">dB figures are the makers' or sellers' own numbers, not our lab measurements. Sorting uses the highest stated figure for that model (or 0 for fanless). Prices are the cheapest in-stock listing we track right now, before shipping and tax.</p></section>
+<section aria-labelledby="h-3"><h2 id="h-3">3. What the numbers mean in a room</h2>
+<ul><li><strong>~0 / fanless:</strong> no fan whir — you may still hear a faint pump or nothing at all.</li>
+<li><strong>~30 dB:</strong> a whisper; fine for most bedrooms and offices.</li>
+<li><strong>~40 dB:</strong> a quiet library; many people leave this on a desk all day.</li>
+<li><strong>~50 dB:</strong> a normal conversation; better in a living room, garage or dedicated mining spot.</li>
+<li><strong>~60 dB:</strong> a loud conversation or dishwasher; plan for a utility room or put distance and a door between you and the miner.</li></ul>
+<p>Distance matters: moving a few feet away drops what you hear a lot. So does closing a door, and so does running a lower power mode.</p></section>
+<section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
+<section><h2>Keep reading</h2><ul class="links"><li><a href="/best/quiet/">Quietest Bitcoin miners</a></li><li><a href="/compare/avalon-nano-3s-vs-hammer-bc04/">Avalon Nano 3S vs Hammer BC04</a></li><li><a href="/guides/bitaxe-power-supply/">Which power supply?</a></li><li><a href="/guides/bitcoin-mining-heat-your-home/">Mining to heat your home</a></li><li><a href="/find-my-miner/">Find my miner quiz</a></li></ul>
+<p class="hint">Some shop links are affiliate links. They never change prices or rankings.</p></section>
+</article>"""
+    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "How loud are home Bitcoin miners?", desc), faq_ld(faq)], lastmod=NOISE_CHECKED, og_type="article")
 
 
 # First-hour setup checklist (/guides/bitaxe-setup/). Facts from the open-source AxeOS firmware (ESP-Miner), checked Oct 29 2026:
@@ -4028,6 +4106,7 @@ def build_indexes():
           ("/guides/bitaxe-chips/", "Bitaxe chips compared", "BM1366 to BM1373: power per TH/s and today's prices."),
           ("/guides/bitaxe-power-supply/", "Which power supply?", "5V or 12V, plug type and size, by model."),
           ("/guides/bitaxe-monitoring-apps/", "Monitoring apps", "Five apps that watch your miner and alert you."),
+          ("/guides/bitaxe-noise/", "How loud is a home miner?", "Stated dB by model, quietest first, with buy links."),
           ("/guides/how-heater-miners-work/", "How heater miners work", "A miner that warms the room."),
           ("/where-to-buy-bitaxe/", "Where to buy a Bitaxe", "Every shop, ranked by today's price."),
           ("/how-we-track/", "How we track prices", "Where the numbers come from.")]
@@ -4080,6 +4159,7 @@ def main():
     build_guide_chips()
     build_guide_psu()
     build_guide_monitoring()
+    build_guide_noise()
     build_solo_odds()
     build_heat_calc()
     build_solo_wins()
