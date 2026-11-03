@@ -900,6 +900,13 @@
    "currency": "USD",
    "in_stock": true,
    "status": "in_stock"
+  },
+  {
+   "t": "2026-11-03T00:10:55Z",
+   "price": 229.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
   }
  ],
  "solosatoshi:bitaxe-supra": [
@@ -1536,6 +1543,13 @@
   },
   {
    "t": "2026-11-01T22:01:54Z",
+   "price": 210.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  },
+  {
+   "t": "2026-11-03T00:10:55Z",
    "price": 210.99,
    "currency": "USD",
    "in_stock": true,
@@ -2339,6 +2353,13 @@
   },
   {
    "t": "2026-11-01T22:01:54Z",
+   "price": 100.0,
+   "currency": "EUR",
+   "in_stock": true,
+   "status": "in_stock"
+  },
+  {
+   "t": "2026-11-03T00:10:55Z",
    "price": 100.0,
    "currency": "EUR",
    "in_stock": true,
@@ -3908,6 +3929,13 @@
    "currency": "USD",
    "in_stock": true,
    "status": "in_stock"
+  },
+  {
+   "t": "2026-11-03T00:10:55Z",
+   "price": 599.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
   }
  ],
  "bitcoinmerch:nerdoctaxe": [
@@ -4287,6 +4315,13 @@
    "currency": "USD",
    "in_stock": true,
    "status": "in_stock"
+  },
+  {
+   "t": "2026-11-03T00:10:55Z",
+   "price": 589.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
   }
  ],
  "bitcoinmerch:gekko-kbox-22": [
@@ -4376,6 +4411,13 @@
   },
   {
    "t": "2026-11-01T22:01:54Z",
+   "price": 899.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  },
+  {
+   "t": "2026-11-03T00:10:55Z",
    "price": 899.99,
    "currency": "USD",
    "in_stock": true,
@@ -4473,6 +4515,13 @@
    "currency": "USD",
    "in_stock": true,
    "status": "in_stock"
+  },
+  {
+   "t": "2026-11-03T00:10:55Z",
+   "price": 449.99,
+   "currency": "USD",
+   "in_stock": false,
+   "status": "out_of_stock"
   }
  ],
  "solosatoshi:bitaxe-naja-duo": [
@@ -4762,6 +4811,13 @@
   },
   {
    "t": "2026-11-01T22:01:54Z",
+   "price": 169.0,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  },
+  {
+   "t": "2026-11-03T00:10:55Z",
    "price": 169.0,
    "currency": "USD",
    "in_stock": true,
@@ -5987,6 +6043,13 @@
   },
   {
    "t": "2026-11-01T22:01:54Z",
+   "price": 449.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  },
+  {
+   "t": "2026-11-03T00:10:55Z",
    "price": 449.99,
    "currency": "USD",
    "in_stock": true,
