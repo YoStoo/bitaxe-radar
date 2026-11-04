@@ -1,6 +1,6 @@
 # Bitaxe Radar Roadmap
 
-Updated: Nov 3, 2026 (morning)
+Updated: Nov 3, 2026 (evening)
 
 ## 🎯 Goal
 
@@ -39,7 +39,7 @@ Updated: Nov 3, 2026 (morning)
    - ✅ "Buying on AliExpress or from an unknown shop" box: live Nov 2 on /where-to-buy-bitaxe/ (what to check before buying, plus today's cheapest in-stock Gamma at a shop we track).
    - ✅ Avalon Nano 3S vs Hammer BC04 compare: live Nov 2 at /compare/avalon-nano-3s-vs-hammer-bc04/ (same stated ~6 TH/s desk class; Nano enclosed up to 140 W vs BC04 open-frame at ~96 W, with live prices).
    - ✅ Noise table: live Nov 3 at /guides/bitaxe-noise/ (stated dB by model from maker/seller sources only, quietest first, with today's price and buy links).
-   - Still open from the Reddit list: optionally a "several miners on one power supply" section for the PSU guide.
+   - ✅ Several miners on one power supply: live Nov 3 as section 4 on /guides/bitaxe-power-supply/ (same-voltage-only rule, 80% continuous headroom with a worked NerdOCTaxe + NerdQaxe++ example, wall vs dashboard watts, power-strip note).
    - Next: watch Reddit for the next owner question (weekly scan on Mondays).
 
 ## 💰 Money
@@ -77,6 +77,8 @@ Later:
 - PO Box address before the first newsletter email goes out.
 
 ## ✅ Done
+
+- Nov 3 (evening): Several-miners-on-one-PSU section on /guides/bitaxe-power-supply/: same-voltage-only rule, keep 24/7 load under about 80% of continuous rating with a worked example (NerdOCTaxe ≈160 W + NerdQaxe++ ≈80 W = 240 W → want ≥300 W continuous; a 350 W unit has ≈280 W headroom), never feed a 5V Gamma from a 12V rail, wall vs dashboard watts (wall often 15–20% higher), and power-strip continuous AC load. Two new FAQ answers. Watts from our model data. Why: optional Reddit owner question from the Nov 2 scan — people stacking boards on one Mean Well.
 
 - Nov 3 (morning): Noise table (/guides/bitaxe-noise/): every tracked miner with a published noise figure, quietest first (fanless Heatbit Canvas/Bitwater through ~60 dB StealthMiner). Each row shows the stated dB text, the source label (maker or shop page), today's cheapest in-stock price and a buy button. Plain guide to what 30 / 40 / 50 / 60 dB feels like in a room. Why: "how loud?" is Reddit owner question #10, and quiet buyers are close to a purchase — the table points them at affiliate buy links. Linked from Guides, /best/quiet/, monitoring apps and llms.txt.
 - Nov 2 (evening): Avalon Nano 3S vs Hammer BC04 compare (/compare/avalon-nano-3s-vs-hammer-bc04/): same stated ~6 TH/s desk class, different power and design. Nano 3S is Canaan's enclosed desk miner (up to 140 W, also used as a mini heater); Hammer BC04 states the same hashrate at ~96 W in an open-frame style. Live cheapest in-stock prices at build ($219 Solo Satoshi vs $215 Altair), efficiency (~23.3 vs ~16.0 J/TH), yearly power at $0.15/kWh, and buy links. Why: #1 idea from the Nov 2 Reddit scan — buyers can get both at about the same price and were weighing enclosed plug-and-play vs open-frame efficiency.
@@ -142,13 +144,13 @@ Later:
 - Oct 24: Heat guide (/guides/bitcoin-mining-heat-your-home/): miner vs space heater vs heat pump with live numbers. Each heater miner shows its power cost, what mining pays back, and the power price below which it beats a heat pump (DOE: heat pumps use about 50% less electricity). Also hot-water heating (Heatbit Bitwater) and winter-only tips.
 - Oct 21: Room heat calculator (/heat-calculator/): type your room size, see how much heat it needs and which miners can heat it, with today's prices.
 
-## 📊 Numbers (Nov 2, evening)
+## 📊 Numbers (Nov 3, evening)
 
 - Revenue: $0 (no commission emails yet)
 - Subscribers: 1 (Resend contact count in the Nov 1 alert run; it's your own test)
 - Miners tracked: 32
 - Sellers tracked: 11
-- Listings checked: 59
+- Listings checked: 58
 - Paying affiliate programs: 3 (Power Mining, Bitaxe.de, Solo Satoshi)
-- Tests: 122 passing
-- Pages on the site: 92 in the sitemap
+- Tests: 128 passing
+- Pages on the site: 93 in the sitemap
