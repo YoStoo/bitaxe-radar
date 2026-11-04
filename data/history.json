@@ -998,6 +998,13 @@
    "currency": "USD",
    "in_stock": true,
    "status": "in_stock"
+  },
+  {
+   "t": "2026-11-04T19:45:25Z",
+   "price": 229.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
   }
  ],
  "solosatoshi:bitaxe-supra": [
@@ -1704,6 +1711,13 @@
   },
   {
    "t": "2026-11-03T23:23:25Z",
+   "price": 210.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  },
+  {
+   "t": "2026-11-04T19:45:25Z",
    "price": 210.99,
    "currency": "USD",
    "in_stock": true,
@@ -2595,6 +2609,13 @@
    "currency": "EUR",
    "in_stock": true,
    "status": "in_stock"
+  },
+  {
+   "t": "2026-11-04T19:45:25Z",
+   "price": 100.0,
+   "currency": "EUR",
+   "in_stock": true,
+   "status": "in_stock"
   }
  ],
  "powermining:nerdaxe-gamma": [
@@ -3311,6 +3332,13 @@
   {
    "t": "2026-11-04T13:42:44Z",
    "price": 249.0,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  },
+  {
+   "t": "2026-11-04T19:45:25Z",
+   "price": 239.0,
    "currency": "USD",
    "in_stock": true,
    "status": "in_stock"
@@ -4384,6 +4412,13 @@
    "currency": "USD",
    "in_stock": true,
    "status": "in_stock"
+  },
+  {
+   "t": "2026-11-04T19:45:25Z",
+   "price": 599.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
   }
  ],
  "bitcoinmerch:nerdoctaxe": [
@@ -4819,6 +4854,13 @@
    "currency": "USD",
    "in_stock": true,
    "status": "in_stock"
+  },
+  {
+   "t": "2026-11-04T19:45:25Z",
+   "price": 589.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
   }
  ],
  "bitcoinmerch:gekko-kbox-22": [
@@ -4926,6 +4968,13 @@
    "currency": "USD",
    "in_stock": true,
    "status": "in_stock"
+  },
+  {
+   "t": "2026-11-04T19:45:25Z",
+   "price": 899.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
   }
  ],
  "solosatoshi:bitaxe-gamma-hex": [
@@ -5029,6 +5078,13 @@
   },
   {
    "t": "2026-11-03T23:23:25Z",
+   "price": 449.99,
+   "currency": "USD",
+   "in_stock": false,
+   "status": "out_of_stock"
+  },
+  {
+   "t": "2026-11-04T19:45:25Z",
    "price": 449.99,
    "currency": "USD",
    "in_stock": false,
@@ -5357,6 +5413,13 @@
   },
   {
    "t": "2026-11-03T23:23:25Z",
+   "price": 169.0,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  },
+  {
+   "t": "2026-11-04T19:45:25Z",
    "price": 169.0,
    "currency": "USD",
    "in_stock": true,
@@ -6424,6 +6487,13 @@
    "currency": "USD",
    "in_stock": false,
    "status": "preorder"
+  },
+  {
+   "t": "2026-11-04T19:45:25Z",
+   "price": 949.0,
+   "currency": "USD",
+   "in_stock": false,
+   "status": "preorder"
   }
  ],
  "bitcoinmerch:avalon-nano-3s": [
@@ -6778,6 +6848,13 @@
   },
   {
    "t": "2026-11-03T23:23:25Z",
+   "price": 449.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  },
+  {
+   "t": "2026-11-04T19:45:25Z",
    "price": 449.99,
    "currency": "USD",
    "in_stock": true,
