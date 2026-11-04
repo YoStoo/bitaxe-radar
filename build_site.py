@@ -225,7 +225,7 @@ SHORT = {"bitaxe-supra": "Bitaxe Supra", "bitaxe-ultra": "Bitaxe Ultra", "bitaxe
          "heatbit-maxi": "Heatbit Maxi", "heatbit-canvas": "Heatbit Canvas", "braiins-bmm-101": "Braiins Mini Miner", "hammer-bc04": "Hammer BC04",
          "bitaxe-gamma-hex": "Bitaxe Gamma Hex", "bitaxe-naja-duo": "Bitaxe Naja Duo", "nerdoctaxe": "NerdOCTaxe Gamma", "bitforge-nano": "BitForge Nano",
          "heatbit-bitair": "Heatbit Bitair", "futurebit-apollo-iii": "FutureBit Apollo III", "hammer-thor-p2": "Hammer Thor P2", "hammer-bc08": "Hammer BC08",
-         "gekko-kbox-22": "GekkoScience KBox 22", "dcentral-stealthminer": "D-Central StealthMiner", "bitcube": "Bitcube", "heatbit-bitwater": "Heatbit Bitwater", "nmqaxe-nexus": "NMQAxe++ Nexus", "nerdqx": "NerdQX", "bitaxe-702": "Bitaxe 702", "nerdaxe-gaia-copper-pro": "Gaia Copper Pro"}
+         "gekko-kbox-22": "GekkoScience KBox 22", "dcentral-stealthminer": "D-Central StealthMiner", "bitcube": "Bitcube", "heatbit-bitwater": "Heatbit Bitwater", "nmqaxe-nexus": "NMQAxe++ Nexus", "nerdqx": "NerdQX", "bitaxe-702": "Bitaxe 702", "nerdaxe-gaia-copper-pro": "Gaia Copper Pro", "gekko-kbeast-50": "GekkoScience KBeast 50"}
 NOINDEX_MODELS = {"bitaxe-supra", "bitaxe-ultra"}   # older generations: pages exist for completeness but stay out of the index/sitemap
 
 MODEL_COPY = {
@@ -432,6 +432,14 @@ NEW_COPY = {   # added 2026-10-21 (docs/MINER_CATALOG.md). Stock settings only; 
                "A 12 V / 6 A power supply and a stand are included, per the listing.",
                "Compare it with the regular Nerdaxe Gaia: the Copper Pro trades a little efficiency for about 15% more hashrate.",
                "The hashrate and power figures are the seller's, not our measurements."]),
+    "gekko-kbeast-50": dict(
+        intro="The GekkoScience KBeast 50 is a plug-and-mine room heater miner built on GekkoScience's KBox platform, with an integrated 800 W power supply. Bitcoin Merch states up to 50 TH/s at 800 W at the wall, with efficiency down to about 13 J/TH when tuned, and High/Medium/Low presets you can edit.",
+        who="Someone heating a room this winter who wants roughly Avalon Mini 3 / Heatbit Maxi class hashrate in one enclosed box, and is fine waiting for the shop's ship date.",
+        check=["Bitcoin Merch's listing says it ships in December 2026, so check the stock badge before you pay.",
+               "Right now only Bitcoin Merch sells it among the shops we track.",
+               "The 800 W PSU is built in (120 V or 240 V). No external power supply to buy.",
+               "At 800 W it heats like a small space heater. Use a dedicated outlet; don't share a power strip with other big loads.",
+               "Hashrate and heat depend on the power mode you pick. The figures above are the seller's, not our measurements."]),
 }
 MODEL_COPY.update(NEW_COPY)
 
@@ -597,8 +605,8 @@ SOLO_SET = ["bitaxe-gamma", "bitaxe-gamma-duo", "bitaxe-gt-801", "nerdaxe-gamma"
             "braiins-bmm-101", "avalon-nano-3s", "hammer-bc04", "bitaxe-supra", "bitaxe-ultra",
             "bitaxe-naja-duo", "bitforge-nano", "heatbit-bitair", "bitaxe-gamma-hex", "nerdoctaxe", "hammer-thor-p2", "hammer-bc08", "futurebit-apollo-iii", "bitcube", "nmqaxe-nexus", "nerdqx", "bitaxe-702", "nerdaxe-gaia-copper-pro"]
 POOL_SET = ["avalon-nano-3s", "hammer-bc04", "heatbit-canvas", "heatbit-trio", "avalon-mini-3", "heatbit-maxi", "avalon-q",
-            "bitaxe-gamma-hex", "nerdoctaxe", "hammer-thor-p2", "hammer-bc08", "futurebit-apollo-iii", "gekko-kbox-22", "dcentral-stealthminer", "heatbit-bitwater", "nmqaxe-nexus"]
-HEAT_SET = ["avalon-nano-3s", "heatbit-canvas", "heatbit-trio", "avalon-mini-3", "heatbit-maxi", "avalon-q", "gekko-kbox-22", "dcentral-stealthminer"]
+            "bitaxe-gamma-hex", "nerdoctaxe", "hammer-thor-p2", "hammer-bc08", "futurebit-apollo-iii", "gekko-kbox-22", "gekko-kbeast-50", "dcentral-stealthminer", "heatbit-bitwater", "nmqaxe-nexus"]
+HEAT_SET = ["avalon-nano-3s", "heatbit-canvas", "heatbit-trio", "avalon-mini-3", "heatbit-maxi", "avalon-q", "gekko-kbox-22", "gekko-kbeast-50", "dcentral-stealthminer"]
 CATS = [  # key, path, nav/tag label, h1, set, photo for the browse tile
     ("solo", "/solo-miners/", "Solo", "Best for solo mining", SOLO_SET, "bitaxe-gamma"),
     ("pool", "/pool-miners/", "Pool", "Best for pool mining", POOL_SET, "avalon-q"),
@@ -1667,7 +1675,7 @@ def build_black_friday():
 # ---------------------------------------------------------------------------------------------
 # HEATER & HOME MINERS hub + plain-language guides
 # ---------------------------------------------------------------------------------------------
-HEATER_GROUP = ["avalon-mini-3", "avalon-q", "heatbit-trio", "heatbit-maxi", "heatbit-canvas", "gekko-kbox-22", "dcentral-stealthminer"]
+HEATER_GROUP = ["avalon-mini-3", "avalon-q", "heatbit-trio", "heatbit-maxi", "heatbit-canvas", "gekko-kbox-22", "gekko-kbeast-50", "dcentral-stealthminer"]
 DESK_GROUP = ["avalon-nano-3s", "hammer-bc04", "braiins-bmm-101", "heatbit-bitair", "bitcube", "futurebit-apollo-iii", "hammer-thor-p2", "hammer-bc08", "nmqaxe-nexus"]
 GUIDE_UPDATED = "2026-10-21"
 NETWORK_EH_SEEN = "about 1,050 EH/s"       # mempool.space /api/v1/mining/hashrate/3d on 2026-10-21 (see docs/HOME_MINING_HUB_PLAN.md)
@@ -1983,6 +1991,7 @@ GIFT_WHY = {   # gift-friendly picks; each lands in a budget group by its live i
     "nerdoctaxe": "About 9.6 TH/s at 160 W. The big open-source NerdQaxe-family board.",
     "dcentral-stealthminer": "A room heater that mines: about 860 W through quiet Noctua fans on a normal 120 V outlet. Refurbished, ships from Canada.",
     "avalon-q": "The big one: about 90 TH/s and up to about 1,674 W of heat for a garage or basement this winter.",
+    "gekko-kbeast-50": "About 50 TH/s at 800 W in one enclosed heater box, with the power supply built in. A high-ticket winter gift if the shop's ship date works.",
 }
 GIFT_BANDS = [("under-100", "Under $100", 0, 100), ("100-300", "$100 to $300", 100, 300), ("300-up", "$300 and up", 300, 10 ** 9)]
 
@@ -2301,7 +2310,7 @@ def build_guide_worth():
     desc = "Is a home Bitcoin miner worth it? It depends on your power price. Plain answer with live break-even prices, the solo lottery and the heat offset."
     if not (NET and NET_OK):
         return
-    ex = [m for m in ("bitaxe-gamma", "nerdqaxe-pp", "avalon-nano-3s", "hammer-thor-p2", "gekko-kbox-22", "avalon-mini-3", "avalon-q") if m in TRACKED]
+    ex = [m for m in ("bitaxe-gamma", "nerdqaxe-pp", "avalon-nano-3s", "hammer-thor-p2", "gekko-kbox-22", "gekko-kbeast-50", "avalon-mini-3", "avalon-q") if m in TRACKED]
     rows = "".join(f'<tr><td><a href="/models/{m}/">{esc(SHORT[m])}</a></td><td class="num">{E.fmt_usd(earn(m)["pool"]["usd_month_shown"])}</td>'
                    f'<td class="num" data-calc="power"{calc_attrs(m)}>{E.fmt_usd(earn(m)["power"])}</td>'
                    f'<td class="num net {net_cls(m)}" data-calc="netnum"{calc_attrs(m)}>{E.net_short(MODELS[m]["hashrate_ths"], mine_watts(m), NET)}</td>'

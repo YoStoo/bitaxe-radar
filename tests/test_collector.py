@@ -15,7 +15,9 @@ class CollectorRules(unittest.TestCase):
               ("futurebit-apollo-iii", "Apollo III - Standard Version - Miner Only - Ships in 4-6 Weeks"),
               ("bitaxe-gamma-hex", "Bitaxe Gamma Hex Bitcoin Solo Miner (1300 Model)"),
               ("nmqaxe-nexus", "NMQAxe++ Nexus — Powerful Dual BM1373 Bitcoin Miner"),
-              ("nerdqx", "Bitcoin Merch® - NerdQX 8TH/s Home Miner w/ Power Supply")]
+              ("nerdqx", "Bitcoin Merch® - NerdQX 8TH/s Home Miner w/ Power Supply"),
+              ("gekko-kbeast-50", "Bitcoin Merch® - GekkoScience KBeast 50+TH/s Bitcoin Miner & Heater"),
+              ("gekko-kbox-22", "Bitcoin Merch® - GekkoScience KBox 22TH/s Bitcoin Miner & Heater")]
         bad = [("bitforge-nano", "BitForge Nano Bitcoin Solo Miner (Ghost Edition)"),
                ("nerdoctaxe", "Bitcoin Merch® - NerdOCTaxe Stand"),
                ("nerdoctaxe", "Bitcoin Merch® - NerdOCTaxe Hydro 12TH/s BTC Miner"),
@@ -24,7 +26,9 @@ class CollectorRules(unittest.TestCase):
                ("bitaxe-gamma-hex", "Bitaxe Hex Heatsink"),
                ("hammer-bc08", "Hammer Miner BC08 Hydro 12TH/s Bitcoin Miner"),
                ("bitaxe-naja-duo", "Naja Duo Stand Free .STL Download"),
-               ("nmqaxe-nexus", "NMQAxe++ Rev. 6.1 — NMMiner Powerful ASIC Crypto Miner 6T")]
+               ("nmqaxe-nexus", "NMQAxe++ Rev. 6.1 — NMMiner Powerful ASIC Crypto Miner 6T"),
+               ("gekko-kbox-22", "Bitcoin Merch® - GekkoScience KBeast 50+TH/s Bitcoin Miner & Heater"),
+               ("gekko-kbeast-50", "Bitcoin Merch® - GekkoScience KBox 22TH/s Bitcoin Miner & Heater")]
         for m, t in ok:
             self.assertTrue(C.title_ok(m, t), (m, t))
         for m, t in bad:
@@ -37,6 +41,8 @@ class CollectorRules(unittest.TestCase):
         self.assertNotIn("bitaxe-touch", C.MODELS)                             # sellers list different hardware under one name
         self.assertEqual(C.MODELS["nmqaxe-nexus"]["hashrate_ths"], 8.5)
         self.assertEqual(C.MODELS["nerdqx"]["hashrate_ths"], 8.1)        # Normal mode; ~11 TH/s is Turbo
+        self.assertEqual(C.MODELS["gekko-kbeast-50"]["hashrate_ths"], 50)
+        self.assertEqual(C.MODELS["gekko-kbeast-50"]["watts"], 800)
         for m in ("dtv", "futurebit", "nmminer"):
             self.assertIn(m, C.SELLERS)
             self.assertIn(m, C.ADAPTERS)
@@ -45,6 +51,8 @@ class CollectorRules(unittest.TestCase):
         self.assertEqual(C.ship_wait("Apollo III - Standard Version - Miner Only - Ships in 4-6 Weeks")[0], "backorder")
         self.assertEqual(C.ship_wait("GekkoScience KBox 22TH Quiet Bitcoin Miner Pre-order: Shipping within 6-10 weeks")[0], "preorder")
         self.assertIsNone(C.ship_wait("FutureBit Apollo 200W Power Supply - Ships in 2-3 Days"))
+        long = ("Meet the KBeast. " * 40) + "Ships in December 2026"
+        self.assertEqual(C.ship_wait(long), ("preorder", "Ships in December 2026 (per the shop)"))
 
 
 if __name__ == "__main__":

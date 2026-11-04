@@ -121,7 +121,7 @@ Internal research doc. This doc doesn't change any site code.
 | GekkoScience Terminus A2X | GekkoScience | 7-8 TH/s | 100-130 W | $399-500 | solo | altairtech.io $399, bitcoinmerch.com $499.99 | ❌ | HTML/JSON | |
 | GekkoScience KBuddy | GekkoScience | 15-18 TH/s | 200-300 W | $599.99 | pool | bitcoinmerch.com | ❌ | JSON | 120/240 V |
 | GekkoScience KBox 22 | GekkoScience | 22 TH/s | 330 W | $849-900 | pool/heater | altairtech.io $849, bitcoinmerch.com $899.99 | ❌ | HTML/JSON | Sold as a "Miner & Heater" |
-| GekkoScience KBeast 50 | GekkoScience | 50+ TH/s | 800 W | $1,099.99 | heater | bitcoinmerch.com | ❌ | JSON | 120/240 V |
+| GekkoScience KBeast 50 | GekkoScience | 50+ TH/s | 800 W | $1,099.99 | heater | bitcoinmerch.com | ✅ | JSON | 120/240 V |
 | GekkoScience Mein Coffee | GekkoScience | ? | ? | $249 | ? | altairtech.io | ❌ | HTML | Specs not found on the page |
 | Nexus S1-1 (BM1373) | Nexus | 6 TH/s | 95 W | $324.99 | solo | bitcoinmerch.com | ❌ | JSON | ⚠ The brand site is a parking page. |
 | Nexus S1-2 | Nexus | 10 TH/s | ? | $599.99 | pool | bitcoinmerch.com | ❌ | JSON | ⚠ Same as above |

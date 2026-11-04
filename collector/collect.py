@@ -95,6 +95,10 @@ MODELS = {
                          "note": "Seller-stated ~4.2 TH/s at ~90 W (about 21.4 J/TH), older BM1368 chip generation"},
     "nerdaxe-gaia-copper-pro": {"name": "Nerdaxe Gaia Copper Pro", "category": "board", "chip": "BM1373", "hashrate_ths": 3.0, "watts": 33,
                          "note": "Seller-stated ~3 TH/s at ~33 W (about 11 J/TH) from the factory, Gaia board with an AXP60 copper cooler"},
+    # added 2026-11-04: GekkoScience room heater miner (same maker as KBox 22), tracked at Bitcoin Merch
+    "gekko-kbeast-50":  {"name": "GekkoScience KBeast 50", "category": "home", "kind": "Room heater miner", "maker": "GekkoScience",
+                         "hashrate_ths": 50, "watts": 800,
+                         "note": "Seller-stated up to 50 TH/s at 800 W at the wall (Bitcoin Merch); efficiency down to ~13 J/TH tuned; integrated 800 W PSU"},
 }
 # hashrate_ths / watts above are typical VENDOR-STATED figures used only for the cost estimate.
 # They are approximate and must be labelled as such on the site.
@@ -142,6 +146,7 @@ BITCOINMERCH = {  # Shopify handle
     "gekko-kbox-22":    "bitcoin-merch®-gekkoscience-kbox-22th-s-bitcoin-miner-heater",
     "avalon-nano-3s":   "bitcoin-merch-avalon-nano-3s-bitcoin-miner-6-th-s",
     "nerdqx":           "bitcoin-merch®-nerdqx-8th-s-home-miner-w-power-supply",
+    "gekko-kbeast-50":  "bitcoin-merch®-gekkoscience-kbeast-50-th-s-bitcoin-miner-heater",
 }
 SOLOSATOSHI = {  # WooCommerce slug
     "bitaxe-supra":     "bitaxe-supra",
@@ -205,11 +210,12 @@ TITLE_MUST = {
     "bitaxe-gamma-hex": ["hex", "1300"], "bitaxe-naja-duo": ["naja duo"], "nerdoctaxe": ["nerdoctaxe"],
     "bitforge-nano": ["bitforge nano"], "heatbit-bitair": ["bitair"], "heatbit-bitwater": ["bitwater"], "futurebit-apollo-iii": ["apollo iii"],
     "hammer-thor-p2": ["thor p2"], "hammer-bc08": ["bc08"], "gekko-kbox-22": ["kbox"], "dcentral-stealthminer": ["stealthminer"],
-    "nmqaxe-nexus": ["nmqaxe", "nexus"], "nerdqx": ["nerdqx"],
+    "nmqaxe-nexus": ["nmqaxe", "nexus"], "nerdqx": ["nerdqx"], "gekko-kbeast-50": ["kbeast"],
 }
 TITLE_NOT = {  # words that mean a different product (accessory, other edition)
     "bitforge-nano": ["ghost"], "nerdoctaxe": ["stand", "screen", "fan", "heatsink", "hydro"], "bitaxe-naja-duo": ["stand", ".stl"],
     "hammer-bc08": ["hydro"], "futurebit-apollo-iii": ["full node", "apollo ii "], "heatbit-bitair": ["filter"],
+    "gekko-kbox-22": ["kbeast"], "gekko-kbeast-50": ["kbox"],
 }
 
 
@@ -219,14 +225,19 @@ def title_ok(model, title):
 
 
 def ship_wait(text):
-    """'Ships in 4-6 weeks' / 'Pre-order' wording near the top of a listing -> (status, note). None if it reads as ready to ship."""
-    t = re.sub(r"\s+", " ", text or "")[:400]
+    """'Ships in 4-6 weeks' / 'Pre-order' / 'Ships in December 2026' wording -> (status, note). None if it reads as ready to ship."""
+    full = re.sub(r"\s+", " ", text or "")
+    t = full[:400]
     if re.search(r"pre-?order", t, re.I):
         m = re.search(r"(?:shipping|ships) (?:with)?in \d+\s*[-–]\s*\d+ weeks", t, re.I)
         return "preorder", (m.group(0).capitalize() if m else "Pre-order")
     m = re.search(r"ships in (\d+)\s*[-–]\s*(\d+) weeks", t, re.I)
     if m:
         return "backorder", f"Ships in {m.group(1)}-{m.group(2)} weeks (per the shop)"
+    # Month+year ship date can sit at the end of a long listing (e.g. KBeast "Ships in December 2026")
+    m = re.search(r"ships in (january|february|march|april|may|june|july|august|september|october|november|december)\s+(20\d{2})", full, re.I)
+    if m:
+        return "preorder", f"Ships in {m.group(1).capitalize()} {m.group(2)} (per the shop)"
     return None
 
 

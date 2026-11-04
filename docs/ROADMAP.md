@@ -1,6 +1,6 @@
 # Bitaxe Radar Roadmap
 
-Updated: Nov 3, 2026 (evening)
+Updated: Nov 4, 2026 (morning)
 
 ## 🎯 Goal
 
@@ -10,8 +10,8 @@ Updated: Nov 3, 2026 (evening)
 
 ## 🔨 Now
 
-- Add more home miners: 79 found, 32 on the site so far.
-- Bitaxe 702 added Oct 29. Avalon Nano 3 skipped for now (replaced by the 3S and sold out where we looked).
+- Add more home miners: 79 found, 33 on the site so far.
+- GekkoScience KBeast 50 added Nov 4. Avalon Nano 3 skipped for now (replaced by the 3S and sold out where we looked).
 
 ## ⏭️ Next up (in order)
 
@@ -77,6 +77,8 @@ Later:
 - PO Box address before the first newsletter email goes out.
 
 ## ✅ Done
+
+- Nov 4 (morning): GekkoScience KBeast 50 added (/models/gekko-kbeast-50/). Room heater miner from the same maker as the KBox 22: seller-stated up to 50 TH/s at 800 W at the wall (~13 J/TH tuned), integrated 800 W PSU, plug and mine. Tracked at Bitcoin Merch only among shops we scrape ($1,099.99; listing says ships in December 2026, so we show it as pre-order). On heater / pool / Black Friday heater group and the gift guide $300+ bucket. Why: catalog #14, winter / Black Friday heater demand, high ticket.
 
 - Nov 3 (evening): Several-miners-on-one-PSU section on /guides/bitaxe-power-supply/: same-voltage-only rule, keep 24/7 load under about 80% of continuous rating with a worked example (NerdOCTaxe ≈160 W + NerdQaxe++ ≈80 W = 240 W → want ≥300 W continuous; a 350 W unit has ≈280 W headroom), never feed a 5V Gamma from a 12V rail, wall vs dashboard watts (wall often 15–20% higher), and power-strip continuous AC load. Two new FAQ answers. Watts from our model data. Why: optional Reddit owner question from the Nov 2 scan — people stacking boards on one Mean Well.
 
@@ -144,13 +146,13 @@ Later:
 - Oct 24: Heat guide (/guides/bitcoin-mining-heat-your-home/): miner vs space heater vs heat pump with live numbers. Each heater miner shows its power cost, what mining pays back, and the power price below which it beats a heat pump (DOE: heat pumps use about 50% less electricity). Also hot-water heating (Heatbit Bitwater) and winter-only tips.
 - Oct 21: Room heat calculator (/heat-calculator/): type your room size, see how much heat it needs and which miners can heat it, with today's prices.
 
-## 📊 Numbers (Nov 3, evening)
+## 📊 Numbers (Nov 4, morning)
 
 - Revenue: $0 (no commission emails yet)
 - Subscribers: 1 (Resend contact count in the Nov 1 alert run; it's your own test)
-- Miners tracked: 32
+- Miners tracked: 33
 - Sellers tracked: 11
-- Listings checked: 58
+- Listings checked: 59
 - Paying affiliate programs: 3 (Power Mining, Bitaxe.de, Solo Satoshi)
 - Tests: 128 passing
-- Pages on the site: 93 in the sitemap
+- Pages on the site: 94 in the sitemap
