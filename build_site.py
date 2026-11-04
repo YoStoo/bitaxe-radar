@@ -2919,7 +2919,8 @@ def build_guide_psu():
     path = PSU_GUIDE_PATH
     trail = [("Home", "/"), ("Guides", "/guides/"), ("Power supplies", path)]
     title = "What power supply does a Bitaxe need? 5V vs 12V, by model | Bitaxe Radar"
-    desc = "Which voltage and plug each Bitaxe, NerdQaxe and Avalon Nano needs, how big a power supply to get, and where to buy one with the supply in the box."
+    desc = ("5V vs 12V by Bitaxe model, supply size, sharing one brick across several miners, "
+            "and cheapest listings with the supply in the box.")
     rows, buy = [], []
     for m in psu_models():
         v, conn, supply, note = PSU_SPECS[m]
@@ -2939,34 +2940,59 @@ def build_guide_psu():
                 f'<th>Supply the seller offers</th></tr></thead><tbody>{"".join(rows)}</tbody></table></div>')
     buy_tbl = (f'<div class="tablewrap pool-wrap"><table class="pool-tbl"><thead><tr><th>Miner</th><th class="num">Cheapest with a supply in the box</th><th></th></tr></thead>'
                f'<tbody>{"".join(buy)}</tbody></table></div>')
+    # Live stated watts for the multi-miner worked example (same numbers as the model pages).
+    w_oct = MODELS["nerdoctaxe"]["watts"]
+    w_nq = MODELS["nerdqaxe-pp"]["watts"]
+    w_g = MODELS["bitaxe-gamma"]["watts"]
+    w_hex = MODELS["bitaxe-gamma-hex"]["watts"]
+    combo = w_oct + w_nq
+    need80 = int(round(combo / 0.8))
+    headroom350 = int(round(350 * 0.8))
+    multi = f"""<section aria-labelledby="h-4"><h2 id="h-4">4. Several miners on one power supply</h2>
+<p>People often run two or more boards from one big 12V supply (a Mean Well-style brick is a common pick). That can work, but only if every miner on that supply uses the <strong>same voltage</strong>, and the total load stays well under the supply's continuous rating. Guidance below is general (Nov 3, 2026); always follow the maker's instructions for your boards and supply.</p>
+<ul>
+<li><strong>Same voltage only.</strong> A 12V supply can feed 12V boards (for example a <a href="/models/nerdoctaxe/">{esc(SHORT["nerdoctaxe"])}</a>, a <a href="/models/nerdqaxe-pp/">{esc(SHORT["nerdqaxe-pp"])}</a> or a <a href="/models/bitaxe-gamma-hex/">{esc(SHORT["bitaxe-gamma-hex"])}</a>). Never feed a 5V board like the <a href="/models/bitaxe-gamma/">{esc(SHORT["bitaxe-gamma"])}</a> from a 12V rail — wrong voltage can damage the board. Give each voltage its own supply.</li>
+<li><strong>Keep 24/7 load under about 80% of continuous rating.</strong> Example with our stated watts: {esc(SHORT["nerdoctaxe"])} ≈{w_oct:g} W plus {esc(SHORT["nerdqaxe-pp"])} ≈{w_nq:g} W is about <strong>{combo:g} W</strong>. At the 80% rule you want a supply rated about <strong>{need80:g} W</strong> continuous or more. A 350 W unit has about <strong>{headroom350:g} W</strong> of headroom at 80%, so those two 12V boards fit. Adding another ≈{w_hex:g} W 12V board (Gamma Hex) would push you over that headroom.</li>
+<li><strong>A 5V Gamma on that 12V brick is the wrong idea anyway.</strong> Even if {combo:g} W + ≈{w_g:g} W (Gamma) still looks under {headroom350:g} W on paper, the Gamma needs its own 5V supply — different voltage rail, separate brick.</li>
+<li><strong>Wall watts vs dashboard watts.</strong> The number on the miner dashboard is usually the board's DC draw. A wall (AC) meter is often about 15–20% higher because the supply itself wastes some power as heat. Size the supply from the higher figure if you measured at the wall, or add that margin if you only have the dashboard number.</li>
+<li><strong>Power strips are an AC limit too.</strong> If several supplies plug into one strip, check the strip's <em>continuous</em> load rating (not only the surge number) and keep the total wall draw under that for long runs.</li>
+</ul>
+<p class="hint">Stated watts above match our model pages (Gamma ≈{w_g:g} W, NerdQaxe++ ≈{w_nq:g} W, NerdOCTaxe ≈{w_oct:g} W, Gamma Hex ≈{w_hex:g} W). Overclocking draws more — leave extra headroom.</p></section>"""
     faq = [("Can I use a phone charger for my Bitaxe Gamma?",
             "No. The Gamma needs a steady 5V supply with a 5.5 × 2.1 mm barrel plug and about 4 A or more. Phone chargers don't have that plug and most can't deliver that current for hours."),
            ("Can I plug a 12V supply into a 5V Bitaxe?",
             "No. 5V boards like the Gamma, Gamma Duo and Nerdaxe Gamma can be damaged by 12V. Boards with an XT30 plug (GT 801, Naja Duo, NerdQaxe++) need 12V, and a 5V supply won't run them."),
+           ("Can several miners share one power supply?",
+            f"Yes, if they all use the same voltage and the combined 24/7 load stays under about 80% of the supply's continuous rating. Example: a NerdOCTaxe (≈{w_oct:g} W) plus a NerdQaxe++ (≈{w_nq:g} W) is about {combo:g} W, so you want roughly a {need80:g} W continuous supply or bigger. Never mix 5V and 12V boards on one rail."),
+           ("What does the 80% rule mean for a 350 W supply?",
+            f"Plan to run at most about {headroom350:g} W continuous on a 350 W unit (80% of 350). That leaves room for heat and small spikes. Two 12V boards at ≈{combo:g} W fit; adding more 12V load or a 5V Gamma on that same brick does not."),
            ("How big a power supply should I get?",
-            "Pick one rated well above what the miner draws. A simple rule: at least a quarter more than the stated watts, and more if you plan to overclock."),
+            "Pick one rated well above what the miner draws. A simple rule: at least a quarter more than the stated watts, and more if you plan to overclock. For several miners, size from the combined watts and keep about 20% spare (the 80% rule)."),
            ("Do all shops include the power supply?",
             "No. Some sell the miner alone and the supply as an add-on. The second table only counts listings that say the supply is in the box."),
            ("Why does overclocking need a bigger supply?",
             "Overclocking raises the power the miner draws. If the supply runs near its limit for hours it gets hot and can shut off or fail.")]
     body = f"""<article>
 <header class="hero"><h1>What power supply does a Bitaxe need?</h1>
-<p class="lede">Small Bitaxe boards run on 5 volts. Bigger ones, like the GT, Naja Duo and NerdQaxe++, run on 12 volts and use a different plug. Using the wrong supply can damage the board, so here's what each miner needs and where to buy one with the right supply in the box.</p>
-<p class="meta">Prices updated {fmt_time(latest["generated_at"])} · 3-minute read</p></header>
+<p class="lede">Small Bitaxe boards run on 5 volts. Bigger ones, like the GT, Naja Duo and NerdQaxe++, run on 12 volts and use a different plug. Using the wrong supply can damage the board, so here's what each miner needs, how to size a supply for one board or several on the same rail, and where to buy one with the right supply in the box.</p>
+<p class="meta">Prices updated {fmt_time(latest["generated_at"])} · 4-minute read</p></header>
 <section aria-labelledby="h-1"><h2 id="h-1">1. The short answer</h2>
 <ul><li><strong>Bitaxe Gamma, Gamma Duo and Nerdaxe Gamma: 5V</strong> through a round 5.5 × 2.1 mm barrel plug.</li>
 <li><strong>Bitaxe GT 801, Naja Duo and NerdQaxe++: 12V</strong> through a yellow XT30 plug. Never use a 5V Gamma supply on these, or a 12V supply on a 5V board.</li>
 <li><strong>Get a supply rated above what the miner draws.</strong> Example: a Gamma draws about 20 W. At 5V that's about 4 A, so a 6 A (30 W) supply has room to spare.</li>
+<li><strong>Several miners on one supply:</strong> same voltage only, and keep the combined 24/7 load under about 80% of the continuous rating (see section 4).</li>
 <li><strong>Easiest option for a gift:</strong> buy a listing that includes the supply (see section 3).</li></ul></section>
 <section aria-labelledby="h-2"><h2 id="h-2">2. Which supply each miner needs</h2>{spec_tbl}
 <p class="hint">Input, plug and supply details are from Solo Satoshi's product pages, checked Nov 1, 2026. Stated power is the seller's stock figure; overclocking draws more.</p></section>
 <section aria-labelledby="h-3"><h2 id="h-3">3. Cheapest with the power supply in the box</h2>{buy_tbl}
 <p class="hint">Only in-stock listings that say the supply is included. Prices checked {fmt_time(latest["generated_at"])}. Some shops sell the supply as an add-on, so the miner-only price can be lower: see each model's page for every price.</p></section>
+{multi}
 <section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
 <section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/bitaxe-setup/">First-hour setup checklist</a></li><li><a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a></li><li><a href="/guides/bitaxe-chips/">Bitaxe chips compared</a></li><li><a href="/best/gifts/">Bitcoin miner gift ideas</a></li></ul>
 <p class="hint">General guidance only. Follow the maker's instructions for your board.</p></section>
 </article>"""
-    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "What power supply does a Bitaxe need?", desc), faq_ld(faq)], lastmod=PSU_CHECKED, og_type="article")
+    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "What power supply does a Bitaxe need?", desc), faq_ld(faq)], lastmod="2026-11-03", og_type="article")
+
 
 
 # Monitoring apps roundup (/guides/bitaxe-monitoring-apps/). Platforms, prices and features are taken from each app's own

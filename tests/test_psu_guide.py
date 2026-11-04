@@ -42,6 +42,20 @@ class PsuGuide(unittest.TestCase):
         t = PAGE.read_text()
         self.assertIsNone(re.search(r"TODO|placeholder|lorem|Shervin|Wilkinson", t, re.I))
 
+    def test_several_miners_section(self):
+        t = PAGE.read_text()
+        self.assertIn('id="h-4"', t)
+        self.assertIn("Several miners on one power supply", t)
+        self.assertIn("80%", t)
+        self.assertRegex(t, r"same voltage|Same voltage", re.I)
+        self.assertIn("Never feed a 5V", t)
+        self.assertIn("Wall watts vs dashboard watts", t)
+        self.assertIn("power strip", t.lower())
+        # Worked example uses live model watts
+        self.assertIn(f"{B.MODELS['nerdoctaxe']['watts']:g} W", t)
+        self.assertIn(f"{B.MODELS['nerdqaxe-pp']['watts']:g} W", t)
+        self.assertIn("Can several miners share one power supply?", t)
+
 
 if __name__ == "__main__":
     unittest.main()
