@@ -454,7 +454,7 @@ MODEL_COPY.update(NEW_COPY)
 COMPARE_PAIRS = [("bitaxe-gamma", "nerdqaxe-pp"), ("bitaxe-gamma", "bitaxe-gt-801"), ("bitaxe-gamma", "nerdaxe-gamma"),
                  ("bitaxe-gamma", "bitaxe-supra"), ("nerdqaxe-pp", "nerdaxe-gaia"),
                  ("bitaxe-gamma", "nerdaxe-gaia"), ("nerdqaxe-pp", "avalon-nano-3s"), ("bitaxe-gamma-hex", "nerdoctaxe"),
-                 ("avalon-nano-3s", "hammer-bc04")]
+                 ("avalon-nano-3s", "hammer-bc04"), ("bitforge-nano", "bitaxe-gt-801")]
 COMPARE_COPY = {
     ("bitaxe-gamma", "nerdqaxe-pp"): dict(
         angle="One chip versus four: the Gamma is the small, quiet, cheap option; the NerdQaxe++ buys roughly four times the hashrate for a much larger power bill and a louder, hotter box.",
@@ -492,6 +492,10 @@ COMPARE_COPY = {
         angle="Same stated ~6 TH/s desk class, different power and design: Avalon Nano 3S is Canaan's enclosed desk miner (up to 140 W, also used as a mini heater); Hammer BC04 states the same hashrate at ~96 W in an open-frame style desk miner.",
         a_for="you want a finished enclosed box from a big maker and like using its heat.",
         b_for="you want the same stated hashrate at lower power and are fine with an open-frame desk miner."),
+    ("bitforge-nano", "bitaxe-gt-801"): dict(
+        angle="Same ~$170 desk/solo class, both dual BM1370: BitForge Nano is the enclosed quieter pick (about 2.6 TH/s at ~40 W, about 29 dB stated); Bitaxe GT 801 is the open board (about 2.15 TH/s at ~43 W) for buyers who like to tinker.",
+        a_for="you want a closed, quiet desk case with a little more stated hashrate and a power supply in the box.",
+        b_for="you want the open Bitaxe-style GT board and are fine managing cooling yourself."),
 }
 
 SELLER_COPY = {
@@ -2887,7 +2891,7 @@ def build_guide_chips():
 <section aria-labelledby="h-4"><h2 id="h-4">4. How to pick</h2>
 <ul><li><strong>Cheap electricity</strong> (under about $0.10/kWh): go for the lowest price per TH/s. See the <a href="/price-per-th/">price per TH/s leaderboard</a>.</li>
 <li><strong>Expensive electricity</strong>: a lower J/TH saves money every month. Check the power cost column.</li>
-<li><strong>Just want a lottery ticket</strong>: any single-chip board works. See <a href="/best/under-100/">best under $100</a>.</li></ul></section>
+<li><strong>Just want a lottery ticket</strong>: any single-chip board works. See {("<a href=\"/best/under-100/\">best under $100</a>" if under_price(100) else "<a href=\"/best/beginners/\">best for beginners</a>")}.</li></ul></section>
 <section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
 <section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a></li><li><a href="/guides/bitaxe-firmware/">Bitaxe firmware compared</a></li><li><a href="/guides/is-home-mining-worth-it/">Is home mining worth it?</a></li><li><a href="/guides/bitaxe-power-supply/">Which power supply?</a></li><li><a href="/compare/">Compare two miners</a></li></ul></section>
 </article>"""

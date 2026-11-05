@@ -1,6 +1,6 @@
 # Bitaxe Radar Roadmap
 
-Updated: Nov 4, 2026 (evening)
+Updated: Nov 5, 2026 (morning)
 
 ## 🎯 Goal
 
@@ -78,6 +78,9 @@ Later:
 
 ## ✅ Done
 
+- Nov 5 (morning): Chips guide link: when no miner is in stock under $100, point "lottery ticket" shoppers to /best/beginners/ instead of a missing /best/under-100/ page (keeps internal links and the sitemap test green).
+- Nov 5 (morning): BitForge Nano vs Bitaxe GT 801 compare (/compare/bitforge-nano-vs-bitaxe-gt-801/): same ~$170 desk/solo class, both dual BM1370. Enclosed quieter BitForge Nano (about 2.6 TH/s at ~40 W, about 29 dB stated) vs open Bitaxe GT / Gamma Turbo 801 (about 2.15 TH/s at ~43 W). Live cheapest in-stock USD at build ($169.99 DTV Electronics vs $174.99 Bitcoin Merch; Solo Satoshi GT $195.99 also in stock), efficiency, yearly power at $0.15/kWh, and buy links. Why: buyers weighing a quiet closed desk case against an open GT board at nearly the same price — drives affiliate buy buttons.
+
 - Nov 4 (evening): Bitaxe Touch added (/models/bitaxe-touch/). ACS Texas desk miner with 4.3″ touchscreen: seller-stated ~1 TH/s (950 GH/s–1 TH/s) at 17 W on a BM1370, 5 V (USB-C or barrel), Wi-Fi 2.4 GHz. Tracked at Bitcoin Merch only among shops we scrape (Silver / BM1370 1TH/s variant $499.99 in stock; the $399.99 option on that page is BM1368 700 GH/s and is not mapped). Solo Satoshi's "Turbo Touch" (GT 801 dual-chip ~2.15 TH/s @ 43 W) is different hardware and is not mapped. On solo set, gift guide $300+ bucket, and desk group. Why: catalog #7 — resolve the same-name conflict by tracking only the ACS unit.
 
 - Nov 4 (morning): GekkoScience KBeast 50 added (/models/gekko-kbeast-50/). Room heater miner from the same maker as the KBox 22: seller-stated up to 50 TH/s at 800 W at the wall (~13 J/TH tuned), integrated 800 W PSU, plug and mine. Tracked at Bitcoin Merch only among shops we scrape ($1,099.99; listing says ships in December 2026, so we show it as pre-order). On heater / pool / Black Friday heater group and the gift guide $300+ bucket. Why: catalog #14, winter / Black Friday heater demand, high ticket.
@@ -148,7 +151,7 @@ Later:
 - Oct 24: Heat guide (/guides/bitcoin-mining-heat-your-home/): miner vs space heater vs heat pump with live numbers. Each heater miner shows its power cost, what mining pays back, and the power price below which it beats a heat pump (DOE: heat pumps use about 50% less electricity). Also hot-water heating (Heatbit Bitwater) and winter-only tips.
 - Oct 21: Room heat calculator (/heat-calculator/): type your room size, see how much heat it needs and which miners can heat it, with today's prices.
 
-## 📊 Numbers (Nov 4, evening)
+## 📊 Numbers (Nov 5, morning)
 
 - Revenue: $0 (no commission emails yet)
 - Subscribers: 1 (Resend contact count in the Nov 1 alert run; it's your own test)
@@ -156,5 +159,5 @@ Later:
 - Sellers tracked: 11
 - Listings checked: 60
 - Paying affiliate programs: 3 (Power Mining, Bitaxe.de, Solo Satoshi)
-- Tests: 128 passing
+- Tests: 131 passing
 - Pages on the site: 95 in the sitemap
