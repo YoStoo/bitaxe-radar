@@ -17,7 +17,8 @@ class CollectorRules(unittest.TestCase):
               ("nmqaxe-nexus", "NMQAxe++ Nexus — Powerful Dual BM1373 Bitcoin Miner"),
               ("nerdqx", "Bitcoin Merch® - NerdQX 8TH/s Home Miner w/ Power Supply"),
               ("gekko-kbeast-50", "Bitcoin Merch® - GekkoScience KBeast 50+TH/s Bitcoin Miner & Heater"),
-              ("gekko-kbox-22", "Bitcoin Merch® - GekkoScience KBox 22TH/s Bitcoin Miner & Heater")]
+              ("gekko-kbox-22", "Bitcoin Merch® - GekkoScience KBox 22TH/s Bitcoin Miner & Heater"),
+              ("bitaxe-touch", "Bitcoin Merch® - Bitaxe Touch - 1TH/s")]
         bad = [("bitforge-nano", "BitForge Nano Bitcoin Solo Miner (Ghost Edition)"),
                ("nerdoctaxe", "Bitcoin Merch® - NerdOCTaxe Stand"),
                ("nerdoctaxe", "Bitcoin Merch® - NerdOCTaxe Hydro 12TH/s BTC Miner"),
@@ -28,7 +29,10 @@ class CollectorRules(unittest.TestCase):
                ("bitaxe-naja-duo", "Naja Duo Stand Free .STL Download"),
                ("nmqaxe-nexus", "NMQAxe++ Rev. 6.1 — NMMiner Powerful ASIC Crypto Miner 6T"),
                ("gekko-kbox-22", "Bitcoin Merch® - GekkoScience KBeast 50+TH/s Bitcoin Miner & Heater"),
-               ("gekko-kbeast-50", "Bitcoin Merch® - GekkoScience KBox 22TH/s Bitcoin Miner & Heater")]
+               ("gekko-kbeast-50", "Bitcoin Merch® - GekkoScience KBox 22TH/s Bitcoin Miner & Heater"),
+               ("bitaxe-touch", "Bitaxe Touch Bitcoin Solo Miner (Turbo Touch Edition)"),
+               ("bitaxe-touch", "Bitaxe Touch Blockstream Edition"),
+               ("bitaxe-touch", "Bitaxe Touch Jade")]
         for m, t in ok:
             self.assertTrue(C.title_ok(m, t), (m, t))
         for m, t in bad:
@@ -38,7 +42,8 @@ class CollectorRules(unittest.TestCase):
         self.assertEqual(C.MODELS["bitaxe-naja-duo"]["hashrate_ths"], 4.4)     # 8 TH/s is the ~92 W overclock
         self.assertEqual(C.MODELS["nerdoctaxe"]["hashrate_ths"], 9.6)          # 12 TH/s is an overclock
         self.assertEqual(C.MODELS["bitaxe-gamma-hex"]["hashrate_ths"], 8.4)
-        self.assertNotIn("bitaxe-touch", C.MODELS)                             # sellers list different hardware under one name
+        self.assertEqual(C.MODELS["bitaxe-touch"]["hashrate_ths"], 1.0)
+        self.assertEqual(C.MODELS["bitaxe-touch"]["watts"], 17)
         self.assertEqual(C.MODELS["nmqaxe-nexus"]["hashrate_ths"], 8.5)
         self.assertEqual(C.MODELS["nerdqx"]["hashrate_ths"], 8.1)        # Normal mode; ~11 TH/s is Turbo
         self.assertEqual(C.MODELS["gekko-kbeast-50"]["hashrate_ths"], 50)

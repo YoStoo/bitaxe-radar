@@ -72,3 +72,4 @@ No photo (drawn placeholder kept):
 | File | Model | Seller | Product title checked | Original image URL |
 |---|---|---|---|---|
 | nmqaxe-nexus.webp | NMMiner NMQAxe++ Nexus (front, screen and cooler) | NMMiner, the maker (WooCommerce Store API, first image, already transparent; trimmed) | NMQAxe++ Nexus — Powerful Dual BM1373 Bitcoin Miner | https://www.nmminer.com/wp-content/uploads/2026/09/NMQAxe-Nexus-01-Front.png |
+| bitaxe-touch.webp | ACS Bitaxe Touch 1 TH/s (4.3″ touch) | Bitcoin Merch Shopify product image (`btc-price-lifestyle.png`) | Bitcoin Merch® - Bitaxe Touch - 1TH/s | https://cdn.shopify.com/s/files/1/2609/9556/files/btc-price-lifestyle.png?v=1780363019 |

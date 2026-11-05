@@ -1,6 +1,6 @@
 # Bitaxe Radar Roadmap
 
-Updated: Nov 4, 2026 (morning)
+Updated: Nov 4, 2026 (evening)
 
 ## 🎯 Goal
 
@@ -10,8 +10,8 @@ Updated: Nov 4, 2026 (morning)
 
 ## 🔨 Now
 
-- Add more home miners: 79 found, 33 on the site so far.
-- GekkoScience KBeast 50 added Nov 4. Avalon Nano 3 skipped for now (replaced by the 3S and sold out where we looked).
+- Add more home miners: 79 found, 34 on the site so far.
+- Bitaxe Touch (catalog #7 ACS/Bitcoin Merch unit) added Nov 4 evening. Avalon Nano 3 skipped for now (replaced by the 3S and sold out where we looked).
 
 ## ⏭️ Next up (in order)
 
@@ -77,6 +77,8 @@ Later:
 - PO Box address before the first newsletter email goes out.
 
 ## ✅ Done
+
+- Nov 4 (evening): Bitaxe Touch added (/models/bitaxe-touch/). ACS Texas desk miner with 4.3″ touchscreen: seller-stated ~1 TH/s (950 GH/s–1 TH/s) at 17 W on a BM1370, 5 V (USB-C or barrel), Wi-Fi 2.4 GHz. Tracked at Bitcoin Merch only among shops we scrape (Silver / BM1370 1TH/s variant $499.99 in stock; the $399.99 option on that page is BM1368 700 GH/s and is not mapped). Solo Satoshi's "Turbo Touch" (GT 801 dual-chip ~2.15 TH/s @ 43 W) is different hardware and is not mapped. On solo set, gift guide $300+ bucket, and desk group. Why: catalog #7 — resolve the same-name conflict by tracking only the ACS unit.
 
 - Nov 4 (morning): GekkoScience KBeast 50 added (/models/gekko-kbeast-50/). Room heater miner from the same maker as the KBox 22: seller-stated up to 50 TH/s at 800 W at the wall (~13 J/TH tuned), integrated 800 W PSU, plug and mine. Tracked at Bitcoin Merch only among shops we scrape ($1,099.99; listing says ships in December 2026, so we show it as pre-order). On heater / pool / Black Friday heater group and the gift guide $300+ bucket. Why: catalog #14, winter / Black Friday heater demand, high ticket.
 
@@ -146,13 +148,13 @@ Later:
 - Oct 24: Heat guide (/guides/bitcoin-mining-heat-your-home/): miner vs space heater vs heat pump with live numbers. Each heater miner shows its power cost, what mining pays back, and the power price below which it beats a heat pump (DOE: heat pumps use about 50% less electricity). Also hot-water heating (Heatbit Bitwater) and winter-only tips.
 - Oct 21: Room heat calculator (/heat-calculator/): type your room size, see how much heat it needs and which miners can heat it, with today's prices.
 
-## 📊 Numbers (Nov 4, morning)
+## 📊 Numbers (Nov 4, evening)
 
 - Revenue: $0 (no commission emails yet)
 - Subscribers: 1 (Resend contact count in the Nov 1 alert run; it's your own test)
-- Miners tracked: 33
+- Miners tracked: 34
 - Sellers tracked: 11
-- Listings checked: 59
+- Listings checked: 60
 - Paying affiliate programs: 3 (Power Mining, Bitaxe.de, Solo Satoshi)
 - Tests: 128 passing
-- Pages on the site: 94 in the sitemap
+- Pages on the site: 95 in the sitemap

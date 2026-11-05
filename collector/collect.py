@@ -99,6 +99,9 @@ MODELS = {
     "gekko-kbeast-50":  {"name": "GekkoScience KBeast 50", "category": "home", "kind": "Room heater miner", "maker": "GekkoScience",
                          "hashrate_ths": 50, "watts": 800,
                          "note": "Seller-stated up to 50 TH/s at 800 W at the wall (Bitcoin Merch); efficiency down to ~13 J/TH tuned; integrated 800 W PSU"},
+    # added 2026-11-04 evening: ACS/Bitcoin Merch Bitaxe Touch only (Solo Satoshi Turbo Touch is different hardware)
+    "bitaxe-touch":     {"name": "Bitaxe Touch", "category": "board", "chip": "BM1370", "hashrate_ths": 1.0, "watts": 17,
+                         "note": "Seller-stated ~1 TH/s (950 GH/s–1 TH/s) at 17 W for the BM1370 ACS/Bitcoin Merch unit with 4.3″ touchscreen; Solo Satoshi Turbo Touch is different hardware and is not mapped"},
 }
 # hashrate_ths / watts above are typical VENDOR-STATED figures used only for the cost estimate.
 # They are approximate and must be labelled as such on the site.
@@ -147,6 +150,7 @@ BITCOINMERCH = {  # Shopify handle
     "avalon-nano-3s":   "bitcoin-merch-avalon-nano-3s-bitcoin-miner-6-th-s",
     "nerdqx":           "bitcoin-merch®-nerdqx-8th-s-home-miner-w-power-supply",
     "gekko-kbeast-50":  "bitcoin-merch®-gekkoscience-kbeast-50-th-s-bitcoin-miner-heater",
+    "bitaxe-touch":     ("bitcoin-merch-bitaxe-touch-1th-s", "Silver / BM1370 1TH/s"),  # not BM1368 700GH/s ($399.99)
 }
 SOLOSATOSHI = {  # WooCommerce slug
     "bitaxe-supra":     "bitaxe-supra",
@@ -211,11 +215,13 @@ TITLE_MUST = {
     "bitforge-nano": ["bitforge nano"], "heatbit-bitair": ["bitair"], "heatbit-bitwater": ["bitwater"], "futurebit-apollo-iii": ["apollo iii"],
     "hammer-thor-p2": ["thor p2"], "hammer-bc08": ["bc08"], "gekko-kbox-22": ["kbox"], "dcentral-stealthminer": ["stealthminer"],
     "nmqaxe-nexus": ["nmqaxe", "nexus"], "nerdqx": ["nerdqx"], "gekko-kbeast-50": ["kbeast"],
+    "bitaxe-touch": ["bitaxe", "touch"],
 }
 TITLE_NOT = {  # words that mean a different product (accessory, other edition)
     "bitforge-nano": ["ghost"], "nerdoctaxe": ["stand", "screen", "fan", "heatsink", "hydro"], "bitaxe-naja-duo": ["stand", ".stl"],
     "hammer-bc08": ["hydro"], "futurebit-apollo-iii": ["full node", "apollo ii "], "heatbit-bitair": ["filter"],
     "gekko-kbox-22": ["kbeast"], "gekko-kbeast-50": ["kbox"],
+    "bitaxe-touch": ["turbo", "blockstream", "jade", "gt 801", "801"],
 }
 
 

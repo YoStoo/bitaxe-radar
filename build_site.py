@@ -225,7 +225,7 @@ SHORT = {"bitaxe-supra": "Bitaxe Supra", "bitaxe-ultra": "Bitaxe Ultra", "bitaxe
          "heatbit-maxi": "Heatbit Maxi", "heatbit-canvas": "Heatbit Canvas", "braiins-bmm-101": "Braiins Mini Miner", "hammer-bc04": "Hammer BC04",
          "bitaxe-gamma-hex": "Bitaxe Gamma Hex", "bitaxe-naja-duo": "Bitaxe Naja Duo", "nerdoctaxe": "NerdOCTaxe Gamma", "bitforge-nano": "BitForge Nano",
          "heatbit-bitair": "Heatbit Bitair", "futurebit-apollo-iii": "FutureBit Apollo III", "hammer-thor-p2": "Hammer Thor P2", "hammer-bc08": "Hammer BC08",
-         "gekko-kbox-22": "GekkoScience KBox 22", "dcentral-stealthminer": "D-Central StealthMiner", "bitcube": "Bitcube", "heatbit-bitwater": "Heatbit Bitwater", "nmqaxe-nexus": "NMQAxe++ Nexus", "nerdqx": "NerdQX", "bitaxe-702": "Bitaxe 702", "nerdaxe-gaia-copper-pro": "Gaia Copper Pro", "gekko-kbeast-50": "GekkoScience KBeast 50"}
+         "gekko-kbox-22": "GekkoScience KBox 22", "dcentral-stealthminer": "D-Central StealthMiner", "bitcube": "Bitcube", "heatbit-bitwater": "Heatbit Bitwater", "nmqaxe-nexus": "NMQAxe++ Nexus", "nerdqx": "NerdQX", "bitaxe-702": "Bitaxe 702", "nerdaxe-gaia-copper-pro": "Gaia Copper Pro", "gekko-kbeast-50": "GekkoScience KBeast 50", "bitaxe-touch": "Bitaxe Touch"}
 NOINDEX_MODELS = {"bitaxe-supra", "bitaxe-ultra"}   # older generations: pages exist for completeness but stay out of the index/sitemap
 
 MODEL_COPY = {
@@ -440,6 +440,14 @@ NEW_COPY = {   # added 2026-10-21 (docs/MINER_CATALOG.md). Stock settings only; 
                "The 800 W PSU is built in (120 V or 240 V). No external power supply to buy.",
                "At 800 W it heats like a small space heater. Use a dedicated outlet; don't share a power strip with other big loads.",
                "Hashrate and heat depend on the power mode you pick. The figures above are the seller's, not our measurements."]),
+    "bitaxe-touch": dict(
+        intro="The Bitaxe Touch is an ACS-built Bitaxe-class desk miner with a 4.3″ touchscreen that shows a clock and live mining stats. Bitcoin Merch states about 1 TH/s (950 GH/s–1 TH/s) at 17 W on a single BM1370, made in Texas, USA. It runs on 5 V through USB-C or a 5.5×2.1 mm barrel jack, with 2.4 GHz Wi-Fi.",
+        who="Someone who wants a polished plug-and-play Bitaxe-class desk piece and will pay for the built-in screen, not just the cheapest board.",
+        check=["Among the shops we track, only Bitcoin Merch sells this exact 1 TH/s ACS unit. Pick the BM1370 1 TH/s ASIC option (not the cheaper BM1368 700 GH/s option on the same page).",
+               "Solo Satoshi sells a different product under a similar name (Turbo Touch on a GT 801 dual-chip board). We do not mix those listings.",
+               "It needs a 5 V power supply (USB-C or barrel). Check whether the listing includes one.",
+               "Wi-Fi is 2.4 GHz only.",
+               "The hashrate and power figures above are the seller's, not our measurements."]),
 }
 MODEL_COPY.update(NEW_COPY)
 
@@ -603,7 +611,7 @@ NAV_SECTIONS = {"/miners/": ("/miners/", "/solo-miners/", "/pool-miners/", "/hea
 # Browse-by-type categories. Any miner can solo or pool mine; these say what each is best suited to. A miner can be in several.
 SOLO_SET = ["bitaxe-gamma", "bitaxe-gamma-duo", "bitaxe-gt-801", "nerdaxe-gamma", "nerdaxe-gaia", "nerdqaxe-pp",
             "braiins-bmm-101", "avalon-nano-3s", "hammer-bc04", "bitaxe-supra", "bitaxe-ultra",
-            "bitaxe-naja-duo", "bitforge-nano", "heatbit-bitair", "bitaxe-gamma-hex", "nerdoctaxe", "hammer-thor-p2", "hammer-bc08", "futurebit-apollo-iii", "bitcube", "nmqaxe-nexus", "nerdqx", "bitaxe-702", "nerdaxe-gaia-copper-pro"]
+            "bitaxe-naja-duo", "bitforge-nano", "heatbit-bitair", "bitaxe-gamma-hex", "nerdoctaxe", "hammer-thor-p2", "hammer-bc08", "futurebit-apollo-iii", "bitcube", "nmqaxe-nexus", "nerdqx", "bitaxe-702", "nerdaxe-gaia-copper-pro", "bitaxe-touch"]
 POOL_SET = ["avalon-nano-3s", "hammer-bc04", "heatbit-canvas", "heatbit-trio", "avalon-mini-3", "heatbit-maxi", "avalon-q",
             "bitaxe-gamma-hex", "nerdoctaxe", "hammer-thor-p2", "hammer-bc08", "futurebit-apollo-iii", "gekko-kbox-22", "gekko-kbeast-50", "dcentral-stealthminer", "heatbit-bitwater", "nmqaxe-nexus"]
 HEAT_SET = ["avalon-nano-3s", "heatbit-canvas", "heatbit-trio", "avalon-mini-3", "heatbit-maxi", "avalon-q", "gekko-kbox-22", "gekko-kbeast-50", "dcentral-stealthminer"]
@@ -625,7 +633,7 @@ RADAR_BG = ('<svg class="radar-bg" viewBox="0 0 200 200" aria-hidden="true" focu
             '<path d="M100 0v200M0 100h200" stroke-opacity=".5"/></g><path d="M100 100 L132.8 9.8 A96 96 0 0 1 178.6 45 Z" fill="#f7931a" fill-opacity=".8"/></svg>')
 CHIPS = {"bitaxe-supra": 1, "bitaxe-ultra": 1, "bitaxe-gamma": 1, "bitaxe-gamma-duo": 2, "bitaxe-gt-801": 2,
          "nerdaxe-gamma": 1, "nerdaxe-gaia": 1, "nerdqaxe-pp": 4, "nerdoctaxe": 4, "nerdqx": 4, "dcentral-stealthminer": 4, "bitaxe-702": 6, "nerdaxe-gaia-copper-pro": 1}
-SCREEN = {"nerdaxe-gamma", "nerdaxe-gaia", "nerdaxe-gaia-copper-pro"}
+SCREEN = {"nerdaxe-gamma", "nerdaxe-gaia", "nerdaxe-gaia-copper-pro", "bitaxe-touch"}
 
 
 # Product photos: each one is the seller's own product image for that exact model (sources in docs/IMAGE_SOURCES.md),
@@ -657,6 +665,7 @@ MODEL_IMG = {
     "heatbit-bitwater": (800, 639, "Heatbit Bitwater water heater element with a built-in Bitcoin miner"),
     "nmqaxe-nexus": (495, 800, "NMMiner NMQAxe++ Nexus desk Bitcoin miner with a color screen and tower cooler"),
     "bitcube": (800, 613, "Power Mining Bitcube cube Bitcoin miner with 777 GH/s on its touchscreen"),
+    "bitaxe-touch": (463, 463, "ACS Bitaxe Touch 1 TH/s desk Bitcoin miner with 4.3 inch touchscreen"),
 }
 MODEL_IMG = {k: v for k, v in MODEL_IMG.items() if (SITE / "img" / "models" / f"{k}.webp").exists()}
 
@@ -1676,7 +1685,7 @@ def build_black_friday():
 # HEATER & HOME MINERS hub + plain-language guides
 # ---------------------------------------------------------------------------------------------
 HEATER_GROUP = ["avalon-mini-3", "avalon-q", "heatbit-trio", "heatbit-maxi", "heatbit-canvas", "gekko-kbox-22", "gekko-kbeast-50", "dcentral-stealthminer"]
-DESK_GROUP = ["avalon-nano-3s", "hammer-bc04", "braiins-bmm-101", "heatbit-bitair", "bitcube", "futurebit-apollo-iii", "hammer-thor-p2", "hammer-bc08", "nmqaxe-nexus"]
+DESK_GROUP = ["avalon-nano-3s", "hammer-bc04", "braiins-bmm-101", "heatbit-bitair", "bitcube", "futurebit-apollo-iii", "hammer-thor-p2", "hammer-bc08", "nmqaxe-nexus", "bitaxe-touch"]
 GUIDE_UPDATED = "2026-10-21"
 NETWORK_EH_SEEN = "about 1,050 EH/s"       # mempool.space /api/v1/mining/hashrate/3d on 2026-10-21 (see docs/HOME_MINING_HUB_PLAN.md)
 
@@ -1992,6 +2001,7 @@ GIFT_WHY = {   # gift-friendly picks; each lands in a budget group by its live i
     "dcentral-stealthminer": "A room heater that mines: about 860 W through quiet Noctua fans on a normal 120 V outlet. Refurbished, ships from Canada.",
     "avalon-q": "The big one: about 90 TH/s and up to about 1,674 W of heat for a garage or basement this winter.",
     "gekko-kbeast-50": "About 50 TH/s at 800 W in one enclosed heater box, with the power supply built in. A high-ticket winter gift if the shop's ship date works.",
+    "bitaxe-touch": "A Bitaxe-class desk miner with a 4.3″ touchscreen for clock and stats — polished gift for someone who wants more than a bare board.",
 }
 GIFT_BANDS = [("under-100", "Under $100", 0, 100), ("100-300", "$100 to $300", 100, 300), ("300-up", "$300 and up", 300, 10 ** 9)]
 

@@ -61,7 +61,7 @@ Internal research doc. This doc doesn't change any site code.
 | Bitaxe Gamma Duo (650) | Open-source | ~1.6 TH/s | ~26 W | $104-240 | solo | solosatoshi.com $104.29, bitcoinmerch.com $239.99 | ✅ | JSON | |
 | Bitaxe GT / Gamma Turbo (801) | Open-source | 2.0-2.4 TH/s | ~43 W | $174-270 | solo | solosatoshi.com $173.99, bitcoinmerch.com $174.99, D-Central CA$269.99 | ✅ | JSON | |
 | Bitaxe 801 GTR+ | Open-source / Bitcoin Merch | 3.8 TH/s (seller) | 75 W | $249.99 | solo | bitcoinmerch.com | ❌ | JSON | SPEC? This is a tuned GT claim. |
-| Bitaxe Touch | Open-source | Bitcoin Merch: 1 TH/s @ 14.5-20 W. Solo Satoshi "Turbo Touch": 1.5-3.06 TH/s @ 41-48 W | see left | $250-400 | solo | bitcoinmerch.com $399.99, solosatoshi.com $250 (OOS) | ❌ | JSON | The two sellers list different hardware under the same name. |
+| Bitaxe Touch | Open-source / ACS | Bitcoin Merch ACS: ~1 TH/s @ 17 W. Solo Satoshi "Turbo Touch": 1.5-3.06 TH/s @ 41-48 W (excluded) | see left | $399.99 | solo | bitcoinmerch.com $399.99 (ACS unit only) | ✅ | JSON | Tracked: ACS/Bitcoin Merch 1 TH/s BM1370 only. Solo Satoshi Turbo Touch (GT 801 dual-chip) is different hardware and is not mapped. |
 | Bitaxe Gamma Hex (1300) | Open-source | 8.4-11 TH/s | 140-252 W | $397-450 | solo/pool | solosatoshi.com $396.99, bitcoinmerch.com Hydro $449.99 | ❌ | JSON | New 6-chip flagship |
 | Bitaxe Naja Duo (1201, 2x BM1373) | Open-source | up to ~8 TH/s | 42-92 W | $366-600 | solo | solosatoshi.com $366, bitcoinmerch.com $599.99 | ❌ | JSON | |
 | Bitaxe SupraHex | Open-source | 4.2+ TH/s (title) | ? | $224.99 | solo | bitcoinmerch.com | ❌ | JSON | The listing gives no wattage. |

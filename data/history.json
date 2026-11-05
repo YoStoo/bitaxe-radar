@@ -6971,5 +6971,21 @@
    "in_stock": false,
    "status": "preorder"
   }
+ ],
+ "bitcoinmerch:bitaxe-touch": [
+  {
+   "t": "2026-11-05T00:07:47Z",
+   "price": 399.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  },
+  {
+   "t": "2026-11-05T00:09:39Z",
+   "price": 499.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  }
  ]
 }
