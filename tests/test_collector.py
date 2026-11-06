@@ -20,7 +20,9 @@ class CollectorRules(unittest.TestCase):
               ("gekko-kbox-22", "Bitcoin Merch® - GekkoScience KBox 22TH/s Bitcoin Miner & Heater"),
               ("bitaxe-touch", "Bitcoin Merch® - Bitaxe Touch - 1TH/s"),
               ("hammer-thor-x1", "Bitcoin Merch® - Hammer Miner Thor X1  3.2TH/s Lottery Miner w/ Power Supply"),
-              ("hammer-thor-x1", "Hammer Miner Thor X1 Home Desktop Bitcoin Miner 3.2T")]
+              ("hammer-thor-x1", "Hammer Miner Thor X1 Home Desktop Bitcoin Miner 3.2T"),
+              ("hammer-bc01", "Bitcoin Merch® - Hammer Miner BC01 1.5TH/s Bitcoin Miner w/ Power Supply"),
+              ("hammer-bc01", "Hammer Miner BC01 Home Bitcoin Miner")]
         bad = [("bitforge-nano", "BitForge Nano Bitcoin Solo Miner (Ghost Edition)"),
                ("nerdoctaxe", "Bitcoin Merch® - NerdOCTaxe Stand"),
                ("nerdoctaxe", "Bitcoin Merch® - NerdOCTaxe Hydro 12TH/s BTC Miner"),
@@ -37,7 +39,10 @@ class CollectorRules(unittest.TestCase):
                ("bitaxe-touch", "Bitaxe Touch Jade"),
                ("hammer-thor-x1", "Thor P2 Bitcoin Miner – 10 TH/s Dual BM1373 ASIC Miner"),
                ("hammer-thor-x1", "Hammer Miner BC01 Home Bitcoin Miner"),
-               ("hammer-thor-x1", "Hammer Miner Thor X1 Replacement Power Supply")]
+               ("hammer-thor-x1", "Hammer Miner Thor X1 Replacement Power Supply"),
+               ("hammer-bc01", "Hammer Miner Thor X1 Home Desktop Bitcoin Miner 3.2T"),
+               ("hammer-bc01", "Hammer Miner BC04 Home Bitcoin Miner"),
+               ("hammer-bc01", "Hammer Miner BC01 Replacement Power Supply")]
         for m, t in ok:
             self.assertTrue(C.title_ok(m, t), (m, t))
         for m, t in bad:
@@ -55,6 +60,8 @@ class CollectorRules(unittest.TestCase):
         self.assertEqual(C.MODELS["gekko-kbeast-50"]["watts"], 800)
         self.assertEqual(C.MODELS["hammer-thor-x1"]["hashrate_ths"], 3.2)
         self.assertEqual(C.MODELS["hammer-thor-x1"]["watts"], 35)
+        self.assertEqual(C.MODELS["hammer-bc01"]["hashrate_ths"], 1.2)
+        self.assertEqual(C.MODELS["hammer-bc01"]["watts"], 22)
         for m in ("dtv", "futurebit", "nmminer"):
             self.assertIn(m, C.SELLERS)
             self.assertIn(m, C.ADAPTERS)

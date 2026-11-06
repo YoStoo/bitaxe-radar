@@ -101,7 +101,7 @@ Internal research doc. This doc doesn't change any site code.
 | Apollo III Standard | FutureBit (USA) | 12-17 TH/s Eco to Turbo (~6 TH/s Ultra-Eco) | ~70-375 W | $899.99 | pool/solo | shop.futurebit.io | ❌ | JSON | Ships in 4-6 weeks |
 | Apollo III Full Node | FutureBit | same as above, plus a node | same | from $1,099.99 | pool/solo | shop.futurebit.io | ❌ | JSON | |
 | Apollo II (Full Node / Standard add-on) | FutureBit | ~9 TH/s (third-party figure, bitshopper.de) | ~270 W | $899.99 / $599.99 | pool | shop.futurebit.io | ❌ | JSON | Previous gen, still sold |
-| Hammer BC01 | Hammer | 1.5 TH/s | 22-31 W | $109-115 | solo | altairtech.io $109, bitcoinmerch.com $114.99 | ❌ | HTML/JSON | |
+| Hammer BC01 | Hammer | 1.5 TH/s | 22-31 W | $109-115 | solo | altairtech.io $109, bitcoinmerch.com $114.99 | ✅ | HTML/JSON | Tracked Nov 6 morning: stock Normal 1.2 TH/s @ 22 W (Altair + Bitcoin Merch; chip not stated on seller pages). |
 | Hammer BC04 | Hammer | 6 TH/s | 76-108 W | $215-350 | solo | altairtech.io $215, bitcoinmerch.com $349.99 | ✅ | HTML/JSON | |
 | Hammer BC08 (air with touchscreen / Hydro) | Hammer | 12 TH/s | 210 W | $519-700 | pool | altairtech.io $519, bitcoinmerch.com Hydro $699.99 | ❌ | HTML/JSON | ⚠ The Bitcoin Merch Hydro page mentions 240 V, so verify the voltage. |
 | Hammer Thor X1 | Hammer | 3.2 TH/s | 35 W | $219-330 | solo | altairtech.io $219, bitcoinmerch.com $329.99 | ✅ | HTML/JSON | Tracked Nov 5 evening: stock 3.2 TH/s @ 35 W BM1373 USB-C (Altair + Bitcoin Merch). |

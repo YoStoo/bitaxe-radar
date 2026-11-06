@@ -106,6 +106,10 @@ MODELS = {
     "hammer-thor-x1":   {"name": "Hammer Miner Thor X1", "category": "home", "kind": "Desk miner", "maker": "Hammer",
                          "chip": "BM1373", "hashrate_ths": 3.2, "watts": 35,
                          "note": "Seller-stated 3.2 TH/s at 35 W (Bitcoin Merch) on one BM1373 via USB-C; Altair FAQ also states ~34 W normal / ~46 W overclock"},
+    # added 2026-11-06 morning: Hammer BC01 desk miner (Altair + Bitcoin Merch); stock Normal 1.2 TH/s @ 22 W (chip not stated on seller pages)
+    "hammer-bc01":      {"name": "Hammer Miner BC01", "category": "home", "kind": "Desk miner", "maker": "Hammer",
+                         "hashrate_ths": 1.2, "watts": 22,
+                         "note": "Seller-stated Normal 1.2 TH/s at 22 W (~16 J/TH, ~46 dB); Overclock ~1.5 TH/s at ~31 W (~49 dB); USB-C PSU in box; Altair $109 / Bitcoin Merch $114.99"},
 }
 # hashrate_ths / watts above are typical VENDOR-STATED figures used only for the cost estimate.
 # They are approximate and must be labelled as such on the site.
@@ -156,6 +160,7 @@ BITCOINMERCH = {  # Shopify handle
     "gekko-kbeast-50":  "bitcoin-merch®-gekkoscience-kbeast-50-th-s-bitcoin-miner-heater",
     "bitaxe-touch":     ("bitcoin-merch-bitaxe-touch-1th-s", "Silver / BM1370 1TH/s"),  # not BM1368 700GH/s ($399.99)
     "hammer-thor-x1":   "bitcoin-merch®-hammer-miner-thor-x1-3-2th-s-lottery-miner",
+    "hammer-bc01":      "bitcoin-merch®-hammer-miner-bc01-1-5th-s-bitcoin-miner-w-power-supply",
 }
 SOLOSATOSHI = {  # WooCommerce slug
     "bitaxe-supra":     "bitaxe-supra",
@@ -197,6 +202,7 @@ ALTAIR = {  # product slug -> (variation attribute filter or None)
     "hammer-bc08":    ("hammer-miner-bc08-12th-desktop-bitcoin-miner", None),
     "gekko-kbox-22":  ("gekkoscience-kbox-bitcoin-miner", None),
     "hammer-thor-x1": ("hammer-miner-thor-x1-home-bitcoin-miner", None),
+    "hammer-bc01":    ("hammer-miner-bc01-home-bitcoin-miner", None),
 }
 HEATBIT = {  # Shopify handle -> regex the US variant title must match
     "heatbit-trio":   ("heatbit-trio", r"/ US /"),
@@ -223,6 +229,7 @@ TITLE_MUST = {
     "nmqaxe-nexus": ["nmqaxe", "nexus"], "nerdqx": ["nerdqx"], "gekko-kbeast-50": ["kbeast"],
     "bitaxe-touch": ["bitaxe", "touch"],
     "hammer-thor-x1": ["thor x1"],
+    "hammer-bc01": ["hammer", "bc01"],
 }
 TITLE_NOT = {  # words that mean a different product (accessory, other edition)
     "bitforge-nano": ["ghost"], "nerdoctaxe": ["stand", "screen", "fan", "heatsink", "hydro"], "bitaxe-naja-duo": ["stand", ".stl"],
@@ -230,6 +237,7 @@ TITLE_NOT = {  # words that mean a different product (accessory, other edition)
     "gekko-kbox-22": ["kbeast"], "gekko-kbeast-50": ["kbox"],
     "bitaxe-touch": ["turbo", "blockstream", "jade", "gt 801", "801"],
     "hammer-thor-x1": ["thor p2", "bc01", "replacement"],
+    "hammer-bc01": ["thor", "bc04", "bc08", "replacement"],
 }
 
 

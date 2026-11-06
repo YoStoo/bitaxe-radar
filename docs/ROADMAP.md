@@ -1,6 +1,6 @@
 # Bitaxe Radar Roadmap
 
-Updated: Nov 5, 2026 (evening)
+Updated: Nov 6, 2026 (morning)
 
 ## 🎯 Goal
 
@@ -10,8 +10,8 @@ Updated: Nov 5, 2026 (evening)
 
 ## 🔨 Now
 
-- Add more home miners: 79 found, 35 on the site so far.
-- Hammer Thor X1 added Nov 5 evening. Avalon Nano 3 skipped for now (replaced by the 3S and sold out where we looked).
+- Add more home miners: 79 found, 36 on the site so far.
+- Hammer BC01 added Nov 6 morning. Avalon Nano 3 skipped for now (replaced by the 3S and sold out where we looked).
 
 ## ⏭️ Next up (in order)
 
@@ -77,6 +77,8 @@ Later:
 - PO Box address before the first newsletter email goes out.
 
 ## ✅ Done
+
+- Nov 6 (morning): Hammer Miner BC01 added (/models/hammer-bc01/). Entry desk miner: seller-stated Normal 1.2 TH/s at 22 W (~16 J/TH, ~46 dB); Overclock ~1.5 TH/s at ~31 W (~49 dB); USB-C PSU in the box; Wi-Fi 2.4 GHz; screen; forced-air. Chip not stated on seller pages we checked. Tracked at Altair ($109.00 in stock) and Bitcoin Merch ($114.99 available). On solo set, desk group, and gift guide $100–$300 band. Why: gift/entry Hammer after Thor X1 — Altair $109 in stock.
 
 - Nov 5 (evening): Hammer Miner Thor X1 added (/models/hammer-thor-x1/). Desk miner with one BM1373: seller-stated 3.2 TH/s at 35 W (Bitcoin Merch; Altair FAQ also lists ~34 W normal / ~46 W overclock), USB-C, Wi-Fi 2.4 GHz, screen. Tracked at Altair ($219.00 in stock, ships in 1 business day, 65 W USB-C PSU in the box) and Bitcoin Merch ($329.99; listing says ships as soon as 4 weeks). On solo set, desk group, and gift guide $100–$300 band. Why: next clear vetted desk miner after catalog top-15 are largely tracked (Altair + Bitcoin Merch).
 
@@ -153,13 +155,13 @@ Later:
 - Oct 24: Heat guide (/guides/bitcoin-mining-heat-your-home/): miner vs space heater vs heat pump with live numbers. Each heater miner shows its power cost, what mining pays back, and the power price below which it beats a heat pump (DOE: heat pumps use about 50% less electricity). Also hot-water heating (Heatbit Bitwater) and winter-only tips.
 - Oct 21: Room heat calculator (/heat-calculator/): type your room size, see how much heat it needs and which miners can heat it, with today's prices.
 
-## 📊 Numbers (Nov 5, evening)
+## 📊 Numbers (Nov 6, morning)
 
 - Revenue: $0 (no commission emails yet)
 - Subscribers: 1 (Resend contact count in the Nov 1 alert run; it's your own test)
-- Miners tracked: 35
+- Miners tracked: 36
 - Sellers tracked: 11
-- Listings checked: 62
+- Listings checked: 64
 - Paying affiliate programs: 3 (Power Mining, Bitaxe.de, Solo Satoshi)
 - Tests: 131 passing
-- Pages on the site: 97 in the sitemap
+- Pages on the site: 98 in the sitemap
