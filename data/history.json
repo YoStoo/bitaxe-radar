@@ -1352,6 +1352,13 @@
    "currency": "USD",
    "in_stock": false,
    "status": "out_of_stock"
+  },
+  {
+   "t": "2026-11-06T00:14:54Z",
+   "price": 67.0,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
   }
  ],
  "solosatoshi:bitaxe-gamma-duo": [
@@ -1501,6 +1508,13 @@
    "currency": "USD",
    "in_stock": false,
    "status": "out_of_stock"
+  },
+  {
+   "t": "2026-11-06T00:14:54Z",
+   "price": 111.69,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
   }
  ],
  "solosatoshi:bitaxe-gt-801": [
@@ -1806,6 +1820,13 @@
    "currency": "USD",
    "in_stock": false,
    "status": "out_of_stock"
+  },
+  {
+   "t": "2026-11-06T00:14:54Z",
+   "price": 210.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
   }
  ],
  "bitaxede:bitaxe-gamma": [
@@ -4536,6 +4557,13 @@
    "currency": "USD",
    "in_stock": true,
    "status": "in_stock"
+  },
+  {
+   "t": "2026-11-06T00:14:54Z",
+   "price": 449.99,
+   "currency": "USD",
+   "in_stock": false,
+   "status": "backorder"
   }
  ],
  "bitcoinmerch:bitaxe-naja-duo": [
@@ -4657,6 +4685,13 @@
    "currency": "USD",
    "in_stock": true,
    "status": "in_stock"
+  },
+  {
+   "t": "2026-11-06T00:14:54Z",
+   "price": 599.99,
+   "currency": "USD",
+   "in_stock": false,
+   "status": "backorder"
   }
  ],
  "bitcoinmerch:nerdoctaxe": [
@@ -5127,6 +5162,13 @@
    "currency": "USD",
    "in_stock": true,
    "status": "in_stock"
+  },
+  {
+   "t": "2026-11-06T00:14:54Z",
+   "price": 589.99,
+   "currency": "USD",
+   "in_stock": false,
+   "status": "backorder"
   }
  ],
  "bitcoinmerch:gekko-kbox-22": [
@@ -5248,6 +5290,13 @@
    "currency": "USD",
    "in_stock": true,
    "status": "in_stock"
+  },
+  {
+   "t": "2026-11-06T00:14:54Z",
+   "price": 899.99,
+   "currency": "USD",
+   "in_stock": false,
+   "status": "backorder"
   }
  ],
  "solosatoshi:bitaxe-gamma-hex": [
@@ -7251,6 +7300,13 @@
    "currency": "USD",
    "in_stock": true,
    "status": "in_stock"
+  },
+  {
+   "t": "2026-11-06T00:14:54Z",
+   "price": 449.99,
+   "currency": "USD",
+   "in_stock": false,
+   "status": "backorder"
   }
  ],
  "bitaxede:bitaxe-702": [
@@ -7396,6 +7452,31 @@
   {
    "t": "2026-11-05T00:09:39Z",
    "price": 499.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  },
+  {
+   "t": "2026-11-06T00:14:54Z",
+   "price": 499.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  }
+ ],
+ "bitcoinmerch:hammer-thor-x1": [
+  {
+   "t": "2026-11-06T00:14:54Z",
+   "price": 329.99,
+   "currency": "USD",
+   "in_stock": false,
+   "status": "backorder"
+  }
+ ],
+ "altair:hammer-thor-x1": [
+  {
+   "t": "2026-11-06T00:14:54Z",
+   "price": 219.0,
    "currency": "USD",
    "in_stock": true,
    "status": "in_stock"
