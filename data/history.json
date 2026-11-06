@@ -1096,6 +1096,13 @@
    "currency": "USD",
    "in_stock": true,
    "status": "in_stock"
+  },
+  {
+   "t": "2026-11-06T19:24:37Z",
+   "price": 229.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
   }
  ],
  "solosatoshi:bitaxe-supra": [
@@ -2854,6 +2861,13 @@
    "currency": "EUR",
    "in_stock": true,
    "status": "in_stock"
+  },
+  {
+   "t": "2026-11-06T19:24:37Z",
+   "price": 100.0,
+   "currency": "EUR",
+   "in_stock": true,
+   "status": "in_stock"
   }
  ],
  "powermining:nerdaxe-gamma": [
@@ -3536,6 +3550,13 @@
    "currency": "USD",
    "in_stock": false,
    "status": "out_of_stock"
+  },
+  {
+   "t": "2026-11-06T19:24:37Z",
+   "price": 1498.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
   }
  ],
  "altair:avalon-nano-3s": [
@@ -3653,6 +3674,13 @@
   },
   {
    "t": "2026-11-05T19:57:05Z",
+   "price": 239.0,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  },
+  {
+   "t": "2026-11-06T19:24:37Z",
    "price": 239.0,
    "currency": "USD",
    "in_stock": true,
@@ -5621,6 +5649,13 @@
    "currency": "USD",
    "in_stock": false,
    "status": "out_of_stock"
+  },
+  {
+   "t": "2026-11-06T19:24:37Z",
+   "price": 449.99,
+   "currency": "USD",
+   "in_stock": false,
+   "status": "out_of_stock"
   }
  ],
  "solosatoshi:bitaxe-naja-duo": [
@@ -5973,6 +6008,13 @@
   },
   {
    "t": "2026-11-05T19:57:05Z",
+   "price": 169.0,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  },
+  {
+   "t": "2026-11-06T19:24:37Z",
    "price": 169.0,
    "currency": "USD",
    "in_stock": true,
@@ -7176,6 +7218,13 @@
   },
   {
    "t": "2026-11-05T19:57:05Z",
+   "price": 949.0,
+   "currency": "USD",
+   "in_stock": false,
+   "status": "preorder"
+  },
+  {
+   "t": "2026-11-06T19:24:37Z",
    "price": 949.0,
    "currency": "USD",
    "in_stock": false,
