@@ -225,7 +225,7 @@ SHORT = {"bitaxe-supra": "Bitaxe Supra", "bitaxe-ultra": "Bitaxe Ultra", "bitaxe
          "heatbit-maxi": "Heatbit Maxi", "heatbit-canvas": "Heatbit Canvas", "braiins-bmm-101": "Braiins Mini Miner", "hammer-bc04": "Hammer BC04",
          "bitaxe-gamma-hex": "Bitaxe Gamma Hex", "bitaxe-naja-duo": "Bitaxe Naja Duo", "nerdoctaxe": "NerdOCTaxe Gamma", "bitforge-nano": "BitForge Nano",
          "heatbit-bitair": "Heatbit Bitair", "futurebit-apollo-iii": "FutureBit Apollo III", "hammer-thor-p2": "Hammer Thor P2", "hammer-bc08": "Hammer BC08",
-         "gekko-kbox-22": "GekkoScience KBox 22", "dcentral-stealthminer": "D-Central StealthMiner", "bitcube": "Bitcube", "heatbit-bitwater": "Heatbit Bitwater", "nmqaxe-nexus": "NMQAxe++ Nexus", "nerdqx": "NerdQX", "bitaxe-702": "Bitaxe 702", "nerdaxe-gaia-copper-pro": "Gaia Copper Pro", "gekko-kbeast-50": "GekkoScience KBeast 50", "bitaxe-touch": "Bitaxe Touch"}
+         "gekko-kbox-22": "GekkoScience KBox 22", "dcentral-stealthminer": "D-Central StealthMiner", "bitcube": "Bitcube", "heatbit-bitwater": "Heatbit Bitwater", "nmqaxe-nexus": "NMQAxe++ Nexus", "nerdqx": "NerdQX", "bitaxe-702": "Bitaxe 702", "nerdaxe-gaia-copper-pro": "Gaia Copper Pro", "gekko-kbeast-50": "GekkoScience KBeast 50", "bitaxe-touch": "Bitaxe Touch", "hammer-thor-x1": "Hammer Thor X1"}
 NOINDEX_MODELS = {"bitaxe-supra", "bitaxe-ultra"}   # older generations: pages exist for completeness but stay out of the index/sitemap
 
 MODEL_COPY = {
@@ -448,6 +448,14 @@ NEW_COPY = {   # added 2026-10-21 (docs/MINER_CATALOG.md). Stock settings only; 
                "It needs a 5 V power supply (USB-C or barrel). Check whether the listing includes one.",
                "Wi-Fi is 2.4 GHz only.",
                "The hashrate and power figures above are the seller's, not our measurements."]),
+    "hammer-thor-x1": dict(
+        intro="The Hammer Miner Thor X1 is a compact desk miner with one Bitmain BM1373 chip and a small status screen. Bitcoin Merch states about 3.2 TH/s at 35 W (about 11 J/TH) over USB-C. Altair's power modes list about 2.7 TH/s at 34 W in normal mode and about 3.2 TH/s at 46 W when overclocked. Wi-Fi is 2.4 GHz.",
+        who="Someone who wants a small BM1373 desk miner for solo lottery mining, with a USB-C power supply in the box, without stepping up to the bigger Thor P2.",
+        check=["Two shops we track sell it: Altair is usually cheaper and says in stock with next-business-day shipping; Bitcoin Merch is higher and its listing says it ships as soon as 4 weeks — check the stock badge.",
+               "Altair's listing includes a 65 W USB-C PSU plus a US cord. Bitcoin Merch's title also says a power supply is included.",
+               "The Thor P2 is a different, larger dual-chip model. We do not mix those listings.",
+               "Do not buy Altair's separate Thor X1 replacement PSU page by mistake — that is only a spare adapter.",
+               "The hashrate and power figures above are the sellers', not our measurements."]),
 }
 MODEL_COPY.update(NEW_COPY)
 
@@ -615,7 +623,7 @@ NAV_SECTIONS = {"/miners/": ("/miners/", "/solo-miners/", "/pool-miners/", "/hea
 # Browse-by-type categories. Any miner can solo or pool mine; these say what each is best suited to. A miner can be in several.
 SOLO_SET = ["bitaxe-gamma", "bitaxe-gamma-duo", "bitaxe-gt-801", "nerdaxe-gamma", "nerdaxe-gaia", "nerdqaxe-pp",
             "braiins-bmm-101", "avalon-nano-3s", "hammer-bc04", "bitaxe-supra", "bitaxe-ultra",
-            "bitaxe-naja-duo", "bitforge-nano", "heatbit-bitair", "bitaxe-gamma-hex", "nerdoctaxe", "hammer-thor-p2", "hammer-bc08", "futurebit-apollo-iii", "bitcube", "nmqaxe-nexus", "nerdqx", "bitaxe-702", "nerdaxe-gaia-copper-pro", "bitaxe-touch"]
+            "bitaxe-naja-duo", "bitforge-nano", "heatbit-bitair", "bitaxe-gamma-hex", "nerdoctaxe", "hammer-thor-p2", "hammer-bc08", "futurebit-apollo-iii", "bitcube", "nmqaxe-nexus", "nerdqx", "bitaxe-702", "nerdaxe-gaia-copper-pro", "bitaxe-touch", "hammer-thor-x1"]
 POOL_SET = ["avalon-nano-3s", "hammer-bc04", "heatbit-canvas", "heatbit-trio", "avalon-mini-3", "heatbit-maxi", "avalon-q",
             "bitaxe-gamma-hex", "nerdoctaxe", "hammer-thor-p2", "hammer-bc08", "futurebit-apollo-iii", "gekko-kbox-22", "gekko-kbeast-50", "dcentral-stealthminer", "heatbit-bitwater", "nmqaxe-nexus"]
 HEAT_SET = ["avalon-nano-3s", "heatbit-canvas", "heatbit-trio", "avalon-mini-3", "heatbit-maxi", "avalon-q", "gekko-kbox-22", "gekko-kbeast-50", "dcentral-stealthminer"]
@@ -637,7 +645,7 @@ RADAR_BG = ('<svg class="radar-bg" viewBox="0 0 200 200" aria-hidden="true" focu
             '<path d="M100 0v200M0 100h200" stroke-opacity=".5"/></g><path d="M100 100 L132.8 9.8 A96 96 0 0 1 178.6 45 Z" fill="#f7931a" fill-opacity=".8"/></svg>')
 CHIPS = {"bitaxe-supra": 1, "bitaxe-ultra": 1, "bitaxe-gamma": 1, "bitaxe-gamma-duo": 2, "bitaxe-gt-801": 2,
          "nerdaxe-gamma": 1, "nerdaxe-gaia": 1, "nerdqaxe-pp": 4, "nerdoctaxe": 4, "nerdqx": 4, "dcentral-stealthminer": 4, "bitaxe-702": 6, "nerdaxe-gaia-copper-pro": 1}
-SCREEN = {"nerdaxe-gamma", "nerdaxe-gaia", "nerdaxe-gaia-copper-pro", "bitaxe-touch"}
+SCREEN = {"nerdaxe-gamma", "nerdaxe-gaia", "nerdaxe-gaia-copper-pro", "bitaxe-touch", "hammer-thor-x1"}
 
 
 # Product photos: each one is the seller's own product image for that exact model (sources in docs/IMAGE_SOURCES.md),
@@ -670,6 +678,7 @@ MODEL_IMG = {
     "nmqaxe-nexus": (495, 800, "NMMiner NMQAxe++ Nexus desk Bitcoin miner with a color screen and tower cooler"),
     "bitcube": (800, 613, "Power Mining Bitcube cube Bitcoin miner with 777 GH/s on its touchscreen"),
     "bitaxe-touch": (463, 463, "ACS Bitaxe Touch 1 TH/s desk Bitcoin miner with 4.3 inch touchscreen"),
+    "hammer-thor-x1": (646, 800, "Hammer Miner Thor X1 desk Bitcoin miner on green Hammer stand"),
 }
 MODEL_IMG = {k: v for k, v in MODEL_IMG.items() if (SITE / "img" / "models" / f"{k}.webp").exists()}
 
@@ -1689,7 +1698,7 @@ def build_black_friday():
 # HEATER & HOME MINERS hub + plain-language guides
 # ---------------------------------------------------------------------------------------------
 HEATER_GROUP = ["avalon-mini-3", "avalon-q", "heatbit-trio", "heatbit-maxi", "heatbit-canvas", "gekko-kbox-22", "gekko-kbeast-50", "dcentral-stealthminer"]
-DESK_GROUP = ["avalon-nano-3s", "hammer-bc04", "braiins-bmm-101", "heatbit-bitair", "bitcube", "futurebit-apollo-iii", "hammer-thor-p2", "hammer-bc08", "nmqaxe-nexus", "bitaxe-touch"]
+DESK_GROUP = ["avalon-nano-3s", "hammer-bc04", "braiins-bmm-101", "heatbit-bitair", "bitcube", "futurebit-apollo-iii", "hammer-thor-p2", "hammer-bc08", "nmqaxe-nexus", "bitaxe-touch", "hammer-thor-x1"]
 GUIDE_UPDATED = "2026-10-21"
 NETWORK_EH_SEEN = "about 1,050 EH/s"       # mempool.space /api/v1/mining/hashrate/3d on 2026-10-21 (see docs/HOME_MINING_HUB_PLAN.md)
 
@@ -1977,6 +1986,7 @@ NOISE = {   # (max stated dB or 0 for fanless, text, source)
     "bitaxe-gamma-hex": (30, "About 30 dB stated (liquid-cooled)", "Solo Satoshi listing"),
     "hammer-bc08": (38, "About 38 dB stated", "Altair Technology listing"),
     "hammer-thor-p2": (40, "About 38–40 dB stated", "Altair / Bitcoin Merch listings"),
+    "hammer-thor-x1": (51, "About 34–51 dB stated, by mode", "Altair Technology listing"),
     "heatbit-bitair": (44, "25–44 dB stated", "Heatbit / Altair listings"),
     "gekko-kbox-22": (47, "About 38–47 dB stated, by mode", "Altair Technology listing"),
     "dcentral-stealthminer": (60, "Under 60 dB stated", "D-Central listing"),
@@ -2006,6 +2016,7 @@ GIFT_WHY = {   # gift-friendly picks; each lands in a budget group by its live i
     "avalon-q": "The big one: about 90 TH/s and up to about 1,674 W of heat for a garage or basement this winter.",
     "gekko-kbeast-50": "About 50 TH/s at 800 W in one enclosed heater box, with the power supply built in. A high-ticket winter gift if the shop's ship date works.",
     "bitaxe-touch": "A Bitaxe-class desk miner with a 4.3″ touchscreen for clock and stats — polished gift for someone who wants more than a bare board.",
+    "hammer-thor-x1": "About 3.2 TH/s on a BM1373 in a compact USB-C desk miner with a screen — a mid-budget gift that ships with a power supply from Altair when in stock.",
 }
 GIFT_BANDS = [("under-100", "Under $100", 0, 100), ("100-300", "$100 to $300", 100, 300), ("300-up", "$300 and up", 300, 10 ** 9)]
 

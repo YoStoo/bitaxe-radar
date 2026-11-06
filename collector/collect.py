@@ -102,6 +102,10 @@ MODELS = {
     # added 2026-11-04 evening: ACS/Bitcoin Merch Bitaxe Touch only (Solo Satoshi Turbo Touch is different hardware)
     "bitaxe-touch":     {"name": "Bitaxe Touch", "category": "board", "chip": "BM1370", "hashrate_ths": 1.0, "watts": 17,
                          "note": "Seller-stated ~1 TH/s (950 GH/s–1 TH/s) at 17 W for the BM1370 ACS/Bitcoin Merch unit with 4.3″ touchscreen; Solo Satoshi Turbo Touch is different hardware and is not mapped"},
+    # added 2026-11-05 evening: Hammer Thor X1 desk miner (Altair + Bitcoin Merch); stock 3.2 TH/s @ 35 W BM1373 USB-C
+    "hammer-thor-x1":   {"name": "Hammer Miner Thor X1", "category": "home", "kind": "Desk miner", "maker": "Hammer",
+                         "chip": "BM1373", "hashrate_ths": 3.2, "watts": 35,
+                         "note": "Seller-stated 3.2 TH/s at 35 W (Bitcoin Merch) on one BM1373 via USB-C; Altair FAQ also states ~34 W normal / ~46 W overclock"},
 }
 # hashrate_ths / watts above are typical VENDOR-STATED figures used only for the cost estimate.
 # They are approximate and must be labelled as such on the site.
@@ -151,6 +155,7 @@ BITCOINMERCH = {  # Shopify handle
     "nerdqx":           "bitcoin-merch®-nerdqx-8th-s-home-miner-w-power-supply",
     "gekko-kbeast-50":  "bitcoin-merch®-gekkoscience-kbeast-50-th-s-bitcoin-miner-heater",
     "bitaxe-touch":     ("bitcoin-merch-bitaxe-touch-1th-s", "Silver / BM1370 1TH/s"),  # not BM1368 700GH/s ($399.99)
+    "hammer-thor-x1":   "bitcoin-merch®-hammer-miner-thor-x1-3-2th-s-lottery-miner",
 }
 SOLOSATOSHI = {  # WooCommerce slug
     "bitaxe-supra":     "bitaxe-supra",
@@ -191,6 +196,7 @@ ALTAIR = {  # product slug -> (variation attribute filter or None)
     "hammer-thor-p2": ("thor-p2-bitcoin-miner", ("attribute_power-supply", "US")),
     "hammer-bc08":    ("hammer-miner-bc08-12th-desktop-bitcoin-miner", None),
     "gekko-kbox-22":  ("gekkoscience-kbox-bitcoin-miner", None),
+    "hammer-thor-x1": ("hammer-miner-thor-x1-home-bitcoin-miner", None),
 }
 HEATBIT = {  # Shopify handle -> regex the US variant title must match
     "heatbit-trio":   ("heatbit-trio", r"/ US /"),
@@ -216,12 +222,14 @@ TITLE_MUST = {
     "hammer-thor-p2": ["thor p2"], "hammer-bc08": ["bc08"], "gekko-kbox-22": ["kbox"], "dcentral-stealthminer": ["stealthminer"],
     "nmqaxe-nexus": ["nmqaxe", "nexus"], "nerdqx": ["nerdqx"], "gekko-kbeast-50": ["kbeast"],
     "bitaxe-touch": ["bitaxe", "touch"],
+    "hammer-thor-x1": ["thor x1"],
 }
 TITLE_NOT = {  # words that mean a different product (accessory, other edition)
     "bitforge-nano": ["ghost"], "nerdoctaxe": ["stand", "screen", "fan", "heatsink", "hydro"], "bitaxe-naja-duo": ["stand", ".stl"],
     "hammer-bc08": ["hydro"], "futurebit-apollo-iii": ["full node", "apollo ii "], "heatbit-bitair": ["filter"],
     "gekko-kbox-22": ["kbeast"], "gekko-kbeast-50": ["kbox"],
     "bitaxe-touch": ["turbo", "blockstream", "jade", "gt 801", "801"],
+    "hammer-thor-x1": ["thor p2", "bc01", "replacement"],
 }
 
 
@@ -240,6 +248,13 @@ def ship_wait(text):
     m = re.search(r"ships in (\d+)\s*[-–]\s*(\d+) weeks", t, re.I)
     if m:
         return "backorder", f"Ships in {m.group(1)}-{m.group(2)} weeks (per the shop)"
+    # Single-number / "as soon as" ship waits can sit at the end of a long listing (e.g. Thor X1 "Ships as soon as 4 weeks")
+    m = re.search(r"ships as soon as (\d+)\s*weeks?", full, re.I)
+    if m:
+        return "backorder", f"Ships as soon as {m.group(1)} weeks (per the shop)"
+    m = re.search(r"ships in (\d+)\s*weeks?(?!\s*[-–])", full, re.I)
+    if m:
+        return "backorder", f"Ships in {m.group(1)} weeks (per the shop)"
     # Month+year ship date can sit at the end of a long listing (e.g. KBeast "Ships in December 2026")
     m = re.search(r"ships in (january|february|march|april|may|june|july|august|september|october|november|december)\s+(20\d{2})", full, re.I)
     if m:

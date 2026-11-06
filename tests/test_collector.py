@@ -18,7 +18,9 @@ class CollectorRules(unittest.TestCase):
               ("nerdqx", "Bitcoin Merch® - NerdQX 8TH/s Home Miner w/ Power Supply"),
               ("gekko-kbeast-50", "Bitcoin Merch® - GekkoScience KBeast 50+TH/s Bitcoin Miner & Heater"),
               ("gekko-kbox-22", "Bitcoin Merch® - GekkoScience KBox 22TH/s Bitcoin Miner & Heater"),
-              ("bitaxe-touch", "Bitcoin Merch® - Bitaxe Touch - 1TH/s")]
+              ("bitaxe-touch", "Bitcoin Merch® - Bitaxe Touch - 1TH/s"),
+              ("hammer-thor-x1", "Bitcoin Merch® - Hammer Miner Thor X1  3.2TH/s Lottery Miner w/ Power Supply"),
+              ("hammer-thor-x1", "Hammer Miner Thor X1 Home Desktop Bitcoin Miner 3.2T")]
         bad = [("bitforge-nano", "BitForge Nano Bitcoin Solo Miner (Ghost Edition)"),
                ("nerdoctaxe", "Bitcoin Merch® - NerdOCTaxe Stand"),
                ("nerdoctaxe", "Bitcoin Merch® - NerdOCTaxe Hydro 12TH/s BTC Miner"),
@@ -32,7 +34,10 @@ class CollectorRules(unittest.TestCase):
                ("gekko-kbeast-50", "Bitcoin Merch® - GekkoScience KBox 22TH/s Bitcoin Miner & Heater"),
                ("bitaxe-touch", "Bitaxe Touch Bitcoin Solo Miner (Turbo Touch Edition)"),
                ("bitaxe-touch", "Bitaxe Touch Blockstream Edition"),
-               ("bitaxe-touch", "Bitaxe Touch Jade")]
+               ("bitaxe-touch", "Bitaxe Touch Jade"),
+               ("hammer-thor-x1", "Thor P2 Bitcoin Miner – 10 TH/s Dual BM1373 ASIC Miner"),
+               ("hammer-thor-x1", "Hammer Miner BC01 Home Bitcoin Miner"),
+               ("hammer-thor-x1", "Hammer Miner Thor X1 Replacement Power Supply")]
         for m, t in ok:
             self.assertTrue(C.title_ok(m, t), (m, t))
         for m, t in bad:
@@ -48,6 +53,8 @@ class CollectorRules(unittest.TestCase):
         self.assertEqual(C.MODELS["nerdqx"]["hashrate_ths"], 8.1)        # Normal mode; ~11 TH/s is Turbo
         self.assertEqual(C.MODELS["gekko-kbeast-50"]["hashrate_ths"], 50)
         self.assertEqual(C.MODELS["gekko-kbeast-50"]["watts"], 800)
+        self.assertEqual(C.MODELS["hammer-thor-x1"]["hashrate_ths"], 3.2)
+        self.assertEqual(C.MODELS["hammer-thor-x1"]["watts"], 35)
         for m in ("dtv", "futurebit", "nmminer"):
             self.assertIn(m, C.SELLERS)
             self.assertIn(m, C.ADAPTERS)
@@ -55,6 +62,7 @@ class CollectorRules(unittest.TestCase):
     def test_ship_wait(self):
         self.assertEqual(C.ship_wait("Apollo III - Standard Version - Miner Only - Ships in 4-6 Weeks")[0], "backorder")
         self.assertEqual(C.ship_wait("GekkoScience KBox 22TH Quiet Bitcoin Miner Pre-order: Shipping within 6-10 weeks")[0], "preorder")
+        self.assertEqual(C.ship_wait("Ships as soon as 4 weeks."), ("backorder", "Ships as soon as 4 weeks (per the shop)"))
         self.assertIsNone(C.ship_wait("FutureBit Apollo 200W Power Supply - Ships in 2-3 Days"))
         long = ("Meet the KBeast. " * 40) + "Ships in December 2026"
         self.assertEqual(C.ship_wait(long), ("preorder", "Ships in December 2026 (per the shop)"))

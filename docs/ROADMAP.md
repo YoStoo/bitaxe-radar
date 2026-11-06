@@ -1,6 +1,6 @@
 # Bitaxe Radar Roadmap
 
-Updated: Nov 5, 2026 (morning)
+Updated: Nov 5, 2026 (evening)
 
 ## 🎯 Goal
 
@@ -10,8 +10,8 @@ Updated: Nov 5, 2026 (morning)
 
 ## 🔨 Now
 
-- Add more home miners: 79 found, 34 on the site so far.
-- Bitaxe Touch (catalog #7 ACS/Bitcoin Merch unit) added Nov 4 evening. Avalon Nano 3 skipped for now (replaced by the 3S and sold out where we looked).
+- Add more home miners: 79 found, 35 on the site so far.
+- Hammer Thor X1 added Nov 5 evening. Avalon Nano 3 skipped for now (replaced by the 3S and sold out where we looked).
 
 ## ⏭️ Next up (in order)
 
@@ -77,6 +77,8 @@ Later:
 - PO Box address before the first newsletter email goes out.
 
 ## ✅ Done
+
+- Nov 5 (evening): Hammer Miner Thor X1 added (/models/hammer-thor-x1/). Desk miner with one BM1373: seller-stated 3.2 TH/s at 35 W (Bitcoin Merch; Altair FAQ also lists ~34 W normal / ~46 W overclock), USB-C, Wi-Fi 2.4 GHz, screen. Tracked at Altair ($219.00 in stock, ships in 1 business day, 65 W USB-C PSU in the box) and Bitcoin Merch ($329.99; listing says ships as soon as 4 weeks). On solo set, desk group, and gift guide $100–$300 band. Why: next clear vetted desk miner after catalog top-15 are largely tracked (Altair + Bitcoin Merch).
 
 - Nov 5 (morning): Chips guide link: when no miner is in stock under $100, point "lottery ticket" shoppers to /best/beginners/ instead of a missing /best/under-100/ page (keeps internal links and the sitemap test green).
 - Nov 5 (morning): BitForge Nano vs Bitaxe GT 801 compare (/compare/bitforge-nano-vs-bitaxe-gt-801/): same ~$170 desk/solo class, both dual BM1370. Enclosed quieter BitForge Nano (about 2.6 TH/s at ~40 W, about 29 dB stated) vs open Bitaxe GT / Gamma Turbo 801 (about 2.15 TH/s at ~43 W). Live cheapest in-stock USD at build ($169.99 DTV Electronics vs $174.99 Bitcoin Merch; Solo Satoshi GT $195.99 also in stock), efficiency, yearly power at $0.15/kWh, and buy links. Why: buyers weighing a quiet closed desk case against an open GT board at nearly the same price — drives affiliate buy buttons.
@@ -151,13 +153,13 @@ Later:
 - Oct 24: Heat guide (/guides/bitcoin-mining-heat-your-home/): miner vs space heater vs heat pump with live numbers. Each heater miner shows its power cost, what mining pays back, and the power price below which it beats a heat pump (DOE: heat pumps use about 50% less electricity). Also hot-water heating (Heatbit Bitwater) and winter-only tips.
 - Oct 21: Room heat calculator (/heat-calculator/): type your room size, see how much heat it needs and which miners can heat it, with today's prices.
 
-## 📊 Numbers (Nov 5, morning)
+## 📊 Numbers (Nov 5, evening)
 
 - Revenue: $0 (no commission emails yet)
 - Subscribers: 1 (Resend contact count in the Nov 1 alert run; it's your own test)
-- Miners tracked: 34
+- Miners tracked: 35
 - Sellers tracked: 11
-- Listings checked: 60
+- Listings checked: 62
 - Paying affiliate programs: 3 (Power Mining, Bitaxe.de, Solo Satoshi)
 - Tests: 131 passing
-- Pages on the site: 95 in the sitemap
+- Pages on the site: 97 in the sitemap

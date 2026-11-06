@@ -104,7 +104,7 @@ Internal research doc. This doc doesn't change any site code.
 | Hammer BC01 | Hammer | 1.5 TH/s | 22-31 W | $109-115 | solo | altairtech.io $109, bitcoinmerch.com $114.99 | ❌ | HTML/JSON | |
 | Hammer BC04 | Hammer | 6 TH/s | 76-108 W | $215-350 | solo | altairtech.io $215, bitcoinmerch.com $349.99 | ✅ | HTML/JSON | |
 | Hammer BC08 (air with touchscreen / Hydro) | Hammer | 12 TH/s | 210 W | $519-700 | pool | altairtech.io $519, bitcoinmerch.com Hydro $699.99 | ❌ | HTML/JSON | ⚠ The Bitcoin Merch Hydro page mentions 240 V, so verify the voltage. |
-| Hammer Thor X1 | Hammer | 3.2 TH/s | 35 W | $219-330 | solo | altairtech.io $219, bitcoinmerch.com $329.99 | ❌ | HTML/JSON | |
+| Hammer Thor X1 | Hammer | 3.2 TH/s | 35 W | $219-330 | solo | altairtech.io $219, bitcoinmerch.com $329.99 | ✅ | HTML/JSON | Tracked Nov 5 evening: stock 3.2 TH/s @ 35 W BM1373 USB-C (Altair + Bitcoin Merch). |
 | Hammer Thor P2 (2x BM1373) | Hammer | 10 TH/s | 166 W | $369-590 | pool | altairtech.io $369, bitcoinmerch.com $589.99 | ❌ | HTML/JSON | |
 | Hammer Glod P3 | Hammer | 12 TH/s | 160 W | $649.99 | pool | bitcoinmerch.com | ❌ | JSON | |
 | Hammer Glod Omni (touchscreen) | Hammer | 1.2 TH/s | 20 W | $324.99 | solo | bitcoinmerch.com | ❌ | JSON | |
