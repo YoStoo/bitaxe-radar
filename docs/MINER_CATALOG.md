@@ -118,7 +118,7 @@ Internal research doc. This doc doesn't change any site code.
 | LuckyAxe BL04 (BTC/DOGE dual) | ? | 3.3 TH/s | 100 W | $499.99 | solo | bitcoinmerch.com | ❌ | JSON | ⚠ Maker unclear |
 | LuckyAxe B101 | ? | 1.8 TH/s (seller) | ? | $99 | solo | luckyminerclub.com | ❌ | JSON | SPEC?, UNVETTED |
 | GekkoScience Compac F (USB) | GekkoScience | ~250-300 GH/s per stick | ? | $134.99 (bundles $450-900) | solo | bitcoinmerch.com | ❌ | JSON | Poor value per TH/s |
-| GekkoScience Terminus A2X | GekkoScience | 7-8 TH/s | 100-130 W | $399-500 | solo | altairtech.io $399, bitcoinmerch.com $499.99 | ❌ | HTML/JSON | |
+| GekkoScience Terminus A2X | GekkoScience | 7-8 TH/s | 100-130 W | $399-500 | solo | altairtech.io $399, bitcoinmerch.com $499.99 | ✅ | HTML/JSON | Tracked Nov 6 evening: stock 7.2 TH/s @ 110 W (Altair + Bitcoin Merch; chip not stated on seller pages). |
 | GekkoScience KBuddy | GekkoScience | 15-18 TH/s | 200-300 W | $599.99 | pool | bitcoinmerch.com | ❌ | JSON | 120/240 V |
 | GekkoScience KBox 22 | GekkoScience | 22 TH/s | 330 W | $849-900 | pool/heater | altairtech.io $849, bitcoinmerch.com $899.99 | ❌ | HTML/JSON | Sold as a "Miner & Heater" |
 | GekkoScience KBeast 50 | GekkoScience | 50+ TH/s | 800 W | $1,099.99 | heater | bitcoinmerch.com | ✅ | JSON | 120/240 V |

@@ -110,6 +110,10 @@ MODELS = {
     "hammer-bc01":      {"name": "Hammer Miner BC01", "category": "home", "kind": "Desk miner", "maker": "Hammer",
                          "hashrate_ths": 1.2, "watts": 22,
                          "note": "Seller-stated Normal 1.2 TH/s at 22 W (~16 J/TH, ~46 dB); Overclock ~1.5 TH/s at ~31 W (~49 dB); USB-C PSU in box; Altair $109 / Bitcoin Merch $114.99"},
+    # added 2026-11-06 evening: GekkoScience Terminus A2X desk/pod miner (Altair + Bitcoin Merch); stock 7.2 TH/s @ 110 W (chip not stated on seller pages)
+    "gekko-terminus-a2x": {"name": "GekkoScience Terminus A2X", "category": "home", "kind": "Desk miner (pod)", "maker": "GekkoScience",
+                         "hashrate_ths": 7.2, "watts": 110,
+                         "note": "Seller-stated ~7.2 TH/s at ~110 W stock; overclock up to ~8 TH/s at ~130 W (Bitcoin Merch); 24V 6A brick included; integrated Linux controller, Wi-Fi, web UI; made in USA (Missouri)"},
 }
 # hashrate_ths / watts above are typical VENDOR-STATED figures used only for the cost estimate.
 # They are approximate and must be labelled as such on the site.
@@ -161,6 +165,7 @@ BITCOINMERCH = {  # Shopify handle
     "bitaxe-touch":     ("bitcoin-merch-bitaxe-touch-1th-s", "Silver / BM1370 1TH/s"),  # not BM1368 700GH/s ($399.99)
     "hammer-thor-x1":   "bitcoin-merch®-hammer-miner-thor-x1-3-2th-s-lottery-miner",
     "hammer-bc01":      "bitcoin-merch®-hammer-miner-bc01-1-5th-s-bitcoin-miner-w-power-supply",
+    "gekko-terminus-a2x": "bitcoin-merch®-gekkoscience-terminus-a2x-7th-s-btc-miner",
 }
 SOLOSATOSHI = {  # WooCommerce slug
     "bitaxe-supra":     "bitaxe-supra",
@@ -203,6 +208,7 @@ ALTAIR = {  # product slug -> (variation attribute filter or None)
     "gekko-kbox-22":  ("gekkoscience-kbox-bitcoin-miner", None),
     "hammer-thor-x1": ("hammer-miner-thor-x1-home-bitcoin-miner", None),
     "hammer-bc01":    ("hammer-miner-bc01-home-bitcoin-miner", None),
+    "gekko-terminus-a2x": ("gekkoscience-terminus-a2x-bitcoin-miner", None),
 }
 HEATBIT = {  # Shopify handle -> regex the US variant title must match
     "heatbit-trio":   ("heatbit-trio", r"/ US /"),
@@ -230,6 +236,7 @@ TITLE_MUST = {
     "bitaxe-touch": ["bitaxe", "touch"],
     "hammer-thor-x1": ["thor x1"],
     "hammer-bc01": ["hammer", "bc01"],
+    "gekko-terminus-a2x": ["terminus"],
 }
 TITLE_NOT = {  # words that mean a different product (accessory, other edition)
     "bitforge-nano": ["ghost"], "nerdoctaxe": ["stand", "screen", "fan", "heatsink", "hydro"], "bitaxe-naja-duo": ["stand", ".stl"],
@@ -238,6 +245,7 @@ TITLE_NOT = {  # words that mean a different product (accessory, other edition)
     "bitaxe-touch": ["turbo", "blockstream", "jade", "gt 801", "801"],
     "hammer-thor-x1": ["thor p2", "bc01", "replacement"],
     "hammer-bc01": ["thor", "bc04", "bc08", "replacement"],
+    "gekko-terminus-a2x": ["kbox", "kbeast", "replacement"],
 }
 
 

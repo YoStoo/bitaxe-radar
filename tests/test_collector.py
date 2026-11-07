@@ -22,7 +22,9 @@ class CollectorRules(unittest.TestCase):
               ("hammer-thor-x1", "Bitcoin Merch® - Hammer Miner Thor X1  3.2TH/s Lottery Miner w/ Power Supply"),
               ("hammer-thor-x1", "Hammer Miner Thor X1 Home Desktop Bitcoin Miner 3.2T"),
               ("hammer-bc01", "Bitcoin Merch® - Hammer Miner BC01 1.5TH/s Bitcoin Miner w/ Power Supply"),
-              ("hammer-bc01", "Hammer Miner BC01 Home Bitcoin Miner")]
+              ("hammer-bc01", "Hammer Miner BC01 Home Bitcoin Miner"),
+              ("gekko-terminus-a2x", "Bitcoin Merch® - GekkoScience Terminus A2X 7-8TH/s Pod BTC Miner"),
+              ("gekko-terminus-a2x", "GekkoScience Terminus A2X Bitcoin Miner")]
         bad = [("bitforge-nano", "BitForge Nano Bitcoin Solo Miner (Ghost Edition)"),
                ("nerdoctaxe", "Bitcoin Merch® - NerdOCTaxe Stand"),
                ("nerdoctaxe", "Bitcoin Merch® - NerdOCTaxe Hydro 12TH/s BTC Miner"),
@@ -42,7 +44,10 @@ class CollectorRules(unittest.TestCase):
                ("hammer-thor-x1", "Hammer Miner Thor X1 Replacement Power Supply"),
                ("hammer-bc01", "Hammer Miner Thor X1 Home Desktop Bitcoin Miner 3.2T"),
                ("hammer-bc01", "Hammer Miner BC04 Home Bitcoin Miner"),
-               ("hammer-bc01", "Hammer Miner BC01 Replacement Power Supply")]
+               ("hammer-bc01", "Hammer Miner BC01 Replacement Power Supply"),
+               ("gekko-terminus-a2x", "Bitcoin Merch® - GekkoScience KBox 22TH/s Bitcoin Miner & Heater"),
+               ("gekko-terminus-a2x", "Bitcoin Merch® - GekkoScience KBeast 50+TH/s Bitcoin Miner & Heater"),
+               ("gekko-terminus-a2x", "GekkoScience Terminus A2X Replacement Power Supply")]
         for m, t in ok:
             self.assertTrue(C.title_ok(m, t), (m, t))
         for m, t in bad:
@@ -62,6 +67,8 @@ class CollectorRules(unittest.TestCase):
         self.assertEqual(C.MODELS["hammer-thor-x1"]["watts"], 35)
         self.assertEqual(C.MODELS["hammer-bc01"]["hashrate_ths"], 1.2)
         self.assertEqual(C.MODELS["hammer-bc01"]["watts"], 22)
+        self.assertEqual(C.MODELS["gekko-terminus-a2x"]["hashrate_ths"], 7.2)
+        self.assertEqual(C.MODELS["gekko-terminus-a2x"]["watts"], 110)
         for m in ("dtv", "futurebit", "nmminer"):
             self.assertIn(m, C.SELLERS)
             self.assertIn(m, C.ADAPTERS)
