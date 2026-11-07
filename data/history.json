@@ -1145,6 +1145,13 @@
    "currency": "USD",
    "in_stock": true,
    "status": "in_stock"
+  },
+  {
+   "t": "2026-11-07T21:51:19Z",
+   "price": 229.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
   }
  ],
  "solosatoshi:bitaxe-supra": [
@@ -1471,6 +1478,13 @@
    "currency": "USD",
    "in_stock": true,
    "status": "in_stock"
+  },
+  {
+   "t": "2026-11-07T21:51:19Z",
+   "price": 67.0,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
   }
  ],
  "solosatoshi:bitaxe-gamma-duo": [
@@ -1630,6 +1644,13 @@
   },
   {
    "t": "2026-11-07T00:11:39Z",
+   "price": 111.69,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  },
+  {
+   "t": "2026-11-07T21:51:19Z",
    "price": 111.69,
    "currency": "USD",
    "in_stock": true,
@@ -1963,6 +1984,13 @@
   },
   {
    "t": "2026-11-07T00:11:39Z",
+   "price": 210.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  },
+  {
+   "t": "2026-11-07T21:51:19Z",
    "price": 210.99,
    "currency": "USD",
    "in_stock": true,
@@ -2654,6 +2682,13 @@
    "currency": "EUR",
    "in_stock": false,
    "status": "backorder"
+  },
+  {
+   "t": "2026-11-07T21:51:19Z",
+   "price": 249.0,
+   "currency": "EUR",
+   "in_stock": false,
+   "status": "backorder"
   }
  ],
  "bitaxede:nerdqaxe-pp": [
@@ -2976,6 +3011,13 @@
   },
   {
    "t": "2026-11-06T19:24:37Z",
+   "price": 100.0,
+   "currency": "EUR",
+   "in_stock": true,
+   "status": "in_stock"
+  },
+  {
+   "t": "2026-11-07T21:51:19Z",
    "price": 100.0,
    "currency": "EUR",
    "in_stock": true,
@@ -3697,6 +3739,13 @@
    "currency": "USD",
    "in_stock": true,
    "status": "in_stock"
+  },
+  {
+   "t": "2026-11-07T21:51:19Z",
+   "price": 1478.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
   }
  ],
  "altair:avalon-nano-3s": [
@@ -3821,6 +3870,13 @@
   },
   {
    "t": "2026-11-06T19:24:37Z",
+   "price": 239.0,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  },
+  {
+   "t": "2026-11-07T21:51:19Z",
    "price": 239.0,
    "currency": "USD",
    "in_stock": true,
@@ -4977,6 +5033,13 @@
    "currency": "USD",
    "in_stock": false,
    "status": "backorder"
+  },
+  {
+   "t": "2026-11-07T21:51:19Z",
+   "price": 449.99,
+   "currency": "USD",
+   "in_stock": false,
+   "status": "backorder"
   }
  ],
  "bitcoinmerch:bitaxe-naja-duo": [
@@ -5108,6 +5171,13 @@
   },
   {
    "t": "2026-11-07T00:11:39Z",
+   "price": 599.99,
+   "currency": "USD",
+   "in_stock": false,
+   "status": "backorder"
+  },
+  {
+   "t": "2026-11-07T21:51:19Z",
    "price": 599.99,
    "currency": "USD",
    "in_stock": false,
@@ -5638,6 +5708,13 @@
    "currency": "USD",
    "in_stock": false,
    "status": "backorder"
+  },
+  {
+   "t": "2026-11-07T21:51:19Z",
+   "price": 589.99,
+   "currency": "USD",
+   "in_stock": false,
+   "status": "backorder"
   }
  ],
  "bitcoinmerch:gekko-kbox-22": [
@@ -5773,6 +5850,13 @@
    "currency": "USD",
    "in_stock": false,
    "status": "backorder"
+  },
+  {
+   "t": "2026-11-07T21:51:19Z",
+   "price": 899.99,
+   "currency": "USD",
+   "in_stock": false,
+   "status": "backorder"
   }
  ],
  "solosatoshi:bitaxe-gamma-hex": [
@@ -5897,6 +5981,13 @@
   },
   {
    "t": "2026-11-06T19:24:37Z",
+   "price": 449.99,
+   "currency": "USD",
+   "in_stock": false,
+   "status": "out_of_stock"
+  },
+  {
+   "t": "2026-11-07T21:51:19Z",
    "price": 449.99,
    "currency": "USD",
    "in_stock": false,
@@ -6267,6 +6358,13 @@
   },
   {
    "t": "2026-11-06T19:24:37Z",
+   "price": 169.0,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  },
+  {
+   "t": "2026-11-07T21:51:19Z",
    "price": 169.0,
    "currency": "USD",
    "in_stock": true,
@@ -7544,6 +7642,13 @@
    "currency": "USD",
    "in_stock": false,
    "status": "preorder"
+  },
+  {
+   "t": "2026-11-07T21:51:19Z",
+   "price": 949.0,
+   "currency": "USD",
+   "in_stock": false,
+   "status": "preorder"
   }
  ],
  "bitcoinmerch:avalon-nano-3s": [
@@ -7993,6 +8098,13 @@
    "currency": "USD",
    "in_stock": false,
    "status": "backorder"
+  },
+  {
+   "t": "2026-11-07T21:51:19Z",
+   "price": 449.99,
+   "currency": "USD",
+   "in_stock": false,
+   "status": "backorder"
   }
  ],
  "bitaxede:bitaxe-702": [
@@ -8137,6 +8249,13 @@
    "currency": "EUR",
    "in_stock": false,
    "status": "backorder"
+  },
+  {
+   "t": "2026-11-07T21:51:19Z",
+   "price": 299.0,
+   "currency": "EUR",
+   "in_stock": false,
+   "status": "backorder"
   }
  ],
  "bitcoinmerch:gekko-kbeast-50": [
@@ -8197,6 +8316,13 @@
    "currency": "USD",
    "in_stock": true,
    "status": "in_stock"
+  },
+  {
+   "t": "2026-11-07T21:51:19Z",
+   "price": 499.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
   }
  ],
  "bitcoinmerch:hammer-thor-x1": [
@@ -8213,6 +8339,13 @@
    "currency": "USD",
    "in_stock": false,
    "status": "backorder"
+  },
+  {
+   "t": "2026-11-07T21:51:19Z",
+   "price": 329.99,
+   "currency": "USD",
+   "in_stock": false,
+   "status": "backorder"
   }
  ],
  "altair:hammer-thor-x1": [
@@ -8225,6 +8358,13 @@
   },
   {
    "t": "2026-11-07T00:11:39Z",
+   "price": 219.0,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  },
+  {
+   "t": "2026-11-07T21:51:19Z",
    "price": 219.0,
    "currency": "USD",
    "in_stock": true,
@@ -8270,11 +8410,25 @@
    "currency": "USD",
    "in_stock": false,
    "status": "backorder"
+  },
+  {
+   "t": "2026-11-07T21:51:19Z",
+   "price": 499.99,
+   "currency": "USD",
+   "in_stock": false,
+   "status": "backorder"
   }
  ],
  "altair:gekko-terminus-a2x": [
   {
    "t": "2026-11-07T00:11:39Z",
+   "price": 399.0,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  },
+  {
+   "t": "2026-11-07T21:51:19Z",
    "price": 399.0,
    "currency": "USD",
    "in_stock": true,
