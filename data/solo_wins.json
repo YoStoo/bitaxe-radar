@@ -1,9 +1,9 @@
 {
- "fetched_at": "2026-11-08T13:26:04Z",
- "checked_at": "2026-11-08T13:26:04Z",
+ "fetched_at": "2026-11-08T22:06:52Z",
+ "checked_at": "2026-11-08T22:06:52Z",
  "status": {
   "mempool.space": "ok",
-  "sololuck.io": "failed: URLError"
+  "sololuck.io": "ok"
  },
  "wins": [
   {
@@ -145,7 +145,7 @@
    "pool": "Solo CKPool",
    "reward_btc": 3.15525693,
    "source": "mempool.space",
-   "hashrate_hs": 1200000000000000.0,
+   "hashrate_hs": null,
    "hardware": null,
    "rented": false
   },
@@ -365,8 +365,8 @@
    "pool": "Solo CKPool",
    "reward_btc": 3.14642595,
    "source": "mempool.space",
-   "hashrate_hs": 5400000000000.0,
-   "hardware": "Bitaxe-class setup",
+   "hashrate_hs": 6000000000000.0,
+   "hardware": null,
    "rented": false
   },
   {
@@ -464,7 +464,7 @@
    "pool": "Solo CKPool",
    "reward_btc": 3.17263363,
    "source": "mempool.space",
-   "hashrate_hs": 6000000000000.0,
+   "hashrate_hs": 2300000000000000.0,
    "hardware": null,
    "rented": false
   },
@@ -497,8 +497,8 @@
    "pool": "Solo CKPool",
    "reward_btc": 3.14932805,
    "source": "mempool.space",
-   "hashrate_hs": 1200000000000.0,
-   "hardware": "Bitaxe Gamma",
+   "hashrate_hs": null,
+   "hardware": null,
    "rented": false
   },
   {
@@ -531,7 +531,18 @@
    "reward_btc": 3.15016555,
    "source": "mempool.space",
    "hashrate_hs": 3300000000000.0,
-   "hardware": "cluster of six Bitaxes",
+   "hardware": null,
+   "rented": false
+  },
+  {
+   "height": 883181,
+   "hash": null,
+   "time": "2025-02-10T00:00:00Z",
+   "pool": "Unlisted pool (ckpool-based)",
+   "reward_btc": 3.1581,
+   "source": "sololuck.io",
+   "hashrate_hs": null,
+   "hardware": null,
    "rented": false
   },
   {
@@ -552,8 +563,8 @@
    "pool": "FutureBit Apollo Solo",
    "reward_btc": 3.1462,
    "source": "sololuck.io",
-   "hashrate_hs": 3000000000000.0,
-   "hardware": "FutureBit Apollo",
+   "hashrate_hs": null,
+   "hardware": null,
    "rented": false
   },
   {
