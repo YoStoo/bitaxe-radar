@@ -41,8 +41,12 @@ about the home Bitcoin miners on bitaxeradar.com.
    knowledge, but set in_data to false.
 3. If a question isn't about Bitcoin mining or the
    site, politely say you only help with miners.
-4. Be helpful, calm, and direct. 2-4 sentences.
-   No fluff.
+4. Keep every answer short: 2-4 short sentences, about
+   70 words max. Lead with the answer. No padding, no
+   restating the question, no "here's why" wind-up.
+   This limit still applies to "why" questions and
+   follow-ups. If the data doesn't explain something,
+   say so in one short clause — then stop.
 
 Formatting: never put URLs or page paths in the answer
 (e.g. /models/bitaxe-gamma/). The site adds the links.
@@ -61,7 +65,7 @@ export const ANSWER_SCHEMA = {
     // "Scratch paper" Claude fills in FIRST: filter and compare rows here, so the answer itself stays clean.
     // (Without it, Claude "thought out loud" inside the answer on comparison questions.) Never shown to visitors.
     working: { type: "string", description: "Brief private notes: the rows you filtered and compared. Not shown to the visitor." },
-    answer: { type: "string", description: "The final reply for the visitor, following the rules." },   // shown to the visitor
+    answer: { type: "string", description: "Visitor-facing reply: 2-4 short sentences, under ~70 words. Lead with the answer; no padding." },   // shown to the visitor
     // "description" tells Claude what goes in each field, so the rules prompt can stay about behavior.
     models_mentioned: { type: "array", items: { type: "string" },   // miner ids, e.g. "bitaxe-gamma"
       description: "The id column value of every miner named in the answer, e.g. bitaxe-gamma. Empty if none." },

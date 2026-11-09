@@ -192,6 +192,10 @@ const histChars = claudeCalls.at(-1).body.messages.slice(0, -1).reduce((n, m) =>
 assert.ok(histChars <= MAX_HISTORY_TOTAL);
 
 assert.match(SYSTEM_PROMPT, /Follow-ups/i);
+assert.match(SYSTEM_PROMPT, /2-4 short sentences/i);
+assert.match(SYSTEM_PROMPT, /70 words/i);
+assert.match(ANSWER_SCHEMA.properties.answer.description, /2-4 short sentences/i);
+assert.match(ANSWER_SCHEMA.properties.answer.description, /70 words/i);
 
 
 console.log("ask tests: all passed");

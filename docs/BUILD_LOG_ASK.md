@@ -127,6 +127,16 @@ The site-wide floating chat bubble itself was Shervin's idea (example chips that
 
 **Lesson.** "Chat" implies memory. A single-shot API call is a Q&A box, not a conversation, until you send the recent turns along.
 
+### 13. Answers got too long on "why" follow-ups
+
+**Bug.** After multi-turn memory shipped, a follow-up like "Why is it so expensive?" after "Most expensive miner" came back ~7 sentences. Shervin's rule was 2–4.
+
+**Cause.** The system prompt said "2-4 sentences. No fluff." but Claude padded "why" answers with restating and extra context. The `answer` schema field had no length description either.
+
+**Fix.** Tighten rule 4: 2–4 short sentences, ~70 words max, lead with the answer, no padding, still apply on why/follow-ups; if data doesn't explain something, one short clause then stop. Mirror that in the `answer` schema description. Keep `max_tokens` at 1000 so the hidden `working` scratchpad still has room.
+
+**Lesson.** Length rules need to be specific (word cap, no restating) and repeated in the schema — a soft "2-4 sentences" alone isn't enough for follow-up "why" questions.
+
 ## How we checked it
 
 - Mocked Worker tests (`cd worker && npm test`) — free, repeatable, no API key.
