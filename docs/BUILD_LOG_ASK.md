@@ -137,6 +137,36 @@ The site-wide floating chat bubble itself was Shervin's idea (example chips that
 
 **Lesson.** Length rules need to be specific (word cap, no restating) and repeated in the schema — a soft "2-4 sentences" alone isn't enough for follow-up "why" questions.
 
+### 14. Tool calling: Claude described the tool call instead of making it
+
+**Bug.** First live test of tool calling (branch `feature/ask-tool-calling`): 4 of 6 questions failed. Claude replied with JSON like `{"working": "Calling search_miners with brand Bitaxe...", "answer": ""}`. It wrote *about* calling the tool but never called it, and the answer was empty.
+
+**Cause.** We kept `output_config.format` (structured output) on, the old way of forcing our JSON answer shape. That setting makes Claude's reply JSON text from the first word, which pushed out the real tool call.
+
+**Fix.** The final answer is now a tool too: `respond`. Its inputs are exactly our old answer schema, with `strict: true`. `tool_choice: "any"` means Claude must call *some* tool every turn: a data tool, or `respond` when it's done. At the round cap we force `tool_choice: {name: "respond"}`. The frontend gets the same JSON as before.
+
+**Lesson.** "Force JSON output" and "let the model call tools" can fight each other. Make the final answer a tool, so there's one way out of the loop.
+
+### 15. Tool-call markup leaked into the answer
+
+**Bug.** "Compare the Gamma and the NerdQaxe++" came back with `…$55.8).</answer><parameter name="models_mentioned">["bitaxe-gamma", "nerdqaxe-pp"]` stuck on the end of the answer text, and `models_mentioned` was empty, so the site would show no links.
+
+**Cause.** Claude put the next field's markup *inside* the answer string. Strict mode can't catch this because it's still a valid string.
+
+**Fix.** `cleanAnswer()` cuts the answer at the first leaked tag (`</answer>`, `<parameter`, …) and pulls any miner ids out of the cut-off part, keeping only ids that exist in our data. Added a test with the exact text from the live run.
+
+**Lesson.** A schema guarantees the *shape*, not that the *content* is clean. Keep checking what goes to visitors.
+
+### 16. (Found while measuring) Old way ran out of tokens on a math question
+
+**Bug.** In the before/after test, the OLD "paste all data" way failed on "Best miner under $200 per TH/s". It used all 1,000 output tokens and the visitor got "Couldn't get a clear answer."
+
+**Cause.** Claude worked out $/TH for many rows by hand in the hidden `working` scratchpad and ran out of room.
+
+**Fix.** With tool calling, `search_miners` does the math in code (`usd_per_th`, sorted), so Claude only reads the top 5. Same question: answered in 2.7 s, about 450 output tokens.
+
+**Lesson.** Do math in code, not in the model. Tools are how you hand the model a calculator.
+
 ## How we checked it
 
 - Mocked Worker tests (`cd worker && npm test`) — free, repeatable, no API key.
@@ -154,6 +184,9 @@ The site-wide floating chat bubble itself was Shervin's idea (example chips that
 | `site/chat-widget.js` | Site-wide floating bubble + panel |
 | `build_site.py` → `build_ask()` | Builds `/ask/` page |
 | `worker/test/ask.test.mjs` | Mocked tests |
+| `worker/src/tools.js` | Tool calling: tool definitions, input checks, tools over live data |
+| `worker/test/tools.test.mjs` | Mocked agent-loop tests (scripted fake Claude) |
+| `docs/TOOL_CALLING.md` | Plain-English tool calling explainer |
 | `tests/test_ask_page.py` | Static page checks |
 | `worker/wrangler.toml` | Worker config, daily cap, `ASK_KV` |
 

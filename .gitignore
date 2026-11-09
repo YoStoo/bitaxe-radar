@@ -36,3 +36,8 @@ site/about/
 docs/REDDIT_RESEARCH.md
 docs/REBRAND_RESEARCH.md
 docs/BACKUP_IDEAS.md
+
+# local Worker secrets for `wrangler dev` (never commit)
+.dev.vars
+.dev.vars.*
+.wrangler/
