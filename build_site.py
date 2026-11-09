@@ -4059,6 +4059,32 @@ def build_alerts():
 
 
 # ---------------------------------------------------------------------------------------------
+# ASK BITAXE RADAR (/ask/): question box -> Worker POST /ask -> Claude answers from live data (worker/src/ask.js)
+# noindex until it's launched; not linked from the nav yet.
+# ---------------------------------------------------------------------------------------------
+ASK_URL = WORKER_URL.rsplit("/", 1)[0] + "/ask"
+
+
+def build_ask():
+    path = "/ask/"
+    body = f"""<article>
+<header class="hero"><h1>Ask Bitaxe Radar</h1>
+<p class="lede">Ask about home Bitcoin miners. An AI (Claude) answers using only today's prices and specs from this site.</p></header>
+<form id="ask-form" class="signup">
+<label for="ask-q">Your question</label>
+<textarea id="ask-q" name="question" maxlength="300" rows="3" required placeholder="What's the cheapest miner with at least 1 TH/s in stock?"></textarea>
+<p><button class="btn" type="submit">Ask</button></p>
+</form>
+<div id="ask-answer" aria-live="polite"></div>
+<p class="hint">Answers can be wrong. Prices change often; check the miner page before you buy. Questions are sent to Anthropic's API; don't type personal info.</p>
+</article>"""
+    scripts = f'<script>window.RADAR_ASK={json.dumps({"url": ASK_URL})};</script>\n<script src="/ask.js" defer></script>'
+    layout(path, "Ask Bitaxe Radar: AI answers from live miner prices | Bitaxe Radar",
+           "Ask a question about home Bitcoin miners and get an AI answer based only on Bitaxe Radar's live prices and specs.",
+           body, crumbs=[("Home", "/"), ("Ask", path)], noindex=True, scripts=scripts)
+
+
+# ---------------------------------------------------------------------------------------------
 # NEWSLETTER (Home Mining Weekly): web copies of each issue, from data/newsletter/*.json (see newsletter.py)
 # ---------------------------------------------------------------------------------------------
 NL_NAME = "Home Mining Weekly"
@@ -4221,6 +4247,7 @@ def main():
     build_miners()
     build_quiz()
     build_alerts()
+    build_ask()
     build_newsletter()
     for c in CATS:
         build_category(c[0])

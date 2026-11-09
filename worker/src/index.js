@@ -14,6 +14,9 @@
 //   GET  /confirm?t=TOKEN    confirms the subscription (double opt-in link from the email)
 //   GET|POST /unsubscribe?t= unsubscribes (POST = RFC 8058 one-click)
 //   GET  /health
+//   POST /ask                {"question": "..."} -> Claude answer from live site data (see src/ask.js)
+
+import { handleAsk } from "./ask.js";
 
 const ALLOWED_ORIGINS = ["https://bitaxeradar.com", "https://www.bitaxeradar.com", "https://yostoo.github.io"];
 const FROM = "Bitaxe Radar <alerts@bitaxeradar.com>";
@@ -287,6 +290,11 @@ export default {
         const origin = request.headers.get("Origin");
         if (origin && !ALLOWED_ORIGINS.includes(origin)) return json({ ok: false, error: "Origin not allowed." }, 403, request);
         return await handleSubscribe(request, env);
+      }
+      if (url.pathname === "/ask" && request.method === "POST") {
+        const origin = request.headers.get("Origin");
+        if (origin && !ALLOWED_ORIGINS.includes(origin)) return json({ ok: false, error: "Origin not allowed." }, 403, request);
+        return await handleAsk(request, env, json);
       }
       if (url.pathname === "/confirm" && request.method === "GET") return await handleConfirm(url, env);
       if (url.pathname === "/nl/confirm" && request.method === "GET") return await handleNewsletterConfirm(url, env);

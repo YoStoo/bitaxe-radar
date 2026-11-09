@@ -9,6 +9,7 @@ preview_urls = false
 [vars]
 PUBLIC_BASE = "https://bitaxe-radar-alerts.bitaxeradar.workers.dev"
 SITE_URL = "https://bitaxeradar.com"
+ASK_DAILY_LIMIT = "200"     # max /ask questions per day (cost safety net)
 
 # Custom domain (bitaxeradar.com must be a zone in the same Cloudflare account; see README).
 # [[routes]]
@@ -23,5 +24,12 @@ namespace_id = "1001"
   limit = 5
   period = 60
 
+# "Ask Bitaxe Radar" (POST /ask). Daily question cap; storage for the counter is the KV namespace below.
+# Create it once with `npx wrangler kv namespace create ASK_KV`, paste the id it prints, then uncomment.
+# Without it the Worker still runs, but the cap is only per Worker copy (weaker).
+# [[kv_namespaces]]
+# binding = "ASK_KV"
+# id = "PASTE_ID_HERE"
+
 # Secrets (NOT in this file) -- set with `wrangler secret put <NAME>`:
-#   RESEND_API_KEY, SIGNING_SECRET, TURNSTILE_SECRET
+#   RESEND_API_KEY, SIGNING_SECRET, TURNSTILE_SECRET, ANTHROPIC_API_KEY (for /ask)
