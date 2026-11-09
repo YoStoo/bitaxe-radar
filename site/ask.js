@@ -9,7 +9,9 @@
     out.textContent = "";
     var p = document.createElement("p"); p.textContent = text; out.appendChild(p);
     (links || []).forEach(function (id) {
-      var a = document.createElement("a"); a.href = "/models/" + encodeURIComponent(id) + "/"; a.textContent = id;
+      var a = document.createElement("a");
+      a.href = "/models/" + encodeURIComponent(id) + "/";
+      a.textContent = window.RadarAsk.modelName(id);
       out.appendChild(a); out.appendChild(document.createTextNode(" "));
     });
     if (note) { var s = document.createElement("p"); s.className = "hint"; s.textContent = note; out.appendChild(s); }

@@ -148,7 +148,7 @@
         if (i) links.appendChild(document.createTextNode(" · "));
         var a = document.createElement("a");
         a.href = "/models/" + encodeURIComponent(id) + "/";
-        a.textContent = id;
+        a.textContent = window.RadarAsk.modelName(id);
         links.appendChild(a);
       });
       b.appendChild(links);
@@ -237,12 +237,33 @@
     chipsEl.hidden = false;
   }
 
+  function isMobile() {
+    try { return window.matchMedia("(max-width: 520px)").matches; } catch (e) { return false; }
+  }
+
+  // On phones, don't cover the primary Buy CTA — wait until it scrolls above the widget.
+  function ctaIsClear() {
+    if (!isMobile()) return true;
+    var cta = document.querySelector(".model-deal a.btn, .cta a.btn, .model-deal .btn");
+    if (!cta) return true;
+    var r = cta.getBoundingClientRect();
+    var box = root.getBoundingClientRect();
+    return r.bottom < box.top - 6;
+  }
+
   function startChips() {
     if (chipsDismissed()) return;
-    renderChip();
+    function showIfClear() {
+      if (chipsDismissed() || open) return;
+      if (!ctaIsClear()) { chipsEl.hidden = true; return; }
+      renderChip();
+    }
+    showIfClear();
+    window.addEventListener("scroll", showIfClear, { passive: true });
+    window.addEventListener("resize", showIfClear, { passive: true });
     if (reduceMotion || allChips.length < 2) return;
     chipTimer = setInterval(function () {
-      if (chipsEl.hidden || open) return;
+      if (chipsEl.hidden || open || !ctaIsClear()) return;
       chipIdx = (chipIdx + 1) % allChips.length;
       renderChip();
     }, CHIP_CYCLE_MS);

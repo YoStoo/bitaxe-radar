@@ -16,7 +16,8 @@ class AskPage(unittest.TestCase):
         self.assertIn('maxlength="300"', self.html)
         self.assertIn('src="/ask-api.js"', self.html)
         self.assertIn('src="/ask.js"', self.html)
-        cfg = json.loads(re.search(r"window\.RADAR_ASK=(\{.*?\});", self.html).group(1))
+        i = self.html.index("window.RADAR_ASK=") + len("window.RADAR_ASK=")
+        cfg, _ = json.JSONDecoder().raw_decode(self.html[i:])
         self.assertTrue(cfg["url"].startswith("https://") and cfg["url"].endswith("/ask"))
 
     def test_not_indexed_yet(self):
@@ -27,6 +28,7 @@ class AskPage(unittest.TestCase):
         js = (SITE / "ask.js").read_text()
         self.assertIn("textContent", js)
         self.assertNotIn("innerHTML", js)
+        self.assertIn("modelName", js)
 
 
 if __name__ == "__main__":

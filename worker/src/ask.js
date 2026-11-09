@@ -39,7 +39,11 @@ about the home Bitcoin miners on bitaxeradar.com.
 3. If a question isn't about Bitcoin mining or the
    site, politely say you only help with miners.
 4. Be helpful, calm, and direct. 2-4 sentences.
-   No fluff.`;
+   No fluff.
+
+Formatting: never put URLs or page paths in the answer
+(e.g. /models/bitaxe-gamma/). The site adds the links.
+Name miners in plain words.`;
 
 // ---------- the JSON shape Claude must reply with ----------
 export const ANSWER_SCHEMA = {

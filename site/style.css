@@ -471,7 +471,7 @@ details .tablewrap{margin-bottom:14px}
 #radar-ask-bubble .ra-ico svg{display:block}
 #radar-ask-bubble.ra-bounce{animation:ra-bounce 1.6s ease-in-out 2}
 @keyframes ra-bounce{0%,100%{transform:translateY(0)}40%{transform:translateY(-7px)}60%{transform:translateY(-3px)}}
-#radar-ask-chips{max-width:min(320px,calc(100vw - 48px))}
+#radar-ask-chips{max-width:min(320px,calc(100vw - 36px));box-sizing:border-box}
 .ra-chip-wrap{display:flex;align-items:center;gap:6px;animation:ra-chip-in .35s ease-out}
 @keyframes ra-chip-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .ra-chip{flex:1;text-align:left;background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:999px;padding:10px 14px;font:600 13px/1.3 var(--font);cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.35);transition:border-color .15s,background .15s}
@@ -510,12 +510,19 @@ details .tablewrap{margin-bottom:14px}
 .ra-foot{margin:0;padding:0 12px 10px;color:var(--faint);font-size:11px;background:var(--panel)}
 #radar-ask-root.ra-open #radar-ask-bubble{display:none}
 @media (max-width:520px){
-  #radar-ask-root{right:12px;bottom:12px}
-  #radar-ask-bubble{min-height:48px;padding:0 14px 0 10px;font-size:14px}
+  /* One bottom row: chip (flex) on the left, Ask bubble on the right. Keeps the ×
+     on-screen. Chips also wait for the Buy CTA to scroll clear (see chat-widget.js). */
+  #radar-ask-root{left:10px;right:10px;bottom:12px;flex-direction:row;align-items:center;justify-content:flex-end;gap:8px}
+  #radar-ask-bubble{flex:none;order:2;min-height:48px;padding:0 14px 0 10px;font-size:14px}
   #radar-ask-bubble .ra-ico{width:30px;height:30px}
   #radar-ask-bubble .ra-ico svg{width:24px;height:24px}
-  #radar-ask-chips{max-width:min(280px,calc(100vw - 72px))}
-  #radar-ask-panel{position:fixed;inset:8px 8px 8px 8px;width:auto;height:auto;border-radius:16px;animation:none}
+  #radar-ask-chips{flex:1;order:1;min-width:0;max-width:none}
+  .ra-chip-wrap{width:100%;min-width:0;box-sizing:border-box}
+  .ra-chip{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:8px 12px;font-size:12.5px}
+  .ra-chip-x{flex:none}
+  #radar-ask-panel{position:fixed;inset:8px;width:auto;height:auto;border-radius:16px;animation:none;order:0}
+  #radar-ask-root.ra-open{left:0;right:0;top:0;bottom:0;flex-direction:column;align-items:stretch;pointer-events:none}
+  #radar-ask-root.ra-open #radar-ask-panel{pointer-events:auto}
 }
 @media (prefers-reduced-motion:reduce){
   #radar-ask-bubble.ra-bounce,.ra-chip-wrap,#radar-ask-panel,.ra-typing span{animation:none!important}

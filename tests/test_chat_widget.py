@@ -17,6 +17,12 @@ def html_pages():
     return pages
 
 
+def radar_ask_cfg(html):
+    i = html.index("window.RADAR_ASK=") + len("window.RADAR_ASK=")
+    cfg, _ = json.JSONDecoder().raw_decode(html[i:])
+    return cfg
+
+
 class ChatWidget(unittest.TestCase):
     def test_widget_assets_exist(self):
         self.assertTrue((SITE / "ask-api.js").is_file())
@@ -48,7 +54,7 @@ class ChatWidget(unittest.TestCase):
         self.assertIn('src="/ask-api.js"', html)
         self.assertIn('src="/chat-widget.js"', html)
         self.assertIn('maxlength="300"', html)
-        cfg = json.loads(re.search(r"window\.RADAR_ASK=(\{.*?\});", html).group(1))
+        cfg = radar_ask_cfg(html)
         self.assertTrue(cfg["url"].startswith("https://") and cfg["url"].endswith("/ask"))
         self.assertIn('content="noindex', html)
 
@@ -70,7 +76,22 @@ class ChatWidget(unittest.TestCase):
         self.assertIn("textContent", widget)
         self.assertIn("models_mentioned", widget)
         self.assertIn("radarAskChipsDismissed", widget)
+        self.assertIn("modelName", api)
+        self.assertIn("modelName", widget)
         self.assertIn("prefers-reduced-motion", widget)
+
+    def test_radar_ask_includes_names(self):
+        cfg = radar_ask_cfg((SITE / "index.html").read_text())
+        self.assertIn("names", cfg)
+        self.assertEqual(cfg["names"].get("bitaxe-gamma"), "Bitaxe Gamma")
+        ask_cfg = radar_ask_cfg((SITE / "ask" / "index.html").read_text())
+        self.assertEqual(ask_cfg["names"].get("bitaxe-gamma"), "Bitaxe Gamma")
+
+    def test_mobile_chip_css_keeps_dismiss_on_screen(self):
+        css = (SITE / "style.css").read_text()
+        self.assertIn("justify-content:flex-end", css)
+        self.assertIn("order:2", css)
+        self.assertIn("text-overflow:ellipsis", css)
 
 
 if __name__ == "__main__":

@@ -123,5 +123,7 @@ assert.equal((await viaWorker("https://bitaxeradar.com")).status, 200);   // rea
 assert.equal(claudeCalls.at(-1).body.system, SYSTEM_PROMPT);              // and it's what Claude receives
 assert.match(SYSTEM_PROMPT, /Never guess a price/);
 assert.match(SYSTEM_PROMPT, /in_data to false/);
+assert.match(SYSTEM_PROMPT, /never put URLs or page paths/i);
+assert.ok(SYSTEM_PROMPT.includes("/models/"), "prompt forbids raw /models/ paths");
 
 console.log("ask tests: all passed");

@@ -64,11 +64,6 @@ ANALYTICS = (f"<script defer src=\"https://static.cloudflareinsights.com/beacon.
              if re.fullmatch(r"[0-9a-f]{32}", CF_BEACON_TOKEN or "") else "")
 # Floating Ask chat bubble on every page (POST /ask Worker). Also powers the /ask/ page form via ask-api.js.
 ASK_URL = WORKER_URL.rsplit("/", 1)[0] + "/ask"
-ASK_WIDGET_SCRIPTS = (
-    f'<script>window.RADAR_ASK={json.dumps({"url": ASK_URL})};</script>\n'
-    '<script src="/ask-api.js" defer></script>\n'
-    '<script src="/chat-widget.js" defer></script>\n'
-)
 
 # ---------------------------------------------------------------------------------------------
 # helpers
@@ -895,6 +890,20 @@ def footer_html(extra=""):
 </div></footer>"""
 
 
+def ask_widget_scripts():
+    """Floating Ask bubble + shared API config (url + friendly model names) on every page."""
+    names = {}
+    for mid in TRACKED:
+        if mid in SHORT:
+            names[mid] = SHORT[mid]
+        elif mid in MODELS:
+            names[mid] = re.sub(r"\s*\(.*\)\s*$", "", MODELS[mid]["name"]).strip() or mid
+    cfg = {"url": ASK_URL, "names": names}
+    return (f'<script>window.RADAR_ASK={json.dumps(cfg, separators=(",", ":"))};</script>\n'
+            '<script src="/ask-api.js" defer></script>\n'
+            '<script src="/chat-widget.js" defer></script>\n')
+
+
 def layout(path, title, desc, body, *, crumbs=None, jsonld=(), noindex=False, lastmod=None, scripts="", og_type="website", index_in_sitemap=True):
     url = BASE + (path if path != "/404.html" else "/")
     desc = shorten(desc, 158)
@@ -930,7 +939,7 @@ def layout(path, title, desc, body, *, crumbs=None, jsonld=(), noindex=False, la
 {body}
 </main>
 {footer_html()}
-{ASK_WIDGET_SCRIPTS}{scripts}{calc_scripts() if "data-calc=" in body else ""}{ANALYTICS}
+{ask_widget_scripts()}{scripts}{calc_scripts() if "data-calc=" in body else ""}{ANALYTICS}
 </body>
 </html>
 """
@@ -3847,7 +3856,7 @@ def build_home():
            .replace("<!--HERO-CHIPS-->", chips).replace("<!--BROWSE-->", bf_banner() + browse_tiles() + "\n" + best_pills()).replace("<!--CARDS-->", cards).replace("<!--SIGNUP-->", signup_html("any"))
            .replace("<!--COMPARE-LINKS-->", compare_links).replace("<!--FOOTER-->", footer_html())
            .replace('<script src="/app.js"></script>', '<script src="/app.js"></script>\n' + SIGNUP_SCRIPTS)
-           .replace("</body>", ASK_WIDGET_SCRIPTS + ANALYTICS + "</body>"))
+           .replace("</body>", ask_widget_scripts() + ANALYTICS + "</body>"))
     assert "<!--" not in out, "unfilled placeholder in home template"
     (SITE / "index.html").write_text(out)
     PAGES.append(dict(path="/", lastmod=latest["generated_at"]))
@@ -4082,7 +4091,7 @@ def build_ask():
 <div id="ask-answer" aria-live="polite"></div>
 <p class="hint">Answers can be wrong. Prices change often; check the miner page before you buy. Questions are sent to Anthropic's API; don't type personal info.</p>
 </article>"""
-    # ask-api.js + chat-widget.js come from ASK_WIDGET_SCRIPTS in layout(); ask.js wires the page form.
+    # ask-api.js + chat-widget.js come from ask_widget_scripts() in layout(); ask.js wires the page form.
     scripts = '<script src="/ask.js" defer></script>'
     layout(path, "Ask Bitaxe Radar: AI answers from live miner prices | Bitaxe Radar",
            "Ask a question about home Bitcoin miners and get an AI answer based only on Bitaxe Radar's live prices and specs.",

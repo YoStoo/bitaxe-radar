@@ -1,8 +1,17 @@
-// Shared Ask helper. window.RADAR_ASK = {url} is set by build_site.py on every page.
+// Shared Ask helper. window.RADAR_ASK = {url, names?} is set by build_site.py on every page.
 // ask(question) -> Promise<{ok, answer, models_mentioned, confidence, in_data, data_updated, error}>
+// modelName(id) -> friendly label from RADAR_ASK.names, else window.RADAR, else the id.
 (function (w) {
   "use strict";
   var MAX = 300;
+
+  function modelName(id) {
+    var names = (w.RADAR_ASK && w.RADAR_ASK.names) || {};
+    if (names[id]) return names[id];
+    var m = w.RADAR && w.RADAR.latest && w.RADAR.latest.models && w.RADAR.latest.models[id];
+    if (m && m.name) return String(m.name).replace(/\s*\(.*\)\s*$/, "").trim();
+    return id;
+  }
 
   function ask(question) {
     var cfg = w.RADAR_ASK;
@@ -26,5 +35,5 @@
     });
   }
 
-  w.RadarAsk = { ask: ask, MAX: MAX };
+  w.RadarAsk = { ask: ask, MAX: MAX, modelName: modelName };
 })(window);
