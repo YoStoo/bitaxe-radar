@@ -23,3 +23,23 @@ Price history only has the data points collected so far (first run 2026-10-16); 
 `/models/<id>/` (one per model; Supra and Ultra are `noindex`), `/compare/<a>-vs-<b>/` (5), `/sellers/<id>/` (4), `/where-to-buy-bitaxe/`, `/in-stock/`, `/deals/`, `/how-we-track/`, `sitemap.xml`, `robots.txt`, `404.html`.
 All numbers come from `data/`; hand-written copy lives in `MODEL_COPY`, `COMPARE_COPY`, `SELLER_COPY` in `build_site.py`. Affiliate params, the signup Worker URL and the Turnstile site key are read from `site/app.js` (single source of truth). `site/signup.js` powers the alert form on pre-rendered pages.
 Not done on purpose: no Google/Bing verification tags (need the owner's accounts), no ratings/reviews markup.
+
+## Ask Bitaxe Radar (Claude API)
+
+A question box (`/ask/`) that answers miner questions using the site's own live prices. Code: `worker/src/ask.js`.
+
+How one question flows:
+
+1. **Request.** The page sends `POST /ask {"question": "..."}` to our Cloudflare Worker. The browser never sees the API key; it lives only in the Worker as a secret.
+2. **Validation.** Empty or over-300-character questions get a 400. A per-visitor rate limit and a daily cap (`ASK_DAILY_LIMIT`, 200/day) stop anyone from running up the bill.
+3. **Live data as context ("grounding").** The Worker downloads `bitaxeradar.com/data.js` and shrinks it to one line per miner (specs, J/TH, cheapest in-stock price and shop), sorted cheapest first. That table goes into the message inside `<data>` tags, and the question goes inside `<question>` tags.
+4. **Prompt.** A short system prompt (rules Claude follows on every question): prices, stock, and shops come only from the data, never guessed. General mining questions may use general knowledge but are flagged. Off-topic questions get a polite refusal. Answers are 2–4 sentences.
+5. **Claude call.** Model `claude-haiku-5-5` through the Messages API, `max_tokens` 1000 (caps cost per question).
+6. **Structured output.** A JSON schema forces this reply shape: `{working, answer, models_mentioned, confidence, in_data}`. `working` is scratch space Claude fills first, so the answer stays clean. `in_data: false` means the answer didn't come from our data.
+7. **Our own checks.** The Worker parses the JSON again and rejects cut-off replies, refusals, or a bad shape (502). It drops miner ids that don't exist and never returns `working` or internal errors to the visitor.
+
+Cost: each question uses about 3,500 input and 150–550 output tokens, which comes to about $0.0005. At the 200/day cap, the worst case is about $0.10/day. The Anthropic account also has a $10/month spend limit.
+
+Tests: `cd worker && npm test` runs with a fake Claude ("mocked"), so it's free and repeatable. It checks validation, context building, request shape, reply parsing, the cap, and error handling. To try the real API locally: `ANTHROPIC_API_KEY=... node worker/scripts/try_ask.mjs "your question"`. The script prints the JSON answer and token usage.
+
+Deploy: `cd worker && npx wrangler secret put ANTHROPIC_API_KEY && npx wrangler deploy`.

@@ -3,7 +3,7 @@
 import assert from "node:assert/strict";
 import worker from "../src/index.js";
 import { validateQuestion, buildContext, buildClaudeRequest, parseClaudeReply, handleAsk, takeDailySlot,
-  _resetMemoryCounts, ANSWER_SCHEMA, MAX_QUESTION_CHARS, DEFAULT_MODEL } from "../src/ask.js";
+  _resetMemoryCounts, ANSWER_SCHEMA, SYSTEM_PROMPT, MAX_QUESTION_CHARS, DEFAULT_MODEL } from "../src/ask.js";
 
 // A tiny fake copy of the site's data (2 miners, 3 shop listings).
 const LATEST = {
@@ -19,7 +19,7 @@ const LATEST = {
 };
 const DATA_JS = "window.RADAR = " + JSON.stringify({ latest: LATEST, history: {} }) + ";\n";
 const claudeSays = (obj, extra = {}) => ({ content: [{ type: "text", text: JSON.stringify(obj) }], stop_reason: "end_turn", usage: { input_tokens: 900, output_tokens: 60 }, ...extra });
-const GOOD = { answer: "The Bitaxe Gamma is $99.50 at Shop B as of the last update.", models_mentioned: ["bitaxe-gamma", "made-up-miner"], confidence: "High", in_data: true };
+const GOOD = { working: "gamma rows: 99.5 < 129.99", answer: "The Bitaxe Gamma is $99.50 at Shop B as of the last update.", models_mentioned: ["bitaxe-gamma", "made-up-miner"], confidence: "High", in_data: true };
 
 let claudeReply = claudeSays(GOOD), claudeStatus = 200, claudeCalls = [];
 globalThis.fetch = async (url, init = {}) => {
@@ -50,6 +50,7 @@ const ctx = buildContext(LATEST);
 assert.match(ctx, /bitaxe-gamma \| Bitaxe Gamma \| BM1370 \| 1.2 \| 18 \| 15 \| 99.5 \| Shop B \| 2 \| \/models\/bitaxe-gamma\//);
 assert.match(ctx, /nerdqaxe-pp .*\| out of stock \| - \| 0 \|/);
 assert.match(ctx, /Data updated: 2026-11-09/);
+assert.ok(ctx.indexOf("bitaxe-gamma |") < ctx.indexOf("nerdqaxe-pp |"));   // cheapest in stock first, out of stock last
 
 // 3. request shape: model, JSON schema, question inside <question> tags
 const req = buildClaudeRequest("cheapest?", ctx, PROMPT);
@@ -62,6 +63,7 @@ assert.match(req.messages[0].content, /<data>[\s\S]*<\/data>[\s\S]*<question>che
 const ids = new Set(Object.keys(LATEST.models));
 assert.deepEqual(parseClaudeReply(claudeSays(GOOD), ids).models_mentioned, ["bitaxe-gamma"]);
 assert.equal(parseClaudeReply(claudeSays(GOOD), ids).confidence, "high");
+assert.equal("working" in parseClaudeReply(claudeSays(GOOD), ids), false);   // scratch notes never reach visitors
 assert.equal(parseClaudeReply(claudeSays(GOOD, { stop_reason: "max_tokens" }), ids), null);
 assert.equal(parseClaudeReply(claudeSays(GOOD, { stop_reason: "refusal" }), ids), null);
 assert.equal(parseClaudeReply({ content: [{ type: "text", text: "not json" }] }, ids), null);
@@ -115,6 +117,11 @@ assert.equal((await read(ask("hi", { ...env, ANTHROPIC_API_KEY: "" }))).status, 
 // 10. through the real Worker router: /ask exists, foreign websites are blocked
 const viaWorker = (origin) => worker.fetch(new Request("https://w.example/ask", { method: "POST", headers: { "Content-Type": "application/json", Origin: origin }, body: '{"question":"hi"}' }), env);
 assert.equal((await viaWorker("https://evil.example")).status, 403);
-assert.equal((await viaWorker("https://bitaxeradar.com")).status, 503);   // SYSTEM_PROMPT is still the TODO
+_resetMemoryCounts();
+claudeReply = claudeSays(GOOD); claudeCalls = [];
+assert.equal((await viaWorker("https://bitaxeradar.com")).status, 200);   // real SYSTEM_PROMPT is set
+assert.equal(claudeCalls.at(-1).body.system, SYSTEM_PROMPT);              // and it's what Claude receives
+assert.match(SYSTEM_PROMPT, /Never guess a price/);
+assert.match(SYSTEM_PROMPT, /in_data to false/);
 
 console.log("ask tests: all passed");
