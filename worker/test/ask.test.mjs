@@ -2,8 +2,9 @@
 // "Mocking" = swapping the real internet call for a fake one we control, so tests are free, fast and repeatable.
 import assert from "node:assert/strict";
 import worker from "../src/index.js";
-import { validateQuestion, buildContext, buildClaudeRequest, parseClaudeReply, handleAsk, takeDailySlot,
-  _resetMemoryCounts, ANSWER_SCHEMA, SYSTEM_PROMPT, MAX_QUESTION_CHARS, DEFAULT_MODEL } from "../src/ask.js";
+import { validateQuestion, validateHistory, buildContext, buildClaudeRequest, parseClaudeReply, handleAsk, takeDailySlot,
+  _resetMemoryCounts, ANSWER_SCHEMA, SYSTEM_PROMPT, MAX_QUESTION_CHARS, DEFAULT_MODEL,
+  MAX_HISTORY_TURNS, MAX_HISTORY_CONTENT, MAX_HISTORY_TOTAL } from "../src/ask.js";
 
 // A tiny fake copy of the site's data (2 miners, 3 shop listings).
 const LATEST = {
@@ -35,7 +36,7 @@ globalThis.fetch = async (url, init = {}) => {
 const env = { ANTHROPIC_API_KEY: "sk-test", SITE_URL: "https://bitaxeradar.com", ASK_DAILY_LIMIT: "3" };
 const PROMPT = "Answer only from <data>.";
 const json = (obj, status) => new Response(JSON.stringify(obj), { status });
-const ask = (q, e = env, prompt = PROMPT) => handleAsk(new Request("https://w.example/ask", { method: "POST", body: JSON.stringify({ question: q }) }), e, json, { systemPrompt: prompt });
+const ask = (q, e = env, prompt = PROMPT, history) => handleAsk(new Request("https://w.example/ask", { method: "POST", body: JSON.stringify(history ? { question: q, history } : { question: q }) }), e, json, { systemPrompt: prompt });
 const read = async (p) => { const r = await p; return { status: r.status, body: await r.json() }; };
 
 // 1. question checks
@@ -125,5 +126,72 @@ assert.match(SYSTEM_PROMPT, /Never guess a price/);
 assert.match(SYSTEM_PROMPT, /in_data to false/);
 assert.match(SYSTEM_PROMPT, /never put URLs or page paths/i);
 assert.ok(SYSTEM_PROMPT.includes("/models/"), "prompt forbids raw /models/ paths");
+
+
+// 11. history: validate, forward, drop malformed, trim oversize
+assert.deepEqual(validateHistory(null), []);
+assert.deepEqual(validateHistory("nope"), []);
+assert.deepEqual(validateHistory([{ role: "assistant", content: "orphan" }]), []); // must start with user
+assert.deepEqual(
+  validateHistory([
+    { role: "user", content: "cheapest?" },
+    { role: "assistant", content: "Gamma at $99" },
+    { role: "user", content: "why?" }, // trailing user dropped so new question can append
+  ]),
+  [{ role: "user", content: "cheapest?" }, { role: "assistant", content: "Gamma at $99" }]
+);
+assert.deepEqual(
+  validateHistory([
+    { role: "user", content: "a" },
+    { role: "bot", content: "bad role" },
+    { role: "assistant", content: "ok" },
+    { role: "assistant", content: "dup role skipped" },
+    { role: "user", content: "" },
+    { role: "user", content: "next" },
+  ]),
+  [{ role: "user", content: "a" }, { role: "assistant", content: "ok" }]
+);
+const long = "y".repeat(MAX_HISTORY_CONTENT + 50);
+assert.equal(validateHistory([{ role: "user", content: long }, { role: "assistant", content: "a" }])[0].content.length, MAX_HISTORY_CONTENT);
+const many = [];
+for (let i = 0; i < 10; i++) many.push({ role: i % 2 ? "assistant" : "user", content: "m" + i });
+assert.ok(validateHistory(many).length <= MAX_HISTORY_TURNS);
+assert.equal(validateHistory(many).length % 2, 0); // ends on assistant after trim rules
+
+_resetMemoryCounts();
+claudeReply = claudeSays(GOOD); claudeCalls = [];
+const hist = [
+  { role: "user", content: "Most expensive miner" },
+  { role: "assistant", content: "The Avalon Q is about $1398." },
+];
+r = await read(ask("Why is it so expensive?", env, PROMPT, hist));
+assert.equal(r.status, 200);
+const sent = claudeCalls.at(-1).body.messages;
+assert.equal(sent.length, 3); // 2 history + current
+assert.equal(sent[0].role, "user");
+assert.equal(sent[0].content, "Most expensive miner");
+assert.equal(sent[1].role, "assistant");
+assert.match(sent[2].content, /<question>Why is it so expensive\?<\/question>/);
+
+// malformed history is ignored (still answers the new question)
+_resetMemoryCounts();
+claudeCalls = [];
+r = await read(ask("hi", env, PROMPT, [{ role: "nope", content: 1 }, "x"]));
+assert.equal(r.status, 200);
+assert.equal(claudeCalls.at(-1).body.messages.length, 1); // only the new question
+
+// oversize history trimmed before send
+_resetMemoryCounts();
+claudeCalls = [];
+const fat = [];
+for (let i = 0; i < 20; i++) fat.push({ role: i % 2 ? "assistant" : "user", content: "turn " + i + " " + "z".repeat(200) });
+r = await read(ask("follow up?", env, PROMPT, fat));
+assert.equal(r.status, 200);
+assert.ok(claudeCalls.at(-1).body.messages.length - 1 <= MAX_HISTORY_TURNS);
+const histChars = claudeCalls.at(-1).body.messages.slice(0, -1).reduce((n, m) => n + m.content.length, 0);
+assert.ok(histChars <= MAX_HISTORY_TOTAL);
+
+assert.match(SYSTEM_PROMPT, /Follow-ups/i);
+
 
 console.log("ask tests: all passed");

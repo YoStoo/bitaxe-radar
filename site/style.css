@@ -491,6 +491,9 @@ body.ra-ask-lock{position:fixed;left:0;right:0;width:100%}
 .ra-head-text{display:flex;flex-direction:column;gap:2px;min-width:0}
 .ra-head strong{font-size:15px;letter-spacing:-.01em}
 .ra-sub{color:var(--muted);font-size:12px}
+.ra-head-actions{display:flex;align-items:center;gap:6px;flex:none}
+.ra-new{border:1px solid var(--line);background:var(--panel2);color:var(--muted);border-radius:999px;padding:6px 10px;font:600 12px/1 var(--font);cursor:pointer;white-space:nowrap}
+.ra-new:hover{color:var(--text);border-color:var(--ring)}
 .ra-close{flex:none;width:32px;height:32px;border:0;border-radius:10px;background:transparent;color:var(--muted);font:700 22px/1 var(--font);cursor:pointer}
 .ra-close:hover{background:var(--bg2);color:var(--text)}
 .ra-msgs{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--bg)}

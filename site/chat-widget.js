@@ -5,6 +5,7 @@
   if (!window.RadarAsk || document.getElementById("radar-ask-root")) return;
 
   var LS_CHIPS = "radarAskChipsDismissed";
+  var LS_HIST = "radarAskHistory"; // sessionStorage: follows you around this tab
   var CHIP_DELAY_MS = 2200;
   var CHIP_CYCLE_MS = 5500;
   var EXAMPLES = [
@@ -81,7 +82,10 @@
     '<div class="ra-head">' +
       '<div class="ra-head-text"><strong id="radar-ask-title">Ask Bitaxe Radar</strong>' +
       '<span class="ra-sub">AI answers from today\'s miner prices</span></div>' +
-      '<button type="button" class="ra-close" aria-label="Close chat">&times;</button>' +
+      '<div class="ra-head-actions">' +
+        '<button type="button" class="ra-new" aria-label="Start a new chat">New chat</button>' +
+        '<button type="button" class="ra-close" aria-label="Close chat">&times;</button>' +
+      '</div>' +
     '</div>' +
     '<div class="ra-msgs" id="radar-ask-msgs" aria-live="polite"></div>' +
     '<form class="ra-form" id="radar-ask-form">' +
@@ -101,6 +105,7 @@
   var input = panel.querySelector("#radar-ask-input");
   var sendBtn = panel.querySelector(".ra-send");
   var closeBtn = panel.querySelector(".ra-close");
+  var newBtn = panel.querySelector(".ra-new");
   var open = false;
   var busy = false;
   var lastFocus = null;
@@ -191,11 +196,48 @@
     window.scrollTo(0, lockScrollY);
   }
 
-  function addUser(text) {
+  // ---- conversation memory (sessionStorage so the chat follows you around the site) ----
+  function loadHistory() {
+    try {
+      var raw = JSON.parse(sessionStorage.getItem(LS_HIST) || "[]");
+      return Array.isArray(raw) ? raw.filter(function (m) {
+        return m && (m.role === "user" || m.role === "assistant") && typeof m.content === "string" && m.content.trim();
+      }).slice(-6) : [];
+    } catch (e) { return []; }
+  }
+  function saveHistory(h) {
+    try { sessionStorage.setItem(LS_HIST, JSON.stringify((h || []).slice(-6))); } catch (e) {}
+  }
+  var history = loadHistory();
+
+  function noteFor(d) {
+    if (d.in_data === false) return "General knowledge — not from our price data.";
+    if (d.confidence === "low") return "Low confidence — double-check the miner page.";
+    return "From our price data · " + d.confidence + " confidence";
+  }
+
+  function renderWelcome() {
+    var tip = el("div", "ra-row ra-bot");
+    var b = el("div", "ra-bubble");
+    b.appendChild(el("p", null, "Ask about home Bitcoin miners — prices, stock, or which one to get. I use today's data from this site."));
+    tip.appendChild(b);
+    msgs.appendChild(tip);
+  }
+
+  function renderHistory() {
+    msgs.textContent = "";
+    if (!history.length) { renderWelcome(); return; }
+    history.forEach(function (m) {
+      if (m.role === "user") addUser(m.content, true);
+      else addBot({ ok: true, answer: m.content, models_mentioned: [], confidence: "", in_data: true }, true);
+    });
+  }
+
+  function addUser(text, skipScroll) {
     var row = el("div", "ra-row ra-user");
     row.appendChild(el("div", "ra-bubble", text));
     msgs.appendChild(row);
-    scrollLatest();
+    if (!skipScroll) scrollLatest();
   }
 
   function addTyping() {
@@ -213,7 +255,7 @@
     if (t) t.remove();
   }
 
-  function addBot(d) {
+  function addBot(d, skipScroll) {
     clearTyping();
     var row = el("div", "ra-row ra-bot");
     var b = el("div", "ra-bubble");
@@ -221,7 +263,7 @@
       b.appendChild(el("p", null, d.error || "Something went wrong."));
       row.appendChild(b);
       msgs.appendChild(row);
-      scrollLatest();
+      if (!skipScroll) scrollLatest();
       return;
     }
     b.appendChild(el("p", null, d.answer));
@@ -236,14 +278,12 @@
       });
       b.appendChild(links);
     }
-    if (d.in_data === false) {
-      b.appendChild(el("p", "ra-note", "General knowledge — not from our price data."));
-    } else if (d.confidence) {
-      b.appendChild(el("p", "ra-note", "From our price data · " + d.confidence + " confidence"));
+    if (!skipScroll && (d.confidence || d.in_data === false)) {
+      b.appendChild(el("p", "ra-note", noteFor(d)));
     }
     row.appendChild(b);
     msgs.appendChild(row);
-    scrollLatest();
+    if (!skipScroll) scrollLatest();
   }
 
   function openPanel(prefill, autoSend) {
@@ -296,8 +336,15 @@
     input.value = "";
     addUser(q);
     addTyping();
-    window.RadarAsk.ask(q).then(function (d) {
+    // Send prior turns so follow-ups like "why is it expensive?" still know which miner.
+    window.RadarAsk.ask(q, history.slice()).then(function (d) {
       addBot(d);
+      if (d && d.ok) {
+        history.push({ role: "user", content: q });
+        history.push({ role: "assistant", content: d.answer });
+        if (history.length > 6) history = history.slice(-6);
+        saveHistory(history);
+      }
     }).then(function () {
       busy = false;
       sendBtn.disabled = false;
@@ -305,6 +352,15 @@
       fitPanelToViewport();
       scrollLatest();
     });
+  }
+
+  function clearChat() {
+    history = [];
+    saveHistory(history);
+    msgs.textContent = "";
+    renderWelcome();
+    scrollLatest();
+    input.focus();
   }
 
   // ---- chips ----
@@ -367,6 +423,7 @@
   // ---- events ----
   bubble.addEventListener("click", function () { openPanel(); });
   closeBtn.addEventListener("click", closePanel);
+  newBtn.addEventListener("click", clearChat);
   form.addEventListener("submit", function (e) {
     e.preventDefault();
     submitQ(input.value);
@@ -393,18 +450,18 @@
     e.preventDefault();
   }, { passive: false });
 
-  // Welcome empty state once opened with no messages
-  bubble.addEventListener("click", function once() {
-    if (msgs.childNodes.length === 0) {
-      var tip = el("div", "ra-row ra-bot");
-      var b = el("div", "ra-bubble");
-      b.appendChild(el("p", null, "Ask about home Bitcoin miners — prices, stock, or which one to get. I use today's data from this site."));
-      tip.appendChild(b);
-      msgs.appendChild(tip);
-      scrollLatest();
-    }
-    bubble.removeEventListener("click", once);
-  });
+  // Restore this tab's chat (or show the welcome tip) the first time the panel opens.
+  var painted = false;
+  function ensurePainted() {
+    if (painted) return;
+    painted = true;
+    renderHistory();
+  }
+  var _openPanel = openPanel;
+  openPanel = function (prefill, autoSend) {
+    ensurePainted();
+    _openPanel(prefill, autoSend);
+  };
 
   setTimeout(startChips, reduceMotion ? 400 : CHIP_DELAY_MS);
 })();

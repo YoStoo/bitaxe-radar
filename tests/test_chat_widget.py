@@ -111,6 +111,11 @@ class ChatWidget(unittest.TestCase):
         self.assertIn("ra-ask-lock", js)
         self.assertIn("fitPanelToViewport", js)
         self.assertIn("scrollLatest", js)
+        self.assertIn("radarAskHistory", js)
+        self.assertIn("clearChat", js)
+        self.assertIn("ra-new", js)
+        api = (SITE / "ask-api.js").read_text()
+        self.assertIn("history", api)
 
 
 if __name__ == "__main__":

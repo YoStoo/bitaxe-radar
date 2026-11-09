@@ -1,8 +1,8 @@
 // "Ask Bitaxe Radar" - answers miner questions with Claude, using ONLY the site's live price data.
 //
 // The whole trip, step by step:
-//   1. Visitor sends   POST /ask   {"question": "..."}
-//   2. We check the question (not empty, max 300 characters).
+//   1. Visitor sends   POST /ask   {"question": "...", "history": [...]?}
+//   2. We check the question (not empty, max 300 characters) and optional chat history.
 //   3. We check the daily cap (so a bot can't run up the Claude bill).
 //   4. We download the site's live data (bitaxeradar.com/data.js) and shrink it to one short line per miner.
 //      This is the "context": the facts Claude is allowed to use. Feeding real data in is called "grounding".
@@ -15,6 +15,9 @@
 
 // ---------- settings ----------
 export const MAX_QUESTION_CHARS = 300;
+export const MAX_HISTORY_TURNS = 6;       // max prior messages (user+assistant) we keep
+export const MAX_HISTORY_CONTENT = 1200;  // max chars per history message
+export const MAX_HISTORY_TOTAL = 4000;    // max chars across all history messages
 export const DEFAULT_DAILY_LIMIT = 200;      // ~200 questions/day x ~$0.0005 = about 10 cents/day worst case
 export const DEFAULT_MODEL = "claude-haiku-5-5";   // cheapest, fastest current Claude model
 const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
@@ -43,7 +46,13 @@ about the home Bitcoin miners on bitaxeradar.com.
 
 Formatting: never put URLs or page paths in the answer
 (e.g. /models/bitaxe-gamma/). The site adds the links.
-Name miners in plain words.`;
+Name miners in plain words.
+
+Follow-ups: earlier turns in this chat are included.
+If the visitor says "it", "that one", or "the one you
+just told me about", use the miner you named before.
+Set in_data false only when the answer is not grounded
+in the miner data (or is a pure clarifying question).`;
 
 // ---------- the JSON shape Claude must reply with ----------
 export const ANSWER_SCHEMA = {
@@ -71,6 +80,36 @@ export function validateQuestion(q) {
   if (!question) return { error: "Please type a question." };
   if (question.length > MAX_QUESTION_CHARS) return { error: `Keep it under ${MAX_QUESTION_CHARS} characters.` };
   return { question };
+}
+
+// ---------- optional chat history (multi-turn) ----------
+// The browser may send the last few user/assistant turns so Claude can handle
+// "why is it expensive?" after naming a miner. We validate strictly: bad or
+// oversized history is dropped, never trusted.
+export function validateHistory(raw) {
+  if (!Array.isArray(raw)) return [];
+  const out = [];
+  let total = 0;
+  for (const item of raw) {
+    if (!item || typeof item !== "object") continue;
+    const role = item.role === "user" || item.role === "assistant" ? item.role : null;
+    if (!role) continue;
+    if (typeof item.content !== "string") continue;
+    let content = item.content.replace(/\s+/g, " ").trim();
+    if (!content) continue;
+    if (content.length > MAX_HISTORY_CONTENT) content = content.slice(0, MAX_HISTORY_CONTENT);
+    if (total + content.length > MAX_HISTORY_TOTAL) break;
+    // Claude Messages API needs strict user/assistant alternation.
+    if (out.length && out[out.length - 1].role === role) continue;
+    out.push({ role, content });
+    total += content.length;
+    if (out.length >= MAX_HISTORY_TURNS) break;
+  }
+  // Must start with user; drop a trailing user (incomplete turn) so the new
+  // question can be appended as the next user message.
+  while (out.length && out[0].role !== "user") out.shift();
+  if (out.length && out[out.length - 1].role === "user") out.pop();
+  return out;
 }
 
 // ---------- step 3: daily cap ----------
@@ -127,7 +166,8 @@ export function buildContext(latest) {
 }
 
 // ---------- step 5: the request we send to Claude ----------
-export function buildClaudeRequest(question, context, systemPrompt, model = DEFAULT_MODEL) {
+export function buildClaudeRequest(question, context, systemPrompt, model = DEFAULT_MODEL, history = []) {
+  const prior = Array.isArray(history) ? history : [];
   return {
     model,
     max_tokens: 1000,                      // hard cap on reply length = hard cap on cost per question
@@ -137,11 +177,15 @@ export function buildClaudeRequest(question, context, systemPrompt, model = DEFA
       effort: "low",
       format: { type: "json_schema", schema: ANSWER_SCHEMA },   // force the JSON shape
     },
-    messages: [{
-      role: "user",
-      // XML-style tags make it clear to Claude which part is data and which part is the visitor.
-      content: `<data>\n${context}\n</data>\n\n<question>${question}</question>`,
-    }],
+    // Prior turns first (already validated), then the live data + new question.
+    messages: [
+      ...prior.map((m) => ({ role: m.role, content: m.content })),
+      {
+        role: "user",
+        // XML-style tags make it clear to Claude which part is data and which part is the visitor.
+        content: `<data>\n${context}\n</data>\n\n<question>${question}</question>`,
+      },
+    ],
   };
 }
 
@@ -192,6 +236,7 @@ export async function handleAsk(request, env, json, deps = {}) {
   try { input = await request.json(); } catch { return json({ ok: false, error: "Send JSON like {\"question\": \"...\"}." }, 400, request); }
   const v = validateQuestion(input?.question);
   if (v.error) return json({ ok: false, error: v.error }, 400, request);
+  const history = validateHistory(input?.history);
 
   // Per-visitor speed limit (same limiter as signups), then the site-wide daily cap.
   if (env.RATE_LIMITER) {
@@ -202,11 +247,11 @@ export async function handleAsk(request, env, json, deps = {}) {
 
   try {
     const latest = await loadLatest(env);
-    const body = buildClaudeRequest(v.question, buildContext(latest), systemPrompt, env.ASK_MODEL || DEFAULT_MODEL);
+    const body = buildClaudeRequest(v.question, buildContext(latest), systemPrompt, env.ASK_MODEL || DEFAULT_MODEL, history);
     const data = await callClaude(env, body);
     const result = parseClaudeReply(data, new Set(Object.keys(latest.models || {})));
     if (!result) return json({ ok: false, error: "Couldn't get a clear answer. Try rewording it." }, 502, request);
-    console.log("ask ok", JSON.stringify({ q: v.question.length, usage: data.usage }));   // token use, for cost tracking
+    console.log("ask ok", JSON.stringify({ q: v.question.length, hist: history.length, usage: data.usage }));   // token use, for cost tracking
     return json({ ok: true, ...result, data_updated: latest.generated_at }, 200, request);
   } catch (e) {
     console.error("ask failed", e && e.message);   // never send internal errors (or the key) to the visitor

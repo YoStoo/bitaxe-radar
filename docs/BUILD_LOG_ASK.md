@@ -117,6 +117,16 @@ These all showed up when we ran the real Claude API against six test questions (
 
 The site-wide floating chat bubble itself was Shervin's idea (example chips that open the chat), not just an engineering add-on.
 
+### 12. No conversation memory
+
+**Bug.** Shervin asked "Most expensive miner" (got Avalon Q), then "Why is it so expensive?" Claude said it didn't know which miner he meant. A third follow-up ("the one you literally just told me about") still had no prior message.
+
+**Cause.** Each `POST /ask` was stateless — the Worker only received the new question, never the earlier turns.
+
+**Fix.** The chat widget keeps the last ~6 turns in `sessionStorage` (so the chat follows you around the site in that tab), sends them as `history` with each new question, and shows a **New chat** button to clear. The Worker validates history strictly (roles, size caps) and forwards it to Claude as prior messages. Malformed or oversized history is dropped, not trusted.
+
+**Lesson.** "Chat" implies memory. A single-shot API call is a Q&A box, not a conversation, until you send the recent turns along.
+
 ## How we checked it
 
 - Mocked Worker tests (`cd worker && npm test`) — free, repeatable, no API key.
