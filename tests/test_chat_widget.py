@@ -97,6 +97,21 @@ class ChatWidget(unittest.TestCase):
         self.assertIn("box-shadow:0 10px 28px", css)
         self.assertIn("ra-chip-anim", css)
 
+    def test_mobile_keyboard_css(self):
+        css = (SITE / "style.css").read_text()
+        self.assertIn("100dvh", css)
+        self.assertIn("body.ra-ask-lock", css)
+        self.assertIn("overscroll-behavior:contain", css)
+        # iOS zoom guard: input font-size must be at least 16px on small screens.
+        self.assertRegex(css, r"\.ra-form textarea\{[^}]*font-size:16px")
+
+    def test_widget_js_viewport_and_scroll_lock(self):
+        js = (SITE / "chat-widget.js").read_text()
+        self.assertIn("visualViewport", js)
+        self.assertIn("ra-ask-lock", js)
+        self.assertIn("fitPanelToViewport", js)
+        self.assertIn("scrollLatest", js)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -16,6 +16,10 @@
   var reduceMotion = false;
   try { reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
 
+  function isMobile() {
+    try { return window.matchMedia("(max-width: 520px)").matches; } catch (e) { return false; }
+  }
+
   function modelContext() {
     var m = location.pathname.match(/^\/models\/([^\/]+)\/?$/);
     if (!m) return null;
@@ -100,6 +104,8 @@
   var open = false;
   var busy = false;
   var lastFocus = null;
+  var lockScrollY = 0;
+  var vvListening = false;
 
   function el(tag, cls, text) {
     var n = document.createElement(tag);
@@ -108,11 +114,88 @@
     return n;
   }
 
+  function scrollLatest() {
+    requestAnimationFrame(function () {
+      msgs.scrollTop = msgs.scrollHeight;
+      var last = msgs.lastElementChild;
+      if (last && last.scrollIntoView) {
+        try { last.scrollIntoView({ block: "end", inline: "nearest" }); } catch (e) { last.scrollIntoView(false); }
+      }
+    });
+  }
+
+  // Pin the open panel to the visible viewport (above the iOS keyboard).
+  function fitPanelToViewport() {
+    if (!open || !isMobile()) {
+      panel.style.top = panel.style.left = panel.style.right = panel.style.bottom = "";
+      panel.style.height = panel.style.width = panel.style.borderRadius = "";
+      return;
+    }
+    var vv = window.visualViewport;
+    var top = vv ? vv.offsetTop : 0;
+    var left = vv ? vv.offsetLeft : 0;
+    var height = vv ? vv.height : window.innerHeight;
+    var width = vv ? vv.width : window.innerWidth;
+    // Full-bleed when the keyboard has shrunk the viewport; small inset otherwise.
+    var keyboardOpen = vv && vv.height < window.innerHeight * 0.8;
+    var inset = keyboardOpen ? 0 : 8;
+    panel.style.position = "fixed";
+    panel.style.top = (top + inset) + "px";
+    panel.style.left = (left + inset) + "px";
+    panel.style.width = Math.max(0, width - inset * 2) + "px";
+    panel.style.height = Math.max(0, height - inset * 2) + "px";
+    panel.style.right = "auto";
+    panel.style.bottom = "auto";
+    panel.style.borderRadius = inset ? "16px" : "0";
+  }
+
+  function onViewportChange() {
+    if (!open) return;
+    fitPanelToViewport();
+    scrollLatest();
+  }
+
+  function startViewportWatch() {
+    if (vvListening) return;
+    vvListening = true;
+    window.addEventListener("resize", onViewportChange);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", onViewportChange);
+      window.visualViewport.addEventListener("scroll", onViewportChange);
+    }
+  }
+
+  function stopViewportWatch() {
+    if (!vvListening) return;
+    vvListening = false;
+    window.removeEventListener("resize", onViewportChange);
+    if (window.visualViewport) {
+      window.visualViewport.removeEventListener("resize", onViewportChange);
+      window.visualViewport.removeEventListener("scroll", onViewportChange);
+    }
+  }
+
+  function lockBody() {
+    if (!isMobile()) return;
+    lockScrollY = window.scrollY || window.pageYOffset || 0;
+    document.body.classList.add("ra-ask-lock");
+    document.documentElement.classList.add("ra-ask-lock");
+    document.body.style.top = "-" + lockScrollY + "px";
+  }
+
+  function unlockBody() {
+    if (!document.body.classList.contains("ra-ask-lock")) return;
+    document.body.classList.remove("ra-ask-lock");
+    document.documentElement.classList.remove("ra-ask-lock");
+    document.body.style.top = "";
+    window.scrollTo(0, lockScrollY);
+  }
+
   function addUser(text) {
     var row = el("div", "ra-row ra-user");
     row.appendChild(el("div", "ra-bubble", text));
     msgs.appendChild(row);
-    msgs.scrollTop = msgs.scrollHeight;
+    scrollLatest();
   }
 
   function addTyping() {
@@ -122,7 +205,7 @@
     b.innerHTML = '<span></span><span></span><span></span>';
     row.appendChild(b);
     msgs.appendChild(row);
-    msgs.scrollTop = msgs.scrollHeight;
+    scrollLatest();
   }
 
   function clearTyping() {
@@ -138,7 +221,7 @@
       b.appendChild(el("p", null, d.error || "Something went wrong."));
       row.appendChild(b);
       msgs.appendChild(row);
-      msgs.scrollTop = msgs.scrollHeight;
+      scrollLatest();
       return;
     }
     b.appendChild(el("p", null, d.answer));
@@ -160,7 +243,7 @@
     }
     row.appendChild(b);
     msgs.appendChild(row);
-    msgs.scrollTop = msgs.scrollHeight;
+    scrollLatest();
   }
 
   function openPanel(prefill, autoSend) {
@@ -176,8 +259,15 @@
     bubble.classList.remove("ra-bounce");
     root.classList.add("ra-open");
     dismissChips();
+    lockBody();
+    startViewportWatch();
+    fitPanelToViewport();
     if (prefill) input.value = prefill;
-    setTimeout(function () { input.focus(); }, 30);
+    setTimeout(function () {
+      input.focus();
+      fitPanelToViewport();
+      scrollLatest();
+    }, 30);
     if (autoSend && prefill) submitQ(prefill);
   }
 
@@ -187,6 +277,9 @@
     panel.hidden = true;
     bubble.setAttribute("aria-expanded", "false");
     root.classList.remove("ra-open");
+    stopViewportWatch();
+    fitPanelToViewport(); // clears inline styles
+    unlockBody();
     if (lastFocus && lastFocus.focus) lastFocus.focus();
     else bubble.focus();
   }
@@ -209,6 +302,8 @@
       busy = false;
       sendBtn.disabled = false;
       input.focus();
+      fitPanelToViewport();
+      scrollLatest();
     });
   }
 
@@ -239,10 +334,6 @@
     wrap.appendChild(x);
     chipsEl.appendChild(wrap);
     chipsEl.hidden = false;
-  }
-
-  function isMobile() {
-    try { return window.matchMedia("(max-width: 520px)").matches; } catch (e) { return false; }
   }
 
   // On phones, don't cover the primary Buy CTA — wait until it scrolls above the widget.
@@ -280,6 +371,12 @@
     e.preventDefault();
     submitQ(input.value);
   });
+  input.addEventListener("focus", function () {
+    if (!open) return;
+    // iOS opens the keyboard after focus — re-fit once it settles.
+    setTimeout(onViewportChange, 100);
+    setTimeout(onViewportChange, 350);
+  });
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape" && open) { e.preventDefault(); closePanel(); }
   });
@@ -289,6 +386,12 @@
     if (root.contains(e.target)) return;
     closePanel();
   });
+  // Stop the page behind from scrolling/dragging while the panel is open on phones.
+  document.addEventListener("touchmove", function (e) {
+    if (!open || !isMobile()) return;
+    if (msgs.contains(e.target)) return;
+    e.preventDefault();
+  }, { passive: false });
 
   // Welcome empty state once opened with no messages
   bubble.addEventListener("click", function once() {
@@ -298,6 +401,7 @@
       b.appendChild(el("p", null, "Ask about home Bitcoin miners — prices, stock, or which one to get. I use today's data from this site."));
       tip.appendChild(b);
       msgs.appendChild(tip);
+      scrollLatest();
     }
     bubble.removeEventListener("click", once);
   });
