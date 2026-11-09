@@ -215,14 +215,18 @@
   // ---- chips ----
   var chipIdx = 0;
   var chipTimer = null;
+  var chipsAnimated = false;
   var allChips = chipList();
 
   function renderChip() {
     chipsEl.textContent = "";
     var wrap = el("div", "ra-chip-wrap");
+    // Fade in only the first time — later cycles stay fully opaque (no mid-animation washout).
+    if (!chipsAnimated && !reduceMotion) { wrap.classList.add("ra-chip-anim"); chipsAnimated = true; }
     var q = allChips[chipIdx % allChips.length];
     var btn = el("button", "ra-chip", q);
     btn.type = "button";
+    btn.title = q;
     btn.addEventListener("click", function () {
       dismissChips();
       openPanel(q, true);

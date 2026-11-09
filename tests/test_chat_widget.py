@@ -92,6 +92,10 @@ class ChatWidget(unittest.TestCase):
         self.assertIn("justify-content:flex-end", css)
         self.assertIn("order:2", css)
         self.assertIn("text-overflow:ellipsis", css)
+        self.assertIn("background:#243a5e", css)
+        self.assertIn("#radar-ask-root button.ra-chip", css)
+        self.assertIn("box-shadow:0 10px 28px", css)
+        self.assertIn("ra-chip-anim", css)
 
 
 if __name__ == "__main__":
