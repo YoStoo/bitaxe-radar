@@ -1,13 +1,12 @@
-// "Ask Bitaxe Radar" box on /ask/. Sends the question to our Worker (POST /ask) and shows the answer.
-// window.RADAR_ASK = {url: ".../ask"} is written into the page by build_site.py.
+// "Ask Bitaxe Radar" box on /ask/. Uses window.RadarAsk (ask-api.js).
 (function () {
   "use strict";
-  var cfg = window.RADAR_ASK, form = document.getElementById("ask-form");
-  if (!cfg || !form) return;
+  var form = document.getElementById("ask-form");
+  if (!form || !window.RadarAsk) return;
   var box = form.querySelector("textarea"), btn = form.querySelector("button"), out = document.getElementById("ask-answer");
 
   function show(text, links, note) {
-    out.textContent = "";                               // textContent shows it as plain text, so an answer can never inject code
+    out.textContent = "";
     var p = document.createElement("p"); p.textContent = text; out.appendChild(p);
     (links || []).forEach(function (id) {
       var a = document.createElement("a"); a.href = "/models/" + encodeURIComponent(id) + "/"; a.textContent = id;
@@ -21,15 +20,11 @@
     var q = box.value.trim();
     if (!q) return;
     btn.disabled = true; show("Thinking...");
-    fetch(cfg.url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question: q }) })
-      .then(function (r) { return r.json(); })
-      .then(function (d) {
-        if (!d.ok) return show(d.error || "Something went wrong.");
-        var note = (d.in_data ? "From our price data" : "Our data didn't cover this") + " · confidence: " + d.confidence +
-          " · data updated " + new Date(d.data_updated).toLocaleString() + ". AI answers can be wrong; check the miner page.";
-        show(d.answer, d.models_mentioned, note);
-      })
-      .catch(function () { show("Ask isn't reachable right now. Try again later."); })
-      .then(function () { btn.disabled = false; });
+    window.RadarAsk.ask(q).then(function (d) {
+      if (!d.ok) return show(d.error || "Something went wrong.");
+      var note = (d.in_data ? "From our price data" : "Our data didn't cover this") + " · confidence: " + d.confidence +
+        " · data updated " + new Date(d.data_updated).toLocaleString() + ". AI answers can be wrong; check the miner page.";
+      show(d.answer, d.models_mentioned, note);
+    }).then(function () { btn.disabled = false; });
   });
 })();

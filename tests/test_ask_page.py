@@ -14,6 +14,7 @@ class AskPage(unittest.TestCase):
     def test_form_and_script(self):
         self.assertIn('id="ask-form"', self.html)
         self.assertIn('maxlength="300"', self.html)
+        self.assertIn('src="/ask-api.js"', self.html)
         self.assertIn('src="/ask.js"', self.html)
         cfg = json.loads(re.search(r"window\.RADAR_ASK=(\{.*?\});", self.html).group(1))
         self.assertTrue(cfg["url"].startswith("https://") and cfg["url"].endswith("/ask"))

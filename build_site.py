@@ -62,6 +62,13 @@ _cfb = re.search(r'var CF_BEACON_TOKEN\s*=\s*"([^"]*)"', _app)
 CF_BEACON_TOKEN = _cfb.group(1) if _cfb else ""     # Cloudflare Web Analytics site token (public); empty = no analytics tag
 ANALYTICS = (f"<script defer src=\"https://static.cloudflareinsights.com/beacon.min.js\" data-cf-beacon='{{\"token\": \"{CF_BEACON_TOKEN}\"}}'></script>\n"
              if re.fullmatch(r"[0-9a-f]{32}", CF_BEACON_TOKEN or "") else "")
+# Floating Ask chat bubble on every page (POST /ask Worker). Also powers the /ask/ page form via ask-api.js.
+ASK_URL = WORKER_URL.rsplit("/", 1)[0] + "/ask"
+ASK_WIDGET_SCRIPTS = (
+    f'<script>window.RADAR_ASK={json.dumps({"url": ASK_URL})};</script>\n'
+    '<script src="/ask-api.js" defer></script>\n'
+    '<script src="/chat-widget.js" defer></script>\n'
+)
 
 # ---------------------------------------------------------------------------------------------
 # helpers
@@ -923,7 +930,7 @@ def layout(path, title, desc, body, *, crumbs=None, jsonld=(), noindex=False, la
 {body}
 </main>
 {footer_html()}
-{scripts}{calc_scripts() if "data-calc=" in body else ""}{ANALYTICS}
+{ASK_WIDGET_SCRIPTS}{scripts}{calc_scripts() if "data-calc=" in body else ""}{ANALYTICS}
 </body>
 </html>
 """
@@ -3840,7 +3847,7 @@ def build_home():
            .replace("<!--HERO-CHIPS-->", chips).replace("<!--BROWSE-->", bf_banner() + browse_tiles() + "\n" + best_pills()).replace("<!--CARDS-->", cards).replace("<!--SIGNUP-->", signup_html("any"))
            .replace("<!--COMPARE-LINKS-->", compare_links).replace("<!--FOOTER-->", footer_html())
            .replace('<script src="/app.js"></script>', '<script src="/app.js"></script>\n' + SIGNUP_SCRIPTS)
-           .replace("</body>", ANALYTICS + "</body>"))
+           .replace("</body>", ASK_WIDGET_SCRIPTS + ANALYTICS + "</body>"))
     assert "<!--" not in out, "unfilled placeholder in home template"
     (SITE / "index.html").write_text(out)
     PAGES.append(dict(path="/", lastmod=latest["generated_at"]))
@@ -4062,9 +4069,6 @@ def build_alerts():
 # ASK BITAXE RADAR (/ask/): question box -> Worker POST /ask -> Claude answers from live data (worker/src/ask.js)
 # noindex until it's launched; not linked from the nav yet.
 # ---------------------------------------------------------------------------------------------
-ASK_URL = WORKER_URL.rsplit("/", 1)[0] + "/ask"
-
-
 def build_ask():
     path = "/ask/"
     body = f"""<article>
@@ -4078,7 +4082,8 @@ def build_ask():
 <div id="ask-answer" aria-live="polite"></div>
 <p class="hint">Answers can be wrong. Prices change often; check the miner page before you buy. Questions are sent to Anthropic's API; don't type personal info.</p>
 </article>"""
-    scripts = f'<script>window.RADAR_ASK={json.dumps({"url": ASK_URL})};</script>\n<script src="/ask.js" defer></script>'
+    # ask-api.js + chat-widget.js come from ASK_WIDGET_SCRIPTS in layout(); ask.js wires the page form.
+    scripts = '<script src="/ask.js" defer></script>'
     layout(path, "Ask Bitaxe Radar: AI answers from live miner prices | Bitaxe Radar",
            "Ask a question about home Bitcoin miners and get an AI answer based only on Bitaxe Radar's live prices and specs.",
            body, crumbs=[("Home", "/"), ("Ask", path)], noindex=True, scripts=scripts)
