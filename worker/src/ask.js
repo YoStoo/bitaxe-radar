@@ -1,25 +1,33 @@
 // "Ask Bitaxe Radar" - answers miner questions with Claude, using ONLY the site's live price data.
 //
-// The whole trip, step by step:
+// The whole trip, step by step (tool-calling version; see docs/TOOL_CALLING.md):
 //   1. Visitor sends   POST /ask   {"question": "...", "history": [...]?}
 //   2. We check the question (not empty, max 300 characters) and optional chat history.
-//   3. We check the daily cap (so a bot can't run up the Claude bill).
-//   4. We download the site's live data (bitaxeradar.com/data.js) and shrink it to one short line per miner.
-//      This is the "context": the facts Claude is allowed to use. Feeding real data in is called "grounding".
-//   5. We call the Claude Messages API with: our rules (system prompt) + the data + the question.
-//   6. Claude must reply in a fixed JSON shape (a "JSON schema"). That's "structured output".
+//   3. We check the daily cap (so a bot can't run up the Claude bill). One question = one slot.
+//   4. We download the site's live data (bitaxeradar.com/data.js). We do NOT paste it all into the prompt.
+//   5. "Agent loop": we send Claude the rules + question + a menu of tools (src/tools.js).
+//      If Claude answers stop_reason "tool_use", we run the tool(s) on the live data, send back
+//      tool_result blocks, and call Claude again. Max 4 tool rounds, then Claude must answer.
+//   6. Claude gives its final answer by calling one more tool, "respond", whose inputs ARE our fixed JSON
+//      answer shape (a "JSON schema"). strict: true makes the API enforce that shape.
 //   7. We check that JSON ourselves anyway (never trust an AI's output blindly), then send it back.
+//
+// Kill switch: set ASK_TOOLS = "off" (wrangler.toml [vars]) to go back to the old "paste all data in" way.
 //
 // Secret needed (never put it in code or git):   npx wrangler secret put ANTHROPIC_API_KEY
 // Optional KV storage for the daily counter:      binding name ASK_KV (see wrangler.toml)
+
+import { TOOLS, runTool } from "./tools.js";
 
 // ---------- settings ----------
 export const MAX_QUESTION_CHARS = 300;
 export const MAX_HISTORY_TURNS = 6;       // max prior messages (user+assistant) we keep
 export const MAX_HISTORY_CONTENT = 1200;  // max chars per history message
 export const MAX_HISTORY_TOTAL = 4000;    // max chars across all history messages
-export const DEFAULT_DAILY_LIMIT = 200;      // ~200 questions/day x ~$0.0005 = about 10 cents/day worst case
+export const DEFAULT_DAILY_LIMIT = 200;      // ~200 questions/day x ~$0.0007 (tool way, ~2 calls) = about 14 cents/day; worst case 5 calls ~$0.30/day
 export const DEFAULT_MODEL = "claude-haiku-5-5";   // cheapest, fastest current Claude model
+export const MAX_TOOL_ROUNDS = 4;          // max times Claude may ask for tools before it must answer
+export const ASK_TOTAL_TIMEOUT_MS = 25000; // whole question (all Claude calls) must finish in 25 s
 const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
 const ANTHROPIC_VERSION = "2026-10-21";      // API version header from Anthropic's docs
 const MAX_ANSWER_CHARS = 1500;
@@ -35,7 +43,9 @@ export const SYSTEM_PROMPT = `You are the Bitaxe Radar helper. You answer questi
 about the home Bitcoin miners on bitaxeradar.com.
 
 1. For prices, stock, specs, and shops, use ONLY the
-   miner data below. Never guess a price.
+   miner data from your tools. Never guess a price.
+   Call a tool before naming any price; one or two
+   calls is usually enough. Then call respond.
 2. If the data doesn't have the answer, say so. For
    general mining questions, you may use general
    knowledge, but set in_data to false.
@@ -58,6 +68,11 @@ just told me about", use the miner you named before.
 Set in_data false only when the answer is not grounded
 in the miner data (or is a pure clarifying question).`;
 
+// Old-way rule 1 (data pasted into the prompt). Used only when ASK_TOOLS = "off".
+const CONTEXT_RULE = `1. For prices, stock, specs, and shops, use ONLY the
+   miner data below. Never guess a price.`;
+export function contextModePrompt(p) { return p.replace(/1\. For prices[\s\S]*?is usually enough\./, CONTEXT_RULE); }
+
 // ---------- the JSON shape Claude must reply with ----------
 export const ANSWER_SCHEMA = {
   type: "object",
@@ -68,7 +83,7 @@ export const ANSWER_SCHEMA = {
     answer: { type: "string", description: "Visitor-facing reply: 2-4 short sentences, under ~70 words. Lead with the answer; no padding." },   // shown to the visitor
     // "description" tells Claude what goes in each field, so the rules prompt can stay about behavior.
     models_mentioned: { type: "array", items: { type: "string" },   // miner ids, e.g. "bitaxe-gamma"
-      description: "The id column value of every miner named in the answer, e.g. bitaxe-gamma. Empty if none." },
+      description: "The id of every miner named in the answer (from the tool results or id column), e.g. bitaxe-gamma. Empty if none." },
     confidence: { type: "string", enum: CONFIDENCE,
       description: "high = the data answers it directly; medium = you compared or calculated; low = only partly answered." },
     in_data: { type: "boolean" },                              // false = "the data didn't have the answer"
@@ -193,7 +208,74 @@ export function buildClaudeRequest(question, context, systemPrompt, model = DEFA
   };
 }
 
-export async function callClaude(env, body) {
+// ---------- step 5 (tool version): the request for each round of the agent loop ----------
+// The final answer is itself a tool call. Why not keep output_config.format (structured output) like before?
+// We tried: with the JSON format switched on, Claude wrote its JSON answer straight away and only DESCRIBED
+// the tool call inside `working` ("Calling search_miners...") with an empty answer. The format forces the
+// reply to be JSON text, which crowds out real tool calls. A "respond" tool fixes that cleanly:
+//   - tool_choice "any" = Claude must call SOME tool every turn: a data tool, or respond when it's done.
+//   - Round cap reached: tool_choice {tool: respond} = it must answer now.
+//   - strict: true on respond = the API guarantees the exact same answer shape as before. Frontend unchanged.
+export const RESPOND_TOOL = {
+  name: "respond",
+  description: "Send your final answer to the visitor. Call this once, after you've read any tool results you need. " +
+    "Off-topic or general questions can be answered with respond right away.",
+  strict: true,
+  input_schema: ANSWER_SCHEMA,
+};
+export function buildToolRequest(messages, systemPrompt, model = DEFAULT_MODEL, forceFinal = false) {
+  return {
+    model,
+    max_tokens: 1000,
+    system: systemPrompt,
+    thinking: { type: "disabled" },
+    output_config: { effort: "low" },
+    tools: [...TOOLS, RESPOND_TOOL],       // always sent: earlier tool_use blocks in `messages` refer to them
+    tool_choice: forceFinal ? { type: "tool", name: RESPOND_TOOL.name } : { type: "any" },
+    messages,
+  };
+}
+
+// Pull the answer out of a reply whose only tool call is "respond". Returns the raw object or null.
+export function respondInput(data) {
+  if (!data || data.stop_reason === "refusal" || data.stop_reason === "max_tokens") return null;
+  const blocks = (data.content || []).filter((b) => b.type === "tool_use");
+  if (blocks.length !== 1 || blocks[0].name !== RESPOND_TOOL.name) return null;
+  return blocks[0].input;
+}
+
+// The agent loop. Returns the final Claude reply plus what happened along the way (for logs and teaching).
+export async function runAgentLoop(env, { question, history = [], systemPrompt, latest, model = DEFAULT_MODEL, deadline = Date.now() + ASK_TOTAL_TIMEOUT_MS }) {
+  const messages = [...history.map((m) => ({ role: m.role, content: m.content })), { role: "user", content: `<question>${question}</question>` }];
+  const toolsUsed = [];
+  const usage = { input_tokens: 0, output_tokens: 0 };
+  let calls = 0;
+  for (let round = 0; ; round++) {
+    const left = deadline - Date.now();
+    if (left <= 1000) throw new Error("ask timed out");
+    // Round cap reached (or time nearly up): this call must be the final answer.
+    const forceFinal = round >= MAX_TOOL_ROUNDS || left < 6000;
+    const data = await callClaude(env, buildToolRequest(messages, systemPrompt, model, forceFinal), Math.min(20000, left));
+    calls++;
+    usage.input_tokens += data?.usage?.input_tokens || 0;     // every call costs money, so add them all up
+    usage.output_tokens += data?.usage?.output_tokens || 0;
+    const toolBlocks = (data?.content || []).filter((b) => b.type === "tool_use");
+    const dataTools = toolBlocks.filter((b) => b.name !== RESPOND_TOOL.name);
+    // Done when: Claude answered (respond only), stopped for any other reason, or this was the forced last call.
+    if (data?.stop_reason !== "tool_use" || !dataTools.length || forceFinal) return { data, answer: respondInput(data), toolsUsed, usage, calls, rounds: round };
+    // Claude asked for data tool(s): keep its turn in the conversation, run each tool, send ALL results back
+    // in ONE user turn (every tool_use needs a matching tool_result, or the API rejects the next call).
+    messages.push({ role: "assistant", content: data.content });
+    const results = toolBlocks.map((b) => b.name === RESPOND_TOOL.name
+      // respond in the SAME turn as a data tool = an answer written before seeing the data. Bounce it.
+      ? { result: { type: "tool_result", tool_use_id: b.id, content: "Not sent. Read the tool results first, then call respond.", is_error: true }, log: { name: b.name, input: {}, ok: false } }
+      : runTool(latest, b));
+    results.forEach((r) => toolsUsed.push(r.log));
+    messages.push({ role: "user", content: results.map((r) => r.result) });
+  }
+}
+
+export async function callClaude(env, body, timeoutMs = 20000) {
   const r = await fetch(ANTHROPIC_URL, {
     method: "POST",
     headers: {
@@ -202,7 +284,7 @@ export async function callClaude(env, body) {
       "anthropic-version": ANTHROPIC_VERSION,
     },
     body: JSON.stringify(body),
-    signal: AbortSignal.timeout(20000),     // give up after 20 seconds instead of hanging
+    signal: AbortSignal.timeout(timeoutMs),  // give up instead of hanging (20 s per call, less if the question's time is nearly up)
   });
   const data = await r.json().catch(() => null);
   if (!r.ok) throw new Error(`Claude HTTP ${r.status}: ${data?.error?.message || "no details"}`);
@@ -218,13 +300,33 @@ export function parseClaudeReply(data, knownIds) {
   if (!textBlock) return null;
   let out;
   try { out = JSON.parse(textBlock.text); } catch { return null; }
+  return checkAnswer(out, knownIds);
+}
+
+// Same checks for both ways in: JSON text (old way) or the respond tool's input (tool way).
+// Seen live with tool calling: Claude ended the answer text with tool-call markup that belongs to the NEXT
+// field, e.g. 'answer...</answer>\n<parameter name="models_mentioned">["bitaxe-gamma"]', and left the real
+// models_mentioned empty. Strict mode can't catch it (it's still a valid string). Cut the junk off and
+// rescue any miner ids it contained.
+const LEAK = /<\/?(answer|parameter|invoke|function_calls)\b/i;
+export function cleanAnswer(text) {
+  const m = LEAK.exec(text);
+  if (!m) return { answer: text, leaked: "" };
+  return { answer: text.slice(0, m.index).trim(), leaked: text.slice(m.index) };
+}
+
+export function checkAnswer(out, knownIds) {
   if (!out || typeof out.answer !== "string" || !out.answer.trim()) return null;
   if (!Array.isArray(out.models_mentioned) || typeof out.in_data !== "boolean") return null;
   const confidence = String(out.confidence || "").toLowerCase();   // docs: enum casing isn't guaranteed
   if (!CONFIDENCE.includes(confidence)) return null;
+  const { answer, leaked } = cleanAnswer(out.answer.trim());
+  if (!answer) return null;
+  const rescued = leaked ? [...leaked.matchAll(/"([a-z0-9][a-z0-9-]*)"/g)].map((x) => x[1]) : [];
+  if (leaked) console.warn("ask: cut leaked markup from answer");
   return {
-    answer: out.answer.trim().slice(0, MAX_ANSWER_CHARS),
-    models_mentioned: [...new Set(out.models_mentioned.filter((id) => knownIds.has(id)))],
+    answer: answer.slice(0, MAX_ANSWER_CHARS),
+    models_mentioned: [...new Set([...out.models_mentioned, ...rescued].filter((id) => knownIds.has(id)))],
     confidence,
     in_data: out.in_data,
   };
@@ -251,12 +353,24 @@ export async function handleAsk(request, env, json, deps = {}) {
 
   try {
     const latest = await loadLatest(env);
-    const body = buildClaudeRequest(v.question, buildContext(latest), systemPrompt, env.ASK_MODEL || DEFAULT_MODEL, history);
-    const data = await callClaude(env, body);
-    const result = parseClaudeReply(data, new Set(Object.keys(latest.models || {})));
+    const model = env.ASK_MODEL || DEFAULT_MODEL;
+    const knownIds = new Set(Object.keys(latest.models || {}));
+    let result, toolsUsed = [], usage, calls = 1;
+    if (env.ASK_TOOLS === "off") {   // old way: paste every miner into the prompt, one call
+      const data = await callClaude(env, buildClaudeRequest(v.question, buildContext(latest), deps.systemPrompt ?? contextModePrompt(SYSTEM_PROMPT), model, history));
+      usage = data?.usage;
+      result = parseClaudeReply(data, knownIds);
+    } else {
+      const loop = await runAgentLoop(env, { question: v.question, history, systemPrompt, latest, model });
+      ({ toolsUsed, usage, calls } = loop);
+      // Normal path: the respond tool's input. Fallback: a plain JSON text reply (shouldn't happen with
+      // tool_choice "any", but if it ever does, the same checks apply instead of failing the visitor).
+      result = loop.answer ? checkAnswer(loop.answer, knownIds) : parseClaudeReply(loop.data, knownIds);
+    }
     if (!result) return json({ ok: false, error: "Couldn't get a clear answer. Try rewording it." }, 502, request);
-    console.log("ask ok", JSON.stringify({ q: v.question.length, hist: history.length, usage: data.usage }));   // token use, for cost tracking
-    return json({ ok: true, ...result, data_updated: latest.generated_at }, 200, request);
+    console.log("ask ok", JSON.stringify({ q: v.question.length, hist: history.length, calls, tools: toolsUsed.map((t) => t.name), usage }));   // token use, for cost tracking
+    // tools_used is for debugging/teaching; the site ignores it.
+    return json({ ok: true, ...result, tools_used: toolsUsed, data_updated: latest.generated_at }, 200, request);
   } catch (e) {
     console.error("ask failed", e && e.message);   // never send internal errors (or the key) to the visitor
     return json({ ok: false, error: "Ask is having trouble right now. Try again in a bit." }, 502, request);
