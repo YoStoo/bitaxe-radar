@@ -191,5 +191,38 @@ class HistoryChecks(unittest.TestCase):
         self.assertIn("update the case", [c for c in g["checks"] if c["check"] == "history"][0]["why"])
 
 
+
+class RagChecks(unittest.TestCase):
+    CASE = {"id": "r", "question": "q", "expect": {"rag": {"guides": ["bitaxe-power-supply"]}, "must_match": "5 ?V"}}
+
+    def rag_resp(self, answer, retrieved, cited):
+        return resp(answer, tools_used=[{"name": "search_guides", "input": {"query": "x"}, "ok": True, "guides": retrieved}],
+                    sources=[{"id": g, "title": g, "url": f"/guides/{g}/"} for g in cited])
+
+    def test_retrieved_cited_grounded(self):
+        g = G.grade(self.CASE, self.rag_resp("A Gamma needs a 5V supply, about 4 A.", ["bitaxe-power-supply", "bitaxe-setup"], ["bitaxe-power-supply"]), LATEST)
+        self.assertTrue(g["pass"], g)
+
+    def test_wrong_guide_or_no_citation_fails(self):
+        g = G.grade(self.CASE, self.rag_resp("A Gamma needs a 5V supply.", ["bitaxe-setup"], []), LATEST)
+        failed = {c["check"] for c in g["checks"] if not c["pass"]}
+        self.assertEqual(failed, {"retrieved", "cited"})
+
+    def test_ungrounded_answer_fails(self):
+        g = G.grade(self.CASE, self.rag_resp("Any phone charger works.", ["bitaxe-power-supply"], ["bitaxe-power-supply"]), LATEST)
+        self.assertEqual({c["check"] for c in g["checks"] if not c["pass"]}, {"match"})
+
+    def test_dont_know(self):
+        case = {"id": "d", "question": "q", "expect": {"dont_know": True}}
+        for ok in ("Our guides don't cover the Antminer S19.", "We don't have a guide on Home Assistant yet.",
+                   "That isn't covered in our guides."):
+            self.assertTrue(G.grade(case, resp(ok), LATEST)["pass"], ok)
+        self.assertFalse(G.grade(case, resp("Remove the heatsink and apply new paste."), LATEST)["pass"])
+        # Saying "not covered" and then citing a guide for a related, real fact is fine (eval run 1 taught us this).
+        related = self.rag_resp("Our guides don't cover Home Assistant. To reach the dashboard, open the miner's IP address.",
+                                ["bitaxe-setup"], ["bitaxe-setup"])
+        self.assertTrue(G.grade(case, related, LATEST)["pass"])
+
+
 if __name__ == "__main__":
     unittest.main()

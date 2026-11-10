@@ -173,6 +173,36 @@ def check_history_prices(answer, h):
                 f"{'found' if ok else 'not found'} in {amounts}")
 
 
+# ---------- RAG checks (search_guides cases) ----------
+DONT_KNOW_WORDS = re.compile(
+    r"(guides?|our (site|pages)|bitaxe radar)\b[^.]{0,40}\b(don'?t|do not|doesn'?t|does not|isn'?t|is not|aren'?t|not)\b[^.]{0,20}\b(cover|include|have|explain|go into|address)|"
+    r"(no|not a|don'?t have a|do not have a) guide|not covered|isn'?t covered|outside (what )?our guides", re.I)
+
+
+def check_retrieved(resp, guides):
+    """Did search_guides actually return a passage from one of the right guides? (retrieval quality)"""
+    got = [g for t in (resp.get("tools_used") or []) if t.get("name") == "search_guides" for g in (t.get("guides") or [])]
+    ok = any(g in got for g in guides)
+    return ok, f"retrieved {sorted(set(got)) or 'nothing'}" + ("" if ok else f", expected one of {guides}")
+
+
+def check_cited(resp, guides):
+    """Did the answer cite a right guide? The Worker only keeps citations of guides it really retrieved."""
+    got = [x.get("id") for x in (resp.get("sources") or [])]
+    ok = any(g in got for g in guides)
+    return ok, f"cited {got or 'nothing'}" + ("" if ok else f", expected one of {guides}")
+
+
+def check_dont_know(answer, resp):
+    """Guides don't cover it: the bot must SAY so. It may still cite a guide for a nearby fact it really found
+    ("our guides don't cover Home Assistant; to reach the dashboard, open its IP address"). Made-up specifics
+    are caught per case with must_not_match."""
+    if not DONT_KNOW_WORDS.search(answer):
+        return False, "didn't say our guides don't cover it"
+    cited = [x.get("id") for x in (resp.get("sources") or [])]
+    return True, "said our guides don't cover it" + (f" (cites {cited} for related facts)" if cited else "")
+
+
 # ---------- turn a case's "expect" block into concrete checks, using TODAY's data ----------
 def resolve(case, latest):
     """Returns a list of (check_name, function_taking(answer, resp)) built from current prices.
@@ -219,6 +249,14 @@ def resolve(case, latest):
                     checks.append(("all_time_low", lambda a, r, h=hist: check_price(a, hx["miner"], h["all_time_low"]["usd"])))
                 elif c == "shop":
                     checks.append(("top_shop", lambda a, r, h=hist: check_shop(a, [h["top_shop"]])))
+
+    if "rag" in e:   # e.g. {"guides": ["bitaxe-noise"], "cite": true}
+        guides = e["rag"]["guides"]
+        checks.append(("retrieved", lambda a, r: check_retrieved(r, guides)))
+        if e["rag"].get("cite", True):
+            checks.append(("cited", lambda a, r: check_cited(r, guides)))
+    if e.get("dont_know"):
+        checks.append(("dont_know", lambda a, r: check_dont_know(a, r)))
 
     if "mentions" in e:
         checks.append(("mentions", lambda a, r: check_mentions(a, r, e["mentions"], latest)))

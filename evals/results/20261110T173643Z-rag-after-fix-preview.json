@@ -1,0 +1,732 @@
+{
+  "run": "20261110T173643Z-rag-after-fix-preview",
+  "url": "https://bitaxe-radar-ask-preview.bitaxeradar.workers.dev/ask",
+  "data_updated": "2026-11-10T12:17:52Z",
+  "cases_passed": 12,
+  "cases": 12,
+  "checks_passed": 62,
+  "checks": 62,
+  "results": [
+    {
+      "id": "general-solo-mining",
+      "pass": true,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "3 sentences, 45 words (max 4/90)"
+        },
+        {
+          "check": "retrieved",
+          "pass": true,
+          "why": "retrieved ['bitcoin-mining-pools', 'solo-vs-pool-mining']"
+        },
+        {
+          "check": "cited",
+          "pass": true,
+          "why": "cited ['solo-vs-pool-mining', 'bitcoin-mining-pools']"
+        },
+        {
+          "check": "in_data",
+          "pass": true,
+          "why": "in_data=True, expected True"
+        }
+      ],
+      "question": "What does solo mining mean?",
+      "ok": true,
+      "answer": "Solo mining means your miner works alone on the Bitcoin network. If it finds a block, you keep the whole reward; if not, you earn nothing. It's a lottery ticket, which is why most Bitaxe-style miners run solo, while pool mining pays smaller, steadier shares.",
+      "ms": 4365,
+      "in_data": true,
+      "tools_used": [
+        {
+          "name": "search_guides",
+          "input": {
+            "query": "solo mining vs pool mining"
+          },
+          "ok": true,
+          "guides": [
+            "solo-vs-pool-mining",
+            "bitcoin-mining-pools"
+          ]
+        }
+      ],
+      "models_mentioned": [],
+      "sources": [
+        {
+          "id": "solo-vs-pool-mining",
+          "title": "Solo vs pool mining",
+          "url": "/guides/solo-vs-pool-mining/"
+        },
+        {
+          "id": "bitcoin-mining-pools",
+          "title": "Which mining pool should I use?",
+          "url": "/guides/bitcoin-mining-pools/"
+        }
+      ]
+    },
+    {
+      "id": "general-hashrate",
+      "pass": true,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "3 sentences, 49 words (max 4/90)"
+        },
+        {
+          "check": "in_data",
+          "pass": true,
+          "why": "in_data=False, expected False"
+        }
+      ],
+      "question": "What is hashrate, in simple words?",
+      "ok": true,
+      "answer": "Hashrate is how fast a miner makes guesses at the puzzle that Bitcoin mining requires. It's measured in hashes per second, shown as TH/s (trillions per second). More hashrate means more chances to win a block, and our guides note that adding chips raises hashrate while using more power.",
+      "ms": 3829,
+      "in_data": false,
+      "tools_used": [
+        {
+          "name": "search_guides",
+          "input": {
+            "query": "what is hashrate in simple words"
+          },
+          "ok": true,
+          "guides": [
+            "bitaxe-chips"
+          ]
+        }
+      ],
+      "models_mentioned": [],
+      "sources": [
+        {
+          "id": "bitaxe-chips",
+          "title": "BM1366, BM1368, BM1370, BM1373: which chip is in your miner?",
+          "url": "/guides/bitaxe-chips/"
+        }
+      ]
+    },
+    {
+      "id": "rag-normal-temp",
+      "pass": true,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "2 sentences, 42 words (max 4/90)"
+        },
+        {
+          "check": "retrieved",
+          "pass": true,
+          "why": "retrieved ['bitaxe-setup', 'is-my-bitaxe-normal']"
+        },
+        {
+          "check": "cited",
+          "pass": true,
+          "why": "cited ['is-my-bitaxe-normal']"
+        },
+        {
+          "check": "in_data",
+          "pass": true,
+          "why": "in_data=True, expected True"
+        },
+        {
+          "check": "match",
+          "pass": true,
+          "why": "matched '60\u00b0C'"
+        }
+      ],
+      "question": "Is 65\u00b0C normal for my Bitaxe Gamma?",
+      "ok": true,
+      "answer": "65\u00b0C is a bit above the default 60\u00b0C target, but it's still well under the 75\u00b0C ASIC cutoff where the firmware stops mining, so it's generally within normal range. If it stays there with high error rates, check the settings or cooling.",
+      "ms": 3422,
+      "in_data": true,
+      "tools_used": [
+        {
+          "name": "search_guides",
+          "input": {
+            "query": "bitaxe gamma normal temperature"
+          },
+          "ok": true,
+          "guides": [
+            "is-my-bitaxe-normal",
+            "bitaxe-setup"
+          ]
+        }
+      ],
+      "models_mentioned": [
+        "bitaxe-gamma"
+      ],
+      "sources": [
+        {
+          "id": "is-my-bitaxe-normal",
+          "title": "Is my Bitaxe normal?",
+          "url": "/guides/is-my-bitaxe-normal/"
+        }
+      ]
+    },
+    {
+      "id": "rag-psu",
+      "pass": true,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "3 sentences, 38 words (max 4/90)"
+        },
+        {
+          "check": "retrieved",
+          "pass": true,
+          "why": "retrieved ['bitaxe-power-supply']"
+        },
+        {
+          "check": "cited",
+          "pass": true,
+          "why": "cited ['bitaxe-power-supply']"
+        },
+        {
+          "check": "in_data",
+          "pass": true,
+          "why": "in_data=True, expected True"
+        },
+        {
+          "check": "not_match",
+          "pass": true,
+          "why": "clean"
+        },
+        {
+          "check": "match",
+          "pass": true,
+          "why": "matched '5V'"
+        }
+      ],
+      "question": "What power supply does a Bitaxe Gamma need?",
+      "ok": true,
+      "answer": "A Bitaxe Gamma needs a 5V supply with a round 5.5 \u00d7 2.1 mm barrel plug (center-positive). It draws about 18\u201320 W, so a 5V 6A (30 W) supply leaves headroom. Never use a 12V supply on it.",
+      "ms": 3153,
+      "in_data": true,
+      "tools_used": [
+        {
+          "name": "search_guides",
+          "input": {
+            "query": "Bitaxe Gamma power supply requirements"
+          },
+          "ok": true,
+          "guides": [
+            "bitaxe-power-supply"
+          ]
+        },
+        {
+          "name": "get_miner",
+          "input": {
+            "miner": "Bitaxe Gamma"
+          },
+          "ok": true
+        }
+      ],
+      "models_mentioned": [
+        "bitaxe-gamma"
+      ],
+      "sources": [
+        {
+          "id": "bitaxe-power-supply",
+          "title": "What power supply does a Bitaxe need?",
+          "url": "/guides/bitaxe-power-supply/"
+        }
+      ]
+    },
+    {
+      "id": "rag-12v-on-gamma",
+      "pass": true,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "4 sentences, 40 words (max 4/90)"
+        },
+        {
+          "check": "retrieved",
+          "pass": true,
+          "why": "retrieved ['bitaxe-power-supply']"
+        },
+        {
+          "check": "cited",
+          "pass": true,
+          "why": "cited ['bitaxe-power-supply']"
+        },
+        {
+          "check": "match",
+          "pass": true,
+          "why": "matched 'No'"
+        }
+      ],
+      "question": "Can I plug a 12V power supply into my Bitaxe Gamma?",
+      "ok": true,
+      "answer": "No. The Bitaxe Gamma runs on 5V and a 12V supply can damage it. Use the 5V supply made for it (5.5 \u00d7 2.1 mm barrel, about 4 A or more). 12V supplies are for XT30-plug boards like the NerdQaxe++.",
+      "ms": 3369,
+      "in_data": true,
+      "tools_used": [
+        {
+          "name": "search_guides",
+          "input": {
+            "query": "bitaxe gamma power supply 12V"
+          },
+          "ok": true,
+          "guides": [
+            "bitaxe-power-supply"
+          ]
+        },
+        {
+          "name": "get_miner",
+          "input": {
+            "miner": "Bitaxe Gamma"
+          },
+          "ok": true
+        }
+      ],
+      "models_mentioned": [
+        "bitaxe-gamma"
+      ],
+      "sources": [
+        {
+          "id": "bitaxe-power-supply",
+          "title": "What power supply does a Bitaxe need?",
+          "url": "/guides/bitaxe-power-supply/"
+        }
+      ]
+    },
+    {
+      "id": "rag-firmware",
+      "pass": true,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "3 sentences, 58 words (max 4/90)"
+        },
+        {
+          "check": "retrieved",
+          "pass": true,
+          "why": "retrieved ['bitaxe-firmware']"
+        },
+        {
+          "check": "cited",
+          "pass": true,
+          "why": "cited ['bitaxe-firmware']"
+        },
+        {
+          "check": "in_data",
+          "pass": true,
+          "why": "in_data=True, expected True"
+        },
+        {
+          "check": "match",
+          "pass": true,
+          "why": "matched 'AxeOS'"
+        }
+      ],
+      "question": "How do I update the firmware on my Bitaxe?",
+      "ok": true,
+      "answer": "First, find your board number on the miner or its System page, and download the matching AxeOS file only from the official GitHub releases page. Write down your Wi-Fi, pool, and Bitcoin address, then upload the firmware from your Bitaxe's dashboard. A normal dashboard update usually keeps your settings, but check your pool and hashrate after it restarts.",
+      "ms": 5006,
+      "in_data": true,
+      "tools_used": [
+        {
+          "name": "search_guides",
+          "input": {
+            "query": "how to update Bitaxe firmware AxeOS"
+          },
+          "ok": true,
+          "guides": [
+            "bitaxe-firmware"
+          ]
+        }
+      ],
+      "models_mentioned": [],
+      "sources": [
+        {
+          "id": "bitaxe-firmware",
+          "title": "Bitaxe and NerdQaxe firmware, compared",
+          "url": "/guides/bitaxe-firmware/"
+        }
+      ]
+    },
+    {
+      "id": "rag-quiet",
+      "pass": true,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "4 sentences, 57 words (max 4/90)"
+        },
+        {
+          "check": "retrieved",
+          "pass": true,
+          "why": "retrieved ['bitaxe-noise']"
+        },
+        {
+          "check": "cited",
+          "pass": true,
+          "why": "cited ['bitaxe-noise']"
+        },
+        {
+          "check": "match",
+          "pass": true,
+          "why": "matched 'dB'"
+        }
+      ],
+      "question": "Which miners are quiet enough for a bedroom?",
+      "ok": true,
+      "answer": "For a bedroom, look for under about 35 dB. The Heatbit Canvas and Bitwater are maker-stated silent (no fans), and the BitForge Nano (~29 dB) and Hammer BC04 (32-36 dB) are quiet desk options. The BitForge Nano is $169.99 and the Hammer BC04 is $215 in stock. Our data doesn't list prices for the Canvas or Bitwater.",
+      "ms": 4137,
+      "in_data": true,
+      "tools_used": [
+        {
+          "name": "search_guides",
+          "input": {
+            "query": "bitaxe noise quiet bedroom"
+          },
+          "ok": true,
+          "guides": [
+            "bitaxe-noise"
+          ]
+        },
+        {
+          "name": "search_miners",
+          "input": {
+            "sort_by": "price",
+            "limit": 10
+          },
+          "ok": true
+        }
+      ],
+      "models_mentioned": [
+        "bitforge-nano",
+        "hammer-bc04",
+        "heatbit-bitair",
+        "avalon-nano-3s"
+      ],
+      "sources": [
+        {
+          "id": "bitaxe-noise",
+          "title": "How loud are home Bitcoin miners?",
+          "url": "/guides/bitaxe-noise/"
+        }
+      ]
+    },
+    {
+      "id": "rag-solar",
+      "pass": true,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "4 sentences, 45 words (max 4/90)"
+        },
+        {
+          "check": "retrieved",
+          "pass": true,
+          "why": "retrieved ['solar-bitcoin-mining']"
+        },
+        {
+          "check": "cited",
+          "pass": true,
+          "why": "cited ['solar-bitcoin-mining']"
+        },
+        {
+          "check": "in_data",
+          "pass": true,
+          "why": "in_data=True, expected True"
+        }
+      ],
+      "question": "Can I run a Bitcoin miner on solar panels?",
+      "ok": true,
+      "answer": "Yes. A small Bitaxe-class miner draws roughly 15 to 25 W, so one normal home panel covers it in daylight. For mining at night you'd need a battery, which adds cost and loses some energy. Daytime-only mining is the cheapest setup, but it earns less.",
+      "ms": 4905,
+      "in_data": true,
+      "tools_used": [
+        {
+          "name": "search_guides",
+          "input": {
+            "query": "solar power for bitcoin miner"
+          },
+          "ok": true,
+          "guides": [
+            "solar-bitcoin-mining"
+          ]
+        }
+      ],
+      "models_mentioned": [],
+      "sources": [
+        {
+          "id": "solar-bitcoin-mining",
+          "title": "Can solar power a Bitcoin miner?",
+          "url": "/guides/solar-bitcoin-mining/"
+        }
+      ]
+    },
+    {
+      "id": "rag-how-often",
+      "pass": true,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "2 sentences, 37 words (max 4/90)"
+        },
+        {
+          "check": "retrieved",
+          "pass": true,
+          "why": "retrieved ['how-we-track']"
+        },
+        {
+          "check": "cited",
+          "pass": true,
+          "why": "cited ['how-we-track']"
+        },
+        {
+          "check": "in_data",
+          "pass": true,
+          "why": "in_data=True, expected True"
+        },
+        {
+          "check": "match",
+          "pass": true,
+          "why": "matched '6 hours'"
+        }
+      ],
+      "question": "How often do you check the shops' prices?",
+      "ok": true,
+      "answer": "We check the shops every 6 hours and show who has each miner in stock and at what price. Price history logs a reading whenever a price or stock status changes, and about once a day otherwise.",
+      "ms": 4693,
+      "in_data": true,
+      "tools_used": [
+        {
+          "name": "search_guides",
+          "input": {
+            "query": "how we track prices, how often prices are checked"
+          },
+          "ok": true,
+          "guides": [
+            "how-we-track"
+          ]
+        }
+      ],
+      "models_mentioned": [],
+      "sources": [
+        {
+          "id": "how-we-track",
+          "title": "About Bitaxe Radar",
+          "url": "/how-we-track/"
+        }
+      ]
+    },
+    {
+      "id": "rag-low-hashrate",
+      "pass": true,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "4 sentences, 68 words (max 4/90)"
+        },
+        {
+          "check": "retrieved",
+          "pass": true,
+          "why": "retrieved ['bitaxe-setup', 'is-my-bitaxe-normal']"
+        },
+        {
+          "check": "cited",
+          "pass": true,
+          "why": "cited ['is-my-bitaxe-normal']"
+        },
+        {
+          "check": "in_data",
+          "pass": true,
+          "why": "in_data=True, expected True"
+        },
+        {
+          "check": "match",
+          "pass": true,
+          "why": "matched 'stock'"
+        }
+      ],
+      "question": "Why is my Bitaxe Gamma making less hashrate than the listing says?",
+      "ok": true,
+      "answer": "Most likely the listing assumes a higher clock. At stock settings (525 MHz) a Gamma should average about 1.07 TH/s, while many listings quote 1.2 TH/s or more. Check the 10-minute average rather than the live number, and make sure the power supply is correct and the fan and heatsink are clean. If it was used, a previous owner may have overclocked it, so reset it to stock.",
+      "ms": 3735,
+      "in_data": true,
+      "tools_used": [
+        {
+          "name": "search_guides",
+          "input": {
+            "query": "bitaxe gamma hashrate lower than listed normal"
+          },
+          "ok": true,
+          "guides": [
+            "is-my-bitaxe-normal"
+          ]
+        },
+        {
+          "name": "search_guides",
+          "input": {
+            "query": "is my Bitaxe normal hashrate errors temperature"
+          },
+          "ok": true,
+          "guides": [
+            "is-my-bitaxe-normal",
+            "bitaxe-setup"
+          ]
+        }
+      ],
+      "models_mentioned": [
+        "bitaxe-gamma"
+      ],
+      "sources": [
+        {
+          "id": "is-my-bitaxe-normal",
+          "title": "Is my Bitaxe normal?",
+          "url": "/guides/is-my-bitaxe-normal/"
+        }
+      ]
+    },
+    {
+      "id": "rag-dont-know-s19",
+      "pass": true,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "3 sentences, 48 words (max 4/90)"
+        },
+        {
+          "check": "dont_know",
+          "pass": true,
+          "why": "said our guides don't cover it"
+        },
+        {
+          "check": "not_match",
+          "pass": true,
+          "why": "clean"
+        }
+      ],
+      "question": "How do I replace the thermal paste on an Antminer S19?",
+      "ok": true,
+      "answer": "Our guides don't cover replacing thermal paste on an Antminer S19, so I can't give you reliable steps for that. The Antminer manufacturer's documentation or an experienced repair technician would be the best source. I can help with Bitaxe-style home miners, their specs, or prices if you'd like.",
+      "ms": 4435,
+      "in_data": false,
+      "tools_used": [
+        {
+          "name": "search_guides",
+          "input": {
+            "query": "replace thermal paste on Antminer S19"
+          },
+          "ok": true,
+          "guides": []
+        }
+      ],
+      "models_mentioned": [],
+      "sources": []
+    },
+    {
+      "id": "rag-dont-know-ha",
+      "pass": true,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "3 sentences, 38 words (max 4/90)"
+        },
+        {
+          "check": "dont_know",
+          "pass": true,
+          "why": "said our guides don't cover it"
+        },
+        {
+          "check": "not_match",
+          "pass": true,
+          "why": "clean"
+        }
+      ],
+      "question": "How do I connect my Bitaxe to Home Assistant?",
+      "ok": true,
+      "answer": "Our guides don't cover connecting a Bitaxe to Home Assistant. They only cover monitoring apps like HashWatcher, Bitaxe Baller, and Traxe. Your Bitaxe's built-in AxeOS web page on your home network is the starting point for any integration.",
+      "ms": 4233,
+      "in_data": false,
+      "tools_used": [
+        {
+          "name": "search_guides",
+          "input": {
+            "query": "connect Bitaxe to Home Assistant monitoring"
+          },
+          "ok": true,
+          "guides": [
+            "bitaxe-monitoring-apps"
+          ]
+        }
+      ],
+      "models_mentioned": [],
+      "sources": []
+    }
+  ]
+}

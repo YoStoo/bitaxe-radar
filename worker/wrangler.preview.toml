@@ -21,3 +21,7 @@ namespace_id = "1002"
   limit = 5
   period = 60
 # No KV on purpose: the test copy must not use up production's daily question count.
+
+# Workers AI for RAG embeddings (same as production).
+[ai]
+binding = "AI"

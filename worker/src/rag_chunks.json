@@ -1,0 +1,747 @@
+{
+ "version": "faa8d67a80f07e7b",
+ "guides": {
+  "bitaxe-chips": {
+   "title": "BM1366, BM1368, BM1370, BM1373: which chip is in your miner?",
+   "url": "/guides/bitaxe-chips/"
+  },
+  "bitaxe-firmware": {
+   "title": "Bitaxe and NerdQaxe firmware, compared",
+   "url": "/guides/bitaxe-firmware/"
+  },
+  "bitaxe-monitoring-apps": {
+   "title": "Best apps to monitor your Bitaxe",
+   "url": "/guides/bitaxe-monitoring-apps/"
+  },
+  "bitaxe-noise": {
+   "title": "How loud are home Bitcoin miners?",
+   "url": "/guides/bitaxe-noise/"
+  },
+  "bitaxe-power-supply": {
+   "title": "What power supply does a Bitaxe need?",
+   "url": "/guides/bitaxe-power-supply/"
+  },
+  "bitaxe-setup": {
+   "title": "Bitaxe setup: your first-hour checklist",
+   "url": "/guides/bitaxe-setup/"
+  },
+  "bitcoin-mining-heat-your-home": {
+   "title": "Mining to heat your home",
+   "url": "/guides/bitcoin-mining-heat-your-home/"
+  },
+  "bitcoin-mining-pools": {
+   "title": "Which mining pool should I use?",
+   "url": "/guides/bitcoin-mining-pools/"
+  },
+  "how-heater-miners-work": {
+   "title": "How a heater miner works",
+   "url": "/guides/how-heater-miners-work/"
+  },
+  "is-home-mining-worth-it": {
+   "title": "Is home mining worth it?",
+   "url": "/guides/is-home-mining-worth-it/"
+  },
+  "is-my-bitaxe-normal": {
+   "title": "Is my Bitaxe normal?",
+   "url": "/guides/is-my-bitaxe-normal/"
+  },
+  "solar-bitcoin-mining": {
+   "title": "Can solar power a Bitcoin miner?",
+   "url": "/guides/solar-bitcoin-mining/"
+  },
+  "solo-vs-pool-mining": {
+   "title": "Solo vs pool mining",
+   "url": "/guides/solo-vs-pool-mining/"
+  },
+  "how-we-track": {
+   "title": "About Bitaxe Radar",
+   "url": "/how-we-track/"
+  }
+ },
+ "chunks": [
+  {
+   "id": "bitaxe-chips#0",
+   "guide": "bitaxe-chips",
+   "section": "Intro",
+   "text": "Every Bitaxe-style miner is built around one or more Bitmain mining chips. The chip decides how much power the miner needs for each unit of work. Here's which chip is in each home miner we track, and what it costs today."
+  },
+  {
+   "id": "bitaxe-chips#1",
+   "guide": "bitaxe-chips",
+   "section": "The short answer",
+   "text": "The chip number goes up with each new generation. In our data, each newer chip uses less electricity per TH/s. More chips means more hashrate, not better efficiency. A 4-chip board makes about 4 times the hashrate and uses about 4 times the power. Most boards on sale today use the BM1370. The BM1373 is the newest chip we see in shops. Example: a Bitaxe Gamma (BM1370) uses about 15 joules per TH/s, and a Bitaxe Naja Duo (BM1373) about 10. For the same hashrate, the Bitaxe Naja Duo uses about 36% less electricity."
+  },
+  {
+   "id": "bitaxe-chips#2",
+   "guide": "bitaxe-chips",
+   "section": "The chips side by side",
+   "text": "Chip: BM1366; Miners we track: 1; Power per TH/s: 24 J/TH. Chip: BM1368; Miners we track: 2; Power per TH/s: 21 to 23 J/TH. Chip: BM1370; Miners we track: 11; Power per TH/s: 15 to 20 J/TH. Chip: BM1373; Miners we track: 5; Power per TH/s: 10 to 13 J/TH. Efficiency is the seller-stated power divided by the seller-stated hashrate. Lower J/TH means less electricity for the same work."
+  },
+  {
+   "id": "bitaxe-chips#3",
+   "guide": "bitaxe-chips",
+   "section": "Every miner, by chip",
+   "text": "BM1366 miners. Miner: Bitaxe Ultra; Chips: 1; Hashrate: 0.5 TH/s; Power: 12 W; Efficiency: 24 J/TH. BM1368 miners. Miner: Bitaxe 702; Chips: 6; Hashrate: 4.2 TH/s; Power: 90 W; Efficiency: 21 J/TH. Miner: Bitaxe Supra; Chips: 1; Hashrate: 0.65 TH/s; Power: 15 W; Efficiency: 23 J/TH. BM1370 miners. Miner: Bitaxe Gamma; Chips: 1; Hashrate: 1.2 TH/s; Power: 18 W; Efficiency: 15 J/TH. Miner: Nerdaxe Gamma; Chips: 1; Hashrate: 1.2 TH/s; Power: 18 W; Efficiency: 15 J/TH. Miner: BitForge Nano; Chips: 2; Hashrate: 2.6 TH/s; Power: 40 W; Efficiency: 15 J/TH. Miner: Bitaxe Gamma Duo; Chips: 2; Hashrate: 1.63 TH/s; Power: 26 W; Efficiency: 16 J/TH. Miner: Bitaxe Gamma Hex; Chips: 6; Hashrate: 8.4 TH/s; Power: 140 W; Efficiency: 17 J/TH. Miner: NerdQaxe++; Chips: 4; Hashrate: 4.8 TH/s; Power: 80 W; Efficiency: 17 J/TH."
+  },
+  {
+   "id": "bitaxe-chips#4",
+   "guide": "bitaxe-chips",
+   "section": "Every miner, by chip",
+   "text": "Miner: NerdQaxe++; Chips: 4; Hashrate: 4.8 TH/s; Power: 80 W; Efficiency: 17 J/TH. Miner: NerdOCTaxe Gamma; Chips: 8; Hashrate: 9.6 TH/s; Power: 160 W; Efficiency: 17 J/TH. Miner: Bitaxe Touch; Chips: 1; Hashrate: 1 TH/s; Power: 17 W; Efficiency: 17 J/TH. Miner: NerdQX; Chips: 4; Hashrate: 8.1 TH/s; Power: 138 W; Efficiency: 17 J/TH. Miner: Heatbit Bitwater; Chips: 20; Hashrate: 34 TH/s; Power: 600 W; Efficiency: 18 J/TH. Miner: Bitaxe GT 801; Chips: 2; Hashrate: 2.15 TH/s; Power: 43 W; Efficiency: 20 J/TH. BM1373 miners. Miner: Bitaxe Naja Duo; Chips: 2; Hashrate: 4.4 TH/s; Power: 42 W; Efficiency: 10 J/TH. Miner: Nerdaxe Gaia; Chips: 1; Hashrate: 2.6 TH/s; Power: 25 W; Efficiency: 10 J/TH. Miner: Hammer Thor X1; Chips: 1; Hashrate: 3.2 TH/s; Power: 35 W; Efficiency: 11 J/TH. Miner: Gaia Copper Pro; Chips: 1; Hashrate: 3 TH/s; Power: 33 W; Efficiency: 11 J/TH."
+  },
+  {
+   "id": "bitaxe-chips#5",
+   "guide": "bitaxe-chips",
+   "section": "Every miner, by chip",
+   "text": "Miner: Gaia Copper Pro; Chips: 1; Hashrate: 3 TH/s; Power: 33 W; Efficiency: 11 J/TH. Miner: NMQAxe++ Nexus; Chips: 2; Hashrate: 8.5 TH/s; Power: 110 W; Efficiency: 13 J/TH. Hashrate and power are what sellers state for each model. Power cost assumes $0.15/kWh, running 24/7. Prices are the cheapest in-stock offer we found at Nov 10, 2026 7:17 AM ET."
+  },
+  {
+   "id": "bitaxe-chips#6",
+   "guide": "bitaxe-chips",
+   "section": "How to pick",
+   "text": "Cheap electricity (under about $0.10/kWh): go for the lowest price per TH/s. See the price per TH/s leaderboard. Expensive electricity: a lower J/TH saves money every month. Check the power cost column. Just want a lottery ticket: any single-chip board works. See best under $100."
+  },
+  {
+   "id": "bitaxe-chips#7",
+   "guide": "bitaxe-chips",
+   "section": "Questions",
+   "text": "Which chip does the Bitaxe Gamma use? One BM1370. Most current Bitaxe and NerdQaxe boards use the BM1370; boards with more chips simply have more of them. What does J/TH mean? Joules per terahash: how much electricity a miner uses for each unit of work. Lower is better. It's the stated watts divided by the stated TH/s. Should I wait for a newer chip? Newer chips use less power per TH/s, but they don't always cost less per TH/s, so compare both columns above. If your electricity is cheap, the cheapest price per TH/s matters most. If it's expensive, a lower J/TH saves more over a year. Is a BM1366 Bitaxe Ultra still worth buying? Only if it's cheap. It uses noticeably more power per TH/s than a BM1370 board, so compare its price per TH/s and yearly power cost in the tables above. Why are these numbers different from my miner's dashboard? They're what sellers state for each model."
+  },
+  {
+   "id": "bitaxe-chips#8",
+   "guide": "bitaxe-chips",
+   "section": "Questions",
+   "text": "They're what sellers state for each model. Your miner's real hashrate and power depend on its frequency, voltage, cooling and power supply."
+  },
+  {
+   "id": "bitaxe-firmware#0",
+   "guide": "bitaxe-firmware",
+   "section": "Intro",
+   "text": "Firmware is the software inside your miner. It runs the chip, the fan and the dashboard you open in your browser. Here's which firmware runs on which home miner, and how to update without trouble."
+  },
+  {
+   "id": "bitaxe-firmware#1",
+   "guide": "bitaxe-firmware",
+   "section": "The short answer",
+   "text": "Bitaxe: run the official AxeOS. NerdAxe, NerdQaxe, NerdOCTAXE, NerdQX: run the official NerdQAxe firmware. Custom firmware like AxeForge can be fun, but stick to open-source projects and download only from their own GitHub page."
+  },
+  {
+   "id": "bitaxe-firmware#2",
+   "guide": "bitaxe-firmware",
+   "section": "Every option side by side",
+   "text": "Firmware: AxeOS (ESP-Miner); Runs on: Bitaxe boards 102 to 801, plus 1201 (Naja Duo) and 1300 (Gamma Hex); Open source: Yes (GPL-3.0); Latest release: v2.15.4 (Oct 21, 2026); Good to know: The official firmware every Bitaxe ships with. Start here. Firmware: NerdQAxe firmware; Runs on: NerdAxe, NerdAxe Gamma, NerdQAxe+, NerdQAxe++, NerdOCTAXE, NerdQX, NerdEKO, NerdHaxe Gamma; Open source: Yes (GPL-3.0); Latest release: v1.1.0.1 (Sep 24, 2026); Good to know: The official firmware for the Nerd*axe family. Firmware: AxeForge; Runs on: NerdQaxe++ only; Open source: Yes (GPL-3.0); Latest release: v1.4.2 (Oct 28, 2026); Good to know: A new custom firmware with its own screen layouts. Small and young project, so expect changes."
+  },
+  {
+   "id": "bitaxe-firmware#3",
+   "guide": "bitaxe-firmware",
+   "section": "Every option side by side",
+   "text": "Small and young project, so expect changes. Firmware: NerdMiner v2; Runs on: Plain ESP32 dev boards (LILYGO T-Display S3 and others), no mining chip; Open source: Yes (MIT); Latest release: V1.8.3 (Sep 13, 2025); Good to know: A lottery-ticket toy: it mines on the ESP32 itself, so its hashrate is tiny. Fun to learn on, not to earn. License, latest release and supported boards are from each project's GitHub page, checked Oct 28, 2026. New versions come out often, so check the releases page before you flash."
+  },
+  {
+   "id": "bitaxe-firmware#4",
+   "guide": "bitaxe-firmware",
+   "section": "What each one is",
+   "text": "AxeOS (ESP-Miner). Made by the Bitaxe project (Open Source Miners United). The official firmware every Bitaxe ships with. Start here. Easiest way to install: the web flasher (works in Chrome or Edge over USB). Miners we track that run it: Bitaxe Gamma, Bitaxe GT 801, Bitaxe Naja Duo, Bitaxe Gamma Hex. NerdQAxe firmware. Made by shufps, the NerdQAxe designer (a fork of ESP-Miner). The official firmware for the Nerd*axe family. Easiest way to install: the web flasher (works in Chrome or Edge over USB). Miners we track that run it: Nerdaxe Gamma, NerdQaxe++, NerdOCTaxe Gamma, NerdQX. AxeForge. Made by IsSasoriDev, a community developer. A new custom firmware with its own screen layouts. Small and young project, so expect changes. Miners we track that run it: NerdQaxe++. NerdMiner v2. Made by BitMaker. A lottery-ticket toy: it mines on the ESP32 itself, so its hashrate is tiny."
+  },
+  {
+   "id": "bitaxe-firmware#5",
+   "guide": "bitaxe-firmware",
+   "section": "What each one is",
+   "text": "A lottery-ticket toy: it mines on the ESP32 itself, so its hashrate is tiny. Fun to learn on, not to earn."
+  },
+  {
+   "id": "bitaxe-firmware#6",
+   "guide": "bitaxe-firmware",
+   "section": "How to update safely",
+   "text": "Find your board number on the miner or its System page (for example 602 or 801). Download only from the official releases page of the firmware's GitHub project, or use its web flasher. Write down your Wi-Fi, pool and Bitcoin address in case a full flash resets them. Update from the miner's dashboard when you can (upload the firmware file, then the web file if the project ships one). After it restarts, check the pool settings and that your hashrate looks right: see Is my Bitaxe normal?."
+  },
+  {
+   "id": "bitaxe-firmware#7",
+   "guide": "bitaxe-firmware",
+   "section": "Questions",
+   "text": "Which firmware should I run on my Bitaxe? The official AxeOS from the Bitaxe project's releases page. Pick the file that matches the board number printed on your Bitaxe (for example 601 or 602 for a Gamma). Which firmware runs on a NerdQaxe++? The NerdQAxe firmware from shufps is the official one. AxeForge is a newer community alternative for the NerdQaxe++ only. Can I put AxeOS on a NerdQaxe? No. Use the firmware made for your board. Flashing a file built for a different board can stop it mining until you flash the right one. How do I know my firmware has no hidden fee? Install it yourself from the project's official GitHub releases page, then set your own pool and Bitcoin address. Some resold miners come with modified firmware that sends part of the hashrate elsewhere. Will updating erase my settings? A normal update from the miner's own dashboard keeps your Wi-Fi and pool settings."
+  },
+  {
+   "id": "bitaxe-firmware#8",
+   "guide": "bitaxe-firmware",
+   "section": "Questions",
+   "text": "A normal update from the miner's own dashboard keeps your Wi-Fi and pool settings. A full 'factory' flash over USB can reset them, so write them down first."
+  },
+  {
+   "id": "bitaxe-monitoring-apps#0",
+   "guide": "bitaxe-monitoring-apps",
+   "section": "Intro",
+   "text": "Your miner already has a dashboard, but it only works on your home Wi-Fi and won't tell you when something goes wrong. These five apps add a phone or desktop view, alerts and, in some cases, a way to check in from anywhere."
+  },
+  {
+   "id": "bitaxe-monitoring-apps#1",
+   "guide": "bitaxe-monitoring-apps",
+   "section": "The short answer",
+   "text": "One Bitaxe, just curious: the built-in dashboard (type the miner's IP into your browser) plus your pool's stats page is enough, and free. A few miners and an iPhone: AxeSentry ($0.99) for alerts and auto-reboot, or Miner Monitor if you want pool stats on the go. Mac or Windows, and free: Bitaxe Baller, open source. Mixed fleet, Android, or Avalon miners: HashWatcher."
+  },
+  {
+   "id": "bitaxe-monitoring-apps#2",
+   "guide": "bitaxe-monitoring-apps",
+   "section": "The apps side by side",
+   "text": "App: HashWatcher Mixed fleets, including Avalon miners, and solar automation; Runs on: iPhone, iPad, Mac, Android; Works with: Bitaxe family, NerdQaxe, NMMiner, Avalon Nano 3/3S, Avalon Q and Mini 3, Lucky Miner, plus Antminers on Braiins OS, LuxOS or VNish; Away from home: Yes, with their HashWatcher Hub device (sold separately). Alerts for temperature, offline, best difficulty and block found. App: Bitaxe Baller A free desktop dashboard with tuning tips and power cost; Runs on: Mac (Apple silicon), Windows, Umbrel; phone companion; Works with: Bitaxe-family miners on your home network; Away from home: Pro sends Discord alerts when a miner goes offline or runs hot. The free version keeps 1 hour of history."
+  },
+  {
+   "id": "bitaxe-monitoring-apps#3",
+   "guide": "bitaxe-monitoring-apps",
+   "section": "The apps side by side",
+   "text": "The free version keeps 1 hour of history. App: Miner Monitor Checking solo pool stats when you're out; Runs on: iPhone, iPad; Works with: Bitaxe, NerdQaxe and other AxeOS miners, plus your workers on public-pool.io and solo.ckpool.org; Away from home: Pool stats by payout address work from anywhere. Miner alerts only fire while the app is open. App: AxeSentry A cheap watchdog that reboots a stuck miner; Runs on: iPhone, iPad; Works with: Bitaxe, NerdAxe, NerdQAxe and NMAxe miners running AxeOS; Away from home: Home Wi-Fi only. Alerts for high temp, low hashrate, offline, new best share and block found; optional auto-reboot. App: Traxe A simple phone view with widgets; Runs on: iPhone, Apple Watch; Works with: Bitaxe, NerdQAxe and other ESP-Miner (AxeOS) miners; Away from home: Finds miners on your Wi-Fi; Lock Screen and Home Screen widgets show total hashrate."
+  },
+  {
+   "id": "bitaxe-monitoring-apps#4",
+   "guide": "bitaxe-monitoring-apps",
+   "section": "The apps side by side",
+   "text": "App: Traxe A simple phone view with widgets; Runs on: iPhone, Apple Watch; Works with: Bitaxe, NerdQAxe and other ESP-Miner (AxeOS) miners; Away from home: Finds miners on your Wi-Fi; Lock Screen and Home Screen widgets show total hashrate. Prices are as listed in the US App Store or on the maker's site on Nov 1, 2026 and can change. We have no deal with any of these apps."
+  },
+  {
+   "id": "bitaxe-monitoring-apps#5",
+   "guide": "bitaxe-monitoring-apps",
+   "section": "Watching your miner when you're away",
+   "text": "Free: look up your Bitcoin address on your pool's site (for example public-pool.io or solo.ckpool.org). If the hashrate there drops to zero, your miner is off or lost Wi-Fi. Alerts to your phone: HashWatcher (with its Hub) and Bitaxe Baller Pro (Discord) can tell you a miner went offline while you're out. AxeSentry and Miner Monitor alert you on your home network. Skip port forwarding. The miner's web page has no login, so opening it to the internet lets strangers change your pool."
+  },
+  {
+   "id": "bitaxe-monitoring-apps#6",
+   "guide": "bitaxe-monitoring-apps",
+   "section": "What to watch for",
+   "text": "Hashrate well below normal for your board: see Is my Bitaxe normal? Chip temperature climbing toward the point where mining stops. Offline or zero shares: usually Wi-Fi or a wrong pool setting. Check the setup checklist. Best difficulty is your luckiest share so far. See what it means on the solo odds page."
+  },
+  {
+   "id": "bitaxe-monitoring-apps#7",
+   "guide": "bitaxe-monitoring-apps",
+   "section": "Questions",
+   "text": "Do I need an app to monitor my Bitaxe? No. Every Bitaxe has a built-in dashboard: type its IP address into a browser on the same Wi-Fi. Apps help when you have several miners, want alerts, or want to check from your phone. How can I check my Bitaxe when I'm not home? The simplest free way is your pool's page: public-pool.io and solo.ckpool.org show your workers' hashrate when you look up your Bitcoin address. For the miner itself, HashWatcher offers a Hub device for remote access, and Bitaxe Baller Pro can send Discord alerts. Should I open a port on my router to reach my miner? We wouldn't. The miner's dashboard has no password, so anyone who finds it could change your pool or settings. Use your pool's stats page or an app's own remote option instead. Will an app slow down my miner? No. These apps only read the stats the miner already reports."
+  },
+  {
+   "id": "bitaxe-monitoring-apps#8",
+   "guide": "bitaxe-monitoring-apps",
+   "section": "Questions",
+   "text": "These apps only read the stats the miner already reports. Changing frequency or voltage from an app is like doing it in the dashboard, so the same care applies. Which app works with the Avalon Nano 3S? Of the five here, HashWatcher lists the Avalon Nano 3 and 3S. The others are built for Bitaxe-style miners running AxeOS."
+  },
+  {
+   "id": "bitaxe-noise#0",
+   "guide": "bitaxe-noise",
+   "section": "Intro",
+   "text": "Noise is the number-one question when a miner will sit in a bedroom or office. Here's every miner we track that publishes a noise figure, quietest first, with today's price and a link to buy."
+  },
+  {
+   "id": "bitaxe-noise#1",
+   "guide": "bitaxe-noise",
+   "section": "The short answer",
+   "text": "Want silent: fanless heaters like the Heatbit Canvas or Bitwater (maker-stated: no fans). Want a quiet desk miner: look near 30–40 dB stated — for example the BitForge Nano (~29 dB), Gamma Hex (~30 dB, liquid-cooled), Hammer BC04 (32–36 dB) or Avalon Nano 3S (33–40 dB). Room heater class: often 45–60 dB stated at full power; check for a night or eco mode. No published dB? We don't invent one. Open-board Bitaxe units are usually quiet in practice, but they aren't ranked here without a shop figure. See quietest miners for the ranked shortlist."
+  },
+  {
+   "id": "bitaxe-noise#2",
+   "guide": "bitaxe-noise",
+   "section": "Noise table (stated dB)",
+   "text": "Miner: Heatbit Canvas 10 TH/s · 300 W; Stated noise: silent (no fans) No fans, so it runs silent (maker-stated); Source: heatbit.com Canvas FAQ. Miner: Heatbit Bitwater 34 TH/s · 600 W; Stated noise: silent (no fans) No fans; the water in the tank cools the chips (maker-stated); Source: heatbit.com Bitwater page. Miner: BitForge Nano 2.6 TH/s · 40 W; Stated noise: 29 dB max stated About 29 dB stated; Source: Bitcoin Merch listing. Miner: Bitaxe Gamma Hex 8.4 TH/s · 140 W; Stated noise: 30 dB max stated About 30 dB stated (liquid-cooled); Source: Solo Satoshi listing. Miner: Hammer BC04 6 TH/s · 96 W; Stated noise: 36 dB max stated 32–36 dB stated; Source: Altair Technology Hammer series guide. Miner: Hammer BC08 12 TH/s · 210 W; Stated noise: 38 dB max stated About 38 dB stated; Source: Altair Technology listing."
+  },
+  {
+   "id": "bitaxe-noise#3",
+   "guide": "bitaxe-noise",
+   "section": "Noise table (stated dB)",
+   "text": "Miner: Hammer BC08 12 TH/s · 210 W; Stated noise: 38 dB max stated About 38 dB stated; Source: Altair Technology listing. Miner: Braiins Mini Miner 1 TH/s · 40 W; Stated noise: 40 dB max stated About 40 dB stated; Source: Braiins Forge product page. Miner: Avalon Nano 3S 6 TH/s · 140 W; Stated noise: 40 dB max stated 33–40 dB stated; Source: Canaan shop listing. Miner: Hammer Thor P2 10 TH/s · 166 W; Stated noise: 40 dB max stated About 38–40 dB stated; Source: Altair / Bitcoin Merch listings. Miner: Heatbit Bitair 1.2 TH/s · 25 W; Stated noise: 44 dB max stated 25–44 dB stated; Source: Heatbit / Altair listings. Miner: Heatbit Trio 10 TH/s · 400 W; Stated noise: 45 dB max stated Up to about 45 dB stated; Source: heatbit.com Trio FAQ. Miner: GekkoScience KBox 22 22 TH/s · 330 W; Stated noise: 47 dB max stated About 38–47 dB stated, by mode; Source: Altair Technology listing."
+  },
+  {
+   "id": "bitaxe-noise#4",
+   "guide": "bitaxe-noise",
+   "section": "Noise table (stated dB)",
+   "text": "Miner: GekkoScience KBox 22 22 TH/s · 330 W; Stated noise: 47 dB max stated About 38–47 dB stated, by mode; Source: Altair Technology listing. Miner: Hammer BC01 1.2 TH/s · 22 W; Stated noise: 49 dB max stated About 46–49 dB stated, by mode; Source: Altair / Bitcoin Merch listings. Miner: Hammer Thor X1 3.2 TH/s · 35 W; Stated noise: 51 dB max stated About 34–51 dB stated, by mode; Source: Altair Technology listing. Miner: Avalon Mini 3 37.5 TH/s · 800 W; Stated noise: 55 dB max stated About 33–55 dB stated, by mode; Source: seller listings. Miner: Heatbit Maxi 39 TH/s · 1500 W; Stated noise: 55 dB max stated About 45–55 dB stated, by mode; Source: heatbit.com Maxi FAQ. Miner: D-Central StealthMiner 26 TH/s · 860 W; Stated noise: 60 dB max stated Under 60 dB stated; Source: D-Central listing. dB figures are the makers' or sellers' own numbers, not our lab measurements."
+  },
+  {
+   "id": "bitaxe-noise#5",
+   "guide": "bitaxe-noise",
+   "section": "Noise table (stated dB)",
+   "text": "Miner: D-Central StealthMiner 26 TH/s · 860 W; Stated noise: 60 dB max stated Under 60 dB stated; Source: D-Central listing. dB figures are the makers' or sellers' own numbers, not our lab measurements. Sorting uses the highest stated figure for that model (or 0 for fanless). Prices are the cheapest in-stock listing we track right now, before shipping and tax."
+  },
+  {
+   "id": "bitaxe-noise#6",
+   "guide": "bitaxe-noise",
+   "section": "What the numbers mean in a room",
+   "text": "~0 / fanless: no fan whir — you may still hear a faint pump or nothing at all. ~30 dB: a whisper; fine for most bedrooms and offices. ~40 dB: a quiet library; many people leave this on a desk all day. ~50 dB: a normal conversation; better in a living room, garage or dedicated mining spot. ~60 dB: a loud conversation or dishwasher; plan for a utility room or put distance and a door between you and the miner. Distance matters: moving a few feet away drops what you hear a lot. So does closing a door, and so does running a lower power mode."
+  },
+  {
+   "id": "bitaxe-noise#7",
+   "guide": "bitaxe-noise",
+   "section": "Questions",
+   "text": "Are these our measurements? No. Every dB figure is what the maker or a shop states on its own page. We label the source. Rooms, distance and power mode change what you hear. How loud is 40 dB? About a quiet library or a soft hum. Many people are fine with that on a desk. Under about 35 dB is usually comfortable in a bedroom; over about 50 dB is more of a garage or utility-room sound. Are Bitaxe Gamma boards quiet? They're small with one little fan, so most owners find them fairly quiet, but shops don't publish a dB figure for the single-chip Gamma. We only list miners with a published number. See also the quietest miners list. Does a lower power mode make a miner quieter? Usually yes. Fans spin slower when the chips run cooler. Heater miners often have a night or eco mode that trades hashrate for less noise. What if I need a silent room?"
+  },
+  {
+   "id": "bitaxe-noise#8",
+   "guide": "bitaxe-noise",
+   "section": "Questions",
+   "text": "What if I need a silent room? Pick a fanless design (Heatbit Canvas or Bitwater state no fans) or a liquid-cooled board with a published low figure, like the Gamma Hex at about 30 dB stated. Or put any miner in another room."
+  },
+  {
+   "id": "bitaxe-power-supply#0",
+   "guide": "bitaxe-power-supply",
+   "section": "Intro",
+   "text": "Small Bitaxe boards run on 5 volts. Bigger ones, like the GT, Naja Duo and NerdQaxe++, run on 12 volts and use a different plug. Using the wrong supply can damage the board, so here's what each miner needs, how to size a supply for one board or several on the same rail, and where to buy one with the right supply in the box."
+  },
+  {
+   "id": "bitaxe-power-supply#1",
+   "guide": "bitaxe-power-supply",
+   "section": "The short answer",
+   "text": "Bitaxe Gamma, Gamma Duo and Nerdaxe Gamma: 5V through a round 5.5 × 2.1 mm barrel plug. Bitaxe GT 801, Naja Duo and NerdQaxe++: 12V through a yellow XT30 plug. Never use a 5V Gamma supply on these, or a 12V supply on a 5V board. Get a supply rated above what the miner draws. Example: a Gamma draws about 20 W. At 5V that's about 4 A, so a 6 A (30 W) supply has room to spare. Several miners on one supply: same voltage only, and keep the combined 24/7 load under about 80% of the continuous rating (see section 4). Easiest option for a gift: buy a listing that includes the supply (see section 3)."
+  },
+  {
+   "id": "bitaxe-power-supply#2",
+   "guide": "bitaxe-power-supply",
+   "section": "Which supply each miner needs",
+   "text": "Miner: Bitaxe Supra; Input: 5V DC; Plug: Barrel jack; Stated power: 15 W; Supply the seller offers: 5V 6A (30 W) adapter. Miner: Bitaxe Gamma; Input: 5V DC; Plug: 5.5 × 2.1 mm barrel, center-positive; Stated power: 18 W; Supply the seller offers: Optional 5V supply Draws about 18 to 20 W, so about 4 A at 5V. A 5V 6A (30 W) supply leaves room to spare. Miner: Nerdaxe Gamma; Input: 5V DC; Plug: 5.5 × 2.1 mm barrel, center-positive; Stated power: 18 W; Supply the seller offers: Optional 5V supply Seller states 5 A minimum and more than 25 W. Miner: Bitaxe Gamma Duo; Input: 5V DC; Plug: 5.5 × 2.1 mm barrel, center-positive; Stated power: 26 W; Supply the seller offers: Optional 5V 8A (40 W) supply Seller states at least 6 A for stock settings."
+  },
+  {
+   "id": "bitaxe-power-supply#3",
+   "guide": "bitaxe-power-supply",
+   "section": "Which supply each miner needs",
+   "text": "Miner: Bitaxe Gamma Duo; Input: 5V DC; Plug: 5.5 × 2.1 mm barrel, center-positive; Stated power: 26 W; Supply the seller offers: Optional 5V 8A (40 W) supply Seller states at least 6 A for stock settings. Miner: Bitaxe GT 801; Input: 12V DC; Plug: XT30; Stated power: 43 W; Supply the seller offers: Optional 12.4V 10A (124 W) supply Don't plug in a 5V Bitaxe Gamma supply. Miner: Bitaxe Naja Duo; Input: 12V DC; Plug: XT30; Stated power: 42 W; Supply the seller offers: Optional 12.4V 10A (124 W) supply. Miner: NerdQaxe++; Input: 12V DC; Plug: XT30 (rated to 15 A); Stated power: 80 W; Supply the seller offers: Optional 124 W supply Seller rates the 124 W supply for about 99 W continuous, fine at stock (about 70 W) but not for heavy overclocking."
+  },
+  {
+   "id": "bitaxe-power-supply#4",
+   "guide": "bitaxe-power-supply",
+   "section": "Which supply each miner needs",
+   "text": "Miner: NerdQaxe++; Input: 12V DC; Plug: XT30 (rated to 15 A); Stated power: 80 W; Supply the seller offers: Optional 124 W supply Seller rates the 124 W supply for about 99 W continuous, fine at stock (about 70 W) but not for heavy overclocking. Miner: Bitaxe Gamma Hex; Input: 12V DC; Plug: 6-pin (Molex 39-01-2060); Stated power: 140 W; Supply the seller offers: Optional Mean Well 12V 21A (252 W) supply. Miner: Avalon Nano 3S; Input: USB-C PD (28V); Plug: USB-C; Stated power: 140 W; Supply the seller offers: 28V 5A (140 W) adapter in the box. Input, plug and supply details are from Solo Satoshi's product pages, checked Nov 1, 2026. Stated power is the seller's stock figure; overclocking draws more."
+  },
+  {
+   "id": "bitaxe-power-supply#5",
+   "guide": "bitaxe-power-supply",
+   "section": "Cheapest with the power supply in the box",
+   "text": "Only in-stock listings that say the supply is included. Prices checked Nov 10, 2026 7:17 AM ET. Some shops sell the supply as an add-on, so the miner-only price can be lower: see each model's page for every price."
+  },
+  {
+   "id": "bitaxe-power-supply#6",
+   "guide": "bitaxe-power-supply",
+   "section": "Several miners on one power supply",
+   "text": "People often run two or more boards from one big 12V supply (a Mean Well-style brick is a common pick). That can work, but only if every miner on that supply uses the same voltage, and the total load stays well under the supply's continuous rating. Guidance below is general (Nov 3, 2026); always follow the maker's instructions for your boards and supply. Same voltage only. A 12V supply can feed 12V boards (for example a NerdOCTaxe Gamma, a NerdQaxe++ or a Bitaxe Gamma Hex ). Never feed a 5V board like the Bitaxe Gamma from a 12V rail — wrong voltage can damage the board. Give each voltage its own supply. Keep 24/7 load under about 80% of continuous rating. Example with our stated watts: NerdOCTaxe Gamma ≈160 W plus NerdQaxe++ ≈80 W is about 240 W. At the 80% rule you want a supply rated about 300 W continuous or more."
+  },
+  {
+   "id": "bitaxe-power-supply#7",
+   "guide": "bitaxe-power-supply",
+   "section": "Several miners on one power supply",
+   "text": "At the 80% rule you want a supply rated about 300 W continuous or more. A 350 W unit has about 280 W of headroom at 80%, so those two 12V boards fit. Adding another ≈140 W 12V board (Gamma Hex) would push you over that headroom. A 5V Gamma on that 12V brick is the wrong idea anyway. Even if 240 W + ≈18 W (Gamma) still looks under 280 W on paper, the Gamma needs its own 5V supply — different voltage rail, separate brick. Wall watts vs dashboard watts. The number on the miner dashboard is usually the board's DC draw. A wall (AC) meter is often about 15–20% higher because the supply itself wastes some power as heat. Size the supply from the higher figure if you measured at the wall, or add that margin if you only have the dashboard number. Power strips are an AC limit too."
+  },
+  {
+   "id": "bitaxe-power-supply#8",
+   "guide": "bitaxe-power-supply",
+   "section": "Several miners on one power supply",
+   "text": "Power strips are an AC limit too. If several supplies plug into one strip, check the strip's continuous load rating (not only the surge number) and keep the total wall draw under that for long runs. Stated watts above match our model pages (Gamma ≈18 W, NerdQaxe++ ≈80 W, NerdOCTaxe ≈160 W, Gamma Hex ≈140 W). Overclocking draws more — leave extra headroom."
+  },
+  {
+   "id": "bitaxe-power-supply#9",
+   "guide": "bitaxe-power-supply",
+   "section": "Questions",
+   "text": "Can I use a phone charger for my Bitaxe Gamma? No. The Gamma needs a steady 5V supply with a 5.5 × 2.1 mm barrel plug and about 4 A or more. Phone chargers don't have that plug and most can't deliver that current for hours. Can I plug a 12V supply into a 5V Bitaxe? No. 5V boards like the Gamma, Gamma Duo and Nerdaxe Gamma can be damaged by 12V. Boards with an XT30 plug (GT 801, Naja Duo, NerdQaxe++) need 12V, and a 5V supply won't run them. Can several miners share one power supply? Yes, if they all use the same voltage and the combined 24/7 load stays under about 80% of the supply's continuous rating. Example: a NerdOCTaxe (≈160 W) plus a NerdQaxe++ (≈80 W) is about 240 W, so you want roughly a 300 W continuous supply or bigger. Never mix 5V and 12V boards on one rail. What does the 80% rule mean for a 350 W supply?"
+  },
+  {
+   "id": "bitaxe-power-supply#10",
+   "guide": "bitaxe-power-supply",
+   "section": "Questions",
+   "text": "What does the 80% rule mean for a 350 W supply? Plan to run at most about 280 W continuous on a 350 W unit (80% of 350). That leaves room for heat and small spikes. Two 12V boards at ≈240 W fit; adding more 12V load or a 5V Gamma on that same brick does not. How big a power supply should I get? Pick one rated well above what the miner draws. A simple rule: at least a quarter more than the stated watts, and more if you plan to overclock. For several miners, size from the combined watts and keep about 20% spare (the 80% rule). Do all shops include the power supply? No. Some sell the miner alone and the supply as an add-on. The second table only counts listings that say the supply is in the box. Why does overclocking need a bigger supply? Overclocking raises the power the miner draws. If the supply runs near its limit for hours it gets hot and can shut off or fail."
+  },
+  {
+   "id": "bitaxe-setup#0",
+   "guide": "bitaxe-setup",
+   "section": "Intro",
+   "text": "Just unboxed your Bitaxe? Here's everything to do in the first hour: get it on Wi-Fi, point it at a pool that pays your Bitcoin address, and check it's running right."
+  },
+  {
+   "id": "bitaxe-setup#1",
+   "guide": "bitaxe-setup",
+   "section": "Before you start",
+   "text": "A Bitcoin address you own, from your own wallet. This is where a block reward would go. Your Wi-Fi name and password. The Bitaxe only works with 2.4 GHz Wi-Fi. The power supply that came with it. Some boards take 5 V and others 12 V (see the board table ), so don't swap in a random one. A spot with airflow, away from curtains, with the fan side clear."
+  },
+  {
+   "id": "bitaxe-setup#2",
+   "guide": "bitaxe-setup",
+   "section": "Plug it in and join its setup Wi-Fi",
+   "text": "Plug in the power supply. The screen lights up and shows a setup Wi-Fi name like Bitaxe_1A2B (the last four characters differ on every miner), plus a QR code. On your phone, scan the QR code or pick that Wi-Fi name in your Wi-Fi settings. It has no password. A setup page should pop up on its own. If it doesn't, open your phone's browser."
+  },
+  {
+   "id": "bitaxe-setup#3",
+   "guide": "bitaxe-setup",
+   "section": "Put it on your home Wi-Fi",
+   "text": "On the setup page, choose your home Wi-Fi (2.4 GHz) and type its password. Save. The miner restarts, joins your network, and shows its new IP address on the screen, something like 192.168.1.57. Write it down. Reconnect your phone to your normal Wi-Fi and type that IP address into the browser. That's your miner's dashboard (AxeOS)."
+  },
+  {
+   "id": "bitaxe-setup#4",
+   "guide": "bitaxe-setup",
+   "section": "Set the pool and your Bitcoin address",
+   "text": "This is the step people skip, and the one that matters most. Open Pool settings in the dashboard. Pool address and port: the firmware comes set to Public Pool (public-pool.io, port 21496) with Solo CKPool (solo.ckpool.org, port 3333) as the backup. Both are solo pools. Keep them or pick another from our pool comparison. User: replace it with your own Bitcoin address, plus a dot and a miner name if you like (youraddress.bitaxe1). If AxeOS shows a warning that you're using the default factory Bitcoin address, this field still needs changing. Password: usually just x. Do the backup pool too. Its User field should also be your address, or a reward found while it's on the backup won't reach you. Save and let it restart."
+  },
+  {
+   "id": "bitaxe-setup#5",
+   "guide": "bitaxe-setup",
+   "section": "Check it's mining",
+   "text": "Shares accepted goes up within a few minutes. Hashrate: give it 10 minutes, then compare the average with the stock numbers in Is my Bitaxe normal? (a Gamma lands near 1.07 TH/s at stock). Temperature: the fan aims for about 60°C on the chip. If it goes above 75°C the firmware stops mining to protect it. Best difficulty climbs over the first hours. See what your best difficulty means."
+  },
+  {
+   "id": "bitaxe-setup#6",
+   "guide": "bitaxe-setup",
+   "section": "Nice to do in week one",
+   "text": "Firmware: check you're on the latest official release. See Bitaxe firmware compared for how to update safely. Power cost: see what it costs to run at your electricity price with Is home mining worth it? Odds: see your real chance of a block on the solo odds calculator."
+  },
+  {
+   "id": "bitaxe-setup#7",
+   "guide": "bitaxe-setup",
+   "section": "Questions",
+   "text": "Why can't my Bitaxe find my Wi-Fi? The Bitaxe's chip only works with 2.4 GHz Wi-Fi. If your router puts 2.4 and 5 GHz under one name, it usually still works; if not, turn on a separate 2.4 GHz network in your router settings. What do I put in the User field? Your own Bitcoin address, often followed by a dot and a name for the miner, like youraddress.bitaxe1. The Password field can usually stay as x. Check your pool's own page, since a few pools ask for something different. Do I need an account with the pool? Not for solo pools like Public Pool or Solo CKPool: your Bitcoin address is your login. Some shared pools, like Braiins, ask you to sign up. How do I find my Bitaxe's dashboard later? Its IP address is on the miner's little screen once it's on your Wi-Fi. Type that number into a browser on a phone or computer connected to the same network. My Bitaxe is on, but the hashrate is 0."
+  },
+  {
+   "id": "bitaxe-setup#8",
+   "guide": "bitaxe-setup",
+   "section": "Questions",
+   "text": "My Bitaxe is on, but the hashrate is 0. What's wrong? Usually the pool address or port has a typo, or the miner isn't on Wi-Fi yet. Open the Pool settings, check every field, save, and let it restart."
+  },
+  {
+   "id": "bitcoin-mining-heat-your-home#0",
+   "guide": "bitcoin-mining-heat-your-home",
+   "section": "Intro",
+   "text": "Short answer: a miner heats a room exactly like an electric space heater, and pays a little back while it does. It beats a plain space heater, but usually not a heat pump."
+  },
+  {
+   "id": "bitcoin-mining-heat-your-home#1",
+   "guide": "bitcoin-mining-heat-your-home",
+   "section": "The heat isn't wasted",
+   "text": "A mining chip turns almost all of its electricity into heat. In a data center that heat is a problem someone pays to blow away. In your home in winter, it's heat you'd pay for anyway. That's the whole idea: use one bill twice, once for warmth and once for mining. Take the Avalon Mini 3. It mines at about 800 W, so running it all month costs about $88 at $0.15/kWh. An 800 W space heater would cost the same and give the same heat. The miner also pays back about $34/mo from pool mining, so your heat costs about $54/mo instead of $88."
+  },
+  {
+   "id": "bitcoin-mining-heat-your-home#2",
+   "guide": "bitcoin-mining-heat-your-home",
+   "section": "Heater miners side by side",
+   "text": "Type your power price above and the power column updates. Miner: Avalon Nano 3S; Heat (BTU/h): ≈478; Beats a heat pump below: $0.108. Miner: Heatbit Canvas; Heat (BTU/h): ≈1,024; Beats a heat pump below: $0.084. Miner: GekkoScience KBox 22; Heat (BTU/h): ≈1,126; Beats a heat pump below: $0.168. Miner: Heatbit Trio; Heat (BTU/h): ≈1,365; Beats a heat pump below: $0.062. Miner: Avalon Mini 3; Heat (BTU/h): ≈2,730; Beats a heat pump below: $0.118. Miner: GekkoScience KBeast 50; Heat (BTU/h): ≈2,730; Beats a heat pump below: $0.156. Miner: D-Central StealthMiner; Heat (BTU/h): ≈2,934; Beats a heat pump below: $0.076. Miner: Heatbit Maxi; Heat (BTU/h): ≈5,118; Beats a heat pump below: $0.064. Miner: Avalon Q; Heat (BTU/h): ≈5,712; Beats a heat pump below: $0.134. Running 24/7 at the stated mining watts. Heat = watts × 3.412."
+  },
+  {
+   "id": "bitcoin-mining-heat-your-home#3",
+   "guide": "bitcoin-mining-heat-your-home",
+   "section": "Heater miners side by side",
+   "text": "Heat = watts × 3.412. \"Mining pays back\" is the pool estimate, which changes with Bitcoin's price and network difficulty. \"Beats a heat pump below\" is the power price under which the miner's heat, after the mining payback, costs less than a heat pump making the same heat with about half the electricity. Prices are the cheapest in-stock listing we found, before shipping and tax. Which one fits my room? · All heater miners."
+  },
+  {
+   "id": "bitcoin-mining-heat-your-home#4",
+   "guide": "bitcoin-mining-heat-your-home",
+   "section": "What it beats, and what it doesn't",
+   "text": "Beats a plain electric space heater or baseboard heat: same power, same heat, plus the mining payback. Usually loses to a heat pump: a heat pump moves heat in from outside instead of making it, and the US Department of Energy says that cuts electricity for heating by about 50%. A miner only wins with cheap power, as the last column shows. Gas heat: depends on your gas and power prices. Compare your bills before switching."
+  },
+  {
+   "id": "bitcoin-mining-heat-your-home#5",
+   "guide": "bitcoin-mining-heat-your-home",
+   "section": "Other ways to reuse the heat",
+   "text": "Hot water is the other big heat bill. The Heatbit Bitwater swaps the lower element in an electric tank water heater for mining chips, so the tank heats your water while it mines. It's a pre-order that Heatbit says ships in early 2027, and it only fits standard electric tank heaters. Run it only in heating season: on in the cold months, down or off in summer, so you only pay for heat you want. Put it where you need warmth: a cold bedroom, a home office, a basement or a garage workshop. Use a thermostat or low mode: most heater miners can run cooler, so a big one won't overheat a small room."
+  },
+  {
+   "id": "bitcoin-mining-heat-your-home#6",
+   "guide": "bitcoin-mining-heat-your-home",
+   "section": "Questions",
+   "text": "Can a Bitcoin miner heat a room? Yes. Nearly every watt a miner uses comes out as heat, like an electric space heater, so a 1,000 W miner warms a room about as much as a 1,000 W heater. Is a heater miner cheaper than a space heater? Usually a little. Both turn the same power into the same heat, and the miner also earns a small amount from pool mining, so your heat costs a bit less. How much depends on Bitcoin's price and the network. Is a heater miner cheaper than a heat pump? Usually not at typical US power prices. The US Department of Energy says a modern heat pump uses about half the electricity of electric resistance heat for the same warmth. The table shows the power price below which each miner wins. What about summer? If you don't need the heat, the power is just a mining cost. Most owners turn heater miners down or off in warm months, or run them only on cheap power."
+  },
+  {
+   "id": "bitcoin-mining-pools#0",
+   "guide": "bitcoin-mining-pools",
+   "section": "Intro",
+   "text": "Short answer: tiny miners like a Bitaxe usually go solo, heater miners usually join a shared pool, and a hybrid pool sits in between. Here's how the popular Bitcoin pools compare."
+  },
+  {
+   "id": "bitcoin-mining-pools#1",
+   "guide": "bitcoin-mining-pools",
+   "section": "Three kinds of pool",
+   "text": "Solo: your miner works alone. Find a block and you keep the whole reward; otherwise you get nothing. A lottery ticket. Shared: thousands of miners split every block the pool finds, minus a fee. Small, steady payouts. Hybrid: the miner that finds a block gets a big prize, and everyone else shares the rest. The pool never changes your odds of finding a block. It only decides who gets paid what. Solo vs pool, in plain words."
+  },
+  {
+   "id": "bitcoin-mining-pools#2",
+   "guide": "bitcoin-mining-pools",
+   "section": "Popular pools side by side",
+   "text": "Pool: Public Pool; Type: Solo (also a shared mode); Fee: No fee; How you get paid: Solo: if your miner finds a block, the reward goes straight to your Bitcoin address; Good for: Bitaxe-class solo miners who want zero fees. Pool: Solo CKPool; Type: Solo; Fee: 2% of a block you find; How you get paid: Only if your miner finds a block, paid to your address. No account needed; Good for: Solo miners who want a long-running service (since 2014). Pool: Parasite Pool; Type: Hybrid; Fee: No fee; How you get paid: The miner that finds a block gets 1 BTC. The rest is split by work done since the pool's last block, paid over Lightning; Good for: Small miners who want a lottery shot plus a share."
+  },
+  {
+   "id": "bitcoin-mining-pools#3",
+   "guide": "bitcoin-mining-pools",
+   "section": "Popular pools side by side",
+   "text": "The rest is split by work done since the pool's last block, paid over Lightning; Good for: Small miners who want a lottery shot plus a share. Pool: OCEAN; Type: Shared (TIDES); Fee: 2% (1% with DATUM); How you get paid: Paid from blocks the pool finds, once you pass about 0.0105 BTC; Good for: Bigger miners who want payouts straight from the block. Pool: Braiins Pool; Type: Shared (FPPS); Fee: 2.5%; How you get paid: Steady daily payouts whether or not the pool found a block. Lightning payouts from 1 sat; Good for: Heater and home miners who want small, steady sats. Fees and payout rules as each pool states them on its own site, checked Oct 26, 2026. Parasite Pool's rules are as reported by CoinDesk (Apr 2026). Pools can change their terms, so check before you switch. Bitcoin only."
+  },
+  {
+   "id": "bitcoin-mining-pools#4",
+   "guide": "bitcoin-mining-pools",
+   "section": "What each choice means for your miner",
+   "text": "How many sats a shared pool would pay each miner, how long it takes to reach OCEAN's payout threshold, and the average wait for a solo block. Miner: Bitaxe Gamma; Stated hashrate: ≈1.2 TH/s; Shared pool, per day: ≈50 sats; To reach OCEAN's payout: about 58 years; Avg. wait for a solo block: about 15,000 years. Miner: NerdQaxe++; Stated hashrate: ≈4.8 TH/s; Shared pool, per day: ≈198 sats; To reach OCEAN's payout: about 14 years; Avg. wait for a solo block: about 3,800 years. Miner: Avalon Nano 3S; Stated hashrate: ≈6 TH/s; Shared pool, per day: ≈248 sats; To reach OCEAN's payout: about 12 years; Avg. wait for a solo block: about 3,100 years. Miner: Avalon Mini 3; Stated hashrate: ≈37.5 TH/s; Shared pool, per day: ≈1,547 sats; To reach OCEAN's payout: about 22 months; Avg. wait for a solo block: about 490 years."
+  },
+  {
+   "id": "bitcoin-mining-pools#5",
+   "guide": "bitcoin-mining-pools",
+   "section": "What each choice means for your miner",
+   "text": "Miner: Avalon Mini 3; Stated hashrate: ≈37.5 TH/s; Shared pool, per day: ≈1,547 sats; To reach OCEAN's payout: about 22 months; Avg. wait for a solo block: about 490 years. Miner: Avalon Q; Stated hashrate: ≈90 TH/s; Shared pool, per day: ≈3,714 sats; To reach OCEAN's payout: about 9 months; Avg. wait for a solo block: about 200 years. Live estimate from mempool.space network data (BTC ≈ $73,083, network ≈ 964 EH/s). Shared-pool sats use Braiins' 2.5% fee, the OCEAN column its 2% fee, both with a 10% safety margin, so real payouts can be a bit higher or lower and change every day. The solo wait is an average: a block could come tomorrow or never. Example: a Bitaxe Gamma has about a 1 in 15,000 chance a year of finding a block. Solo, that win is the whole reward, about $230,000 minus any fee."
+  },
+  {
+   "id": "bitcoin-mining-pools#6",
+   "guide": "bitcoin-mining-pools",
+   "section": "What each choice means for your miner",
+   "text": "Solo, that win is the whole reward, about $230,000 minus any fee. On Parasite Pool the same win pays 1 BTC, and each time the pool finds a block you also get a small share of it. Same odds, different prize."
+  },
+  {
+   "id": "bitcoin-mining-pools#7",
+   "guide": "bitcoin-mining-pools",
+   "section": "Which should you pick?",
+   "text": "Bitaxe or another tiny miner: solo on Public Pool or Solo CKPool, or Parasite Pool if you'd like a few sats along the way. A shared pool pays these miners only pennies. Desk miner (5–10 TH/s): either. Solo is still a long shot; a shared pool like Braiins pays a small amount every day over Lightning (see the table). Heater miner: a shared pool, so your heat earns a little back. Braiins for daily payouts, OCEAN if you're fine waiting for its threshold."
+  },
+  {
+   "id": "bitcoin-mining-pools#8",
+   "guide": "bitcoin-mining-pools",
+   "section": "Safety tips",
+   "text": "Use your own Bitcoin address from a wallet you control. Never type in an address someone sends you. Set a fallback pool. New pools sometimes go offline, so give your miner a second pool to switch to. Watch for hidden fees in firmware. Some modified firmware on used miners sends part of your hashrate elsewhere. Stick to the maker's firmware or open-source builds. Be wary of \"pools\" that sell tokens or cloud contracts. A real Bitcoin pool just needs your miner and your address."
+  },
+  {
+   "id": "bitcoin-mining-pools#9",
+   "guide": "bitcoin-mining-pools",
+   "section": "Still picking a miner?",
+   "text": "Bitaxe Gamma: the usual first solo miner. From $67.00 at Solo Satoshi today. Go to Solo Satoshi ↗ affiliate link. Avalon Nano 3S: a quiet desk miner and small heater. From $219.00 at Solo Satoshi today. Go to Solo Satoshi ↗ affiliate link. Avalon Mini 3: a room heater that pool-mines. From $789.00 at Altair Technology today. Go to Altair Technology ↗. Best for solo · Best for pool · Find my miner."
+  },
+  {
+   "id": "bitcoin-mining-pools#10",
+   "guide": "bitcoin-mining-pools",
+   "section": "Questions",
+   "text": "What is the best mining pool for a Bitaxe? Most Bitaxe owners mine solo, because a shared pool pays a tiny miner only a few sats a day. Public Pool (no fee) and Solo CKPool (2% of a block you find) are the common solo picks. Parasite Pool is a middle ground: 1 BTC if your miner finds the block, plus a share of every block the pool finds. Which pool should a heater miner use? Usually a shared pool, so the heat you'd pay for anyway earns a little back each day. An FPPS pool like Braiins pays daily whether or not it found a block. OCEAN pays from the blocks it finds, once you pass its payout threshold. Does the pool change my chance of finding a block? No. Your chance depends on your miner's hashrate versus the whole network. The pool only decides how a block's reward is shared and what fee you pay. Can I switch pools? Yes, anytime."
+  },
+  {
+   "id": "bitcoin-mining-pools#11",
+   "guide": "bitcoin-mining-pools",
+   "section": "Questions",
+   "text": "Yes, anytime. It's a setting in your miner (the pool address and your Bitcoin address). Most miners also have a fallback pool setting in case the main one goes down. Do I need an account? Not for Public Pool, Solo CKPool or OCEAN: you use your Bitcoin address as the username. Braiins Pool uses an account."
+  },
+  {
+   "id": "how-heater-miners-work#0",
+   "guide": "how-heater-miners-work",
+   "section": "Intro",
+   "text": "The short version: a Bitcoin miner is a space heater that also does mining work. Here's what that means for your room and your power bill."
+  },
+  {
+   "id": "how-heater-miners-work#1",
+   "guide": "how-heater-miners-work",
+   "section": "Electricity in, heat out",
+   "text": "A mining chip does billions of calculations a second, and nearly every watt it uses ends up as heat, just like an electric space heater. So a 1,000 W miner warms a room about as much as a 1,000 W heater. A heater miner puts that chip in a quiet, room-friendly case with a fan, a thermostat or app, and heater-style modes. You run it when you want heat, and it mines while it does. Miner: Avalon Nano 3S; Stated power: ≈140 W; Heat (BTU/h): ≈478. Miner: Avalon Mini 3; Stated power: ≈800 W; Heat (BTU/h): ≈2,730. Miner: Heatbit Maxi; Stated power: ≈1,500 W; Heat (BTU/h): ≈5,118. Heat = stated watts × 3.412, at full power."
+  },
+  {
+   "id": "how-heater-miners-work#2",
+   "guide": "how-heater-miners-work",
+   "section": "Where the money comes from",
+   "text": "While it heats, the miner can earn bitcoin. There are two ways to run it: Pool mining: you join thousands of other miners. The pool finds blocks often and pays you a small share for your work, minus a pool fee. You get small, steady payouts that knock part of the power bill back down. Solo mining: you try to find a whole block on your own. If you do, you get the full reward (about 3.125 BTC plus fees), but for one home miner that's a long-shot lottery, and most of the time you get nothing. Most heater-miner owners pool. Solo vs pool, explained."
+  },
+  {
+   "id": "how-heater-miners-work#3",
+   "guide": "how-heater-miners-work",
+   "section": "What it won't do",
+   "text": "It won't usually cover your whole power bill. Pool earnings rise and fall with Bitcoin's price and the network's total hashrate. Your electricity rate decides how much they offset. We don't show earnings promises. It's not the cheapest heat. A heat pump can move several units of heat for each unit of electricity, so it heats for less than any electric heater, miners included. Heater miners make the most sense in place of a plain electric heater. It's not free in summer. If you don't need the heat, you're paying for power just to mine."
+  },
+  {
+   "id": "how-heater-miners-work#4",
+   "guide": "how-heater-miners-work",
+   "section": "Before you buy",
+   "text": "Size: about 300–800 W suits a small or medium room. 1,500 W-class units are like a full-size space heater on high. Circuit: a US 15 A, 120 V circuit should carry about 1,440 W continuously. Put big units on their own circuit, and follow the maker's guidance. Noise: fans are louder in high-heat modes. Check the stated decibels. Stock: many heater miners sell out before winter, and pre-orders ship later. Check the badge on each listing. See heater miners Which one fits my room? Does it save money? Miner vs space heater vs heat pump →."
+  },
+  {
+   "id": "is-home-mining-worth-it#0",
+   "guide": "is-home-mining-worth-it",
+   "section": "Intro",
+   "text": "Short answer: for the money alone, usually not at typical US power prices. It depends on what you pay for electricity, and whether you want the heat or the lottery."
+  },
+  {
+   "id": "is-home-mining-worth-it#1",
+   "guide": "is-home-mining-worth-it",
+   "section": "It depends on your power price",
+   "text": "A miner earns a little bitcoin and spends electricity all day. If the power costs more than the bitcoin is worth, you lose money each month. Type your price above and the table updates. Pool estimate: share of the network × 144 blocks a day × the block reward, minus a 2% pool fee and a 10% safety margin, rounded down. Power runs 24/7 at full draw. Estimate. Changes with Bitcoin price and network difficulty. Reddit commenters often quote about $0.06/kWh as a cut-off; the break-even column shows it varies by miner. Check every miner at your price →."
+  },
+  {
+   "id": "is-home-mining-worth-it#2",
+   "guide": "is-home-mining-worth-it",
+   "section": "Solo mining is a lottery",
+   "text": "Run solo and a miner either finds a whole block, worth about $230,000 right now, or gets nothing. A Bitaxe Gamma has about a 1 in 15,000 chance a year. People do win, but plan on paying the power bill for a ticket, not for income. Solo vs pool."
+  },
+  {
+   "id": "is-home-mining-worth-it#3",
+   "guide": "is-home-mining-worth-it",
+   "section": "Heat changes the math",
+   "text": "A miner turns almost all its power into heat, like an electric space heater. If you'd heat a room with electric heat anyway, that power is a cost you'd have paid regardless, and the mining earns a little of it back. Example: the Avalon Mini 3 draws about 800 W. An electric space heater of the same size would cost about $87 /mo to run 24/7 at $0.15 /kWh. The miner makes the same heat and its pool estimate is about $34/mo back. That's an estimate, and only real if you'd run electric heat anyway. Heater miners · Best for heating a room · How heater miners work · Mining to heat your home."
+  },
+  {
+   "id": "is-home-mining-worth-it#4",
+   "guide": "is-home-mining-worth-it",
+   "section": "Questions",
+   "text": "Is home Bitcoin mining worth it? Usually not for the money at typical US power prices. A small miner's pool estimate is often less than its power bill. It can make sense with very cheap power, as a heater you'd run anyway, or as a hobby and a solo lottery ticket. What electricity price makes mining break even? It depends on the miner's efficiency. Each miner page shows a break-even power price; for the miners we track today it is roughly $0.05 to $0.08 per kWh, and it moves with Bitcoin's price and difficulty. Does a heater miner save money? Only against electric resistance heat you'd use anyway. Then the power is heat you'd pay for regardless and the mining is a small rebate. A heat pump or gas heat is usually cheaper per unit of heat. Not financial advice. Earnings aren't guaranteed and change with Bitcoin's price and network difficulty."
+  },
+  {
+   "id": "is-my-bitaxe-normal#0",
+   "guide": "is-my-bitaxe-normal",
+   "section": "Intro",
+   "text": "Just got a Bitaxe, new or used, and not sure the numbers look right? Here are the stock numbers from the Bitaxe's own firmware, board by board, and what to check first."
+  },
+  {
+   "id": "is-my-bitaxe-normal#1",
+   "guide": "is-my-bitaxe-normal",
+   "section": "The one-minute check",
+   "text": "Open your miner's dashboard (type its IP address into a browser on the same Wi-Fi). Look at five things: Hashrate: use the 10-minute or 1-hour average. The live number swings a lot. ASIC temperature: the automatic fan aims for 60°C by default. Power: close to the seller-stated figure in the table below. Frequency and core voltage (Settings): stock values are in the table. A used miner may have been overclocked. Pool and fallback pool (Settings): both should be pools you chose, paying a Bitcoin address you own."
+  },
+  {
+   "id": "is-my-bitaxe-normal#2",
+   "guide": "is-my-bitaxe-normal",
+   "section": "Stock numbers for each Bitaxe",
+   "text": "At stock settings, a healthy board's average hashrate lands near \"Expected at stock\". The firmware's own self-test passes a board that reaches the pass mark. Board: Bitaxe Ultra (204 / 205); Chip: BM1366; Self-test pass mark: 369 GH/s (85%); Seller-stated power: ≈12 W; Power input: 5 V. Board: Bitaxe Supra (401 / 403); Chip: BM1368; Self-test pass mark: 500 GH/s (80%); Seller-stated power: ≈15 W; Power input: 5 V. Board: Bitaxe Gamma (601 / 602); Chip: BM1370; Self-test pass mark: 910 GH/s (85%); Seller-stated power: ≈18 W; Power input: 5 V. Board: Bitaxe Gamma Duo (650); Chip: 2x BM1370; Self-test pass mark: 1.39 TH/s (85%); Seller-stated power: ≈26 W; Power input: 5 V. Board: Bitaxe GT 801 (801); Chip: 2x BM1370; Self-test pass mark: 1.82 TH/s (85%); Seller-stated power: ≈43 W; Power input: 12 V."
+  },
+  {
+   "id": "is-my-bitaxe-normal#3",
+   "guide": "is-my-bitaxe-normal",
+   "section": "Stock numbers for each Bitaxe",
+   "text": "Board: Bitaxe GT 801 (801); Chip: 2x BM1370; Self-test pass mark: 1.82 TH/s (85%); Seller-stated power: ≈43 W; Power input: 12 V. Board: Bitaxe Naja Duo (1201); Chip: 2x BM1373; Self-test pass mark: 3.74 TH/s (85%); Seller-stated power: ≈42 W; Power input: 12 V. Board: Bitaxe Gamma Hex (1300); Chip: 6x BM1370; Self-test pass mark: 7.18 TH/s (85%); Seller-stated power: ≈140 W; Power input: 12 V. Stock frequency, voltage and the expected-hashrate formula (frequency × cores × chips) are from the open-source AxeOS firmware (ESP-Miner), checked Oct 28, 2026. The pass mark is the share of that number the firmware's own self-test asks for. Power is what sellers state for the model, so your reading can differ a little. Shop listings often quote higher hashrates than these because they assume a higher frequency."
+  },
+  {
+   "id": "is-my-bitaxe-normal#4",
+   "guide": "is-my-bitaxe-normal",
+   "section": "Hashrate lower than it should be?",
+   "text": "Wait 10 minutes and read the average, not the live number. Check the power supply. The 600-series and older boards run on 5 V; the 801, 1201 and 1300 run on 12 V. A weak or wrong supply is a common cause of low hashrate and restarts. Put settings back to stock (table above). Overclocks from a previous owner can make a chip unstable. Check the fan and heatsink. Dust, a loose heatsink or dried-out thermal paste make the chip run hot and slow. Update to the latest official AxeOS from the ESP-Miner releases page."
+  },
+  {
+   "id": "is-my-bitaxe-normal#5",
+   "guide": "is-my-bitaxe-normal",
+   "section": "Running hot?",
+   "text": "Around 60°C with the fan on auto is normal: that's what the fan aims for. Above 75°C on the chip (or 105°C on the voltage regulator), AxeOS stops mining, sets the fan to 100% and shows an overheat message. Fix the cooling before you turn it back on. Give it open air: not in a cupboard, not against a wall, not in direct sun. A louder fan is the trade-off for a cooler chip. Lowering the frequency a little cuts both heat and noise."
+  },
+  {
+   "id": "is-my-bitaxe-normal#6",
+   "guide": "is-my-bitaxe-normal",
+   "section": "Bought it used? Check these too",
+   "text": "Firmware: the System page shows the version. Official AxeOS is open source; if it's a build you can't find on the releases page, reflash the official one. Hidden fees: some modified firmware on resold miners sends part of the hashrate to someone else. Official firmware plus your own pool settings avoids this. Pool settings: re-enter the pool, the fallback pool and your own Bitcoin address yourself. Power supply: make sure it came with the right one (5 V or 12 V, see the table) and that it isn't a no-name brick that runs hot."
+  },
+  {
+   "id": "is-my-bitaxe-normal#7",
+   "guide": "is-my-bitaxe-normal",
+   "section": "Thinking of buying used? Check today's new price first",
+   "text": "A used miner usually comes without the shop's warranty, so compare its price with a new one. Here's what new costs today: Bitaxe Gamma: the usual first miner. New from $67.00 at Solo Satoshi today. Go to Solo Satoshi ↗ affiliate link. Bitaxe GT 801: two chips, about twice the hashrate. New from $174.99 at Bitcoin Merch today. Go to Bitcoin Merch ↗. Bitaxe Naja Duo: the newest two-chip board. New from $385.00 at Solo Satoshi today. Go to Solo Satoshi ↗ affiliate link. Every shop, ranked by today's price · Get a price-drop alert."
+  },
+  {
+   "id": "is-my-bitaxe-normal#8",
+   "guide": "is-my-bitaxe-normal",
+   "section": "Questions",
+   "text": "Why is my Bitaxe Gamma under 1.2 TH/s? At stock settings (525 MHz) the firmware expects about 1.07 TH/s from a Gamma 601 or 602. Many listings quote 1.2 TH/s or more, which assumes a higher frequency. Look at the 10-minute or 1-hour average, not the live number, which jumps around. What temperature is normal for a Bitaxe? AxeOS's automatic fan aims for an ASIC temperature of 60°C by default, so readings around there are by design. If the ASIC goes above 75°C, or the voltage regulator above 105°C, the firmware stops mining and runs the fan at full speed. What does the error percentage mean? It's the share of the chip's work that came back wrong. A small number is normal. A high or rising number usually means the chip is too hot, or the voltage is too low for the frequency it's set to. Does a higher best difficulty mean I'm closer to a block? No."
+  },
+  {
+   "id": "is-my-bitaxe-normal#9",
+   "guide": "is-my-bitaxe-normal",
+   "section": "Questions",
+   "text": "No. Every share is a fresh draw, so past shares don't move you closer. The solo odds page shows what your best difficulty means next to the network's. Is a used Bitaxe worth it? It can be, if it hits the stock numbers above, runs official open-source firmware and the price is well under a new one. Check the pool settings yourself before you trust it."
+  },
+  {
+   "id": "solar-bitcoin-mining#0",
+   "guide": "solar-bitcoin-mining",
+   "section": "Intro",
+   "text": "Short answer: yes. Small miners like a Bitaxe need only one panel. Big heater-size miners need a whole roof, plus batteries if you want them running at night."
+  },
+  {
+   "id": "solar-bitcoin-mining#1",
+   "guide": "solar-bitcoin-mining",
+   "section": "The simple math",
+   "text": "Every miner draws a steady number of watts. Run it all day and it uses watts × 24 hours of energy. A solar panel makes its rated watts only in full sun, so what it makes in a day depends on how many hours of strong sun you get. Solar people call that peak sun hours. Across the US it ranges from about 3 to 6.5 a day depending on where you live (see this US sun-hours map ). Real systems also lose a bit to dust, wiring and shade. NREL's PVWatts calculator uses 14% losses by default. So in our example, one 400 W panel with 4 peak sun hours makes about 1.38 kWh a day. Miner: Bitaxe Gamma; Stated power: ≈18 W; kWh a day (24/7): 0.4; 400 W panels for 24/7*: 1. Miner: NerdQaxe++; Stated power: ≈80 W; kWh a day (24/7): 1.9; 400 W panels for 24/7*: 2. Miner: Avalon Nano 3S; Stated power: ≈140 W; kWh a day (24/7): 3.4; 400 W panels for 24/7*: 3."
+  },
+  {
+   "id": "solar-bitcoin-mining#2",
+   "guide": "solar-bitcoin-mining",
+   "section": "The simple math",
+   "text": "Miner: Avalon Nano 3S; Stated power: ≈140 W; kWh a day (24/7): 3.4; 400 W panels for 24/7*: 3. Miner: NMQAxe++ Nexus; Stated power: ≈110 W; kWh a day (24/7): 2.6; 400 W panels for 24/7*: 2. Miner: Hammer Thor P2; Stated power: ≈166 W; kWh a day (24/7): 4.0; 400 W panels for 24/7*: 3. Miner: Avalon Mini 3; Stated power: ≈800 W; kWh a day (24/7): 19.2; 400 W panels for 24/7*: 14. Miner: Heatbit Maxi; Stated power: ≈1,500 W; kWh a day (24/7): 36.0; 400 W panels for 24/7*: 27. Miner: Avalon Q; Stated power: ≈1,674 W; kWh a day (24/7): 40.2; 400 W panels for 24/7*: 30. *Example only: one 400 W panel × 4 peak sun hours × (1 − 14% losses) ≈ 1.38 kWh a day. Running 24/7 also needs a battery big enough to cover the night, and winter or cloudy days make less. Rounded up to whole panels. Prices are the cheapest in-stock listing we found, before shipping and tax."
+  },
+  {
+   "id": "solar-bitcoin-mining#3",
+   "guide": "solar-bitcoin-mining",
+   "section": "Small miners: easy",
+   "text": "A Bitaxe Gamma draws about 18 W. That's tiny: a single 400 W panel in full sun makes many times more than it needs. Over a whole day it uses about 0.4 kWh, which one panel can cover on a decent day, as long as a battery carries it through the night. That makes a Bitaxe a fun first solar project: a panel, a small battery or power station, and a USB-C or 5 V supply. It's a solo lottery ticket powered by the sun. Check the solo odds."
+  },
+  {
+   "id": "solar-bitcoin-mining#4",
+   "guide": "solar-bitcoin-mining",
+   "section": "Big miners: a roof's worth",
+   "text": "Heater-size miners draw hundreds of watts or more, so running one 24/7 takes many panels and a large battery. Most home solar owners with a big miner run it in the daytime only, when the panels make more than the house uses, instead of sending that power back to the grid for a low buy-back rate. In winter the sun is weaker but you need heat anyway, so a heater miner can still make sense on grid power. How heater miners work · Room heat calculator."
+  },
+  {
+   "id": "solar-bitcoin-mining#5",
+   "guide": "solar-bitcoin-mining",
+   "section": "Daytime only or 24/7?",
+   "text": "Daytime only: no battery, cheapest setup. The miner runs fewer hours, so it earns less and gets fewer solo chances. 24/7 with a battery: more hours mining, but batteries cost money and lose some energy charging and discharging. Grid-tied panels: if you already have solar on the roof, the real question is what your spare power is worth. Compare it with the break-even power price on each miner page."
+  },
+  {
+   "id": "solar-bitcoin-mining#6",
+   "guide": "solar-bitcoin-mining",
+   "section": "Questions",
+   "text": "Can a solar panel run a Bitaxe? Yes. A Bitaxe-class miner draws around 15 to 25 W, so one normal home panel makes more than enough in daylight. For night-time mining you need a battery and a charge controller or a small power station. Can I mine only when the sun is out? Yes. A miner can be switched on and off, so daytime-only mining with no battery works. It just mines fewer hours, so it earns less and has lower solo odds than running 24/7. Is solar mining free? Not quite. The panels and batteries cost money, and power you'd otherwise use in your home or sell back to the grid has value. Solar makes the most sense with spare power you can't use or sell for much. How many panels does a big home miner need? Roughly the miner's watts × 24 hours, divided by what one panel makes in a day."
+  },
+  {
+   "id": "solar-bitcoin-mining#7",
+   "guide": "solar-bitcoin-mining",
+   "section": "Questions",
+   "text": "Roughly the miner's watts × 24 hours, divided by what one panel makes in a day. With our example of about 1.38 kWh per 400 W panel a day, a 500 W miner needs about 9 panels plus a battery to run around the clock."
+  },
+  {
+   "id": "solo-vs-pool-mining#0",
+   "guide": "solo-vs-pool-mining",
+   "section": "Intro",
+   "text": "Every miner, from a Bitaxe to a heater miner, can run one of two ways. One is a lottery ticket, the other is a small, steady paycheck."
+  },
+  {
+   "id": "solo-vs-pool-mining#1",
+   "guide": "solo-vs-pool-mining",
+   "section": "Solo: the lottery",
+   "text": "Your miner tries to find the next Bitcoin block by itself. If it wins, you get the whole block reward, about 3.125 BTC plus fees. If it doesn't, you get nothing. For a home miner the odds are tiny, but small solo miners have won blocks, and that thrill is why many Bitaxe owners run solo. Miner: Bitaxe Gamma; Stated hashrate: ≈1.2 TH/s; Avg. wait for a solo block: ~16,000 yrs. Miner: Avalon Nano 3S; Stated hashrate: ≈6 TH/s; Avg. wait for a solo block: ~3,200 yrs. Miner: Avalon Mini 3; Stated hashrate: ≈37.5 TH/s; Avg. wait for a solo block: ~510 yrs. Miner: Avalon Q; Stated hashrate: ≈90 TH/s; Avg. wait for a solo block: ~210 yrs. Illustration only: assumes a network of 1,000 EH/s (mempool.space showed about 1,050 EH/s on Oct 21, 2026) and 144 blocks a day. It's an average: a block could come tomorrow or never, and the network keeps growing, which makes the odds worse."
+  },
+  {
+   "id": "solo-vs-pool-mining#2",
+   "guide": "solo-vs-pool-mining",
+   "section": "Pool: the steady paycheck",
+   "text": "Thousands of miners combine their hashrate in a pool. The pool finds blocks regularly and splits each reward by how much work everyone did, minus a pool fee. You get small, regular payouts instead of all or nothing. On average a pool pays about what solo mining would over a very long time, just smoothed out, minus the fee. Pool payouts move with Bitcoin's price and the network's total hashrate, so nobody can promise a fixed amount."
+  },
+  {
+   "id": "solo-vs-pool-mining#3",
+   "guide": "solo-vs-pool-mining",
+   "section": "Which should you pick?",
+   "text": "Bitaxe and other tiny miners: usually solo. A pool would pay them very little, so the long-shot is the fun part. Best for solo mining. Heater miners: usually pool, so the heat you'd pay for anyway earns a little back. Best for pool mining · Heater miners. You can switch anytime. It's a setting in the miner (the pool address), not a different device."
+  },
+  {
+   "id": "how-we-track#0",
+   "guide": "how-we-track",
+   "section": "Intro",
+   "text": "We check the shops that sell Bitaxe-style miners and heater and home miners every 6 hours, and show you who has each one in stock and for how much."
+  },
+  {
+   "id": "how-we-track#1",
+   "guide": "how-we-track",
+   "section": "Where the prices come from",
+   "text": "Straight from each shop's own product pages. We show the price and stock status the shop itself reports, and link you to that page so you can check it. Last check: Nov 10, 2026 7:17 AM ET. Shop: Bitcoin Merch; Currency: USD; Pricing: USD prices. Shop: Solo Satoshi; Currency: USD; Pricing: USD prices. Shop: Bitaxe.de; Currency: EUR; Pricing: EUR prices incl. VAT. Shop: Power Mining; Currency: EUR; Pricing: EUR prices (US price, no VAT). Shop: Altair Technology; Currency: USD; Pricing: USD prices. Shop: Heatbit; Currency: USD; Pricing: USD prices (sold direct). Shop: Braiins Forge; Currency: USD; Pricing: USD prices (sold direct). Shop: DTV Electronics; Currency: USD; Pricing: USD prices. Shop: FutureBit; Currency: USD; Pricing: USD prices (sold direct). Shop: NMMiner; Currency: USD; Pricing: USD prices (sold direct). Shop: D-Central; Currency: CAD; Pricing: CAD prices (ships from Canada)."
+  },
+  {
+   "id": "how-we-track#2",
+   "guide": "how-we-track",
+   "section": "What a price means",
+   "text": "The shop's listed price for the bundle shown, before shipping, import duties and (unless noted) tax. Euro and Canadian-dollar prices are converted to US dollars at the ECB reference rates (€1 = $1.1193, CA$1 = $0.709091 on 2026-11-09), so treat them as estimates. Bundles differ (power supply, stand, fan, revision). We note what's included when the shop says so. Hashrate and power are the shop's stated figures, not our own measurements."
+  },
+  {
+   "id": "how-we-track#3",
+   "guide": "how-we-track",
+   "section": "What \"in stock\" means",
+   "text": "Only listings the shop says are available now. Pre-orders and backorders are labelled separately because they ship later. Stock can change within minutes, so always confirm on the shop's page."
+  },
+  {
+   "id": "how-we-track#4",
+   "guide": "how-we-track",
+   "section": "Price history",
+   "text": "We log a point whenever a price or stock status changes, and about once a day otherwise. Charts start when we started tracking; nothing is filled in after the fact."
+  },
+  {
+   "id": "how-we-track#5",
+   "guide": "how-we-track",
+   "section": "Which shops we list",
+   "text": "Shops with real stock, consistent prices and normal payment methods. We leave out shops we can't vet, like ones with prices far below everyone else or wire/crypto-only payment."
+  },
+  {
+   "id": "how-we-track#6",
+   "guide": "how-we-track",
+   "section": "How Bitaxe Radar earns money",
+   "text": "Some shop links are affiliate links: if you buy through one, we may earn a commission at no extra cost to you. They're labelled \"affiliate link\" and never change prices, rankings or sort order. Any sponsored placement is clearly labelled (see advertise ). We don't publish ratings or reviews, because we haven't tested the hardware, and nothing here is financial advice. Solo mining with a small miner is a lottery: once you count electricity, you should expect to lose money. Write to contact@bitaxeradar.com. Shops can ask us to correct a listing the same way."
+  }
+ ]
+}

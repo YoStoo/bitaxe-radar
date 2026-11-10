@@ -33,3 +33,8 @@ id = "90bdf0c8c48e428e91eb26516536a002"
 
 # Secrets (NOT in this file) -- set with `wrangler secret put <NAME>`:
 #   RESEND_API_KEY, SIGNING_SECRET, TURNSTILE_SECRET, ANTHROPIC_API_KEY (for /ask)
+
+# Workers AI: turns guide passages and questions into embeddings for RAG (search_guides, src/rag.js).
+# Free daily allowance; our use is tiny (about 100 passages once per guide change + one short question per search).
+[ai]
+binding = "AI"

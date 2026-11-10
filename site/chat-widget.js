@@ -211,6 +211,7 @@
   var history = loadHistory();
 
   function noteFor(d) {
+    if (d.sources && d.sources.length) return "From our guides · " + d.confidence + " confidence";
     if (d.in_data === false) return "General knowledge — not from our price data.";
     if (d.confidence === "low") return "Low confidence — double-check the miner page.";
     return "From our price data · " + d.confidence + " confidence";
@@ -277,6 +278,19 @@
         links.appendChild(a);
       });
       b.appendChild(links);
+    }
+    // RAG citations: the guide(s) the answer came from (the Worker only returns guides it really retrieved).
+    if (d.sources && d.sources.length) {
+      var src = el("p", "ra-links ra-sources");
+      src.appendChild(document.createTextNode("Source: "));
+      d.sources.forEach(function (s, i) {
+        if (i) src.appendChild(document.createTextNode(" · "));
+        var a = document.createElement("a");
+        if (/^\/[a-z0-9\/-]*$/.test(s.url || "")) a.href = s.url;   // site paths only
+        a.textContent = s.title;
+        src.appendChild(a);
+      });
+      b.appendChild(src);
     }
     if (!skipScroll && (d.confidence || d.in_data === false)) {
       b.appendChild(el("p", "ra-note", noteFor(d)));

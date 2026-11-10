@@ -6,7 +6,7 @@
   var box = form.querySelector("textarea"), btn = form.querySelector("button"), out = document.getElementById("ask-answer");
   var history = []; // [{role, content}, ...] last few turns on this page
 
-  function show(text, links, note) {
+  function show(text, links, note, sources) {
     out.textContent = "";
     var p = document.createElement("p"); p.textContent = text; out.appendChild(p);
     (links || []).forEach(function (id) {
@@ -15,10 +15,23 @@
       a.textContent = window.RadarAsk.modelName(id);
       out.appendChild(a); out.appendChild(document.createTextNode(" "));
     });
+    if (sources && sources.length) {   // RAG citations: which guide the answer came from
+      var src = document.createElement("p"); src.className = "hint"; src.appendChild(document.createTextNode("Source: "));
+      sources.forEach(function (s, i) {
+        if (i) src.appendChild(document.createTextNode(" · "));
+        var a = document.createElement("a");
+        if (/^\/[a-z0-9\/-]*$/.test(s.url || "")) a.href = s.url;
+        a.textContent = s.title; src.appendChild(a);
+      });
+      out.appendChild(src);
+    }
     if (note) { var s = document.createElement("p"); s.className = "hint"; s.textContent = note; out.appendChild(s); }
   }
 
   function noteFor(d) {
+    if (d.sources && d.sources.length) {
+      return "From our guides · confidence: " + d.confidence + ". AI answers can be wrong; check the guide.";
+    }
     if (d.in_data === false) {
       return "Our data didn't cover this · confidence: " + d.confidence +
         " · data updated " + new Date(d.data_updated).toLocaleString() + ". AI answers can be wrong; check the miner page.";
@@ -41,7 +54,7 @@
       history.push({ role: "user", content: q });
       history.push({ role: "assistant", content: d.answer });
       if (history.length > 6) history = history.slice(-6);
-      show(d.answer, d.models_mentioned, noteFor(d));
+      show(d.answer, d.models_mentioned, noteFor(d), d.sources);
     }).then(function () { btn.disabled = false; });
   });
 })();

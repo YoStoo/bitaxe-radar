@@ -1,0 +1,589 @@
+{
+  "run": "20261110T171500Z-rag-after-preview",
+  "url": "https://bitaxe-radar-ask-preview.bitaxeradar.workers.dev/ask",
+  "data_updated": "2026-11-10T12:17:52Z",
+  "cases_passed": 10,
+  "cases": 11,
+  "checks_passed": 56,
+  "checks": 57,
+  "results": [
+    {
+      "id": "general-solo-mining",
+      "pass": true,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "3 sentences, 41 words (max 4/90)"
+        },
+        {
+          "check": "retrieved",
+          "pass": true,
+          "why": "retrieved ['bitcoin-mining-pools', 'solo-vs-pool-mining']"
+        },
+        {
+          "check": "cited",
+          "pass": true,
+          "why": "cited ['solo-vs-pool-mining', 'bitcoin-mining-pools']"
+        },
+        {
+          "check": "in_data",
+          "pass": true,
+          "why": "in_data=True, expected True"
+        }
+      ],
+      "question": "What does solo mining mean?",
+      "ok": true,
+      "answer": "Solo mining means your miner works alone on the Bitcoin network. If it finds a block, you keep the entire reward; if not, you earn nothing. It's a lottery ticket, unlike pool mining, which shares smaller, steadier payouts among many miners.",
+      "ms": 4661,
+      "in_data": true,
+      "tools_used": [
+        {
+          "name": "search_guides",
+          "input": {
+            "query": "solo mining vs pool mining"
+          },
+          "ok": true,
+          "guides": [
+            "solo-vs-pool-mining",
+            "bitcoin-mining-pools"
+          ]
+        }
+      ],
+      "models_mentioned": []
+    },
+    {
+      "id": "rag-normal-temp",
+      "pass": true,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "3 sentences, 52 words (max 4/90)"
+        },
+        {
+          "check": "retrieved",
+          "pass": true,
+          "why": "retrieved ['bitaxe-setup', 'is-my-bitaxe-normal']"
+        },
+        {
+          "check": "cited",
+          "pass": true,
+          "why": "cited ['is-my-bitaxe-normal', 'bitaxe-setup']"
+        },
+        {
+          "check": "in_data",
+          "pass": true,
+          "why": "in_data=True, expected True"
+        },
+        {
+          "check": "match",
+          "pass": true,
+          "why": "matched '60\u00b0C'"
+        }
+      ],
+      "question": "Is 65\u00b0C normal for my Bitaxe Gamma?",
+      "ok": true,
+      "answer": "Probably yes. The AxeOS fan aims for about 60\u00b0C on the chip, so 65\u00b0C is a little above target but well under the 75\u00b0C level where the firmware stops mining to protect it. Watch that your error percentage stays low; a rising error rate can mean the chip is running too hot.",
+      "ms": 4499,
+      "in_data": true,
+      "tools_used": [
+        {
+          "name": "search_guides",
+          "input": {
+            "query": "bitaxe gamma normal temperature"
+          },
+          "ok": true,
+          "guides": [
+            "is-my-bitaxe-normal",
+            "bitaxe-setup"
+          ]
+        }
+      ],
+      "models_mentioned": [
+        "bitaxe-gamma"
+      ]
+    },
+    {
+      "id": "rag-psu",
+      "pass": true,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "3 sentences, 38 words (max 4/90)"
+        },
+        {
+          "check": "retrieved",
+          "pass": true,
+          "why": "retrieved ['bitaxe-power-supply']"
+        },
+        {
+          "check": "cited",
+          "pass": true,
+          "why": "cited ['bitaxe-power-supply']"
+        },
+        {
+          "check": "in_data",
+          "pass": true,
+          "why": "in_data=True, expected True"
+        },
+        {
+          "check": "not_match",
+          "pass": true,
+          "why": "clean"
+        },
+        {
+          "check": "match",
+          "pass": true,
+          "why": "matched '5V'"
+        }
+      ],
+      "question": "What power supply does a Bitaxe Gamma need?",
+      "ok": true,
+      "answer": "A Bitaxe Gamma runs on 5V through a 5.5 \u00d7 2.1 mm barrel plug (center-positive). It draws about 18\u201320 W, so a 5V 6A (30 W) supply leaves room to spare. Never use a 12V supply on it.",
+      "ms": 2781,
+      "in_data": true,
+      "tools_used": [
+        {
+          "name": "search_guides",
+          "input": {
+            "query": "bitaxe gamma power supply requirements"
+          },
+          "ok": true,
+          "guides": [
+            "bitaxe-power-supply"
+          ]
+        },
+        {
+          "name": "get_miner",
+          "input": {
+            "miner": "Bitaxe Gamma"
+          },
+          "ok": true
+        }
+      ],
+      "models_mentioned": [
+        "bitaxe-gamma"
+      ]
+    },
+    {
+      "id": "rag-12v-on-gamma",
+      "pass": true,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "3 sentences, 42 words (max 4/90)"
+        },
+        {
+          "check": "retrieved",
+          "pass": true,
+          "why": "retrieved ['bitaxe-power-supply']"
+        },
+        {
+          "check": "cited",
+          "pass": true,
+          "why": "cited ['bitaxe-power-supply']"
+        },
+        {
+          "check": "match",
+          "pass": true,
+          "why": "matched 'No'"
+        }
+      ],
+      "question": "Can I plug a 12V power supply into my Bitaxe Gamma?",
+      "ok": true,
+      "answer": "No. The Bitaxe Gamma needs a 5V supply with a 5.5 \u00d7 2.1 mm barrel plug and about 4 A or more. A 12V supply can damage it, so use the 5V supply that came with it or a matching 5V one.",
+      "ms": 4176,
+      "in_data": true,
+      "tools_used": [
+        {
+          "name": "search_guides",
+          "input": {
+            "query": "bitaxe gamma 12V power supply"
+          },
+          "ok": true,
+          "guides": [
+            "bitaxe-power-supply"
+          ]
+        },
+        {
+          "name": "get_miner",
+          "input": {
+            "miner": "Bitaxe Gamma"
+          },
+          "ok": true
+        }
+      ],
+      "models_mentioned": [
+        "bitaxe-gamma"
+      ]
+    },
+    {
+      "id": "rag-firmware",
+      "pass": true,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "3 sentences, 56 words (max 4/90)"
+        },
+        {
+          "check": "retrieved",
+          "pass": true,
+          "why": "retrieved ['bitaxe-firmware']"
+        },
+        {
+          "check": "cited",
+          "pass": true,
+          "why": "cited ['bitaxe-firmware']"
+        },
+        {
+          "check": "in_data",
+          "pass": true,
+          "why": "in_data=True, expected True"
+        },
+        {
+          "check": "match",
+          "pass": true,
+          "why": "matched 'AxeOS'"
+        }
+      ],
+      "question": "How do I update the firmware on my Bitaxe?",
+      "ok": true,
+      "answer": "Find your board number on the miner or its System page, then download the matching AxeOS file from the official Bitaxe GitHub releases page. Note your Wi-Fi, pool and Bitcoin address first, then upload the firmware from the miner's dashboard. A normal dashboard update usually keeps your settings; check your pool and hashrate after it restarts.",
+      "ms": 5154,
+      "in_data": true,
+      "tools_used": [
+        {
+          "name": "search_guides",
+          "input": {
+            "query": "how to update Bitaxe firmware AxeOS"
+          },
+          "ok": true,
+          "guides": [
+            "bitaxe-firmware"
+          ]
+        }
+      ],
+      "models_mentioned": []
+    },
+    {
+      "id": "rag-quiet",
+      "pass": true,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "4 sentences, 60 words (max 4/90)"
+        },
+        {
+          "check": "retrieved",
+          "pass": true,
+          "why": "retrieved ['bitaxe-noise']"
+        },
+        {
+          "check": "cited",
+          "pass": true,
+          "why": "cited ['bitaxe-noise']"
+        },
+        {
+          "check": "match",
+          "pass": true,
+          "why": "matched 'dB'"
+        }
+      ],
+      "question": "Which miners are quiet enough for a bedroom?",
+      "ok": true,
+      "answer": "For a bedroom, look for miners under about 35 dB. The BitForge Nano (about 29 dB), Bitaxe Gamma Hex (about 30 dB, liquid-cooled) and Hammer BC04 (32\u201336 dB) are the quietest with published figures. Heatbit Canvas and Bitwater have no fans and are listed as silent by the maker. These are the makers' and shops' stated numbers, not our measurements.",
+      "ms": 4992,
+      "in_data": true,
+      "tools_used": [
+        {
+          "name": "search_guides",
+          "input": {
+            "query": "bitaxe noise bedroom quiet miners"
+          },
+          "ok": true,
+          "guides": [
+            "bitaxe-noise"
+          ]
+        }
+      ],
+      "models_mentioned": [
+        "bitforge-nano",
+        "bitaxe-gamma-hex",
+        "hammer-bc04",
+        "heatbit-canvas",
+        "heatbit-bitwater"
+      ]
+    },
+    {
+      "id": "rag-solar",
+      "pass": true,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "4 sentences, 45 words (max 4/90)"
+        },
+        {
+          "check": "retrieved",
+          "pass": true,
+          "why": "retrieved ['solar-bitcoin-mining']"
+        },
+        {
+          "check": "cited",
+          "pass": true,
+          "why": "cited ['solar-bitcoin-mining']"
+        },
+        {
+          "check": "in_data",
+          "pass": true,
+          "why": "in_data=True, expected True"
+        }
+      ],
+      "question": "Can I run a Bitcoin miner on solar panels?",
+      "ok": true,
+      "answer": "Yes, small miners can. A Bitaxe-class miner draws about 15 to 25 W, so one normal home panel covers it in daylight. For night mining you need a battery, or you can mine only in daytime and accept fewer hours. Bigger miners need several panels.",
+      "ms": 4879,
+      "in_data": true,
+      "tools_used": [
+        {
+          "name": "search_guides",
+          "input": {
+            "query": "solar power for bitcoin miner"
+          },
+          "ok": true,
+          "guides": [
+            "solar-bitcoin-mining"
+          ]
+        }
+      ],
+      "models_mentioned": []
+    },
+    {
+      "id": "rag-how-often",
+      "pass": true,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "2 sentences, 34 words (max 4/90)"
+        },
+        {
+          "check": "retrieved",
+          "pass": true,
+          "why": "retrieved ['how-we-track']"
+        },
+        {
+          "check": "cited",
+          "pass": true,
+          "why": "cited ['how-we-track']"
+        },
+        {
+          "check": "in_data",
+          "pass": true,
+          "why": "in_data=True, expected True"
+        },
+        {
+          "check": "match",
+          "pass": true,
+          "why": "matched '6 hours'"
+        }
+      ],
+      "question": "How often do you check the shops' prices?",
+      "ok": true,
+      "answer": "We check the shops every 6 hours and show each miner's current price and stock. Our price history logs a point whenever a price or stock status changes, and about once a day otherwise.",
+      "ms": 6123,
+      "in_data": true,
+      "tools_used": [
+        {
+          "name": "search_guides",
+          "input": {
+            "query": "how we track prices, how often prices are checked"
+          },
+          "ok": true,
+          "guides": [
+            "how-we-track"
+          ]
+        }
+      ],
+      "models_mentioned": []
+    },
+    {
+      "id": "rag-low-hashrate",
+      "pass": true,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "3 sentences, 68 words (max 4/90)"
+        },
+        {
+          "check": "retrieved",
+          "pass": true,
+          "why": "retrieved ['is-my-bitaxe-normal']"
+        },
+        {
+          "check": "cited",
+          "pass": true,
+          "why": "cited ['is-my-bitaxe-normal']"
+        },
+        {
+          "check": "in_data",
+          "pass": true,
+          "why": "in_data=True, expected True"
+        },
+        {
+          "check": "match",
+          "pass": true,
+          "why": "matched 'stock'"
+        }
+      ],
+      "question": "Why is my Bitaxe Gamma making less hashrate than the listing says?",
+      "ok": true,
+      "answer": "A Gamma at stock settings (525 MHz) is expected to run about 1.07 TH/s, while many listings quote 1.2 TH/s or more, which assumes a higher frequency. Check the 10-minute or 1-hour average rather than the live number. If it's still low, check your power supply (the Gamma runs on 5 V), clean the fan and heatsink, and make sure settings are at stock with the latest AxeOS.",
+      "ms": 3797,
+      "in_data": true,
+      "tools_used": [
+        {
+          "name": "search_guides",
+          "input": {
+            "query": "bitaxe gamma hashrate lower than listed normal"
+          },
+          "ok": true,
+          "guides": [
+            "is-my-bitaxe-normal"
+          ]
+        }
+      ],
+      "models_mentioned": [
+        "bitaxe-gamma"
+      ]
+    },
+    {
+      "id": "rag-dont-know-s19",
+      "pass": true,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "2 sentences, 50 words (max 4/90)"
+        },
+        {
+          "check": "dont_know",
+          "pass": true,
+          "why": "said our guides don't cover it"
+        }
+      ],
+      "question": "How do I replace the thermal paste on an Antminer S19?",
+      "ok": true,
+      "answer": "Our guides don't cover replacing thermal paste on an Antminer S19, so I can't give you verified steps. The Antminer manufacturer's service manual or a dedicated repair resource would be the best place to check, and it's worth confirming the procedure for your specific model before you open the unit.",
+      "ms": 4443,
+      "in_data": false,
+      "tools_used": [
+        {
+          "name": "search_guides",
+          "input": {
+            "query": "replace thermal paste on Antminer S19"
+          },
+          "ok": true,
+          "guides": []
+        }
+      ],
+      "models_mentioned": []
+    },
+    {
+      "id": "rag-dont-know-ha",
+      "pass": false,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "3 sentences, 51 words (max 4/90)"
+        },
+        {
+          "check": "dont_know",
+          "pass": false,
+          "why": "says not covered but cites ['bitaxe-setup', 'bitaxe-monitoring-apps']"
+        }
+      ],
+      "question": "How do I connect my Bitaxe to Home Assistant?",
+      "ok": true,
+      "answer": "Our guides don't cover a Home Assistant connection directly. What they do cover: get your Bitaxe on 2.4 GHz Wi-Fi, note its IP address from the screen, and open that address in a browser to reach the AxeOS dashboard. Monitoring apps are listed in our guide if you want an alternative.",
+      "ms": 4189,
+      "in_data": true,
+      "tools_used": [
+        {
+          "name": "search_guides",
+          "input": {
+            "query": "connect Bitaxe to Home Assistant"
+          },
+          "ok": true,
+          "guides": [
+            "bitaxe-monitoring-apps",
+            "bitaxe-setup"
+          ]
+        }
+      ],
+      "models_mentioned": []
+    }
+  ]
+}

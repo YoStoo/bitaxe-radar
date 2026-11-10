@@ -111,6 +111,9 @@ All runs graded with the final grader (`--regrade` re-scored the earlier answers
 | **After fix, live** | live Worker `d9f863e3` (deployed Nov 10, 6:49 AM ET) | **32/32** (156/156 checks) | none |
 | **+6 price-history cases, before** | live Worker (no history tool yet) | **1/6** on the new cases (24/33 checks) | It could only give today's price. See docs/SQL.md. |
 | **+6 price-history cases, after** | test Worker `bitaxe-radar-ask-preview`, branch `feature/sql-price-history` | **38/38** (189/189 checks) | none |
+| **+10 RAG cases (+1 converted), before** | live Worker (no guide search) | **0/11** on RAG cases (27/57 checks) | See docs/RAG.md. |
+| **RAG, full suite** | test Worker, branch `feature/ask-rag` | **47/48** (244/245) | `general-hashrate`: citation flipped in_data (story 7 in RAG.md) |
+| **RAG, after fix** | test Worker, `rag` + `general` cases | **12/12** (62/62) | none |
 
 Not reproduced: we suspected Claude might sort "$ per TH/s" questions by `efficiency`. All 3 price-per-TH cases picked `price_per_th`, so no change was made. The cases stay in the set to catch it if it ever happens.
 

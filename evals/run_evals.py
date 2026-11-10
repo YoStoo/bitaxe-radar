@@ -26,7 +26,7 @@ import grader  # noqa: E402
 import radar_data as R  # noqa: E402
 
 LIVE_URL = "https://bitaxe-radar-alerts.bitaxeradar.workers.dev/ask"
-MAX_REQUESTS = 45   # safety cap per run (daily limit is 200)
+MAX_REQUESTS = 50   # safety cap per run (daily limit is 200)
 
 
 def ask(url, question, history):
@@ -97,7 +97,8 @@ def main(argv=None):
             resp = ask(a.url, c["question"], history)
         g = grader.grade(c, resp, latest)
         g.update(question=c["question"], ok=resp.get("ok") is True, answer=resp.get("answer") or resp.get("error"), ms=resp.get("ms"),
-                 in_data=resp.get("in_data"), tools_used=resp.get("tools_used"), models_mentioned=resp.get("models_mentioned"))
+                 in_data=resp.get("in_data"), tools_used=resp.get("tools_used"), models_mentioned=resp.get("models_mentioned"),
+                 sources=resp.get("sources"))
         graded.append(g)
         fails = [f"{x['check']}: {x['why']}" for x in g["checks"] if not x["pass"]]
         print(f"{'PASS' if g['pass'] else 'FAIL'}  {c['id']:<26} {resp.get('ms', 0) / 1000:4.1f}s  {'; '.join(fails)}")
@@ -134,9 +135,10 @@ def regrade(path, a):
     for r in old["results"]:
         ok = r.get("ok", any(x["check"] == "answered" and x["pass"] for x in r["checks"]))
         resp = {"ok": ok, "answer": r.get("answer") if ok else None, "error": None if ok else r.get("answer"),
-                "in_data": r.get("in_data"), "tools_used": r.get("tools_used"), "models_mentioned": r.get("models_mentioned")}
+                "in_data": r.get("in_data"), "tools_used": r.get("tools_used"), "models_mentioned": r.get("models_mentioned"),
+                "sources": r.get("sources")}
         g = grader.grade(cases[r["id"]], resp, latest)
-        g.update({k: r.get(k) for k in ("question", "answer", "ms", "in_data", "tools_used", "models_mentioned")}, ok=ok)
+        g.update({k: r.get(k) for k in ("question", "answer", "ms", "in_data", "tools_used", "models_mentioned", "sources")}, ok=ok)
         graded.append(g)
         fails = [f"{x['check']}: {x['why']}" for x in g["checks"] if not x["pass"]]
         print(f"{'PASS' if g['pass'] else 'FAIL'}  {r['id']:<26} {'; '.join(fails)}")
