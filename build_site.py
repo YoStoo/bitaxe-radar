@@ -813,6 +813,9 @@ CORE_TRACKED = [m for m in TRACKED if cat(m) == "bitaxe"]   # the original Bitax
 HOME_TRACKED = [m for m in TRACKED if is_home(m)]
 LIVE_TRACKED = [m for m in TRACKED if m not in NOINDEX_MODELS]
 BITAXE_OFFERS = [o for o in OFFERS if cat(o["model"]) == "bitaxe"]
+# Pages that actually get built. Every link to a compare page goes through these, so a link
+# can never point at a page today's data skipped (a model with no listings).
+BUILT_PAIRS = [(a, b) for a, b in COMPARE_PAIRS if STATS[a]["offers"] and STATS[b]["offers"]]
 EFF_RANK, PTH_RANK, RANK_N, PTH_N = {}, {}, {}, {}
 for _grp in (BITAXE_TRACKED, HOME_TRACKED):       # ranks are within a category (a Bitaxe is not compared with a heater)
     for i, mid in enumerate(sorted(_grp, key=jth)):
@@ -1106,7 +1109,7 @@ SIGNUP_SCRIPTS = (f'<script>window.RADAR_SIGNUP={json.dumps({"workerUrl": WORKER
 # MODEL PAGES
 # ---------------------------------------------------------------------------------------------
 def related_compare(mid):
-    return [(a, b) for a, b in COMPARE_PAIRS if mid in (a, b)]
+    return [(a, b) for a, b in BUILT_PAIRS if mid in (a, b)]
 
 
 def compare_url(a, b):
@@ -1323,7 +1326,7 @@ def build_compare_page(a, b):
         top = sort_offers(t["offers"])[:3]
         return offers_table(top, best_id=t["best"]["id"]) + f'<p class="hint"><a href="/models/{mid}/">All {len(t["offers"])} listings and history for the {esc(SHORT[mid])}</a></p>'
 
-    olinks = "".join(f'<li><a href="{compare_url(*p)}">{esc(compare_label(*p))}</a></li>' for p in COMPARE_PAIRS if p != (a, b))
+    olinks = "".join(f'<li><a href="{compare_url(*p)}">{esc(compare_label(*p))}</a></li>' for p in BUILT_PAIRS if p != (a, b))
     price_bit = f"in stock from {money(usd(ba))} vs {money(usd(bb))}" if ba and bb else "prices, stock and running cost"
     title = f"{sa} vs {sb}: price, hashrate, power cost ({fmt_day(GEN)}) | Bitaxe Radar"
     desc = f"{sa} vs {sb}: {price_bit}, {ma['hashrate_ths']:g} vs {mb['hashrate_ths']:g} TH/s stated, {ea:.1f} vs {eb:.1f} J/TH, yearly electricity cost. Updated {fmt_day(GEN)}."
@@ -3909,7 +3912,7 @@ def build_home():
     {older_html}
     <p class="older">Want one that heats a room too? <a href="/heater-miners/">See heater miners →</a></p>
   </section>"""
-    compare_links = '<ul class="links">' + "".join(f'<li><a href="{compare_url(a, b)}">{esc(compare_label(a, b))}</a></li>' for a, b in COMPARE_PAIRS) + "</ul>"
+    compare_links = '<ul class="links">' + "".join(f'<li><a href="{compare_url(a, b)}">{esc(compare_label(a, b))}</a></li>' for a, b in BUILT_PAIRS) + "</ul>"
     sellers_line = ('<p>Shops we check: ' + " · ".join(f'<a href="/sellers/{sid}/">{esc(s["name"])}</a>' for sid, s in SELLERS.items() if sid in SELLER_COPY) + "</p>\n  ")
     out = (tpl.replace("<!--HEAD-->", head).replace("<!--HEADER-->", header_html()).replace("<!--RADAR-BG-->", RADAR_BG)
            .replace("<!--HERO-CHIPS-->", chips).replace("<!--BROWSE-->", bf_banner() + browse_tiles() + "\n" + best_pills()).replace("<!--CARDS-->", cards).replace("<!--SIGNUP-->", signup_html("any"))
@@ -4293,7 +4296,7 @@ def build_indexes():
     layout("/best/", "Best home Bitcoin miners by need: beginners, quiet, cheap, heating | Bitaxe Radar",
            "Ranked picks of home Bitcoin miners for beginners, quiet rooms, under $100, heating a room and gifts, from today's prices.", body, crumbs=[("Home", "/"), ("Best for", "/best/")])
     # /compare/
-    pairs = [(a, b) for a, b in COMPARE_PAIRS if STATS[a]["offers"] and STATS[b]["offers"]]
+    pairs = BUILT_PAIRS
     body = f"""<article><header class="hero"><h1>Compare miners</h1>
 <p class="lede">Side by side: price, hashrate, power and running cost.</p></header>
 <ul class="links">{"".join(f'<li><a href="{compare_url(a, b)}">{esc(compare_label(a, b))}</a></li>' for a, b in pairs)}</ul></article>"""
@@ -4365,9 +4368,8 @@ def main():
     BEST.update(best_defs())      # before any page that shows the best-for chips
     for mid in TRACKED:
         build_model_page(mid)
-    for a, b in COMPARE_PAIRS:
-        if STATS[a]["offers"] and STATS[b]["offers"]:      # only where the data supports a comparison
-            build_compare_page(a, b)
+    for a, b in BUILT_PAIRS:      # only where the data supports a comparison
+        build_compare_page(a, b)
     for sid in SELLERS:
         if sid in SELLER_COPY and any(o["seller"] == sid for o in OFFERS):
             build_seller_page(sid)
