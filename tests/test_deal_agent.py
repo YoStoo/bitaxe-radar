@@ -202,6 +202,12 @@ class Guard(unittest.TestCase):
         self.assertTrue(any("shouldn't quote" in e for e in guard.verify(good_deal(pd, summary="Gamma is $67."), pd)))
         self.assertEqual(guard.verify(good_deal(pd), pd), [])
 
+    def test_no_deal_percentages_are_checked_too(self):
+        """Story #40: production's no-deal text said "a 1.1% dip"; true, but nothing checked it."""
+        pd = pd_for("no-deal-flat")    # Hammer BC04: $213 vs typical $215 = 0.9%
+        self.assertEqual(guard.verify(good_deal(pd, summary="No miner is 3% under typical. The biggest move is a 0.9% dip."), pd), [])
+        self.assertTrue(guard.verify(good_deal(pd, summary="The biggest move is a 2.5% dip."), pd))
+
     def test_a_non_deal_pick_is_rejected(self):
         pd = pd_for("one-day-spike")
         f = pd.facts("avalon-nano-3s")

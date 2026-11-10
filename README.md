@@ -113,7 +113,7 @@ flowchart TD
 
 ## Tech stack
 
-- **Python 3** for the collector, the site builder, the eval runner and grader, and 233 unit tests
+- **Python 3** for the collector, the site builder, the eval runner and grader, and 234 unit tests
 - **JavaScript** for the static site (no frontend framework) and the Cloudflare Worker
 - **Claude Haiku** (`claude-haiku-5-5`) through the Messages API, with tool calling
 - **Cloudflare Workers** and KV for `/ask`, alert signups, the daily question counter, and cached embeddings

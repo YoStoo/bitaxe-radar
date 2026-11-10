@@ -98,6 +98,11 @@ def verify(deal, pd):
             errs.append(f"no_standout is false: {deals[0]['miner_name']} is {deals[0]['drop_pct']}% below its typical price and in stock")
         for n in MONEY_RE.findall(prose):
             errs.append(f"${n} in the text: a no-deal day shouldn't quote prices")
+        # A % on a no-deal day must still be real: the 3% bar, or some in-stock miner's actual move today (story #40).
+        real_pcts = [3.0] + [abs(f["drop_pct"]) for f in pd.all_facts() if f["drop_pct"] is not None]
+        for n in PCT_RE.findall(prose):
+            if not any(written_matches(n, v) for v in real_pcts):
+                errs.append(f"{n}% in the text doesn't match any miner's move today")
         if LOWEST_RE.search(prose) or NEW_LOW_RE.search(prose):
             errs.append("lowest-ever claim on a no-deal day")
         return errs
