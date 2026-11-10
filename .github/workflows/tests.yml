@@ -1,0 +1,34 @@
+# Unit tests only. Does not collect prices, deploy Pages, or call the Claude API.
+# The existing collect-and-deploy workflow (concurrency group "pages") is unchanged.
+name: tests
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: tests-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      # Generated pages are gitignored. Site tests read them, so build first.
+      # build_site.py uses only local data/ and does not touch the network.
+      - name: Build the static site
+        run: python3 build_site.py
+      - name: Python tests
+        run: python3 -m unittest discover -s tests -p "test_*.py"
+      # No npm install: the Worker has no package dependencies. Tests mock fetch.
+      # Live evals (evals/run_evals.py) are not run here. They need a network
+      # call to /ask, cost about $0.02, and use 32 of the 200 daily question slots.
+      - name: Worker tests
+        working-directory: worker
+        run: npm test
