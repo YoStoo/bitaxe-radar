@@ -87,8 +87,10 @@ Same rules. Backgrounds removed with an open-source cut-out model (rembg, isnet-
 | dcentral-stealthminer.webp | StealthMiner (D-Central's build uses this Structur3 enclosure) | Structur3, the enclosure's maker (Shopify `/products/stealthminer.js`, first image) | StealthMiner JPro+ [v1.2] | https://cdn.shopify.com/s/files/1/0593/8102/2789/files/stealthminer-v1.1-black-02.jpg?v=1745350025 |
 | nerdqx.webp | NerdQX 8 TH/s | Bitcoin Merch (Shopify `.js`, **second** image) | Bitcoin Merch® - NerdQX 8TH/s Home Miner w/ Power Supply | https://cdn.shopify.com/s/files/1/2609/9556/files/WhatsAppImage2026-07-27at21.08.42.jpg?v=1785953244 |
 | gekko-kbeast-50.webp | GekkoScience KBeast 50 | Bitcoin Merch (Shopify `.js`, second image, black background) | Bitcoin Merch® - GekkoScience KBeast 50+TH/s Bitcoin Miner & Heater | https://cdn.shopify.com/s/files/1/2609/9556/files/kbeast.jpg?v=1790372727 |
+| bitaxe-702.webp | Bitaxe 702 (Supra Hex) | Bitaxe.de (product page `og:image`) | Bitaxe Supra Hex 702 kaufen, 4.2 TH/s | https://bitaxe.de/images/products/bitaxe-702-2.webp?v=1789635220 |
+| nerdaxe-gaia-copper-pro.webp | Nerdaxe Gaia Copper Pro | Bitaxe.de (product page `og:image`) | Nerdaxe Gaia Copper Pro kaufen, 3 TH/s | https://bitaxe.de/images/products/nerdaxe-gaia-pro-bitcoin-miner.webp?v=1790596864 |
 | bitaxe-ultra.webp | Bitaxe Ultra 204 (BM1366) | The maker's open-source repo, bitaxeorg/bitaxeUltra (CERN-OHL-S-2.0), README photo | "bitaxeUltra assembled" | https://raw.githubusercontent.com/bitaxeorg/bitaxeUltra/HEAD/doc/bitaxe_204.jpg |
 
 Not used: Bitcoin Merch's first NerdQX image (filename `ChatGPTImage...`, AI-generated); D-Central's StealthMiner and NerdOCTAXE images (a "D-Central × Structur3" logo is printed over the product, and the NerdOCTAXE one shows the enclosed Octaxe+, not the Gamma board). This replaces the Bitaxe Ultra "no photo" note above: the maker's own photo is reliable.
 
-Still no photo: Bitaxe 702 and Nerdaxe Gaia Copper Pro. Neither has a listing today, so neither has a page or a card.
+Bitaxe 702 and Nerdaxe Gaia Copper Pro were added once Bitaxe.de listings came back (their pages are built again).

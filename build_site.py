@@ -724,6 +724,8 @@ MODEL_IMG = {
     "nerdqx": (800, 508, "NerdQX 8 TH/s home Bitcoin miner with a white tower cooler and screen"),
     "gekko-kbeast-50": (800, 480, "GekkoScience KBeast 50 TH/s Bitcoin miner and heater in a black mesh case"),
     "bitaxe-ultra": (481, 800, "Bitaxe Ultra 204 open-source Bitcoin miner board with fan and OLED screen"),
+    "bitaxe-702": (657, 800, "Bitaxe Supra Hex 702 six-chip Bitcoin miner on its black stand"),
+    "nerdaxe-gaia-copper-pro": (733, 749, "Nerdaxe Gaia Copper Pro Bitcoin miner with copper heat pipes and a color screen"),
 }
 MODEL_IMG = {k: v for k, v in MODEL_IMG.items() if (SITE / "img" / "models" / f"{k}.webp").exists()}
 
