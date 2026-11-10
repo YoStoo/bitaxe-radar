@@ -644,7 +644,7 @@ def facts_table(sids):
     rows = []
     for sid in sids:
         ships, wr, rate = facts_cells(sid)
-        rows.append(f'<tr><td><a href="/sellers/{sid}/">{esc(SELLERS[sid]["name"])}</a></td><td>{ships}</td><td>{wr}</td><td class="num">{rate}</td></tr>')
+        rows.append(f'<tr><td>{seller_a(sid)}</td><td>{ships}</td><td>{wr}</td><td class="num">{rate}</td></tr>')
     return ('<div class="tablewrap"><table class="facts"><thead><tr><th>Shop</th><th>Ships from</th><th>Warranty</th><th class="num">In stock when we checked</th></tr></thead>'
             f'<tbody>{"".join(rows)}</tbody></table></div>')
 
@@ -813,9 +813,10 @@ CORE_TRACKED = [m for m in TRACKED if cat(m) == "bitaxe"]   # the original Bitax
 HOME_TRACKED = [m for m in TRACKED if is_home(m)]
 LIVE_TRACKED = [m for m in TRACKED if m not in NOINDEX_MODELS]
 BITAXE_OFFERS = [o for o in OFFERS if cat(o["model"]) == "bitaxe"]
-# Pages that actually get built. Every link to a compare page goes through these, so a link
-# can never point at a page today's data skipped (a model with no listings).
+# Pages that actually get built. Every link to a compare or shop page goes through these, so a link
+# can never point at a page today's data skipped (a model or shop with no listings).
 BUILT_PAIRS = [(a, b) for a, b in COMPARE_PAIRS if STATS[a]["offers"] and STATS[b]["offers"]]
+BUILT_SELLERS = {sid for sid in SELLERS if sid in SELLER_COPY and any(o["seller"] == sid for o in OFFERS)}
 EFF_RANK, PTH_RANK, RANK_N, PTH_N = {}, {}, {}, {}
 for _grp in (BITAXE_TRACKED, HOME_TRACKED):       # ranks are within a category (a Bitaxe is not compared with a heater)
     for i, mid in enumerate(sorted(_grp, key=jth)):
@@ -998,7 +999,7 @@ def offers_table(offers, *, show_model=False, best_id=None):
         tagb = '<span class="tag-best">Cheapest</span>' if is_best else ""
         stale = '<div class="stale">may be out of date</div>' if o.get("stale") else ""
         first = (f'<td class="model-cell"><a href="/models/{o["model"]}/">{esc(SHORT[o["model"]])}</a></td>' if show_model else "")
-        rows.append(f'<tr{best}>{first}<td class="seller-cell"><a href="/sellers/{esc(o["seller"])}/">{esc(sname(o["seller"]))}</a>{tagb}{stale}</td>'
+        rows.append(f'<tr{best}>{first}<td class="seller-cell">{seller_a(o["seller"])}{tagb}{stale}</td>'
                     f'<td class="num price-cell">{cur}{approx}{cmp_at}</td><td class="status-cell">{badge(o["stock_status"])}</td><td class="cfg">{cfg}</td>'
                     f'<td class="cfg checked-cell">{tag_time(o["checked_at"])}</td><td class="buy-cell">{offer_link(o, cls="btn" if is_best else "btn ghost")}</td></tr>')
     head = ("<th>Model</th>" if show_model else "") + '<th>Shop</th><th class="num">Price</th><th>Stock</th><th>Details</th><th>Checked</th><th><span class="sr">Buy</span></th>'
@@ -1110,6 +1111,17 @@ SIGNUP_SCRIPTS = (f'<script>window.RADAR_SIGNUP={json.dumps({"workerUrl": WORKER
 # ---------------------------------------------------------------------------------------------
 def related_compare(mid):
     return [(a, b) for a, b in BUILT_PAIRS if mid in (a, b)]
+
+
+def model_a(mid, inner):
+    """Link to a model page only when today's data builds it (old newsletter issues name models that may have no listings now)."""
+    return f'<a href="/models/{mid}/">{inner}</a>' if mid in TRACKED else inner
+
+
+def seller_a(sid):
+    """Shop name, linked to its page only when that page is built."""
+    name = esc(sname(sid))
+    return f'<a href="/sellers/{sid}/">{name}</a>' if sid in BUILT_SELLERS else name
 
 
 def compare_url(a, b):
@@ -1424,7 +1436,7 @@ def model_summary_table(models, *, usd_only=False):
         b = st["best_usd"] if usd_only else st["best"]
         if b:
             price = money(usd(b)) + ("" if b["currency"] == "USD" else ' <span class="cfg">(converted)</span>')
-            seller = f'<a href="/sellers/{b["seller"]}/">{esc(sname(b["seller"]))}</a>'
+            seller = seller_a(b["seller"])
         else:
             price, seller = '<span class="stale">none in stock</span>', "–"
         rows.append(f'<tr><td><a href="/models/{mid}/">{esc(SHORT[mid])}</a></td><td class="num">{price}</td><td>{seller}</td>'
@@ -3768,7 +3780,7 @@ def build_price_per_th():
 def build_method():
     path = "/how-we-track/"
     trail = [("Home", "/"), ("About & how we track", path)]
-    src_rows = "".join(f'<tr><td><a href="/sellers/{sid}/">{esc(s["name"])}</a></td><td>{esc(s["currency"])}</td><td>{esc(SELLER_COPY.get(sid, {}).get("region", ""))}</td></tr>' for sid, s in SELLERS.items())
+    src_rows = "".join(f'<tr><td>{seller_a(sid)}</td><td>{esc(s["currency"])}</td><td>{esc(SELLER_COPY.get(sid, {}).get("region", ""))}</td></tr>' for sid, s in SELLERS.items())
     title = "How Bitaxe Radar tracks prices and stock (methodology) | Bitaxe Radar"
     desc = "How Bitaxe Radar collects Bitaxe and NerdQaxe prices and stock: sources, schedule, currency conversion, history, which sellers we list and affiliate income."
     body = f"""<article>
@@ -3913,7 +3925,7 @@ def build_home():
     <p class="older">Want one that heats a room too? <a href="/heater-miners/">See heater miners →</a></p>
   </section>"""
     compare_links = '<ul class="links">' + "".join(f'<li><a href="{compare_url(a, b)}">{esc(compare_label(a, b))}</a></li>' for a, b in BUILT_PAIRS) + "</ul>"
-    sellers_line = ('<p>Shops we check: ' + " · ".join(f'<a href="/sellers/{sid}/">{esc(s["name"])}</a>' for sid, s in SELLERS.items() if sid in SELLER_COPY) + "</p>\n  ")
+    sellers_line = ('<p>Shops we check: ' + " · ".join(seller_a(sid) for sid in SELLERS if sid in BUILT_SELLERS) + "</p>\n  ")
     out = (tpl.replace("<!--HEAD-->", head).replace("<!--HEADER-->", header_html()).replace("<!--RADAR-BG-->", RADAR_BG)
            .replace("<!--HERO-CHIPS-->", chips).replace("<!--BROWSE-->", bf_banner() + browse_tiles() + "\n" + best_pills()).replace("<!--CARDS-->", cards).replace("<!--SIGNUP-->", signup_html("any"))
            .replace("<!--COMPARE-LINKS-->", compare_links).replace("<!--FOOTER-->", footer_html())
@@ -4215,11 +4227,11 @@ def build_newsletter():
     iss = NL.issues()
     for i in iss:
         path = f"/newsletter/{i['slug']}/"
-        rows = "".join(f'<tr><td><a href="/models/{p["model"]}/">{esc(SHORT.get(p["model"], p["name"]))}</a><br><small class="hint">at {esc(p["seller_name"])}</small></td>'
+        rows = "".join(f'<tr><td>{model_a(p["model"], esc(SHORT.get(p["model"], p["name"])))}<br><small class="hint">at {esc(p["seller_name"])}</small></td>'
                        f'<td class="num"><b>{esc(NL.price_label(p))}</b></td><td>{offer_link(dict(seller=p["seller"], url=p["url"]), "Shop ↗", "btn sm")}</td></tr>'
                        for p in i["prices"])
-        new = "".join(f'<li><a href="/models/{n["model"]}/"><b>{esc(SHORT.get(n["model"], n["name"]))}</b>'
-                      + (f' · from {money(n["from_usd"])}' if n.get("from_usd") else "") + f'</a> {esc(n["blurb"])}</li>' for n in i["new_miners"])
+        new = "".join("<li>" + model_a(n["model"], f'<b>{esc(SHORT.get(n["model"], n["name"]))}</b>'
+                      + (f' · from {money(n["from_usd"])}' if n.get("from_usd") else "")) + f' {esc(n["blurb"])}</li>' for n in i["new_miners"])
         ex = i["explainer"]
         ft = i.get("feature")
         feature = (f'<section aria-labelledby="h-f"><h2 id="h-f">{esc(ft["title"])}</h2>' + "".join(f"<p>{esc(x)}</p>" for x in ft["paras"])
@@ -4371,7 +4383,7 @@ def main():
     for a, b in BUILT_PAIRS:      # only where the data supports a comparison
         build_compare_page(a, b)
     for sid in SELLERS:
-        if sid in SELLER_COPY and any(o["seller"] == sid for o in OFFERS):
+        if sid in BUILT_SELLERS:
             build_seller_page(sid)
     build_where_to_buy()
     build_in_stock()
