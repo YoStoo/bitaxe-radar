@@ -68,4 +68,5 @@ def grade(case, pd, res):
     return dict(id=case["id"], passed=not final, problems=final, source=res.get("source"),
                 first_try_ok=(first_probs == [] and not (res.get("guard_errors") or [[1]])[0]) if first is not None else None,
                 first_try_problems=first_probs, guard_first=(res.get("guard_errors") or [None])[0],
+                attempts=[dict(d, problems=e) for d, e in zip(res.get("submitted", []), res.get("guard_errors", []))],
                 calls=res.get("calls"), tools=[t["name"] for t in res.get("tools_used", [])], cost_usd=res.get("cost_usd", 0))

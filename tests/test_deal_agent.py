@@ -132,6 +132,14 @@ class Tools(unittest.TestCase):
                            for n in ("list_current_offers", "rank_price_drops", "compare_to_average", "get_price_history")])
         self.assertNotIn("IGNORE", blob)
 
+    def test_low_claim_spells_out_what_may_be_said(self):
+        """Story #39: the live model wrote 'lowest we've logged' while copying lowest_ever = false."""
+        out, _ = tools.run_tool(pd_for("not-lowest-ever"), "compare_to_average", {"miner": "bitaxe-gamma-duo"})
+        self.assertTrue(out["low_claim"].startswith("NOT the lowest: it was $99.00 on "))
+        out, _ = tools.run_tool(pd_for("clear-drop"), "compare_to_average", {"miner": "bitaxe-gamma"})
+        self.assertTrue(out["low_claim"].startswith("New low"))
+        self.assertIn("low_claim", agent.SYSTEM_PROMPT)
+
     def test_schemas_are_strict(self):
         for t in tools.ALL_TOOLS:
             self.assertTrue(t["strict"])

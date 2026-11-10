@@ -42,7 +42,9 @@ Writing rules (our code checks every one and rejects the deal if broken):
 - Only use numbers that appear in your tool results for the picked miner.
   You may round a dollar price to whole dollars. No other math.
 - Name only the picked miner and only the shop that has that price.
-- Say "lowest we've logged" only if lowest_ever is true; "new low" only if new_low is true.
+- Before writing, read low_claim from compare_to_average and follow it exactly.
+  Most deals are NOT the lowest ever. If lowest_ever is false, the text must
+  not say lowest, record, all-time or new low, even if the price "held" for weeks.
 - Headline: max 70 characters. Summary: 2-3 short sentences, max 60 words.
 - Plain, honest words. No hype, no "don't miss out", no links. Prices change fast;
   never promise a price will last.
@@ -67,7 +69,7 @@ def run_agent(pd, client):
     Raises claude.ClaudeError if the API itself fails (the caller keeps the previous deal)."""
     messages = [{"role": "user", "content": f"Today is {pd.today}. Pick today's deal of the day from our price data."}]
     usage = {"input_tokens": 0, "output_tokens": 0}
-    trace = dict(tools_used=[], attempts=0, guard_errors=[], calls=0, stop=None, first_deal=None)
+    trace = dict(tools_used=[], attempts=0, guard_errors=[], calls=0, stop=None, first_deal=None, submitted=[])
     tool_rounds = 0
 
     def result(deal, source):
@@ -110,6 +112,7 @@ def run_agent(pd, client):
                 trace["first_deal"] = deal       # kept for the evals: how good was the AI before the guardrail stepped in?
             errs = guard.verify(deal, pd)
             trace["guard_errors"].append(errs)
+            trace["submitted"].append({k: deal.get(k) for k in ("miner_id", "lowest_ever", "headline", "summary")})
             if not errs:
                 trace["stop"] = "submitted"
                 return result(deal, "ai")
@@ -117,5 +120,6 @@ def run_agent(pd, client):
                 trace["stop"] = "failed check twice"
                 return result(template_deal(pd), "template")
             replies.append({"type": "tool_result", "tool_use_id": b["id"], "is_error": True,
-                            "content": "Rejected by our fact check. Fix exactly these and call submit_deal again:\n- " + "\n- ".join(errs)})
+                            "content": "Rejected by our fact check. Fix exactly these, rewrite the headline AND summary so neither repeats "
+                                       "the problem, and call submit_deal again:\n- " + "\n- ".join(errs)})
         messages.append({"role": "user", "content": replies})

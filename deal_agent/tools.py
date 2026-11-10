@@ -93,6 +93,15 @@ def _compare_row(f):
     row = {k: f[k] for k in keys} | {"shop": f["retailer_name"]}
     if f["currency"] != "USD":
         row["shop_price"], row["shop_currency"] = f["price"], f["currency"]
+    # Say the low-price claim in words, right next to the numbers. The first live eval wrote "lowest we've logged"
+    # while copying lowest_ever = false into the JSON (interview story #39).
+    if f["new_low"]:
+        row["low_claim"] = "New low: lower than any price we logged before today. You may say 'new low' or 'lowest we've logged'."
+    elif f["lowest_ever"]:
+        row["low_claim"] = "Ties the lowest price we've logged (not a new low). You may say 'lowest we've logged', not 'new low'."
+    elif f["prior_low_usd"] is not None:
+        row["low_claim"] = (f"NOT the lowest: it was ${f['prior_low_usd']:,.2f} on {f['prior_low_day']}. Do not say lowest, record, "
+                            f"all-time or new low. You may say it was cheaper on {f['prior_low_day']}.")
     if f["fx_only"]:
         row["note"] = "The USD drop is exchange-rate movement only: the shop's own price did not go down. Not a deal."
     return row
