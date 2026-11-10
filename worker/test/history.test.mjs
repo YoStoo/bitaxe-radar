@@ -162,4 +162,11 @@ const loop = await runAgentLoop(env, { question: "x", systemPrompt: "r", latest:
 assert.deepEqual(loop.toolsUsed.map((t) => t.ok), [false]);
 assert.equal(loop.answer.answer, "History isn't available right now.");
 
+// 9. the Worker's lazy loader passes EVERY argument through (bug 3: it dropped the SQL text)
+const { lazyOpenDb } = await import("../src/index.js");
+const seen = [];
+const lazy = lazyOpenDb(async () => ({ openDb: async (...a) => { seen.push(a); return "db"; } }));
+assert.equal(await lazy(null, "CREATE TABLE t (x);"), "db");
+assert.deepEqual(seen, [[null, "CREATE TABLE t (x);"]]);
+
 console.log("history tests: all passed");

@@ -26,7 +26,7 @@ import grader  # noqa: E402
 import radar_data as R  # noqa: E402
 
 LIVE_URL = "https://bitaxe-radar-alerts.bitaxeradar.workers.dev/ask"
-MAX_REQUESTS = 35   # safety cap per run (daily limit is 200)
+MAX_REQUESTS = 45   # safety cap per run (daily limit is 200)
 
 
 def ask(url, question, history):

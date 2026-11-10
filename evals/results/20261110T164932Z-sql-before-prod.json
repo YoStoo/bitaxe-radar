@@ -1,0 +1,322 @@
+{
+  "run": "20261110T164932Z-sql-before-prod",
+  "url": "https://bitaxe-radar-alerts.bitaxeradar.workers.dev/ask",
+  "data_updated": "2026-11-10T12:17:52Z",
+  "cases_passed": 1,
+  "cases": 6,
+  "checks_passed": 24,
+  "checks": 33,
+  "results": [
+    {
+      "id": "hist-gamma-month",
+      "pass": false,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "2 sentences, 47 words (max 4/90)"
+        },
+        {
+          "check": "trend",
+          "pass": true,
+          "why": "says cheaper"
+        },
+        {
+          "check": "history_prices",
+          "pass": false,
+          "why": "$119.99 -> $67 (change -52.99) not found in [67.0, 112.0, 156.0]"
+        },
+        {
+          "check": "mentions",
+          "pass": true,
+          "why": "named all"
+        },
+        {
+          "check": "in_data",
+          "pass": true,
+          "why": "in_data=True, expected True"
+        },
+        {
+          "check": "tool",
+          "pass": false,
+          "why": "expected get_price_history {'miner': 'bitaxe-gamma'}, got get_miner {'miner': 'Bitaxe Gamma'}"
+        }
+      ],
+      "question": "Has the Bitaxe Gamma gotten cheaper this month?",
+      "ok": true,
+      "answer": "I can't tell whether the Bitaxe Gamma got cheaper this month, since I only have current prices and no price history. Right now its cheapest in-stock price is $67 at Solo Satoshi (no stand, North America power supply), with other shops listed from about $112 to $156.",
+      "ms": 4586,
+      "in_data": true,
+      "tools_used": [
+        {
+          "name": "get_miner",
+          "input": {
+            "miner": "Bitaxe Gamma"
+          },
+          "ok": true
+        }
+      ],
+      "models_mentioned": [
+        "bitaxe-gamma"
+      ]
+    },
+    {
+      "id": "hist-lowest-ever",
+      "pass": false,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "3 sentences, 42 words (max 4/90)"
+        },
+        {
+          "check": "all_time_low",
+          "pass": true,
+          "why": "nerdqaxe-pp $210.99 found in [229.99, 210.99]"
+        },
+        {
+          "check": "in_data",
+          "pass": true,
+          "why": "in_data=True, expected True"
+        },
+        {
+          "check": "tool",
+          "pass": false,
+          "why": "expected get_price_history , got get_miner {'miner': 'NerdQaxe++'}"
+        }
+      ],
+      "question": "What's the lowest price the NerdQaxe++ has ever been?",
+      "ok": true,
+      "answer": "I can't confirm the all-time low, since my data only shows current prices. Right now the NerdQaxe++ (4.8 TH/s) is cheapest at Bitcoin Merch for $229.99 in stock. Solo Satoshi listed it at $210.99, but that listing is currently out of stock.",
+      "ms": 2975,
+      "in_data": true,
+      "tools_used": [
+        {
+          "name": "get_miner",
+          "input": {
+            "miner": "NerdQaxe++"
+          },
+          "ok": true
+        }
+      ],
+      "models_mentioned": [
+        "nerdqaxe-pp"
+      ]
+    },
+    {
+      "id": "hist-cheapest-shop",
+      "pass": false,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "3 sentences, 49 words (max 4/90)"
+        },
+        {
+          "check": "top_shop",
+          "pass": true,
+          "why": "mentions a real shop (Solo Satoshi)"
+        },
+        {
+          "check": "in_data",
+          "pass": true,
+          "why": "in_data=True, expected True"
+        },
+        {
+          "check": "tool",
+          "pass": false,
+          "why": "expected get_price_history , got get_miner {'miner': 'Avalon Q'}"
+        }
+      ],
+      "question": "Over the last month, which shop has usually had the cheapest Avalon Q?",
+      "ok": true,
+      "answer": "I can only see current prices for the Canaan Avalon Q, not its history over the last month. Right now Solo Satoshi is cheapest at about $1,398, with Altair Technology at about $1,399. The one-dollar gap is small, so the usual cheapest shop can't be confirmed from this data.",
+      "ms": 2846,
+      "in_data": true,
+      "tools_used": [
+        {
+          "name": "get_miner",
+          "input": {
+            "miner": "Avalon Q"
+          },
+          "ok": true
+        }
+      ],
+      "models_mentioned": [
+        "avalon-q"
+      ]
+    },
+    {
+      "id": "hist-week",
+      "pass": false,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "2 sentences, 36 words (max 4/90)"
+        },
+        {
+          "check": "trend",
+          "pass": false,
+          "why": "expected the answer to say it got cheaper"
+        },
+        {
+          "check": "history_prices",
+          "pass": false,
+          "why": "$1499 -> $1398 (change -101) not found in [1398.0, 1399.0]"
+        },
+        {
+          "check": "in_data",
+          "pass": true,
+          "why": "in_data=True, expected True"
+        },
+        {
+          "check": "tool",
+          "pass": false,
+          "why": "expected get_price_history {'days': 7}, got get_miner {'miner': 'Avalon Q'}"
+        }
+      ],
+      "question": "Did the Avalon Q price change in the last 7 days?",
+      "ok": true,
+      "answer": "I can't tell whether the Avalon Q price changed in the last 7 days, since my data only shows current prices. Right now it's $1,398 at Solo Satoshi and $1,399 at Altair Technology, both in stock.",
+      "ms": 2923,
+      "in_data": true,
+      "tools_used": [
+        {
+          "name": "get_miner",
+          "input": {
+            "miner": "Avalon Q"
+          },
+          "ok": true
+        }
+      ],
+      "models_mentioned": [
+        "avalon-q"
+      ]
+    },
+    {
+      "id": "hist-followup",
+      "pass": false,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "2 sentences, 34 words (max 4/90)"
+        },
+        {
+          "check": "trend",
+          "pass": true,
+          "why": "says cheaper"
+        },
+        {
+          "check": "history_prices",
+          "pass": false,
+          "why": "$249.99 -> $229.99 (change -20) not found in [229.99]"
+        },
+        {
+          "check": "in_data",
+          "pass": true,
+          "why": "in_data=True, expected True"
+        },
+        {
+          "check": "tool",
+          "pass": false,
+          "why": "expected get_price_history {'miner': 'nerdqaxe-pp'}, got get_miner {'miner': 'NerdQaxe++'}"
+        }
+      ],
+      "question": "Has it gone up or down over the last 30 days?",
+      "ok": true,
+      "answer": "I don't have price history for the NerdQaxe++, so I can't tell whether it has gone up or down over the last 30 days. Its current cheapest in-stock price is $229.99 at Bitcoin Merch.",
+      "ms": 2865,
+      "in_data": true,
+      "tools_used": [
+        {
+          "name": "get_miner",
+          "input": {
+            "miner": "NerdQaxe++"
+          },
+          "ok": true
+        }
+      ],
+      "models_mentioned": [
+        "nerdqaxe-pp"
+      ]
+    },
+    {
+      "id": "hist-unknown-miner",
+      "pass": true,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "2 sentences, 35 words (max 4/90)"
+        },
+        {
+          "check": "not_found",
+          "pass": true,
+          "why": "says it isn't in the data"
+        },
+        {
+          "check": "not_match",
+          "pass": true,
+          "why": "clean"
+        }
+      ],
+      "question": "Has the Antminer S21 gotten cheaper this month?",
+      "ok": true,
+      "answer": "I couldn't find any Antminer S21 listings on Bitaxe Radar, so I can't check its price trend. The data I have also doesn't include price history, so I can't tell whether it changed this month.",
+      "ms": 3582,
+      "in_data": true,
+      "tools_used": [
+        {
+          "name": "get_miner",
+          "input": {
+            "miner": "Antminer S21"
+          },
+          "ok": false
+        },
+        {
+          "name": "search_miners",
+          "input": {
+            "sort_by": "price",
+            "brand": "Antminer S21",
+            "in_stock_only": false,
+            "limit": 10
+          },
+          "ok": true
+        }
+      ],
+      "models_mentioned": []
+    }
+  ]
+}

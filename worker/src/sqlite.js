@@ -8,6 +8,11 @@ import initSqlJs from "sql.js/dist/sql-wasm-browser.js";
 import wasmModule from "sql.js/dist/sql-wasm-browser.wasm";
 import { wrapSqlJs } from "./sqlwrap.js";
 
+// Bug 2: the browser build then crashed with "Cannot read properties of undefined (reading 'href')". It sees a
+// "web worker" (WorkerGlobalScope exists) and reads self.location.href to find its files. Browsers' workers have
+// a location; Cloudflare Workers don't. We hand sql.js the .wasm ourselves, so any placeholder URL is fine.
+if (!globalThis.location) globalThis.location = new URL("https://worker.invalid/");
+
 let SQL = null;
 export async function openDb(bytes, sqlText) {
   if (!SQL) {

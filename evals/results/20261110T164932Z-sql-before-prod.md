@@ -1,0 +1,12 @@
+# Eval run 20261110T164932Z-sql-before-prod
+
+**Score: 1/6 cases** (24/33 checks). Endpoint `https://bitaxe-radar-alerts.bitaxeradar.workers.dev/ask`, data from 2026-11-10T12:17:52Z.
+
+| | Case | Failed checks | Answer |
+|---|---|---|---|
+| ❌ | `hist-gamma-month` | **history_prices**: $119.99 -> $67 (change -52.99) not found in [67.0, 112.0, 156.0]; **tool**: expected get_price_history {'miner': 'bitaxe-gamma'}, got get_miner {'miner': 'Bitaxe Gamma'} | I can't tell whether the Bitaxe Gamma got cheaper this month, since I only have current prices and no price history. Right now its cheapest in-stock price is $67 at Solo Satoshi (no stand, North America power supply), with other shops listed from about $112 to $156. |
+| ❌ | `hist-lowest-ever` | **tool**: expected get_price_history , got get_miner {'miner': 'NerdQaxe++'} | I can't confirm the all-time low, since my data only shows current prices. Right now the NerdQaxe++ (4.8 TH/s) is cheapest at Bitcoin Merch for $229.99 in stock. Solo Satoshi listed it at $210.99, but that listing is currently out of stock. |
+| ❌ | `hist-cheapest-shop` | **tool**: expected get_price_history , got get_miner {'miner': 'Avalon Q'} | I can only see current prices for the Canaan Avalon Q, not its history over the last month. Right now Solo Satoshi is cheapest at about $1,398, with Altair Technology at about $1,399. The one-dollar gap is small, so the usual cheapest shop can't be confirmed from this data. |
+| ❌ | `hist-week` | **trend**: expected the answer to say it got cheaper; **history_prices**: $1499 -> $1398 (change -101) not found in [1398.0, 1399.0]; **tool**: expected get_price_history {'days': 7}, got get_miner {'miner': 'Avalon Q'} | I can't tell whether the Avalon Q price changed in the last 7 days, since my data only shows current prices. Right now it's $1,398 at Solo Satoshi and $1,399 at Altair Technology, both in stock. |
+| ❌ | `hist-followup` | **history_prices**: $249.99 -> $229.99 (change -20) not found in [229.99]; **tool**: expected get_price_history {'miner': 'nerdqaxe-pp'}, got get_miner {'miner': 'NerdQaxe++'} | I don't have price history for the NerdQaxe++, so I can't tell whether it has gone up or down over the last 30 days. Its current cheapest in-stock price is $229.99 at Bitcoin Merch. |
+| ✅ | `hist-unknown-miner` |  | I couldn't find any Antminer S21 listings on Bitaxe Radar, so I can't check its price trend. The data I have also doesn't include price history, so I can't tell whether it changed this month. |

@@ -19,7 +19,10 @@
 import { handleAsk } from "./ask.js";
 // SQLite (sql.js) for the get_price_history tool. Loaded lazily: it imports a .wasm file, which only the
 // Worker bundler understands. A static import would break the Node unit tests that import this file.
-const openDb = async (bytes) => (await import("./sqlite.js")).openDb(bytes);
+// Bug 3: this line once read `async (bytes) => ...openDb(bytes)` and silently dropped the 2nd argument (the SQL
+// text), so the test Worker opened an EMPTY database: "no such table: price_snapshots". Pass everything through.
+export const lazyOpenDb = (load) => async (...args) => (await load()).openDb(...args);
+const openDb = lazyOpenDb(() => import("./sqlite.js"));
 
 const ALLOWED_ORIGINS = ["https://bitaxeradar.com", "https://www.bitaxeradar.com", "https://yostoo.github.io"];
 const FROM = "Bitaxe Radar <alerts@bitaxeradar.com>";
