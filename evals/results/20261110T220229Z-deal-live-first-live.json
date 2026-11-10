@@ -1,0 +1,289 @@
+{
+ "summary": {
+  "mode": "live",
+  "model": "claude-haiku-5-5",
+  "when": "2026-11-10T22:02:29Z",
+  "passed": 11,
+  "total": 11,
+  "first_try_ok": 10,
+  "fallbacks": 1,
+  "cost_usd": 0.01295
+ },
+ "rows": [
+  {
+   "id": "clear-drop",
+   "passed": true,
+   "problems": [],
+   "source": "ai",
+   "first_try_ok": true,
+   "first_try_problems": [],
+   "guard_first": [],
+   "calls": 3,
+   "tools": [
+    "rank_price_drops",
+    "compare_to_average",
+    "get_price_history"
+   ],
+   "cost_usd": 0.00121,
+   "published": {
+    "no_standout": false,
+    "miner_id": "bitaxe-gamma",
+    "retailer_name": "Solo Satoshi",
+    "price_usd": 59.99,
+    "drop_pct": 10.5,
+    "headline": "Bitaxe Gamma drops to $60 at Solo Satoshi, a new low",
+    "summary": "The Bitaxe Gamma (601/602) is $59.99 at Solo Satoshi today, against a typical price of $67. That is the lowest price we've logged for it, and it had held at $67 from late October until now."
+   }
+  },
+  {
+   "id": "biggest-drop-sold-out",
+   "passed": true,
+   "problems": [],
+   "source": "ai",
+   "first_try_ok": true,
+   "first_try_problems": [],
+   "guard_first": [],
+   "calls": 3,
+   "tools": [
+    "rank_price_drops",
+    "compare_to_average",
+    "get_price_history"
+   ],
+   "cost_usd": 0.00117,
+   "published": {
+    "no_standout": false,
+    "miner_id": "hammer-bc04",
+    "retailer_name": "Altair Technology",
+    "price_usd": 204.25,
+    "drop_pct": 5.0,
+    "headline": "Hammer Miner BC04 at $204 from Altair, a new low",
+    "summary": "Hammer Miner BC04 is $204.25 at Altair Technology today, 5.0% below its typical $215. It is the lowest price we've logged, after holding at $215 for two weeks."
+   }
+  },
+  {
+   "id": "no-deal-flat",
+   "passed": true,
+   "problems": [],
+   "source": "ai",
+   "first_try_ok": true,
+   "first_try_problems": [],
+   "guard_first": [],
+   "calls": 2,
+   "tools": [
+    "rank_price_drops"
+   ],
+   "cost_usd": 0.00072,
+   "published": {
+    "no_standout": true,
+    "miner_id": "",
+    "retailer_name": "",
+    "price_usd": 0,
+    "drop_pct": 0,
+    "headline": "No deal of the day today",
+    "summary": "No miner is 3% or more below its typical price today. The biggest move is under 1%, so there is no standout deal."
+   }
+  },
+  {
+   "id": "one-day-spike",
+   "passed": true,
+   "problems": [],
+   "source": "ai",
+   "first_try_ok": true,
+   "first_try_problems": [],
+   "guard_first": [],
+   "calls": 3,
+   "tools": [
+    "rank_price_drops",
+    "compare_to_average",
+    "get_price_history"
+   ],
+   "cost_usd": 0.00122,
+   "published": {
+    "no_standout": false,
+    "miner_id": "bitaxe-gamma-duo",
+    "retailer_name": "Solo Satoshi",
+    "price_usd": 107.22,
+    "drop_pct": 4.0,
+    "headline": "Bitaxe Gamma Duo (650) at a new low of $107",
+    "summary": "The Bitaxe Gamma Duo (650) is $107 at Solo Satoshi, 4.0% below its typical $112. It is the lowest we've logged, and the earlier price held for about two weeks."
+   }
+  },
+  {
+   "id": "fx-noise",
+   "passed": true,
+   "problems": [],
+   "source": "ai",
+   "first_try_ok": true,
+   "first_try_problems": [],
+   "guard_first": [],
+   "calls": 3,
+   "tools": [
+    "rank_price_drops",
+    "compare_to_average",
+    "get_price_history"
+   ],
+   "cost_usd": 0.00125,
+   "published": {
+    "no_standout": false,
+    "miner_id": "nerdqaxe-pp",
+    "retailer_name": "Bitcoin Merch",
+    "price_usd": 221.94,
+    "drop_pct": 3.5,
+    "headline": "NerdQaxe++ (4.8 TH/s) at new low: $222 at Bitcoin Merch",
+    "summary": "NerdQaxe++ (4.8 TH/s) is in stock at Bitcoin Merch for $221.94, against a typical $229.99. That is a 3.5% drop and the lowest price we've logged. The price sat at $229.99 for two weeks before today."
+   }
+  },
+  {
+   "id": "tie-new-low",
+   "passed": true,
+   "problems": [],
+   "source": "ai",
+   "first_try_ok": true,
+   "first_try_problems": [],
+   "guard_first": [],
+   "calls": 3,
+   "tools": [
+    "rank_price_drops",
+    "compare_to_average",
+    "get_price_history"
+   ],
+   "cost_usd": 0.00122,
+   "published": {
+    "no_standout": false,
+    "miner_id": "avalon-mini-3",
+    "retailer_name": "Altair Technology",
+    "price_usd": 752,
+    "drop_pct": 6.0,
+    "headline": "Canaan Avalon Mini 3 down 6% to a new low at Altair",
+    "summary": "The Canaan Avalon Mini 3 is $752 at Altair Technology today, versus a typical $800. It is the lowest price we've logged, and it held at $800 for two weeks before this drop."
+   }
+  },
+  {
+   "id": "new-listing-short-history",
+   "passed": true,
+   "problems": [],
+   "source": "ai",
+   "first_try_ok": true,
+   "first_try_problems": [],
+   "guard_first": [],
+   "calls": 3,
+   "tools": [
+    "rank_price_drops",
+    "compare_to_average",
+    "get_price_history"
+   ],
+   "cost_usd": 0.00119,
+   "published": {
+    "no_standout": false,
+    "miner_id": "bitaxe-gamma",
+    "retailer_name": "Solo Satoshi",
+    "price_usd": 63.99,
+    "drop_pct": 4.5,
+    "headline": "Bitaxe Gamma at Solo Satoshi: $64, lowest we've logged",
+    "summary": "Bitaxe Gamma (601/602) is $63.99 at Solo Satoshi today, about 4.5% below its typical $67. It held at $67 from Oct 27 through Nov 9, so this is a new low, and the lowest we've logged."
+   }
+  },
+  {
+   "id": "stale-price",
+   "passed": true,
+   "problems": [],
+   "source": "ai",
+   "first_try_ok": true,
+   "first_try_problems": [],
+   "guard_first": [],
+   "calls": 3,
+   "tools": [
+    "rank_price_drops",
+    "compare_to_average",
+    "get_price_history"
+   ],
+   "cost_usd": 0.00117,
+   "published": {
+    "no_standout": false,
+    "miner_id": "hammer-bc04",
+    "retailer_name": "Altair Technology",
+    "price_usd": 204.25,
+    "drop_pct": 5.0,
+    "headline": "Hammer Miner BC04 drops to a new low at $204",
+    "summary": "Hammer Miner BC04 is $204 at Altair Technology today, 5.0% below its typical $215. It has been at $215 for the past two weeks, and this is the lowest price we've logged."
+   }
+  },
+  {
+   "id": "just-under-threshold",
+   "passed": true,
+   "problems": [],
+   "source": "ai",
+   "first_try_ok": true,
+   "first_try_problems": [],
+   "guard_first": [],
+   "calls": 2,
+   "tools": [
+    "rank_price_drops"
+   ],
+   "cost_usd": 0.00072,
+   "published": {
+    "no_standout": true,
+    "miner_id": "",
+    "retailer_name": "",
+    "price_usd": 0,
+    "drop_pct": 0,
+    "headline": "No deal today: no miner is 3% below its typical price",
+    "summary": "No miner is 3% or more below its typical price today, so there is no deal of the day. We are not recommending any purchase today."
+   }
+  },
+  {
+   "id": "shop-switch",
+   "passed": true,
+   "problems": [],
+   "source": "ai",
+   "first_try_ok": true,
+   "first_try_problems": [],
+   "guard_first": [],
+   "calls": 3,
+   "tools": [
+    "rank_price_drops",
+    "compare_to_average",
+    "get_price_history"
+   ],
+   "cost_usd": 0.00124,
+   "published": {
+    "no_standout": false,
+    "miner_id": "nerdqaxe-pp",
+    "retailer_name": "Solo Satoshi",
+    "price_usd": 211.59,
+    "drop_pct": 8.0,
+    "headline": "NerdQaxe++ (4.8 TH/s) down 8% at Solo Satoshi",
+    "summary": "NerdQaxe++ (4.8 TH/s) is $211.59 at Solo Satoshi today, versus a typical $229.99. That is the lowest we've logged, and the price held at $229.99 for the two weeks before today."
+   }
+  },
+  {
+   "id": "not-lowest-ever",
+   "passed": true,
+   "problems": [],
+   "source": "template",
+   "first_try_ok": false,
+   "first_try_problems": [
+    "claims lowest ever, data says no"
+   ],
+   "guard_first": [
+    "says lowest ever, but we logged 99.0 on 2026-10-20"
+   ],
+   "calls": 4,
+   "tools": [
+    "rank_price_drops",
+    "compare_to_average",
+    "get_price_history"
+   ],
+   "cost_usd": 0.00184,
+   "published": {
+    "no_standout": false,
+    "miner_id": "bitaxe-gamma-duo",
+    "retailer_name": "Solo Satoshi",
+    "price_usd": 106.11,
+    "drop_pct": 5.0,
+    "headline": "5% off its typical price at Solo Satoshi",
+    "summary": "It's $106.11 today, in stock at Solo Satoshi. Its typical price over the last 14 days was $111.69, so that's $5.58 (5%) less."
+   }
+  }
+ ]
+}
