@@ -4161,7 +4161,7 @@ def build_ask():
 <section class="ask-composer ask-reveal" aria-labelledby="ask-q-label">
 <form id="ask-form">
 <label id="ask-q-label" for="ask-q">Your question</label>
-<textarea id="ask-q" name="question" maxlength="300" rows="2" required autocomplete="off" placeholder="What's the cheapest miner with at least 1 TH/s in stock?"></textarea>
+<textarea id="ask-q" name="question" maxlength="300" rows="2" required autocomplete="off" enterkeyhint="send" placeholder="What's the cheapest miner with at least 1 TH/s in stock?"></textarea>
 <div class="ask-bar">
 <span class="ask-count" aria-live="polite"><span id="ask-count">0</span>/300</span>
 <button class="btn ask-submit" type="submit"><span class="ask-submit-label">Ask</span></button>

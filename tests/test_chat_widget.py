@@ -117,6 +117,17 @@ class ChatWidget(unittest.TestCase):
         api = (SITE / "ask-api.js").read_text()
         self.assertIn("history", api)
 
+    def test_enter_submits_question(self):
+        # Enter sends; Shift+Enter keeps a newline. IME composition is ignored.
+        js = (SITE / "chat-widget.js").read_text()
+        self.assertIn('enterkeyhint="send"', js)
+        self.assertIn("isComposing", js)
+        self.assertIn("keyCode === 229", js)
+        self.assertIn('e.key !== "Enter" || e.shiftKey', js)
+        self.assertIn("requestSubmit", js)
+        self.assertIn("busy", js)
+        self.assertIn('!(input.value || "").trim()', js)
+
 
 if __name__ == "__main__":
     unittest.main()

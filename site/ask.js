@@ -148,10 +148,12 @@
 
   box.addEventListener("input", function () { updateCount(); grow(); });
   box.addEventListener("keydown", function (e) {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      form.requestSubmit ? form.requestSubmit() : form.dispatchEvent(new Event("submit", { cancelable: true }));
-    }
+    // Enter sends the question; Shift+Enter inserts a newline. Ignore IME composition.
+    if (e.isComposing || e.keyCode === 229) return;
+    if (e.key !== "Enter" || e.shiftKey) return;
+    e.preventDefault();
+    if ((btn && btn.disabled) || !(box.value || "").trim()) return;
+    form.requestSubmit ? form.requestSubmit() : form.dispatchEvent(new Event("submit", { cancelable: true }));
   });
 
   document.querySelectorAll(".ask-chip").forEach(function (chip) {

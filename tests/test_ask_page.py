@@ -78,5 +78,15 @@ class AskPage(unittest.TestCase):
         self.assertIn("ask-badge", self.js)
 
 
+    def test_enter_submits_question(self):
+        # Enter sends; Shift+Enter keeps a newline. IME composition is ignored.
+        self.assertIn('enterkeyhint="send"', self.html)
+        self.assertIn("isComposing", self.js)
+        self.assertIn("keyCode === 229", self.js)
+        self.assertIn('e.key !== "Enter" || e.shiftKey', self.js)
+        self.assertIn("requestSubmit", self.js)
+        self.assertIn('!(box.value || "").trim()', self.js)
+        self.assertIn("btn.disabled", self.js)
+
 if __name__ == "__main__":
     unittest.main()

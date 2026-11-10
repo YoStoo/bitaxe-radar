@@ -90,7 +90,7 @@
     '<div class="ra-msgs" id="radar-ask-msgs" aria-live="polite"></div>' +
     '<form class="ra-form" id="radar-ask-form">' +
       '<label class="sr" for="radar-ask-input">Your question</label>' +
-      '<textarea id="radar-ask-input" maxlength="300" rows="2" placeholder="Ask about miners, prices, or which one to get…" required></textarea>' +
+      '<textarea id="radar-ask-input" maxlength="300" rows="2" enterkeyhint="send" placeholder="Ask about miners, prices, or which one to get…" required></textarea>' +
       '<button type="submit" class="ra-send" aria-label="Send">Ask</button>' +
     '</form>' +
     '<p class="ra-foot">AI can be wrong. Check the miner page before you buy.</p>';
@@ -441,6 +441,14 @@
   form.addEventListener("submit", function (e) {
     e.preventDefault();
     submitQ(input.value);
+  });
+  input.addEventListener("keydown", function (e) {
+    // Enter sends the question; Shift+Enter inserts a newline. Ignore IME composition.
+    if (e.isComposing || e.keyCode === 229) return;
+    if (e.key !== "Enter" || e.shiftKey) return;
+    e.preventDefault();
+    if (busy || !(input.value || "").trim()) return;
+    form.requestSubmit ? form.requestSubmit() : form.dispatchEvent(new Event("submit", { cancelable: true }));
   });
   input.addEventListener("focus", function () {
     if (!open) return;
