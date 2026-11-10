@@ -719,6 +719,11 @@ MODEL_IMG = {
     "hammer-thor-x1": (646, 800, "Hammer Miner Thor X1 desk Bitcoin miner on green Hammer stand"),
     "hammer-bc01": (721, 760, "Hammer Miner BC01 desk Bitcoin miner on green Hammer stand"),
     "gekko-terminus-a2x": (669, 800, "GekkoScience Terminus A2X 7.2 TH/s desk pod Bitcoin miner"),
+    "nerdoctaxe": (680, 800, "NerdOCTAXE Gamma eight-chip Bitcoin miner with two fans and a color screen"),
+    "dcentral-stealthminer": (800, 589, "StealthMiner black enclosure Bitcoin miner with four top fans"),
+    "nerdqx": (800, 508, "NerdQX 8 TH/s home Bitcoin miner with a white tower cooler and screen"),
+    "gekko-kbeast-50": (800, 480, "GekkoScience KBeast 50 TH/s Bitcoin miner and heater in a black mesh case"),
+    "bitaxe-ultra": (481, 800, "Bitaxe Ultra 204 open-source Bitcoin miner board with fan and OLED screen"),
 }
 MODEL_IMG = {k: v for k, v in MODEL_IMG.items() if (SITE / "img" / "models" / f"{k}.webp").exists()}
 
