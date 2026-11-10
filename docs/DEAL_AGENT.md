@@ -260,6 +260,13 @@ Numbered after the earlier stories (#1–#33).
 - *Fix:* a mention right after "not", "n't" or "no longer" isn't a claim. Tests cover the denials, plus "Not bad: the lowest price we've ever logged", which is still a claim. Regrading the logged first tries with the fixed checkers (offline, no new spend) gives first try 11/11.
 - *Lesson:* the eval caught a bug in the checker, not the model. This is the same lesson as the chat evals: read the failing answer before you "fix" the AI.
 
+**42. Two deploy runs fought over the same data files**
+- *Symptom:* while I pushed fixes quickly, one collect-and-deploy run (42911069058) failed with `CONFLICT (content): Merge conflict in data/latest.json`, and the same in `prices.sql`, `network.json`, `solo_wins.json` and `site/data.js`.
+- *What I assumed:* "no queue". But the workflow already had `concurrency: {group: pages, cancel-in-progress: false}`, and the run log showed it worked: the second run started at 22:05:51, 3 seconds after the first finished.
+- *Cause:* a queued run checks out the commit that **triggered** it (`820609c`), not the current main. The first run had added `data: update prices` (`f3a8196`) in the meantime. So the second run collected fresh prices on top of old data files, and its rebase hit a conflict on every generated file.
+- *Fix:* `actions/checkout` with `ref: main`, so every run starts from the current tip and its data commit lands on top of the previous one. The queue stays as it was: never cancel, so a scheduled collect is never killed. The manual `deal-evals` workflow also checks out main. It only adds new files under `evals/results/`, so it can't conflict and doesn't need the same queue.
+- *Lesson:* check the evidence before you add the obvious fix. "Add a concurrency group" was already done; the bug was one line below it.
+
 ---
 
 ## 30-second interview pitch

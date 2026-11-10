@@ -7,13 +7,19 @@ permissions:
   contents: write
   pages: write
   id-token: write
+# One run at a time: a run that starts while another is going waits in line, and is never cancelled (a scheduled
+# collect is never killed). Note: GitHub keeps only ONE waiting run per group; a newer one replaces an older waiting one.
 concurrency: {group: pages, cancel-in-progress: false}
 jobs:
   collect:
     runs-on: ubuntu-latest
     outputs: {indexnow_urls: "${{ steps.inow.outputs.urls }}"}
     steps:
+      # Check out the CURRENT tip of main, not the commit that triggered the run. A queued run otherwise starts from an
+      # old commit that lacks the previous run's "data: update prices" commit, and its own data commit then conflicts
+      # on every data file (interview story #42).
       - uses: actions/checkout@v4
+        with: {ref: main}
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
       - run: python3 collector/collect.py
