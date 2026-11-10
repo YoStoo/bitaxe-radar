@@ -556,3 +556,76 @@ body.ra-ask-lock{position:fixed;left:0;right:0;width:100%}
 .dotd .ph.dotd-note{margin-top:10px}
 .dotd-now{color:var(--warn)}
 @media (max-width:520px){.dotd{padding:14px}.dotd-price b{font-size:28px}}
+
+/* Eval dashboard (/evals/) */
+.eval-scores{display:flex;flex-wrap:wrap;gap:12px;margin:18px 0 8px}
+.eval-score{flex:1 1 200px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px}
+.eval-score .k{display:block;color:var(--accent-2);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.eval-score b{display:block;font-size:36px;font-weight:850;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1.1}
+.eval-score b.ok{color:var(--good)}
+.eval-score b.mid{color:var(--warn)}
+.eval-score b.bad{color:var(--bad)}
+.eval-score .sub{color:var(--muted);font-size:13px;margin-top:6px}
+.eval-ba{display:flex;flex-wrap:wrap;gap:12px;margin:18px 0}
+.eval-ba article{flex:1 1 calc(50% - 12px);min-width:min(100%,240px);background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+.eval-ba h3{margin:0 0 8px}
+.eval-ba .arrow{color:var(--muted);margin:0 6px}
+.eval-ba .from{color:var(--bad);font-weight:800;font-variant-numeric:tabular-nums}
+.eval-ba .to{color:var(--good);font-weight:800;font-variant-numeric:tabular-nums}
+.eval-chart{margin:16px 0}
+.eval-pass{color:var(--good);font-weight:700}
+.eval-fail{color:var(--bad);font-weight:700}
+tr.eval-fail-row{background:var(--bad-bg)}
+.eval-why{color:var(--muted);font-size:13px;margin-top:4px}
+.eval-q code{font-size:12.5px}
+@media (max-width:700px){
+  .eval-score b{font-size:30px}
+  .eval-ba .from,.eval-ba .to{font-size:22px}
+}
+
+/* Eval dashboard motion and hiring-manager summary */
+.eval-meaning{max-width:46rem;font-size:clamp(16px,2.2vw,19px);line-height:1.5;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:var(--r);padding:16px 18px;margin:18px 0 4px}
+.eval-meaning b{font-variant-numeric:tabular-nums}
+.eval-score{transition:border-color .2s ease,transform .2s ease,box-shadow .2s ease}
+.eval-score:hover{border-color:#3a4d77;transform:translateY(-3px);box-shadow:0 10px 28px rgba(0,0,0,.28)}
+.eval-score .from-line{color:var(--muted);font-size:13px;margin-top:4px}
+.eval-ba article{transition:border-color .2s ease,transform .2s ease,box-shadow .2s ease}
+.eval-ba article:hover{border-color:#3a4d77;transform:translateY(-2px);box-shadow:0 8px 22px rgba(0,0,0,.22)}
+.eval-meter{position:relative;height:10px;background:var(--line);border-radius:99px;overflow:hidden;margin:12px 0 8px}
+.eval-meter-from,.eval-meter-to{position:absolute;left:0;top:0;bottom:0;border-radius:99px}
+.eval-meter-from{background:var(--bad);z-index:2;width:var(--from)}
+.eval-meter-to{background:var(--good);z-index:1;width:var(--to)}
+.eval-fold{margin:12px 0 0;border:1px solid var(--line);border-radius:var(--r);background:var(--panel)}
+.eval-fold summary{cursor:pointer;font-weight:700;padding:14px 18px;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px}
+.eval-fold summary::-webkit-details-marker{display:none}
+.eval-fold summary::after{content:"";width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:transform .25s ease;flex:none}
+.eval-fold[open] summary::after{transform:rotate(225deg)}
+.eval-fold summary:hover{color:var(--accent-2)}
+.eval-fold-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .35s ease}
+.eval-fold[open] .eval-fold-body{grid-template-rows:1fr}
+.eval-fold-body>div{overflow:hidden}
+table.eval-q tbody tr:hover,table.eval-runs tbody tr:hover{background:var(--panel2)}
+.eval-fail-lead{margin:0 0 10px}
+/* Motion only when JS can run and the visitor has not asked to reduce it.
+   Without JS, or with reduced motion, the final state is already visible. */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference){
+  .eval-reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+  .eval-reveal.is-inview{opacity:1;transform:none}
+  .eval-scores .eval-score:nth-child(2){transition-delay:.07s}
+  .eval-scores .eval-score:nth-child(3){transition-delay:.14s}
+  .eval-scores .eval-score:nth-child(4){transition-delay:.21s}
+  .eval-meter-from,.eval-meter-to{width:0}
+  .eval-ba article.is-inview .eval-meter-from{width:var(--from);transition:width .8s cubic-bezier(.22,.8,.28,1)}
+  .eval-ba article.is-inview .eval-meter-to{width:var(--to);transition:width 1s cubic-bezier(.22,.8,.28,1) .12s}
+  .eval-line{stroke-dasharray:1;stroke-dashoffset:1}
+  .eval-chart.is-inview .eval-line{animation:eval-draw 1.15s cubic-bezier(.22,.8,.28,1) forwards}
+  .eval-dot{opacity:0}
+  .eval-chart.is-inview .eval-dot{animation:eval-fade .4s ease forwards;animation-delay:calc(var(--i,0) * 80ms + 400ms)}
+  @keyframes eval-draw{to{stroke-dashoffset:0}}
+  @keyframes eval-fade{to{opacity:1}}
+}
+@media (prefers-reduced-motion:reduce){
+  .eval-reveal,.eval-score,.eval-ba article{opacity:1;transform:none;transition:none;box-shadow:none}
+  .eval-score:hover,.eval-ba article:hover{transform:none}
+  .eval-fold-body,.eval-fold summary::after{transition:none}
+}

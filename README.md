@@ -17,7 +17,7 @@ The site checks shops every 6 hours and publishes a static site. A Cloudflare Wo
 - **SQL price history.** A SQLite database (miners, retailers, offers, daily price snapshots) updated every collector run, idempotently. The chat's `get_price_history` tool queries it. See [SQL, explained simply](docs/SQL.md).
 - **RAG over the guides.** 114 guide passages, hybrid search (Workers AI embeddings + BM25, merged with reciprocal rank fusion), top 3 passages to Claude, citations checked in code. See [RAG, explained simply](docs/RAG.md).
 - **Deal of the Day agent.** Once a day, after prices are collected, Claude runs a tool loop over today's prices and the SQL history, picks the in-stock miner furthest below its 14-day typical price, and writes a short summary. Code checks every price, % and shop before it's published, with one retry, then a template fallback. See [Deal agent, explained simply](docs/DEAL_AGENT.md). It only appears on days with a real deal (3%+ under typical); on other days the site shows nothing.
-- **Evals.** 48 code-graded cases that check rankings, follow-ups, refusals, prompt injection, price history, and RAG retrieval, citations, grounding and "I don't know". See the scores below.
+- **Evals.** 48 code-graded cases that check rankings, follow-ups, refusals, prompt injection, price history, and RAG retrieval, citations, grounding and "I don't know". See the scores below. A public dashboard (branch `feature/eval-dashboard`, not live yet) charts those scores over time and lists which questions failed: [Eval dashboard, explained simply](docs/EVAL_DASHBOARD.md).
 
 ## How the AI chat works
 
@@ -59,7 +59,7 @@ After the two bot fixes, a live run scored **32/32** (156/156 checks). One full 
 
 Then 6 price-history cases and 11 RAG cases were added (48 total). Before, the live chat scored 1/6 on history and 0/11 on RAG. On a test Worker, the full suite scored 47/48. The one failure was a code bug of mine: a guide citation was flipping a general-knowledge answer to "from our data", and I fixed it. The first live run after launch (Nov 10) scored 15/17 on the new cases. Two guide-grounded answers were labeled "not from our data". A one-line fix to the `in_data` field description made that 7/7 on a live re-check. Details: [SQL](docs/SQL.md), [RAG](docs/RAG.md).
 
-Walkthrough: [Evals, explained simply](docs/EVALS.md).
+Walkthrough: [Evals, explained simply](docs/EVALS.md). The public score page is documented in [Eval dashboard, explained simply](docs/EVAL_DASHBOARD.md) and will live at `/evals/` once this branch is approved.
 
 ## The Deal of the Day agent
 
@@ -169,6 +169,7 @@ These are the ones I would talk through in an interview. The full list is in the
 
 - [Tool calling, explained simply](docs/TOOL_CALLING.md)
 - [Evals, explained simply](docs/EVALS.md)
+- [Eval dashboard, explained simply](docs/EVAL_DASHBOARD.md)
 - [SQL price history, explained simply](docs/SQL.md)
 - [RAG, explained simply](docs/RAG.md)
 - [Deal of the Day agent, explained simply](docs/DEAL_AGENT.md)

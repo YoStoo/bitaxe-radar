@@ -9,7 +9,7 @@ Outputs
   site/models/<id>/index.html       one pre-rendered page per tracked model
   site/compare/<a>-vs-<b>/          model-vs-model pages
   site/sellers/<id>/                one page per tracked seller
-  site/where-to-buy-bitaxe/, site/in-stock/, site/deals/, site/how-we-track/, site/advertise/
+  site/where-to-buy-bitaxe/, site/in-stock/, site/deals/, site/how-we-track/, site/evals/, site/advertise/
   site/deals/daily/                 deal of the day archive (data/deals_history.json, written by `python3 -m deal_agent`)
   site/sitemap.xml, site/robots.txt, site/404.html
 
@@ -18,6 +18,7 @@ spec context, buying checklists and honest caveats. Pages that would be thin are
 """
 import html as _html
 import json
+import sys
 import math
 import re
 from zoneinfo import ZoneInfo
@@ -893,7 +894,7 @@ FOOT_GROUPS = [
                 ("/solo-odds/", "Solo odds"), ("/solo-wins/", "Solo wins"), ("/heat-calculator/", "Room heat calculator"), ("/deals/", "Deals"), ("/price-per-th/", "Price per TH/s"), ("/in-stock/", "In stock now"), ("/find-my-miner/", "Find my miner")]),
     ("Help", [("/guides/", "Guides"), ("/best/", "Best for…"), ("/compare/", "Compare"), ("/sellers/", "Shops"),
               ("/where-to-buy-bitaxe/", "Where to buy"), ("/alerts/", "Price alerts"), ("/newsletter/", "Newsletter")]),
-    ("About", [("/how-we-track/", "About & how we track"), ("/advertise/", "Advertise"), ("/bitaxe-black-friday/", "Black Friday 2026"), (f"mailto:{CONTACT}", CONTACT)]),
+    ("About", [("/how-we-track/", "About & how we track"), ("/evals/", "Eval scores"), ("/advertise/", "Advertise"), ("/bitaxe-black-friday/", "Black Friday 2026"), (f"mailto:{CONTACT}", CONTACT)]),
 ]
 
 
@@ -3784,6 +3785,8 @@ def build_method():
 <section><h2>How Bitaxe Radar earns money</h2>
 <p>Some shop links are affiliate links: if you buy through one, we may earn a commission at no extra cost to you. They're labelled "affiliate link" and never change prices, rankings or sort order. Any sponsored placement is clearly labelled (see <a href="/advertise/">advertise</a>).</p>
 <p>We don't publish ratings or reviews, because we haven't tested the hardware, and nothing here is financial advice. Solo mining with a small miner is a lottery: once you count electricity, you should expect to lose money.</p></section>
+<section><h2>How we check the AI chat</h2>
+<p>Ask Bitaxe Radar is tested with automatic quizzes. Code grades every answer against today's prices and the price-history database. <a href="/evals/">See the scores over time, and which questions failed</a>.</p></section>
 <section><h2>Spotted a mistake?</h2><p>Write to <a href="mailto:{CONTACT}">{CONTACT}</a>. Shops can ask us to correct a listing the same way.</p></section>
 </article>"""
     ld = {"@context": "https://schema.org", "@type": "AboutPage", "name": "How Bitaxe Radar tracks prices and stock", "url": BASE + path, "dateModified": METHODOLOGY_UPDATED}
@@ -4297,6 +4300,38 @@ def build_indexes():
            body, crumbs=[("Home", "/"), ("Guides", "/guides/")])
 
 
+
+def load_eval_history():
+    """Rebuild data/eval_history.json from saved result files, then load it.
+    A failure falls back to the committed file so a history-script bug cannot
+    block the rest of the site build."""
+    path = ROOT / "data" / "eval_history.json"
+    try:
+        sys.path.insert(0, str(ROOT / "evals"))
+        import build_history  # noqa: E402
+        return build_history.rebuild()
+    except Exception as e:
+        print(f"eval history rebuild failed: {e}")
+        if path.exists():
+            return json.loads(path.read_text())
+        return {"suites": [], "milestones": [], "runs": [], "notes": []}
+
+
+def build_evals():
+    """Public portfolio page: eval scores over time, latest pass/fail, how grading works."""
+    sys.path.insert(0, str(ROOT / "evals"))
+    import render_dashboard as dash  # noqa: E402
+    history = load_eval_history()
+    path = "/evals/"
+    body = dash.page_body(history)
+    layout(path, dash.TITLE, dash.DESC, body,
+           crumbs=[("Home", "/"), ("Eval scores", path)],
+           jsonld=[{"@context": "https://schema.org", "@type": "WebPage",
+                    "name": "Checking the AI's work", "url": BASE + path,
+                    "description": dash.DESC}],
+           scripts='<script src="/evals.js" defer></script>\n')
+
+
 def main():
     BEST.update(best_defs())      # before any page that shows the best-for chips
     for mid in TRACKED:
@@ -4343,6 +4378,7 @@ def main():
     build_heat_calc()
     build_solo_wins()
     build_method()
+    build_evals()
     build_advertise()
     build_404()
     build_home()

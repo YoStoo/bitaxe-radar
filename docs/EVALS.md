@@ -4,6 +4,8 @@
 
 Live since Nov 10, 2026 (Worker `d9f863e3`; rollback target `3f9052e0`).
 
+A public dashboard of these scores (this branch, not live yet) is described in [Eval dashboard, explained simply](EVAL_DASHBOARD.md) and will be at `/evals/` after it is approved.
+
 ---
 
 ## Why AI needs a different kind of test
