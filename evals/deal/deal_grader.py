@@ -14,6 +14,7 @@ import re
 
 MONEY = re.compile(r"\$\s?(\d[\d,]*(?:\.\d+)?)")
 PCT = re.compile(r"(\d+(?:\.\d+)?)\s?%")
+NEGATED = re.compile(r"(?:\bnot|n't|\bno longer)\s+(?:\w+\s+){0,2}$", re.I)
 LOWEST = re.compile(r"lowest[- ](?:price )?ever|all[- ]time low|record low|never been cheaper|lowest (?:price )?we(?:'ve| have)? (?:ever )?(?:seen|logged)", re.I)
 
 
@@ -55,7 +56,8 @@ def grade_deal(deal, pd):
     for n in PCT.findall(text):
         if not _ok_number(n, pct_ok):
             probs.append(f"wrong number {n}%")
-    if LOWEST.search(text) and not f["lowest_ever"]:
+    claimed = any(not NEGATED.search(text[max(0, m.start() - 30):m.start()]) for m in LOWEST.finditer(text))
+    if claimed and not f["lowest_ever"]:
         probs.append("claims lowest ever, data says no")
     return probs
 

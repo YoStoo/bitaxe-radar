@@ -133,7 +133,7 @@ class Tools(unittest.TestCase):
         self.assertNotIn("IGNORE", blob)
 
     def test_low_claim_spells_out_what_may_be_said(self):
-        """Story #39: the live model wrote 'lowest we've logged' while copying lowest_ever = false."""
+        """Story #39: the allowed low-price claim is spelled out in words next to the numbers."""
         out, _ = tools.run_tool(pd_for("not-lowest-ever"), "compare_to_average", {"miner": "bitaxe-gamma-duo"})
         self.assertTrue(out["low_claim"].startswith("NOT the lowest: it was $99.00 on "))
         out, _ = tools.run_tool(pd_for("clear-drop"), "compare_to_average", {"miner": "bitaxe-gamma"})
@@ -195,6 +195,19 @@ class Guard(unittest.TestCase):
         pd = pd_for("not-lowest-ever")
         errs = guard.verify(good_deal(pd, summary="The lowest price we've ever logged for it."), pd)
         self.assertTrue(any("lowest ever" in e for e in errs))
+
+    def test_a_denial_is_not_a_claim(self):
+        """Story #41: the AI wrote "It was cheaper at $99 on 2026-10-20, so this is not a record low." (true) and both
+        checkers flagged it as claiming a record low."""
+        pd = pd_for("not-lowest-ever")
+        honest = good_deal(pd, summary="It's $106.11 at Solo Satoshi. It was cheaper at $99 on 2026-10-20, so this is not a record low.")
+        self.assertEqual(guard.verify(honest, pd), [])
+        self.assertEqual(grader.grade_deal(honest, pd), [])
+        for text in ("It isn't the lowest ever.", "No longer a record low."):
+            self.assertEqual(guard.verify(good_deal(pd, summary=text), pd), [], text)
+        for text in ("A record low at Solo Satoshi.", "Not bad: the lowest price we've ever logged."):
+            self.assertTrue(guard.verify(good_deal(pd, summary=text), pd), text)
+            self.assertTrue(grader.grade_deal(good_deal(pd, summary=text), pd), text)
 
     def test_no_standout_is_checked_both_ways(self):
         self.assertTrue(guard.verify(good_deal(self.pd, no_standout=True, miner_id=""), self.pd))

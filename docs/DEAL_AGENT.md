@@ -8,7 +8,8 @@ site shows it.
 - Runs in: `.github/workflows/collect.yml`, step `deal-of-the-day`
 - Writes: `data/deal_of_the_day.json` and `data/deals_history.json` (one entry per day)
 - Shows on: the homepage card, the top of `/deals/`, and the archive at `/deals/daily/`, **only on days with a real deal**
-- Status: **live on main (merged Nov 10, 2026).** The daily step skips until the `ANTHROPIC_API_KEY` GitHub secret is added.
+- Status: **live on main since Nov 10, 2026, running with Claude.** The first production run (collect-and-deploy run 42910567767) used 2 calls, cost $0.00076, and correctly found no deal.
+- Key: GitHub Actions secret `ANTHROPIC_API_KEY` (Anthropic key `bitaxe-radar-github-deal-agent`). **It expires Dec 10, 2026 and must be renewed before then.** If it expires, the step prints "Claude unavailable" and keeps the previous deal. The site still deploys, but no new deals appear until a new key is saved in the secret.
 
 ---
 
@@ -100,9 +101,12 @@ Shop product titles are never sent to Claude. They're outside text, so they coul
 | Cost per run | hard stop at **$0.02** (counted from the API's own token usage) |
 | Step timeout in GitHub Actions | 3 minutes |
 
-**Cost.** A normal run has about 8,000 input tokens and 600 output tokens. At $0.10 and $0.50 per million,
-that's about **$0.001 per run**, so roughly 3 cents a month at one run a day. That's an estimate from
-measured request sizes; the live token count needs the live run (below).
+**Cost (measured).** At $0.10 and $0.50 per million tokens:
+- a no-deal day takes 2 calls, about 5,500 tokens in and 400 out: **$0.0008**
+- a deal day takes 3 calls: **about $0.0012**
+- a retry adds about $0.0006
+
+That's under 4 cents a month at one run a day.
 
 ### Runs once a day, and never breaks the deploy
 
@@ -171,8 +175,13 @@ A case passes when the published deal:
 python3 evals/deal/run_deal_evals.py --mode before     # before this feature: nothing published
 python3 evals/deal/run_deal_evals.py --mode template   # code only, no AI
 python3 evals/deal/run_deal_evals.py --mode scripted   # fake Claude on the ideal tool path (tests the loop + grader)
-ANTHROPIC_API_KEY=... python3 evals/deal/run_deal_evals.py --mode live   # real Claude; about 1-2 cents for all 11
+ANTHROPIC_API_KEY=... python3 evals/deal/run_deal_evals.py --mode live   # real Claude; about 1.3 cents for all 11
 ```
+
+The key isn't kept on any laptop or build box, so live runs go through GitHub: **Actions → deal-evals → Run workflow**
+(`.github/workflows/deal-evals.yml`, manual only). It runs the live mode with the secret and commits
+`evals/results/<time>-deal-live-<label>.json` and `.md`, the same format as local runs, so the eval dashboard reads them.
+Each result row keeps every `submit_deal` attempt and the checker's problems for it, so a failure can be read, not guessed.
 
 The live run also reports **first-try OK**: how many cases the AI got right *before* the guardrail
 could step in, and how many fell back to the template. That number shows how good the model is.
@@ -185,7 +194,18 @@ The final score shows how safe the system is.
 | Before (feature missing) | **0/11** | no deal is published |
 | Template (no AI) | **11/11** | right by construction. This checks the grader and cases, not the AI. |
 | Scripted fake Claude | **11/11** | the loop, tools, guardrail and grader work end to end |
-| **Live Claude** | **not run yet** | needs the Anthropic key (not on the build machine or in the repo secrets yet). One command once it's available (above). |
+| Live Claude, run 1 (deal-evals 42910594789) | **11/11** published, **first try 10/11** | 1 fell back to the template (`not-lowest-ever`). $0.0130 |
+| Live Claude, run 2 (deal-evals 42911068314), after story #39 | **11/11**, **first try 10/11**, 0 fallbacks | the one first-try "failure" was the AI being right and the checker being wrong (story #41). $0.0134 |
+| Run 2 first tries, regraded offline after the #41 fix (no API calls) | **first try 11/11** | the fixed checkers accept that first answer |
+
+Total live spend on Nov 10: about $0.027 for both eval runs, plus $0.0008 for the production run.
+
+What a "first try" means: Claude's first `submit_deal`, before our checker could reject it and ask for a fix.
+Claude picked the right deal (or rightly said no deal) in all 11 cases on both runs. It made the expected
+3 calls on deal days and 2 on no-deal days, and caught the traps (exchange-rate noise, sold-out, one-day spike, stale price, short history).
+
+An honest caveat about the eval set: 8 of the 9 deal cases are also new all-time lows, because most cases use flat
+histories. So "lowest ever" claims are rarely tested against a "no". More cases where it isn't a low would make the set harder.
 
 ---
 
@@ -221,6 +241,24 @@ Numbered after the earlier stories (#1–#33).
 - *Symptom:* the card said "Bitaxe Gamma (601/602)" while the rest of the site says "Bitaxe Gamma". And the no-deal card on `/deals/` linked to `/deals/`, the page you're already on. (No-deal cards were later removed entirely by design.)
 - *Fix:* the card uses the site's short names, and the "see today's prices" link only shows on the homepage version.
 - *Lesson:* tests check facts; looking at the page checks the experience. Do both.
+
+**39. The first live eval failed a case, and I couldn't see why**
+- *Symptom:* first live run: 11/11 published, but `not-lowest-ever` fell back to the template. The checker flagged "says lowest ever, but we logged $99.00 on 2026-10-20" on both tries.
+- *Cause:* the runner only saved the first try's error messages, not the text Claude actually wrote. So I couldn't tell whether the model overclaimed or the checker misread it.
+- *Fix:* every attempt (headline, summary, flags and the checker's problems) is now saved in the result file. I also made the tool spell the rule out in words next to the numbers, e.g. `low_claim: "NOT the lowest: it was $99.00 on 2026-10-20. Do not say lowest, record, all-time or new low."`, instead of leaving the model to infer it from two true/false fields. And the retry message now asks for a rewrite of both the headline and the summary. One re-run, same answer key.
+- *Lesson:* log what the model said, not only your verdict on it. My first commit message for this blamed the model, before I had the evidence.
+
+**40. A no-deal day quoted a percentage nobody checked**
+- *Symptom:* the first real production run wrote "The biggest move is a 1.1% dip that comes from exchange-rate changes, not a shop price cut."
+- *Cause:* that's true (it's the D-Central StealthMiner from story #34), but on no-deal days the checker only blocked dollar amounts. Any % would have passed.
+- *Fix:* on a no-deal day, a % must be the 3% bar or a real move by some in-stock miner today.
+- *Lesson:* read the first real outputs yourself. The code paths you tested least are the ones the model will use.
+
+**41. The checker couldn't read "not"**
+- *Symptom:* with logging on, the re-run showed the case "failed" its first try on this text: "It was cheaper at $99 on 2026-10-20, so this is **not a record low**." That's exactly right.
+- *Cause:* both the guardrail and the grader matched "record low" with a regex and ignored the "not" in front of it. The model was being honest and got punished, and the retry removed a useful sentence.
+- *Fix:* a mention right after "not", "n't" or "no longer" isn't a claim. Tests cover the denials, plus "Not bad: the lowest price we've ever logged", which is still a claim. Regrading the logged first tries with the fixed checkers (offline, no new spend) gives first try 11/11.
+- *Lesson:* the eval caught a bug in the checker, not the model. This is the same lesson as the chat evals: read the failing answer before you "fix" the AI.
 
 ---
 

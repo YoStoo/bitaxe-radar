@@ -21,6 +21,7 @@ PCT_RE = re.compile(r"(\d+(?:\.\d+)?)\s?(?:%|percent\b)", re.I)
 LOWEST_RE = re.compile(r"lowest[- ](?:price )?ever|all[- ]time low|record low|never been (?:this )?cheaper|"
                        r"lowest (?:price )?(?:we(?:'ve| have)? (?:ever )?(?:seen|logged|tracked|recorded))|cheapest (?:it'?s|it has) ever", re.I)
 NEW_LOW_RE = re.compile(r"\bnew (?:all[- ]time |record )?low\b", re.I)
+NEGATED_RE = re.compile(r"(?:\bnot|n't|\bno longer)\s+(?:\w+\s+){0,2}$", re.I)   # "...is not a record low", "isn't the lowest ever"
 URL_RE = re.compile(r"https?://|www\.|/models/", re.I)
 
 
@@ -74,6 +75,11 @@ def names_in(text, names):
     return found, t
 
 
+def claims(rx, text):
+    """True if text makes the claim. A negated mention ("this is not a record low") is not a claim (interview story #41)."""
+    return any(not NEGATED_RE.search(text[max(0, m.start() - 30):m.start()]) for m in rx.finditer(text))
+
+
 def verify(deal, pd):
     errs = []
     if not isinstance(deal, dict):
@@ -103,7 +109,7 @@ def verify(deal, pd):
         for n in PCT_RE.findall(prose):
             if not any(written_matches(n, v) for v in real_pcts):
                 errs.append(f"{n}% in the text doesn't match any miner's move today")
-        if LOWEST_RE.search(prose) or NEW_LOW_RE.search(prose):
+        if claims(LOWEST_RE, prose) or claims(NEW_LOW_RE, prose):
             errs.append("lowest-ever claim on a no-deal day")
         return errs
 
@@ -142,8 +148,8 @@ def verify(deal, pd):
     wrong_shops = [s for s in shops if s.lower() != f["retailer_name"].lower()]
     if wrong_shops:
         errs.append(f"names a different shop ({', '.join(wrong_shops)}): the price is at {f['retailer_name']}")
-    if LOWEST_RE.search(prose) and not f["lowest_ever"]:
+    if claims(LOWEST_RE, prose) and not f["lowest_ever"]:
         errs.append(f"says lowest ever, but we logged {f['prior_low_usd']} on {f['prior_low_day']}")
-    if NEW_LOW_RE.search(prose) and not f["new_low"]:
+    if claims(NEW_LOW_RE, prose) and not f["new_low"]:
         errs.append("says new low, but today only matches (or is above) an earlier low")
     return errs

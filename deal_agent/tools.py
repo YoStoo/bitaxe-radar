@@ -93,8 +93,8 @@ def _compare_row(f):
     row = {k: f[k] for k in keys} | {"shop": f["retailer_name"]}
     if f["currency"] != "USD":
         row["shop_price"], row["shop_currency"] = f["price"], f["currency"]
-    # Say the low-price claim in words, right next to the numbers. The first live eval wrote "lowest we've logged"
-    # while copying lowest_ever = false into the JSON (interview story #39).
+    # Say the low-price claim in words, right next to the numbers, so the model doesn't have to infer it from two
+    # booleans (added after the first live eval, interview story #39).
     if f["new_low"]:
         row["low_claim"] = "New low: lower than any price we logged before today. You may say 'new low' or 'lowest we've logged'."
     elif f["lowest_ever"]:

@@ -69,7 +69,7 @@ Agents plus automation: a scheduled GitHub Actions job runs `python3 -m deal_age
 2. **Structured output.** `submit_deal` is a strict JSON-schema tool: miner, shop, price, typical price, drop %, lowest-ever, headline, summary.
 3. **Grounding guardrail.** `deal_agent/guard.py` checks the JSON fields against the data, and every `$` and `%` in the text, the shop and miner names, and any "lowest ever" claim. Fail → one retry with the exact errors → fail again → a template written straight from the data. The site never shows a made-up number.
 4. **Caps.** 4 tool rounds, 7 API calls, and $0.02 per run. A normal run is about $0.001. Once a day (US Eastern). No key or an API error keeps yesterday's deal and never blocks the deploy. No real deal = nothing on the site (the no-deal record stays in the data only).
-5. **Evals.** 11 code-graded cases (`evals/deal/`) with answer keys computed from the case data. Traps include exchange-rate noise, one-day spikes, sold-out listings, stale prices and false "lowest ever" claims. Before: 0/11. Template and scripted-loop harness: 11/11. The live-Claude score is pending an API key.
+5. **Evals.** 11 code-graded cases (`evals/deal/`) with answer keys computed from the case data. Traps include exchange-rate noise, one-day spikes, sold-out listings, stale prices and false "lowest ever" claims. Before: 0/11. Live Claude Haiku: 11/11 published and 10/11 on the first try (11/11 after fixing a checker that couldn't read "not"), for about 1.3 cents a run. Live evals run from a manual GitHub Actions workflow (`deal-evals`), because the key lives only in GitHub secrets.
 
 ```bash
 python3 -m deal_agent --dry-run     # needs ANTHROPIC_API_KEY; prints the deal, writes nothing
@@ -113,7 +113,7 @@ flowchart TD
 
 ## Tech stack
 
-- **Python 3** for the collector, the site builder, the eval runner and grader, and 234 unit tests
+- **Python 3** for the collector, the site builder, the eval runner and grader, and 235 unit tests
 - **JavaScript** for the static site (no frontend framework) and the Cloudflare Worker
 - **Claude Haiku** (`claude-haiku-5-5`) through the Messages API, with tool calling
 - **Cloudflare Workers** and KV for `/ask`, alert signups, the daily question counter, and cached embeddings
