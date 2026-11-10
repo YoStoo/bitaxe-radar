@@ -400,10 +400,22 @@ class Render(unittest.TestCase):
         self.assertIn("Sold out since", h)
         self.assertNotIn('class="btn"', h)
 
-    def test_template_and_no_standout_labels(self):
-        h = render.deal_box({**self.REC, "source": "template", "no_standout": True}, None, "")
+    def test_template_label(self):
+        h = render.deal_box({**self.REC, "source": "template"}, {"stock_status": "in_stock", "price_usd_approx": 59.99}, "")
         self.assertIn(render.TEMPLATE_NOTE, h)
         self.assertNotIn(render.AI_NOTE, h)
+
+    def test_no_deal_day_shows_nothing(self):
+        """Shervin's rule: no real deal -> no card, no archive row. The record stays in the data file only."""
+        quiet = {"date": "2026-11-11", "source": "template", "no_standout": True, "headline": "No standout deal today", "summary": "..."}
+        self.assertEqual(render.deal_box(quiet, None, "", compact=True), "")
+        self.assertEqual(render.deal_box(quiet), "")
+        self.assertFalse(render.is_fresh(quiet, "2026-11-11"))
+        self.assertEqual(render.real_deals([quiet, self.REC]), [self.REC])
+        rows = render.archive_rows([quiet, self.REC])
+        self.assertEqual(rows.count("<tr>"), 1)
+        self.assertNotIn("No standout", rows)
+        self.assertEqual(render.archive_rows([quiet]), "")
 
     def test_freshness(self):
         self.assertTrue(render.is_fresh(self.REC, "2026-11-12"))
@@ -418,10 +430,34 @@ class SitePages(unittest.TestCase):
         p = ROOT / "site" / "deals" / "daily" / "index.html"
         if not p.exists():
             raise unittest.SkipTest("run build_site.py first")
-        h = p.read_text()
+        h, deals_page = p.read_text(), (ROOT / "site" / "deals" / "index.html").read_text()
+        home, sitemap = (ROOT / "site" / "index.html").read_text(), (ROOT / "site" / "sitemap.xml").read_text()
+        hist_file = ROOT / "data" / "deals_history.json"
+        real = render.real_deals(json.loads(hist_file.read_text()) if hist_file.exists() else [])
         self.assertIn("How the deal of the day works", h)
-        self.assertIn('href="/deals/daily/" aria-current="page"', h)
-        self.assertIn('href="/deals/daily/"', (ROOT / "site" / "deals" / "index.html").read_text())
+        self.assertNotIn("No standout", h + deals_page + home)          # no-deal days are never public
+        if real:
+            self.assertIn('href="/deals/daily/" aria-current="page"', h)
+            self.assertIn('href="/deals/daily/"', deals_page)
+            self.assertIn("/deals/daily/", sitemap)
+            self.assertEqual(h.count("<tr>") - 1, len(real))              # header row + one row per real deal
+        else:   # before the first real deal: out of the nav, the sitemap and search, with one short line
+            self.assertIn(render.esc(render.EMPTY_ARCHIVE), h)
+            self.assertNotIn('href="/deals/daily/"', deals_page)
+            self.assertNotIn("/deals/daily/", sitemap)
+            self.assertIn('content="noindex', h)
+
+    def test_card_only_on_a_fresh_real_deal(self):
+        dotd = ROOT / "data" / "deal_of_the_day.json"
+        rec = json.loads(dotd.read_text()) if dotd.exists() else None
+        p = ROOT / "site" / "index.html"
+        if not p.exists():
+            raise unittest.SkipTest("run build_site.py first")
+        latest = json.loads((ROOT / "data" / "latest.json").read_text())
+        today = cli.deal_date(latest["generated_at"])
+        want = render.is_fresh(rec, today)
+        for page in ("index.html", "deals/index.html"):
+            self.assertEqual('class="dotd"' in (ROOT / "site" / page).read_text(), want, page)
 
     def test_deal_card_uses_the_affiliate_link_logic(self):
         dotd = ROOT / "data" / "deal_of_the_day.json"
@@ -429,8 +465,11 @@ class SitePages(unittest.TestCase):
             raise unittest.SkipTest("no deal written yet")
         rec = json.loads(dotd.read_text())
         h = (ROOT / "site" / "deals" / "daily" / "index.html").read_text()
+        if not render.is_real(rec):
+            self.assertNotIn(render.esc(rec["headline"]), h)
+            return
         self.assertIn(render.esc(rec["headline"]), h)
-        if not rec.get("no_standout") and "affiliate link" in h:
+        if "affiliate link" in h:
             self.assertIn('rel="sponsored nofollow noopener"', h)
 
 

@@ -16,7 +16,7 @@ The site checks shops every 6 hours and publishes a static site. A Cloudflare Wo
 - **Ask Bitaxe Radar.** A Claude chat on every page that searches, looks up, or compares miners from the live table. Answers stay short. Off-topic questions are refused.
 - **SQL price history.** A SQLite database (miners, retailers, offers, daily price snapshots) updated every collector run, idempotently. The chat's `get_price_history` tool queries it. See [SQL, explained simply](docs/SQL.md).
 - **RAG over the guides.** 114 guide passages, hybrid search (Workers AI embeddings + BM25, merged with reciprocal rank fusion), top 3 passages to Claude, citations checked in code. See [RAG, explained simply](docs/RAG.md).
-- **Deal of the Day agent.** Once a day, after prices are collected, Claude runs a tool loop over today's prices and the SQL history, picks the in-stock miner furthest below its 14-day typical price, and writes a short summary. Code checks every price, % and shop before it's published, with one retry, then a template fallback. See [Deal agent, explained simply](docs/DEAL_AGENT.md). *(Branch `feature/deal-agent`, not live yet.)*
+- **Deal of the Day agent.** Once a day, after prices are collected, Claude runs a tool loop over today's prices and the SQL history, picks the in-stock miner furthest below its 14-day typical price, and writes a short summary. Code checks every price, % and shop before it's published, with one retry, then a template fallback. See [Deal agent, explained simply](docs/DEAL_AGENT.md). It only appears on days with a real deal (3%+ under typical); on other days the site shows nothing.
 - **Evals.** 48 code-graded cases that check rankings, follow-ups, refusals, prompt injection, price history, and RAG retrieval, citations, grounding and "I don't know". See the scores below.
 
 ## How the AI chat works
@@ -68,7 +68,7 @@ Agents plus automation: a scheduled GitHub Actions job runs `python3 -m deal_age
 1. **Tools, not a data dump.** Claude gets 5 tools: `list_current_offers`, `rank_price_drops`, `compare_to_average`, `get_price_history` (SQL), and `submit_deal`. A normal run takes 3 calls: screen, check the top pick's history, submit.
 2. **Structured output.** `submit_deal` is a strict JSON-schema tool: miner, shop, price, typical price, drop %, lowest-ever, headline, summary.
 3. **Grounding guardrail.** `deal_agent/guard.py` checks the JSON fields against the data, and every `$` and `%` in the text, the shop and miner names, and any "lowest ever" claim. Fail → one retry with the exact errors → fail again → a template written straight from the data. The site never shows a made-up number.
-4. **Caps.** 4 tool rounds, 7 API calls, and $0.02 per run. A normal run is about $0.001. Once a day (US Eastern). No key or an API error keeps yesterday's deal and never blocks the deploy.
+4. **Caps.** 4 tool rounds, 7 API calls, and $0.02 per run. A normal run is about $0.001. Once a day (US Eastern). No key or an API error keeps yesterday's deal and never blocks the deploy. No real deal = nothing on the site (the no-deal record stays in the data only).
 5. **Evals.** 11 code-graded cases (`evals/deal/`) with answer keys computed from the case data. Traps include exchange-rate noise, one-day spikes, sold-out listings, stale prices and false "lowest ever" claims. Before: 0/11. Template and scripted-loop harness: 11/11. The live-Claude score is pending an API key.
 
 ```bash

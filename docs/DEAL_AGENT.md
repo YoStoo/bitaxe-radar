@@ -7,8 +7,8 @@ site shows it.
 - Code: `deal_agent/` (Python, standard library only)
 - Runs in: `.github/workflows/collect.yml`, step `deal-of-the-day`
 - Writes: `data/deal_of_the_day.json` and `data/deals_history.json` (one entry per day)
-- Shows on: the homepage card, the top of `/deals/`, and the archive at `/deals/daily/`
-- Status: **built and tested on branch `feature/deal-agent`. Not merged, not live.**
+- Shows on: the homepage card, the top of `/deals/`, and the archive at `/deals/daily/`, **only on days with a real deal**
+- Status: **live on main (merged Nov 10, 2026).** The daily step skips until the `ANTHROPIC_API_KEY` GitHub secret is added.
 
 ---
 
@@ -39,7 +39,19 @@ Kept simple on purpose, so anyone can check it by hand:
   - For a euro or Canadian-dollar shop, the shop's own price must have dropped too.
     Otherwise it's only the exchange rate moving (story #34).
 - **The deal of the day** = the real deal with the biggest drop %. If two tie, a new all-time low wins, then the cheaper one.
-- **No real deal?** The honest answer is "No standout deal today". That's a normal day. On Nov 10, 2026, it was the real answer.
+- **No real deal?** Then the site shows **nothing**: no homepage card, no box on `/deals/`, no archive row. That's a normal day. On Nov 10, 2026, it was the real answer.
+
+### What the site shows (Shervin's design rule: only show up when there's a deal)
+
+| Day | Homepage + `/deals/` | `/deals/daily/` archive |
+|---|---|---|
+| Real deal today (or in the last 2 days) | the deal card | today's card + one row per real deal day |
+| No real deal | nothing | real deal days only |
+| No real deal has ever happened | nothing | one short line, "No deal of the day yet...". The page is left out of the Deals menu, the sitemap and search (`noindex`) until the first real deal |
+
+The agent still writes a record on no-deal days (`no_standout: true`, in `data/deal_of_the_day.json` and
+`data/deals_history.json`). That's for us: it proves the agent ran and looked, and it's what the evals grade.
+The site filters those records out (`render.is_real()`), and a test checks that "No standout" never appears on a public page.
 
 All of this lives in `deal_agent/facts.py`. Claude's tools, the guardrail, and the eval answer key all use the same functions.
 
@@ -98,7 +110,7 @@ measured request sizes; the live token count needs the live run (below).
   So it costs one run a day, and a failed day retries 6 hours later.
 - No API key, Claude down, or a timeout: it prints why and **keeps the previous deal**. The step also has
   `continue-on-error`, so the site still builds and deploys.
-- An old deal (more than 2 days) quietly drops off the homepage. The archive keeps it.
+- An old deal (more than 2 days) quietly drops off the homepage and `/deals/`. The archive keeps it.
 
 ---
 
@@ -173,7 +185,7 @@ The final score shows how safe the system is.
 | Before (feature missing) | **0/11** | no deal is published |
 | Template (no AI) | **11/11** | right by construction. This checks the grader and cases, not the AI. |
 | Scripted fake Claude | **11/11** | the loop, tools, guardrail and grader work end to end |
-| **Live Claude** | **not run yet** | no Anthropic key on the build machine or in the repo secrets. One command once the key is available (above). |
+| **Live Claude** | **not run yet** | needs the Anthropic key (not on the build machine or in the repo secrets yet). One command once it's available (above). |
 
 ---
 
@@ -206,7 +218,7 @@ Numbered after the earlier stories (#1–#33).
 - *Lesson:* always run the **whole** suite, not just your new file.
 
 **38. The screenshot review caught two small UI slips**
-- *Symptom:* the card said "Bitaxe Gamma (601/602)" while the rest of the site says "Bitaxe Gamma". And the no-deal card on `/deals/` linked to `/deals/`, the page you're already on.
+- *Symptom:* the card said "Bitaxe Gamma (601/602)" while the rest of the site says "Bitaxe Gamma". And the no-deal card on `/deals/` linked to `/deals/`, the page you're already on. (No-deal cards were later removed entirely by design.)
 - *Fix:* the card uses the site's short names, and the "see today's prices" link only shows on the homepage version.
 - *Lesson:* tests check facts; looking at the page checks the experience. Do both.
 

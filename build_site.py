@@ -91,7 +91,8 @@ GEN = datetime.strptime(latest["generated_at"], "%Y-%m-%dT%H:%M:%SZ").replace(tz
 STATUS = {"in_stock": "In stock", "out_of_stock": "Out of stock", "preorder": "Pre-order", "backorder": "Backorder", "unknown": "Unknown"}
 _dotd_file, _dotd_hist = ROOT / "data" / "deal_of_the_day.json", ROOT / "data" / "deals_history.json"
 DEAL = json.loads(_dotd_file.read_text()) if _dotd_file.exists() else None             # newest deal of the day (or None)
-DEAL_HISTORY = json.loads(_dotd_hist.read_text()) if _dotd_hist.exists() else []       # every day's deal, newest first
+DEAL_HISTORY = json.loads(_dotd_hist.read_text()) if _dotd_hist.exists() else []       # every day's record, newest first
+REAL_DEALS = DOTD.real_deals(DEAL_HISTORY)   # only real deal days are public; no-deal days stay in the data file only
 NET, NET_OK = E.load_network(ROOT / "data" / "network.json")   # live mining inputs (mempool.space), cached; hidden if older than 48h
 AVAIL = {"in_stock": "https://schema.org/InStock", "out_of_stock": "https://schema.org/OutOfStock",
          "preorder": "https://schema.org/PreOrder", "backorder": "https://schema.org/BackOrder"}
@@ -1524,7 +1525,8 @@ def build_where_to_buy():
 
 def deal_pills(current):
     return ('<nav class="browse" aria-label="Deals filter">' + "".join(f'<a href="{p}"' + (' aria-current="page"' if p == current else "") + f'>{l}</a>'
-            for p, l in (("/deals/", "All deals"), ("/price-per-th/", "Price per TH/s"), ("/in-stock/", "In stock only"), ("/deals/daily/", "Deal of the day"), (BF_PATH, "Black Friday 2026"))) + "</nav>")
+            for p, l in (("/deals/", "All deals"), ("/price-per-th/", "Price per TH/s"), ("/in-stock/", "In stock only"), ("/deals/daily/", "Deal of the day"), (BF_PATH, "Black Friday 2026"))
+            if p != "/deals/daily/" or REAL_DEALS) + "</nav>")   # the archive joins the nav with the first real deal
 
 
 def build_in_stock():
@@ -1581,21 +1583,21 @@ def short_name(rec):
 def build_deal_archive():
     path = "/deals/daily/"
     trail = [("Home", "/"), ("Deals", "/deals/"), ("Deal of the day", path)]
-    rows = DOTD.archive_rows([short_name(r) for r in DEAL_HISTORY])
+    rows = DOTD.archive_rows([short_name(r) for r in REAL_DEALS])
     table = ('<div class="tablewrap"><table><thead><tr><th>Day</th><th>Pick</th><th class="num">Price when picked</th><th>Written by</th></tr></thead>'
-             f"<tbody>{rows}</tbody></table></div>") if rows else "<p>The first deal of the day hasn't been picked yet. Check back tomorrow.</p>"
+             f"<tbody>{rows}</tbody></table></div>") if rows else f"<p>{esc(DOTD.EMPTY_ARCHIVE)}</p>"
     body = f"""<article>
 <header class="hero"><h1>Deal of the day</h1>
 {deal_pills(path)}
 <p class="lede">Once a day, an AI agent reads our price history and picks the in-stock miner that's furthest below its usual price. Our code checks every number before it goes up.</p></header>
-{deal_of_the_day_html(DEAL)}
+{deal_of_the_day_html(DEAL) if DOTD.is_fresh(DEAL, bf_today().isoformat()) else ""}
 <section aria-labelledby="h-past"><h2 id="h-past">Past picks</h2>{table}
 <p class="hint">Prices are the ones at the time of each pick, not today's. <a href="/deals/">Today's best prices →</a></p></section>
 {DOTD.HOW_IT_WORKS}
 </article>"""
     layout(path, "Deal of the day: the biggest home miner price drop, checked daily | Bitaxe Radar",
            "Once a day, our AI agent picks the in-stock home Bitcoin miner furthest below its 14-day typical price. Every number is checked against our price data.",
-           body, crumbs=trail, noindex=not DEAL_HISTORY)
+           body, crumbs=trail, noindex=not REAL_DEALS, index_in_sitemap=bool(REAL_DEALS))
 
 
 def build_deals():
