@@ -86,6 +86,8 @@ class ReviewFixes(unittest.TestCase):
         aff = dict(re.findall(r'(\w+):\s*"([^"]+)"', re.search(r"var AFFILIATE = \{(.*?)\}", (SITE / "app.js").read_text(), re.S).group(1)))
         self.assertIn("powermining", aff)
         for sid, code in aff.items():
+            if not (SITE / "sellers" / sid / "index.html").exists():
+                continue      # no listings from this shop today, so no shop page is built (and nothing links to it)
             h = read(f"/sellers/{sid}/")
             m = re.search(r'Store: <a href="([^"]+)" rel="([^"]+)"', h)
             self.assertIn(code, m.group(1), sid)
