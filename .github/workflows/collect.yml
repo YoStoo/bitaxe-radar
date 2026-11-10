@@ -1,7 +1,7 @@
 name: collect-and-deploy
 on:
   schedule: [{cron: "17 */6 * * *"}]
-  push: {branches: [main], paths: ["site/**", "collector/**", "build_site.py", "newlows.py", "earnings.py", "newsletter.py", "data/newsletter/**", "scripts/indexnow.py", "templates/**", ".github/workflows/**"]}
+  push: {branches: [main], paths: ["site/**", "collector/**", "build_site.py", "newlows.py", "earnings.py", "newsletter.py", "data/newsletter/**", "scripts/indexnow.py", "templates/**", "deal_agent/**", ".github/workflows/**"]}
   workflow_dispatch: {}
 permissions:
   contents: write
@@ -22,6 +22,15 @@ jobs:
       # Solo-mined blocks (mempool.space + SoloLuck.io). A failure keeps the last data and never blocks the deploy.
       - run: python3 collector/solo_wins.py
         continue-on-error: true
+      # Deal of the day: an AI agent (Claude + tools) picks the best real price drop and writes it up; code checks every
+      # number (docs/DEAL_AGENT.md). Runs once per US-Eastern day. No key, an API error or a timeout keeps the previous deal
+      # and never blocks the deploy. Cost: about 0.1-0.5 cents per day (hard cap 2 cents per run).
+      - name: deal-of-the-day
+        continue-on-error: true
+        timeout-minutes: 3
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python3 -m deal_agent
       - run: curl -sf --max-time 20 https://bitaxeradar.com/sitemap.xml -o /tmp/old_sitemap.xml || true
       - run: python3 build_site.py
       - id: inow

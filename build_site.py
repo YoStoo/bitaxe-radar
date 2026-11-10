@@ -10,6 +10,7 @@ Outputs
   site/compare/<a>-vs-<b>/          model-vs-model pages
   site/sellers/<id>/                one page per tracked seller
   site/where-to-buy-bitaxe/, site/in-stock/, site/deals/, site/how-we-track/, site/advertise/
+  site/deals/daily/                 deal of the day archive (data/deals_history.json, written by `python3 -m deal_agent`)
   site/sitemap.xml, site/robots.txt, site/404.html
 
 Every number on every page comes from the data files (nothing is invented); the hand-written text is
@@ -26,6 +27,7 @@ from pathlib import Path
 import earnings as E
 import newsletter as NL
 import newlows
+from deal_agent import render as DOTD   # deal of the day (AI agent output, checked; docs/DEAL_AGENT.md)
 
 ROOT = Path(__file__).resolve().parent
 SITE = ROOT / "site"
@@ -87,6 +89,9 @@ OFFERS = latest["offers"]
 FX = latest.get("fx") or {}
 GEN = datetime.strptime(latest["generated_at"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
 STATUS = {"in_stock": "In stock", "out_of_stock": "Out of stock", "preorder": "Pre-order", "backorder": "Backorder", "unknown": "Unknown"}
+_dotd_file, _dotd_hist = ROOT / "data" / "deal_of_the_day.json", ROOT / "data" / "deals_history.json"
+DEAL = json.loads(_dotd_file.read_text()) if _dotd_file.exists() else None             # newest deal of the day (or None)
+DEAL_HISTORY = json.loads(_dotd_hist.read_text()) if _dotd_hist.exists() else []       # every day's deal, newest first
 NET, NET_OK = E.load_network(ROOT / "data" / "network.json")   # live mining inputs (mempool.space), cached; hidden if older than 48h
 AVAIL = {"in_stock": "https://schema.org/InStock", "out_of_stock": "https://schema.org/OutOfStock",
          "preorder": "https://schema.org/PreOrder", "backorder": "https://schema.org/BackOrder"}
@@ -1519,7 +1524,7 @@ def build_where_to_buy():
 
 def deal_pills(current):
     return ('<nav class="browse" aria-label="Deals filter">' + "".join(f'<a href="{p}"' + (' aria-current="page"' if p == current else "") + f'>{l}</a>'
-            for p, l in (("/deals/", "All deals"), ("/price-per-th/", "Price per TH/s"), ("/in-stock/", "In stock only"), (BF_PATH, "Black Friday 2026"))) + "</nav>")
+            for p, l in (("/deals/", "All deals"), ("/price-per-th/", "Price per TH/s"), ("/in-stock/", "In stock only"), ("/deals/daily/", "Deal of the day"), (BF_PATH, "Black Friday 2026"))) + "</nav>")
 
 
 def build_in_stock():
@@ -1557,6 +1562,40 @@ def build_in_stock():
 </article>"""
     items = [(f"{SHORT[o['model']]} at {sname(o['seller'])}", f"/models/{o['model']}/") for o in ins]
     layout(path, title, desc, body, crumbs=trail, jsonld=[itemlist("Home Bitcoin miners in stock now", items)])
+
+
+def deal_of_the_day_html(rec, compact=False):
+    """The deal of the day card. The shop button comes from offer_link(), so affiliate links work like everywhere else."""
+    if not rec:
+        return ""
+    live = next((o for o in OFFERS if o["id"] == rec.get("offer_id")), None)
+    link = offer_link(live, "View at " + sname(live["seller"]) + " ↗") if live else ""
+    return DOTD.deal_box(short_name(rec), live, link, compact=compact)
+
+
+def short_name(rec):
+    """Same short miner names as the rest of the site ("Bitaxe Gamma", not "Bitaxe Gamma (601/602)")."""
+    return {**rec, "miner_name": SHORT.get(rec.get("miner_id"), rec.get("miner_name"))} if rec and rec.get("miner_id") else rec
+
+
+def build_deal_archive():
+    path = "/deals/daily/"
+    trail = [("Home", "/"), ("Deals", "/deals/"), ("Deal of the day", path)]
+    rows = DOTD.archive_rows([short_name(r) for r in DEAL_HISTORY])
+    table = ('<div class="tablewrap"><table><thead><tr><th>Day</th><th>Pick</th><th class="num">Price when picked</th><th>Written by</th></tr></thead>'
+             f"<tbody>{rows}</tbody></table></div>") if rows else "<p>The first deal of the day hasn't been picked yet. Check back tomorrow.</p>"
+    body = f"""<article>
+<header class="hero"><h1>Deal of the day</h1>
+{deal_pills(path)}
+<p class="lede">Once a day, an AI agent reads our price history and picks the in-stock miner that's furthest below its usual price. Our code checks every number before it goes up.</p></header>
+{deal_of_the_day_html(DEAL)}
+<section aria-labelledby="h-past"><h2 id="h-past">Past picks</h2>{table}
+<p class="hint">Prices are the ones at the time of each pick, not today's. <a href="/deals/">Today's best prices →</a></p></section>
+{DOTD.HOW_IT_WORKS}
+</article>"""
+    layout(path, "Deal of the day: the biggest home miner price drop, checked daily | Bitaxe Radar",
+           "Once a day, our AI agent picks the in-stock home Bitcoin miner furthest below its 14-day typical price. Every number is checked against our price data.",
+           body, crumbs=trail, noindex=not DEAL_HISTORY)
 
 
 def build_deals():
@@ -1606,6 +1645,7 @@ def build_deals():
 {bf_banner()}
 <p class="lede">The cheapest in-stock price for each miner, ranked by how much hashrate you get per dollar.</p>
 <p class="meta">Data collected {tag_time(latest['generated_at'])}</p></header>
+{deal_of_the_day_html(DEAL) if DOTD.is_fresh(DEAL, bf_today().isoformat()) else ""}
 <section aria-labelledby="h-r"><h2 id="h-r">Cheapest in stock, ranked by price per TH/s</h2>{rank_tbl}
 <p class="hint">Uses seller-stated hashrate and ignores power cost, shipping and bundle differences.</p></section>
 <section aria-labelledby="h-d"><h2 id="h-d">Seller-listed discounts</h2>{disc_html}</section>
@@ -3856,7 +3896,8 @@ def build_home():
     older = [m for m in TRACKED if m in NOINDEX_MODELS]
     older_html = ('<p class="older">Older models: ' + " · ".join(
         f'<a href="/models/{m}/">{esc(SHORT[m])}</a>' + (f' from {money(usd(STATS[m]["best"]))}' if STATS[m]["best"] else " (sold out)") for m in older) + "</p>") if older else ""
-    cards = f"""<section id="miners" aria-labelledby="h-miners">
+    dotd = deal_of_the_day_html(DEAL, compact=True) if DOTD.is_fresh(DEAL, bf_today().isoformat()) else ""
+    cards = dotd + f"""<section id="miners" aria-labelledby="h-miners">
     <div class="sec-head"><h2 id="h-miners">Today's best prices</h2><a href="/in-stock/">Everything in stock →</a></div>
     <p class="hint">The best price per TH/s in each size, from today's in-stock listings. US shops first.</p>
     <div class="cards">{"".join(home_card(m, best_value) for m in picks)}</div>
@@ -4267,6 +4308,7 @@ def main():
     build_where_to_buy()
     build_in_stock()
     build_deals()
+    build_deal_archive()
     build_price_per_th()
     build_black_friday()
     build_redirect("/home-miners/", "/miners/", "All miners")

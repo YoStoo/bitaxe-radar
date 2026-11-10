@@ -542,3 +542,17 @@ body.ra-ask-lock{position:fixed;left:0;right:0;width:100%}
 @media (prefers-reduced-motion:reduce){
   #radar-ask-bubble.ra-bounce,.ra-chip-wrap,.ra-chip-wrap.ra-chip-anim,#radar-ask-panel,.ra-typing span{animation:none!important}
 }
+/* Deal of the day (deal_agent/render.py) */
+.dotd{position:relative;background:linear-gradient(160deg,rgba(247,147,26,.16),rgba(247,147,26,.03) 60%),var(--panel);border:1.5px solid rgba(247,147,26,.6);border-radius:var(--r);padding:16px 18px;margin:18px 0;max-width:640px}
+.dotd>small{display:block;color:var(--accent-2);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.dotd h3{margin:2px 0 6px;font-size:20px}
+.dotd h3 a{color:var(--text);text-decoration:none}
+.dotd p{margin:6px 0}
+.dotd-price b{font-size:32px;font-weight:850;letter-spacing:-.03em;font-variant-numeric:tabular-nums;margin-right:8px}
+.dotd-drop{color:var(--good);font-weight:700}
+.dotd-head{font-weight:700}
+.dotd .btn{margin-top:10px;font-size:16px;padding:12px 18px;width:100%}
+.dotd .ph{text-align:left}
+.dotd .ph.dotd-note{margin-top:10px}
+.dotd-now{color:var(--warn)}
+@media (max-width:520px){.dotd{padding:14px}.dotd-price b{font-size:28px}}
