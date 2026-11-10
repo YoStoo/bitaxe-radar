@@ -110,8 +110,10 @@ export const ANSWER_SCHEMA = {
     guides_cited: { type: "array", items: { type: "string" },
       description: "The guide_id of every search_guides passage the answer used, e.g. bitaxe-noise. Empty if none." },
     in_data: { type: "boolean",                                // false = "the data didn't have the answer"
-      description: "true if the answer uses facts from the tool results (prices, specs, shops), even if it also says the data " +
-        "doesn't explain something. false only for general knowledge, off-topic replies, or clarifying questions." },
+      // Live smoke eval (Nov 10): guide-grounded answers came back false, because this text only named price facts.
+      description: "true if the answer uses facts from the tool results (prices, specs, shops, or search_guides passages), even if " +
+        "it also says the data doesn't explain something. false only for general knowledge (including when you say our guides " +
+        "don't cover it and answer generally), off-topic replies, or clarifying questions." },
   },
   required: ["working", "answer", "models_mentioned", "guides_cited", "confidence", "in_data"],
   additionalProperties: false,

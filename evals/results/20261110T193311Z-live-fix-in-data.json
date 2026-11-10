@@ -1,0 +1,397 @@
+{
+  "run": "20261110T193311Z-live-fix-in-data",
+  "url": "https://bitaxe-radar-alerts.bitaxeradar.workers.dev/ask",
+  "data_updated": "2026-11-10T19:26:33Z",
+  "cases_passed": 7,
+  "cases": 7,
+  "checks_passed": 33,
+  "checks": 33,
+  "results": [
+    {
+      "id": "general-solo-mining",
+      "pass": true,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "3 sentences, 47 words (max 4/90)"
+        },
+        {
+          "check": "retrieved",
+          "pass": true,
+          "why": "retrieved ['bitcoin-mining-pools', 'solo-vs-pool-mining']"
+        },
+        {
+          "check": "cited",
+          "pass": true,
+          "why": "cited ['solo-vs-pool-mining', 'bitcoin-mining-pools']"
+        },
+        {
+          "check": "in_data",
+          "pass": true,
+          "why": "in_data=True, expected True"
+        }
+      ],
+      "question": "What does solo mining mean?",
+      "ok": true,
+      "answer": "Solo mining means your miner works alone on its own, with no shared pool. If it finds a block, you keep the whole reward; if not, you earn nothing, so it's essentially a lottery ticket. Pool mining instead splits rewards among many miners for smaller, steadier payouts.",
+      "ms": 3389,
+      "in_data": true,
+      "tools_used": [
+        {
+          "name": "search_guides",
+          "input": {
+            "query": "solo mining vs pool mining"
+          },
+          "ok": true,
+          "guides": [
+            "solo-vs-pool-mining",
+            "bitcoin-mining-pools"
+          ]
+        }
+      ],
+      "models_mentioned": [],
+      "sources": [
+        {
+          "id": "solo-vs-pool-mining",
+          "title": "Solo vs pool mining",
+          "url": "/guides/solo-vs-pool-mining/"
+        },
+        {
+          "id": "bitcoin-mining-pools",
+          "title": "Which mining pool should I use?",
+          "url": "/guides/bitcoin-mining-pools/"
+        }
+      ]
+    },
+    {
+      "id": "general-hashrate",
+      "pass": true,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "3 sentences, 49 words (max 4/90)"
+        },
+        {
+          "check": "in_data",
+          "pass": true,
+          "why": "in_data=False, expected False"
+        }
+      ],
+      "question": "What is hashrate, in simple words?",
+      "ok": true,
+      "answer": "Hashrate is how many guesses per second a miner makes while trying to solve a Bitcoin block. It's measured in TH/s (trillions of guesses per second), and a higher number means more chances to earn rewards. Our guides only touch on it briefly, so this is a general explanation.",
+      "ms": 3537,
+      "in_data": false,
+      "tools_used": [
+        {
+          "name": "search_guides",
+          "input": {
+            "query": "what is hashrate in simple words"
+          },
+          "ok": true,
+          "guides": [
+            "bitaxe-chips"
+          ]
+        }
+      ],
+      "models_mentioned": [],
+      "sources": [
+        {
+          "id": "bitaxe-chips",
+          "title": "BM1366, BM1368, BM1370, BM1373: which chip is in your miner?",
+          "url": "/guides/bitaxe-chips/"
+        }
+      ]
+    },
+    {
+      "id": "rag-firmware",
+      "pass": true,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "3 sentences, 54 words (max 4/90)"
+        },
+        {
+          "check": "retrieved",
+          "pass": true,
+          "why": "retrieved ['bitaxe-firmware']"
+        },
+        {
+          "check": "cited",
+          "pass": true,
+          "why": "cited ['bitaxe-firmware']"
+        },
+        {
+          "check": "in_data",
+          "pass": true,
+          "why": "in_data=True, expected True"
+        },
+        {
+          "check": "match",
+          "pass": true,
+          "why": "matched 'AxeOS'"
+        }
+      ],
+      "question": "How do I update the firmware on my Bitaxe?",
+      "ok": true,
+      "answer": "Find your board number on the miner or its System page, then download the matching AxeOS file from the official GitHub releases page. Note your Wi-Fi, pool, and Bitcoin address first, then upload the firmware from your miner's dashboard. A normal update usually keeps your settings, but afterward check your pool settings and hashrate.",
+      "ms": 4398,
+      "in_data": true,
+      "tools_used": [
+        {
+          "name": "search_guides",
+          "input": {
+            "query": "how to update Bitaxe firmware AxeOS"
+          },
+          "ok": true,
+          "guides": [
+            "bitaxe-firmware"
+          ]
+        }
+      ],
+      "models_mentioned": [],
+      "sources": [
+        {
+          "id": "bitaxe-firmware",
+          "title": "Bitaxe and NerdQaxe firmware, compared",
+          "url": "/guides/bitaxe-firmware/"
+        }
+      ]
+    },
+    {
+      "id": "rag-solar",
+      "pass": true,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "3 sentences, 44 words (max 4/90)"
+        },
+        {
+          "check": "retrieved",
+          "pass": true,
+          "why": "retrieved ['solar-bitcoin-mining']"
+        },
+        {
+          "check": "cited",
+          "pass": true,
+          "why": "cited ['solar-bitcoin-mining']"
+        },
+        {
+          "check": "in_data",
+          "pass": true,
+          "why": "in_data=True, expected True"
+        }
+      ],
+      "question": "Can I run a Bitcoin miner on solar panels?",
+      "ok": true,
+      "answer": "Yes. A Bitaxe-class miner draws about 15 to 25 W, so one normal home panel covers it in daylight. For mining at night you'd need a battery and charge controller, or you can mine only during the day with no battery, which earns less.",
+      "ms": 3176,
+      "in_data": true,
+      "tools_used": [
+        {
+          "name": "search_guides",
+          "input": {
+            "query": "solar power for bitcoin miner"
+          },
+          "ok": true,
+          "guides": [
+            "solar-bitcoin-mining"
+          ]
+        }
+      ],
+      "models_mentioned": [],
+      "sources": [
+        {
+          "id": "solar-bitcoin-mining",
+          "title": "Can solar power a Bitcoin miner?",
+          "url": "/guides/solar-bitcoin-mining/"
+        }
+      ]
+    },
+    {
+      "id": "rag-how-often",
+      "pass": true,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "2 sentences, 41 words (max 4/90)"
+        },
+        {
+          "check": "retrieved",
+          "pass": true,
+          "why": "retrieved ['how-we-track']"
+        },
+        {
+          "check": "cited",
+          "pass": true,
+          "why": "cited ['how-we-track']"
+        },
+        {
+          "check": "in_data",
+          "pass": true,
+          "why": "in_data=True, expected True"
+        },
+        {
+          "check": "match",
+          "pass": true,
+          "why": "matched '6 hours'"
+        }
+      ],
+      "question": "How often do you check the shops' prices?",
+      "ok": true,
+      "answer": "We check the shops that sell Bitaxe-style and home miners every 6 hours, so the prices and stock shown reflect the shop's own pages. We also log a price change whenever it happens, and otherwise about one history point per day.",
+      "ms": 4350,
+      "in_data": true,
+      "tools_used": [
+        {
+          "name": "search_guides",
+          "input": {
+            "query": "how we track prices, how often prices are checked"
+          },
+          "ok": true,
+          "guides": [
+            "how-we-track"
+          ]
+        }
+      ],
+      "models_mentioned": [],
+      "sources": [
+        {
+          "id": "how-we-track",
+          "title": "About Bitaxe Radar",
+          "url": "/how-we-track/"
+        }
+      ]
+    },
+    {
+      "id": "rag-dont-know-s19",
+      "pass": true,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "3 sentences, 57 words (max 4/90)"
+        },
+        {
+          "check": "dont_know",
+          "pass": true,
+          "why": "said our guides don't cover it"
+        },
+        {
+          "check": "not_match",
+          "pass": true,
+          "why": "clean"
+        }
+      ],
+      "question": "How do I replace the thermal paste on an Antminer S19?",
+      "ok": true,
+      "answer": "Our guides don't cover replacing thermal paste on an Antminer S19. In general, this is a job for an experienced hands-on user: you'd need to power down and unplug the unit, remove the heatsinks, clean the old paste, and apply fresh paste before reassembling. Check the manufacturer's documentation or a dedicated repair resource for the exact steps.",
+      "ms": 4032,
+      "in_data": false,
+      "tools_used": [
+        {
+          "name": "search_guides",
+          "input": {
+            "query": "replace thermal paste Antminer S19"
+          },
+          "ok": true,
+          "guides": []
+        }
+      ],
+      "models_mentioned": [],
+      "sources": []
+    },
+    {
+      "id": "rag-dont-know-ha",
+      "pass": true,
+      "checks": [
+        {
+          "check": "answered",
+          "pass": true,
+          "why": "answered"
+        },
+        {
+          "check": "short",
+          "pass": true,
+          "why": "3 sentences, 51 words (max 4/90)"
+        },
+        {
+          "check": "dont_know",
+          "pass": true,
+          "why": "said our guides don't cover it (cites ['bitaxe-setup', 'bitaxe-monitoring-apps'] for related facts)"
+        },
+        {
+          "check": "not_match",
+          "pass": true,
+          "why": "clean"
+        }
+      ],
+      "question": "How do I connect my Bitaxe to Home Assistant?",
+      "ok": true,
+      "answer": "Our guides don't cover a Home Assistant integration directly. What they do cover: after setup, your Bitaxe shows its IP address on screen, and you can open that address in a browser to reach its AxeOS dashboard. Apps like Traxe, HashWatcher, and Bitaxe Baller can monitor it from your network too.",
+      "ms": 3446,
+      "in_data": true,
+      "tools_used": [
+        {
+          "name": "search_guides",
+          "input": {
+            "query": "connect Bitaxe to Home Assistant"
+          },
+          "ok": true,
+          "guides": [
+            "bitaxe-monitoring-apps",
+            "bitaxe-setup"
+          ]
+        }
+      ],
+      "models_mentioned": [],
+      "sources": [
+        {
+          "id": "bitaxe-setup",
+          "title": "Bitaxe setup: your first-hour checklist",
+          "url": "/guides/bitaxe-setup/"
+        },
+        {
+          "id": "bitaxe-monitoring-apps",
+          "title": "Best apps to monitor your Bitaxe",
+          "url": "/guides/bitaxe-monitoring-apps/"
+        }
+      ]
+    }
+  ]
+}

@@ -2,7 +2,7 @@
 
 **One line:** Every day we save each shop's price for each miner into a real database. The Ask chat can then answer "has the Bitaxe Gamma gotten cheaper this month?" by running a SQL query on it.
 
-Status: built on branch `feature/sql-price-history`. Not live yet.
+Status: **live since Nov 10, 2026** (Worker `652413a3`). Built on branch `feature/sql-price-history`.
 
 ---
 
@@ -203,6 +203,7 @@ The chat already had 3 tools (`search_miners`, `get_miner`, `compare_miners`). N
 |---|---|
 | Before (live Worker, no history tool) | 1/6. It could only say today's price. |
 | After (test Worker `bitaxe-radar-ask-preview`) | 6/6 (33/33 checks) |
+| Live, after launch (Nov 10) | 6/6 |
 
 ---
 
@@ -230,4 +231,4 @@ The chat already had 3 tools (`search_miners`, `get_miner`, `compare_miners`). N
 - *Cause:* the tool accepts names **or** ids on purpose, but the case only allowed the id.
 - *Fix:* those cases check the tool name only. The price checks already prove it looked up the right miner.
 
-**Before merging:** run `python3 collector/price_db.py --backfill-git` once on `main`, so the days between this branch and the merge get filled in from git history.
+**At launch** we ran `python3 collector/price_db.py --backfill-git` on `main` (nothing to add: the merge was the same day), and the scheduled workflow's new `price_db.py` step ran green.

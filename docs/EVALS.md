@@ -114,6 +114,8 @@ All runs graded with the final grader (`--regrade` re-scored the earlier answers
 | **+10 RAG cases (+1 converted), before** | live Worker (no guide search) | **0/11** on RAG cases (27/57 checks) | See docs/RAG.md. |
 | **RAG, full suite** | test Worker, branch `feature/ask-rag` | **47/48** (244/245) | `general-hashrate`: citation flipped in_data (story 7 in RAG.md) |
 | **RAG, after fix** | test Worker, `rag` + `general` cases | **12/12** (62/62) | none |
+| **Launch smoke (history + RAG)** | live Worker `1ab69240` (Nov 10, 2:25 PM ET) | **15/17** (90/92) | `rag-solar`, `rag-how-often`: cited guide answers labeled in_data false |
+| **After in_data description fix** | live Worker `652413a3` | **7/7** (33/33) | none |
 
 Not reproduced: we suspected Claude might sort "$ per TH/s" questions by `efficiency`. All 3 price-per-TH cases picked `price_per_th`, so no change was made. The cases stay in the set to catch it if it ever happens.
 

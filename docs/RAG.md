@@ -2,7 +2,7 @@
 
 **One line:** Before the chat answers a how-to or "why" question, it **looks up** the right paragraphs in our own guides, reads them, answers from them, and shows which guide it used.
 
-Status: built on branch `feature/ask-rag` (on top of `feature/sql-price-history`). Not live yet.
+Status: **live since Nov 10, 2026** (Worker `652413a3`). Built on branch `feature/ask-rag`.
 
 ---
 
@@ -169,6 +169,8 @@ Relevant chunks scored 0.63 to 0.80. Unrelated ones scored 0.58 or less. 0.6 sit
 | After, first run (test Worker) | 10/11. Grader too strict on "I don't know" (story 5) |
 | Full suite, all 48 cases | 47/48. `general-hashrate` mislabeled (story 7) |
 | After both fixes (RAG + general cases) | **12/12** (62/62 checks) |
+| Live, after launch (Nov 10) | 9/11 RAG cases (17-case smoke run incl. history: 15/17). `rag-solar` and `rag-how-often`: grounded, cited answers labeled `in_data: false` (story 8) |
+| Live, after story-8 fix | **7/7** on the re-check (the 2 failures, the "I don't know" cases, hashrate, firmware, solo mining) |
 
 Cost: about $0.001 per question on Claude, and Workers AI is inside the free allowance.
 
@@ -213,6 +215,12 @@ Cost: about $0.001 per question on Claude, and Workers AI is inside the free all
 - *Cause:* Claude cited the chips guide anyway, and my code flipped `in_data` to true whenever there was a citation. The site would have shown "From our guides" on a general-knowledge answer.
 - *Fix:* citations no longer flip `in_data`; only Claude's own label (or real price-tool data) decides it. A unit test locks it in.
 - *Lesson:* code that "corrects" the model can also be wrong. The eval caught my override, not the model.
+
+**8. Fixing story 7 brought back the opposite mislabel**
+- *Symptom:* on the live site, the solar and "how often" answers were correct and cited, but labeled `in_data: false`.
+- *Cause:* once code stopped overriding the label, Claude's own label was the only one left. The `in_data` description only listed price facts ("prices, specs, shops"), so Claude didn't count guide passages as our data.
+- *Fix:* the description now names search_guides passages, and says "false" means general knowledge, including "our guides don't cover it". The live re-check went 7/7, with labels right in both directions.
+- *Lesson:* fix the instruction the model reads, not just the code around it. And rerun both kinds of case, because a fix in one direction can break the other.
 
 ---
 
