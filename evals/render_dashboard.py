@@ -140,7 +140,11 @@ def meaning_line(history):
         bits.append(f'price history went from <b>{a["passed"]}/{a["total"]}</b> to <b>{b["passed"]}/{b["total"]}</b>')
     if "rag" in by and "before" in by["rag"] and "after" in by["rag"]:
         a, b = by["rag"]["before"], by["rag"]["after"]
-        bits.append(f'guide search from <b>{a["passed"]}/{a["total"]}</b> to <b>{b["passed"]}/{b["total"]}</b>, once those tools were added')
+        rag = f'guide search from <b>{a["passed"]}/{a["total"]}</b> to <b>{b["passed"]}/{b["total"]}</b>'
+        if a["total"] != b["total"]:
+            rag += (f' (the after-run added a {b["total"]}th general-knowledge case '
+                    f'the citation bug had broken)')
+        bits.append(rag + ', once those tools were added')
     if "deal" in by and "before" in by["deal"] and "after" in by["deal"]:
         a, b = by["deal"]["before"], by["deal"]["after"]
         live = "live" in (b.get("label") or "")
@@ -238,7 +242,13 @@ def hero_cards(history):
         cls = score_class(passed, total)
         from_line = ""
         if before:
-            from_line = f'<div class="from-line">started at {before["passed"]}/{before["total"]}</div>'
+            from_line = f'<div class="from-line">started at {before["passed"]}/{before["total"]}'
+            if before["total"] != total:
+                from_line += (
+                    f' on {before["total"]} questions. The after-run added a {total}th case '
+                    f'(a general-knowledge question the citation bug had broken).'
+                )
+            from_line += '</div>'
         latest_note = ""
         if after and latest:
             sc = latest["suites"][sid]

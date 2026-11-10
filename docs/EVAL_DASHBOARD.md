@@ -30,7 +30,7 @@ It is a static page, built from files we already saved. Building it costs $0. It
 ## What the page shows
 
 - A score card for each suite, from the latest full run of that suite.
-- Before-and-after numbers from named saved runs, for example price history **1/6 → 6/6** and guide search **0/11 → 12/12**.
+- Before-and-after numbers from named saved runs, for example price history **1/6 → 6/6** and guide search **0/11 → 12/12** (the after-run added a 12th general-knowledge case the citation bug had broken).
 - A chart of full-suite scores over time.
 - The latest run's pass/fail list for each suite, and why a failed question failed.
 - A table of every saved run, including first grades, regrades, and partial re-checks, so a 3-question confirmation is not plotted as a perfect full-suite score.
@@ -62,7 +62,7 @@ A run only counts toward a suite when enough of that suite's questions were actu
 
 ## Honest gaps
 
-- The Deal of the Day **live Claude** run scored **11/11**. Ten cases passed on the first try; one used the template fallback. The scripted harness and no-AI template also scored 11/11.
+- The Deal of the Day **live Claude** run scored **11/11**. Ten cases passed on the first try; one used the template fallback. A later live run, after the low-price claim was spelled out, also scored 11/11, with no fallback. The scripted harness and no-AI template also scored 11/11.
 - After launch, the live RAG re-check was **7/7** on a partial set (the questions that had just failed), not a full 11-question live run. The last full live RAG set was **9/11**.
 - The later full-suite test-Worker run scored **47/48**. The one failure (`general-hashrate`) was a citation bug, then fixed, and re-checked as part of the 12/12 run.
 
@@ -76,17 +76,17 @@ Light motion is there as a tasteful showcase: scores count up, charts draw thems
 
 ## Bugs we hit (interview stories)
 
-Numbered after the earlier stories (#1–#38).
+Numbered after the earlier stories (#1–#42, including the Deal of the Day stories on main).
 
-**#39. A tag overlap would have invented a fake 1/1 RAG score.**  
+**#43. A tag overlap would have invented a fake 1/1 RAG score.**  
 The original 32 Ask cases include `general-solo-mining`. That case later also got a `rag` tag, when it was reused in the guide-search suite. If the dashboard had counted “any case with this tag,” every early Ask run would have shown RAG as 1/1 (or 0/1). That score was never measured. The builder now only attaches a suite score when enough of that suite's questions were actually in the run (6 or more for RAG and history, 3 or more for Ask confirmation re-runs, 32 for a full Ask chart point).
 
-**#40. The first file is not always the official baseline.**  
+**#44. The first file is not always the official baseline.**  
 The earliest Ask run file says **31/32**. After a grader bug was fixed, the same answers were regraded at **30/32**. If the page had used “first file by time” as the before score, it would have hidden a real prompt-injection miss and disagreed with the write-up. Both runs are kept, labelled, and the official before point is the regraded file.
 
-**#41. Import order broke the whole site build.**  
+**#45. Import order broke the whole site build.**  
 `build_evals()` imported `render_dashboard` before it called `load_eval_history()`, which is the function that puts `evals/` on `sys.path`. The first site build died with `ModuleNotFoundError`, and no pages after that step (advertise, 404, home, the sitemap) were written. The import now adds the path itself, and the history rebuild is wrapped so a script failure cannot block the rest of the site.
 
-**#42. The first animation pass hid the page from anyone without JavaScript.**  
+**#46. The first animation pass hid the page from anyone without JavaScript.**  
 Score cards started at `opacity: 0` until an IntersectionObserver added a class. With JavaScript off, a visitor (and a static screenshot) saw a blank area under the headline. Motion styles now apply only when CSS `scripting: enabled` and the visitor has not asked to reduce motion. Everyone else sees the finished page immediately.
 

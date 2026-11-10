@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-10T22:08:52Z",
+  "generated_at": "2026-11-10T22:19:20Z",
   "suites": [
     {
       "id": "ask",
@@ -4515,6 +4515,140 @@
       "source_file": "evals/results/20261110T220229Z-deal-live-first-live.json",
       "when": "2026-11-10T22:02:29Z",
       "label": "deal-live-first-live",
+      "kind": "deal",
+      "env": "live",
+      "regraded": false,
+      "mode": "live",
+      "cases_passed": 11,
+      "cases": 11,
+      "checks_passed": null,
+      "checks": null,
+      "suites": {
+        "deal": {
+          "passed": 11,
+          "total": 11,
+          "meaningful": true,
+          "chartable": true
+        }
+      },
+      "results": [
+        {
+          "id": "clear-drop",
+          "suites": [
+            "deal"
+          ],
+          "pass": true,
+          "question": "A clear in-stock price cut",
+          "failed_checks": [],
+          "sensitive": false
+        },
+        {
+          "id": "biggest-drop-sold-out",
+          "suites": [
+            "deal"
+          ],
+          "pass": true,
+          "question": "The biggest drop is sold out",
+          "failed_checks": [],
+          "sensitive": false
+        },
+        {
+          "id": "no-deal-flat",
+          "suites": [
+            "deal"
+          ],
+          "pass": true,
+          "question": "No price really moved",
+          "failed_checks": [],
+          "sensitive": false
+        },
+        {
+          "id": "one-day-spike",
+          "suites": [
+            "deal"
+          ],
+          "pass": true,
+          "question": "A one-day price spike would fool a simple average",
+          "failed_checks": [],
+          "sensitive": false
+        },
+        {
+          "id": "fx-noise",
+          "suites": [
+            "deal"
+          ],
+          "pass": true,
+          "question": "A currency swing, not a real cut",
+          "failed_checks": [],
+          "sensitive": false
+        },
+        {
+          "id": "tie-new-low",
+          "suites": [
+            "deal"
+          ],
+          "pass": true,
+          "question": "Two similar cuts; one is a new low",
+          "failed_checks": [],
+          "sensitive": false
+        },
+        {
+          "id": "new-listing-short-history",
+          "suites": [
+            "deal"
+          ],
+          "pass": true,
+          "question": "A new listing with too little history",
+          "failed_checks": [],
+          "sensitive": false
+        },
+        {
+          "id": "stale-price",
+          "suites": [
+            "deal"
+          ],
+          "pass": true,
+          "question": "A stale leftover price",
+          "failed_checks": [],
+          "sensitive": false
+        },
+        {
+          "id": "just-under-threshold",
+          "suites": [
+            "deal"
+          ],
+          "pass": true,
+          "question": "A drop just under the minimum bar",
+          "failed_checks": [],
+          "sensitive": false
+        },
+        {
+          "id": "shop-switch",
+          "suites": [
+            "deal"
+          ],
+          "pass": true,
+          "question": "The usual cheapest shop is not today's cheapest",
+          "failed_checks": [],
+          "sensitive": false
+        },
+        {
+          "id": "not-lowest-ever",
+          "suites": [
+            "deal"
+          ],
+          "pass": true,
+          "question": "A real cut that is not the lowest ever",
+          "failed_checks": [],
+          "sensitive": false
+        }
+      ]
+    },
+    {
+      "id": "20261110T220510Z-deal-live-after-low-claim",
+      "source_file": "evals/results/20261110T220510Z-deal-live-after-low-claim.json",
+      "when": "2026-11-10T22:05:10Z",
+      "label": "deal-live-after-low-claim",
       "kind": "deal",
       "env": "live",
       "regraded": false,

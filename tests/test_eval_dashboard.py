@@ -203,6 +203,10 @@ class DashboardPageTests(unittest.TestCase):
         self.assertIn("The short version", self.page)
         self.assertIn("with live Claude", self.page)
         self.assertIn("started at 30/32", self.page)
+        # 12/12 is not 11 questions: the after-run added a general-knowledge case.
+        self.assertIn("started at 0/11 on 11 questions", self.page)
+        self.assertIn("12th case", self.page)
+        self.assertIn("general-knowledge", self.page)
         self.assertIn("eval-meaning", self.page)
         self.assertIn("eval-count", self.page)
         self.assertIn("eval-meter", self.page)
