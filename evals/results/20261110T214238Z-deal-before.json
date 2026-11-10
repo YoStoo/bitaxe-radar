@@ -1,0 +1,179 @@
+{
+ "summary": {
+  "mode": "before",
+  "model": null,
+  "when": "2026-11-10T21:42:38Z",
+  "passed": 0,
+  "total": 11,
+  "first_try_ok": null,
+  "fallbacks": null,
+  "cost_usd": 0.0
+ },
+ "rows": [
+  {
+   "id": "clear-drop",
+   "passed": false,
+   "problems": [
+    "nothing published"
+   ],
+   "source": null,
+   "first_try_ok": null,
+   "first_try_problems": null,
+   "guard_first": null,
+   "calls": null,
+   "tools": [],
+   "cost_usd": 0,
+   "published": null
+  },
+  {
+   "id": "biggest-drop-sold-out",
+   "passed": false,
+   "problems": [
+    "nothing published"
+   ],
+   "source": null,
+   "first_try_ok": null,
+   "first_try_problems": null,
+   "guard_first": null,
+   "calls": null,
+   "tools": [],
+   "cost_usd": 0,
+   "published": null
+  },
+  {
+   "id": "no-deal-flat",
+   "passed": false,
+   "problems": [
+    "nothing published"
+   ],
+   "source": null,
+   "first_try_ok": null,
+   "first_try_problems": null,
+   "guard_first": null,
+   "calls": null,
+   "tools": [],
+   "cost_usd": 0,
+   "published": null
+  },
+  {
+   "id": "one-day-spike",
+   "passed": false,
+   "problems": [
+    "nothing published"
+   ],
+   "source": null,
+   "first_try_ok": null,
+   "first_try_problems": null,
+   "guard_first": null,
+   "calls": null,
+   "tools": [],
+   "cost_usd": 0,
+   "published": null
+  },
+  {
+   "id": "fx-noise",
+   "passed": false,
+   "problems": [
+    "nothing published"
+   ],
+   "source": null,
+   "first_try_ok": null,
+   "first_try_problems": null,
+   "guard_first": null,
+   "calls": null,
+   "tools": [],
+   "cost_usd": 0,
+   "published": null
+  },
+  {
+   "id": "tie-new-low",
+   "passed": false,
+   "problems": [
+    "nothing published"
+   ],
+   "source": null,
+   "first_try_ok": null,
+   "first_try_problems": null,
+   "guard_first": null,
+   "calls": null,
+   "tools": [],
+   "cost_usd": 0,
+   "published": null
+  },
+  {
+   "id": "new-listing-short-history",
+   "passed": false,
+   "problems": [
+    "nothing published"
+   ],
+   "source": null,
+   "first_try_ok": null,
+   "first_try_problems": null,
+   "guard_first": null,
+   "calls": null,
+   "tools": [],
+   "cost_usd": 0,
+   "published": null
+  },
+  {
+   "id": "stale-price",
+   "passed": false,
+   "problems": [
+    "nothing published"
+   ],
+   "source": null,
+   "first_try_ok": null,
+   "first_try_problems": null,
+   "guard_first": null,
+   "calls": null,
+   "tools": [],
+   "cost_usd": 0,
+   "published": null
+  },
+  {
+   "id": "just-under-threshold",
+   "passed": false,
+   "problems": [
+    "nothing published"
+   ],
+   "source": null,
+   "first_try_ok": null,
+   "first_try_problems": null,
+   "guard_first": null,
+   "calls": null,
+   "tools": [],
+   "cost_usd": 0,
+   "published": null
+  },
+  {
+   "id": "shop-switch",
+   "passed": false,
+   "problems": [
+    "nothing published"
+   ],
+   "source": null,
+   "first_try_ok": null,
+   "first_try_problems": null,
+   "guard_first": null,
+   "calls": null,
+   "tools": [],
+   "cost_usd": 0,
+   "published": null
+  },
+  {
+   "id": "not-lowest-ever",
+   "passed": false,
+   "problems": [
+    "nothing published"
+   ],
+   "source": null,
+   "first_try_ok": null,
+   "first_try_problems": null,
+   "guard_first": null,
+   "calls": null,
+   "tools": [],
+   "cost_usd": 0,
+   "published": null
+  }
+ ]
+}

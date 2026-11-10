@@ -1,0 +1,774 @@
+[
+ {
+  "id": "clear-drop",
+  "what": "One clear price cut: Bitaxe Gamma $67 -> $59.99 at Solo Satoshi. Everything else flat.",
+  "listings": [
+   {
+    "seller": "solosatoshi",
+    "miner": "bitaxe-gamma",
+    "today": 59.99,
+    "history": [
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67
+    ]
+   },
+   {
+    "seller": "bitcoinmerch",
+    "miner": "nerdqaxe-pp",
+    "today": 229.99,
+    "history": [
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99
+    ]
+   },
+   {
+    "seller": "altair",
+    "miner": "hammer-bc04",
+    "today": 215,
+    "history": [
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215
+    ]
+   }
+  ]
+ },
+ {
+  "id": "biggest-drop-sold-out",
+  "what": "The biggest drop is on a sold-out listing; the in-stock pick is a smaller 5% drop.",
+  "listings": [
+   {
+    "seller": "bitcoinmerch",
+    "miner": "nerdqaxe-pp",
+    "today": null,
+    "history": [
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99
+    ]
+   },
+   {
+    "seller": "altair",
+    "miner": "hammer-bc04",
+    "today": 204.25,
+    "history": [
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215
+    ]
+   },
+   {
+    "seller": "solosatoshi",
+    "miner": "bitaxe-gamma",
+    "today": 67,
+    "history": [
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67
+    ]
+   }
+  ]
+ },
+ {
+  "id": "no-deal-flat",
+  "what": "Nothing moved more than 1%: the honest answer is 'no standout deal'.",
+  "listings": [
+   {
+    "seller": "solosatoshi",
+    "miner": "bitaxe-gamma",
+    "today": 67,
+    "history": [
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67
+    ]
+   },
+   {
+    "seller": "altair",
+    "miner": "hammer-bc04",
+    "today": 213,
+    "history": [
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215
+    ]
+   },
+   {
+    "seller": "bitcoinmerch",
+    "miner": "nerdqaxe-pp",
+    "today": 229.99,
+    "history": [
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99
+    ]
+   }
+  ]
+ },
+ {
+  "id": "one-day-spike",
+  "what": "Avalon Nano 3S had a one-day $399 spike (a mean would call today's $215 a 7% drop; the median says 1.8%). Real deal: Gamma Duo 4% off.",
+  "listings": [
+   {
+    "seller": "altair",
+    "miner": "avalon-nano-3s",
+    "today": 215,
+    "history": [
+     219,
+     219,
+     219,
+     219,
+     219,
+     219,
+     219,
+     399,
+     219,
+     219,
+     219,
+     219,
+     219,
+     219
+    ]
+   },
+   {
+    "seller": "solosatoshi",
+    "miner": "bitaxe-gamma-duo",
+    "today": 107.22,
+    "history": [
+     111.69,
+     111.69,
+     111.69,
+     111.69,
+     111.69,
+     111.69,
+     111.69,
+     111.69,
+     111.69,
+     111.69,
+     111.69,
+     111.69,
+     111.69,
+     111.69
+    ]
+   },
+   {
+    "seller": "solosatoshi",
+    "miner": "bitaxe-gamma",
+    "today": 67,
+    "history": [
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67
+    ]
+   }
+  ]
+ },
+ {
+  "id": "fx-noise",
+  "what": "A euro shop's USD price fell 4% only because the euro moved (own price unchanged). The real cut is NerdQaxe++ 3.5% at Bitcoin Merch.",
+  "listings": [
+   {
+    "seller": "bitaxede",
+    "miner": "bitaxe-touch",
+    "today": 480.0,
+    "own_today": 429.0,
+    "history": [
+     500.0,
+     500.0,
+     500.0,
+     500.0,
+     500.0,
+     500.0,
+     500.0,
+     500.0,
+     500.0,
+     500.0,
+     500.0,
+     500.0,
+     500.0,
+     500.0
+    ],
+    "own_history": [
+     429.0,
+     429.0,
+     429.0,
+     429.0,
+     429.0,
+     429.0,
+     429.0,
+     429.0,
+     429.0,
+     429.0,
+     429.0,
+     429.0,
+     429.0,
+     429.0
+    ]
+   },
+   {
+    "seller": "bitcoinmerch",
+    "miner": "nerdqaxe-pp",
+    "today": 221.94,
+    "history": [
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99
+    ]
+   },
+   {
+    "seller": "solosatoshi",
+    "miner": "bitaxe-gamma",
+    "today": 67,
+    "history": [
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67
+    ]
+   }
+  ]
+ },
+ {
+  "id": "tie-new-low",
+  "what": "Two miners both exactly 6% off; only Avalon Mini 3 is at a new low, so it wins the tie.",
+  "listings": [
+   {
+    "seller": "altair",
+    "miner": "hammer-bc04",
+    "today": 188.0,
+    "history": [
+     180.0,
+     180.0,
+     200.0,
+     200.0,
+     200.0,
+     200.0,
+     200.0,
+     200.0,
+     200.0,
+     200.0,
+     200.0,
+     200.0,
+     200.0,
+     200.0
+    ]
+   },
+   {
+    "seller": "altair",
+    "miner": "avalon-mini-3",
+    "today": 752.0,
+    "history": [
+     800.0,
+     800.0,
+     800.0,
+     800.0,
+     800.0,
+     800.0,
+     800.0,
+     800.0,
+     800.0,
+     800.0,
+     800.0,
+     800.0,
+     800.0,
+     800.0
+    ]
+   },
+   {
+    "seller": "solosatoshi",
+    "miner": "bitaxe-gamma",
+    "today": 67,
+    "history": [
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67
+    ]
+   }
+  ]
+ },
+ {
+  "id": "new-listing-short-history",
+  "what": "Bitaxe Touch is 40% under its only 2 days of history: too little history to call it a deal. Real deal: Gamma 4.5% off.",
+  "listings": [
+   {
+    "seller": "bitcoinmerch",
+    "miner": "bitaxe-touch",
+    "today": 299.99,
+    "history": [
+     499.99,
+     499.99
+    ]
+   },
+   {
+    "seller": "solosatoshi",
+    "miner": "bitaxe-gamma",
+    "today": 63.99,
+    "history": [
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67
+    ]
+   },
+   {
+    "seller": "altair",
+    "miner": "hammer-bc04",
+    "today": 215,
+    "history": [
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215
+    ]
+   }
+  ]
+ },
+ {
+  "id": "stale-price",
+  "what": "A shop page failed to load and shows an old low price (stale). Ignore it. Real deal: Hammer BC04 5% off.",
+  "listings": [
+   {
+    "seller": "solosatoshi",
+    "miner": "nerdqaxe-pp",
+    "today": 150.0,
+    "stale": true,
+    "history": [
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99
+    ]
+   },
+   {
+    "seller": "bitcoinmerch",
+    "miner": "nerdqaxe-pp",
+    "today": 229.99,
+    "history": [
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99
+    ]
+   },
+   {
+    "seller": "altair",
+    "miner": "hammer-bc04",
+    "today": 204.25,
+    "history": [
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215
+    ]
+   }
+  ]
+ },
+ {
+  "id": "just-under-threshold",
+  "what": "Best drop is 2.9%, just under the 3% bar; prices otherwise rose. Answer: no standout deal.",
+  "listings": [
+   {
+    "seller": "altair",
+    "miner": "hammer-bc04",
+    "today": 208.77,
+    "history": [
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215
+    ]
+   },
+   {
+    "seller": "solosatoshi",
+    "miner": "bitaxe-gamma",
+    "today": 69,
+    "history": [
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67
+    ]
+   },
+   {
+    "seller": "bitcoinmerch",
+    "miner": "nerdqaxe-pp",
+    "today": 239.99,
+    "history": [
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99
+    ]
+   }
+  ]
+ },
+ {
+  "id": "shop-switch",
+  "what": "NerdQaxe++ is usually cheapest at Bitcoin Merch, but today Solo Satoshi has it 8% lower. The shop must be Solo Satoshi.",
+  "listings": [
+   {
+    "seller": "bitcoinmerch",
+    "miner": "nerdqaxe-pp",
+    "today": 229.99,
+    "history": [
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99,
+     229.99
+    ]
+   },
+   {
+    "seller": "solosatoshi",
+    "miner": "nerdqaxe-pp",
+    "today": 211.59,
+    "history": [
+     239.99,
+     239.99,
+     239.99,
+     239.99,
+     239.99,
+     239.99,
+     239.99,
+     239.99,
+     239.99,
+     239.99,
+     239.99,
+     239.99,
+     239.99,
+     239.99
+    ]
+   },
+   {
+    "seller": "altair",
+    "miner": "hammer-bc04",
+    "today": 210,
+    "history": [
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215,
+     215
+    ]
+   },
+   {
+    "seller": "solosatoshi",
+    "miner": "bitaxe-gamma",
+    "today": 65,
+    "history": [
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67
+    ]
+   }
+  ]
+ },
+ {
+  "id": "not-lowest-ever",
+  "what": "Gamma Duo is 5% under its 14-day typical price, but it was cheaper 3 weeks ago. Must NOT say 'lowest ever'.",
+  "listings": [
+   {
+    "seller": "solosatoshi",
+    "miner": "bitaxe-gamma-duo",
+    "today": 106.11,
+    "history": [
+     99.0,
+     99.0,
+     99.0,
+     99.0,
+     99.0,
+     111.69,
+     111.69,
+     111.69,
+     111.69,
+     111.69,
+     111.69,
+     111.69,
+     111.69,
+     111.69,
+     111.69,
+     111.69,
+     111.69,
+     111.69,
+     111.69,
+     111.69,
+     111.69
+    ]
+   },
+   {
+    "seller": "solosatoshi",
+    "miner": "bitaxe-gamma",
+    "today": 67,
+    "history": [
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67,
+     67
+    ]
+   }
+  ]
+ }
+]

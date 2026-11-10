@@ -1,0 +1,289 @@
+{
+ "summary": {
+  "mode": "scripted",
+  "model": null,
+  "when": "2026-11-10T21:42:38Z",
+  "passed": 11,
+  "total": 11,
+  "first_try_ok": 11,
+  "fallbacks": 0,
+  "cost_usd": 0.0
+ },
+ "rows": [
+  {
+   "id": "clear-drop",
+   "passed": true,
+   "problems": [],
+   "source": "ai",
+   "first_try_ok": true,
+   "first_try_problems": [],
+   "guard_first": [],
+   "calls": 3,
+   "tools": [
+    "rank_price_drops",
+    "compare_to_average",
+    "get_price_history"
+   ],
+   "cost_usd": 0.0,
+   "published": {
+    "no_standout": false,
+    "miner_id": "bitaxe-gamma",
+    "retailer_name": "Solo Satoshi",
+    "price_usd": 59.99,
+    "drop_pct": 10.5,
+    "headline": "10.5% off its typical price at Solo Satoshi",
+    "summary": "It's $59.99 today, in stock at Solo Satoshi. Its typical price over the last 14 days was $67.00, so that's $7.01 (10.5%) less. That's the lowest price we've logged for it."
+   }
+  },
+  {
+   "id": "biggest-drop-sold-out",
+   "passed": true,
+   "problems": [],
+   "source": "ai",
+   "first_try_ok": true,
+   "first_try_problems": [],
+   "guard_first": [],
+   "calls": 3,
+   "tools": [
+    "rank_price_drops",
+    "compare_to_average",
+    "get_price_history"
+   ],
+   "cost_usd": 0.0,
+   "published": {
+    "no_standout": false,
+    "miner_id": "hammer-bc04",
+    "retailer_name": "Altair Technology",
+    "price_usd": 204.25,
+    "drop_pct": 5.0,
+    "headline": "5% off its typical price at Altair Technology",
+    "summary": "It's $204.25 today, in stock at Altair Technology. Its typical price over the last 14 days was $215.00, so that's $10.75 (5%) less. That's the lowest price we've logged for it."
+   }
+  },
+  {
+   "id": "no-deal-flat",
+   "passed": true,
+   "problems": [],
+   "source": "ai",
+   "first_try_ok": true,
+   "first_try_problems": [],
+   "guard_first": [],
+   "calls": 3,
+   "tools": [
+    "rank_price_drops",
+    "compare_to_average",
+    "get_price_history"
+   ],
+   "cost_usd": 0.0,
+   "published": {
+    "no_standout": true,
+    "miner_id": "",
+    "retailer_name": "",
+    "price_usd": 0,
+    "drop_pct": 0,
+    "headline": "No standout deal today",
+    "summary": "No miner we track is at least 3% below its typical price of the last 14 days. Prices are steady, so there's no rush today."
+   }
+  },
+  {
+   "id": "one-day-spike",
+   "passed": true,
+   "problems": [],
+   "source": "ai",
+   "first_try_ok": true,
+   "first_try_problems": [],
+   "guard_first": [],
+   "calls": 3,
+   "tools": [
+    "rank_price_drops",
+    "compare_to_average",
+    "get_price_history"
+   ],
+   "cost_usd": 0.0,
+   "published": {
+    "no_standout": false,
+    "miner_id": "bitaxe-gamma-duo",
+    "retailer_name": "Solo Satoshi",
+    "price_usd": 107.22,
+    "drop_pct": 4.0,
+    "headline": "4% off its typical price at Solo Satoshi",
+    "summary": "It's $107.22 today, in stock at Solo Satoshi. Its typical price over the last 14 days was $111.69, so that's $4.47 (4%) less. That's the lowest price we've logged for it."
+   }
+  },
+  {
+   "id": "fx-noise",
+   "passed": true,
+   "problems": [],
+   "source": "ai",
+   "first_try_ok": true,
+   "first_try_problems": [],
+   "guard_first": [],
+   "calls": 3,
+   "tools": [
+    "rank_price_drops",
+    "compare_to_average",
+    "get_price_history"
+   ],
+   "cost_usd": 0.0,
+   "published": {
+    "no_standout": false,
+    "miner_id": "nerdqaxe-pp",
+    "retailer_name": "Bitcoin Merch",
+    "price_usd": 221.94,
+    "drop_pct": 3.5,
+    "headline": "3.5% off its typical price at Bitcoin Merch",
+    "summary": "It's $221.94 today, in stock at Bitcoin Merch. Its typical price over the last 14 days was $229.99, so that's $8.05 (3.5%) less. That's the lowest price we've logged for it."
+   }
+  },
+  {
+   "id": "tie-new-low",
+   "passed": true,
+   "problems": [],
+   "source": "ai",
+   "first_try_ok": true,
+   "first_try_problems": [],
+   "guard_first": [],
+   "calls": 3,
+   "tools": [
+    "rank_price_drops",
+    "compare_to_average",
+    "get_price_history"
+   ],
+   "cost_usd": 0.0,
+   "published": {
+    "no_standout": false,
+    "miner_id": "avalon-mini-3",
+    "retailer_name": "Altair Technology",
+    "price_usd": 752.0,
+    "drop_pct": 6.0,
+    "headline": "6% off its typical price at Altair Technology",
+    "summary": "It's $752.00 today, in stock at Altair Technology. Its typical price over the last 14 days was $800.00, so that's $48.00 (6%) less. That's the lowest price we've logged for it."
+   }
+  },
+  {
+   "id": "new-listing-short-history",
+   "passed": true,
+   "problems": [],
+   "source": "ai",
+   "first_try_ok": true,
+   "first_try_problems": [],
+   "guard_first": [],
+   "calls": 3,
+   "tools": [
+    "rank_price_drops",
+    "compare_to_average",
+    "get_price_history"
+   ],
+   "cost_usd": 0.0,
+   "published": {
+    "no_standout": false,
+    "miner_id": "bitaxe-gamma",
+    "retailer_name": "Solo Satoshi",
+    "price_usd": 63.99,
+    "drop_pct": 4.5,
+    "headline": "4.5% off its typical price at Solo Satoshi",
+    "summary": "It's $63.99 today, in stock at Solo Satoshi. Its typical price over the last 14 days was $67.00, so that's $3.01 (4.5%) less. That's the lowest price we've logged for it."
+   }
+  },
+  {
+   "id": "stale-price",
+   "passed": true,
+   "problems": [],
+   "source": "ai",
+   "first_try_ok": true,
+   "first_try_problems": [],
+   "guard_first": [],
+   "calls": 3,
+   "tools": [
+    "rank_price_drops",
+    "compare_to_average",
+    "get_price_history"
+   ],
+   "cost_usd": 0.0,
+   "published": {
+    "no_standout": false,
+    "miner_id": "hammer-bc04",
+    "retailer_name": "Altair Technology",
+    "price_usd": 204.25,
+    "drop_pct": 5.0,
+    "headline": "5% off its typical price at Altair Technology",
+    "summary": "It's $204.25 today, in stock at Altair Technology. Its typical price over the last 14 days was $215.00, so that's $10.75 (5%) less. That's the lowest price we've logged for it."
+   }
+  },
+  {
+   "id": "just-under-threshold",
+   "passed": true,
+   "problems": [],
+   "source": "ai",
+   "first_try_ok": true,
+   "first_try_problems": [],
+   "guard_first": [],
+   "calls": 3,
+   "tools": [
+    "rank_price_drops",
+    "compare_to_average",
+    "get_price_history"
+   ],
+   "cost_usd": 0.0,
+   "published": {
+    "no_standout": true,
+    "miner_id": "",
+    "retailer_name": "",
+    "price_usd": 0,
+    "drop_pct": 0,
+    "headline": "No standout deal today",
+    "summary": "No miner we track is at least 3% below its typical price of the last 14 days. Prices are steady, so there's no rush today."
+   }
+  },
+  {
+   "id": "shop-switch",
+   "passed": true,
+   "problems": [],
+   "source": "ai",
+   "first_try_ok": true,
+   "first_try_problems": [],
+   "guard_first": [],
+   "calls": 3,
+   "tools": [
+    "rank_price_drops",
+    "compare_to_average",
+    "get_price_history"
+   ],
+   "cost_usd": 0.0,
+   "published": {
+    "no_standout": false,
+    "miner_id": "nerdqaxe-pp",
+    "retailer_name": "Solo Satoshi",
+    "price_usd": 211.59,
+    "drop_pct": 8.0,
+    "headline": "8% off its typical price at Solo Satoshi",
+    "summary": "It's $211.59 today, in stock at Solo Satoshi. Its typical price over the last 14 days was $229.99, so that's $18.40 (8%) less. That's the lowest price we've logged for it."
+   }
+  },
+  {
+   "id": "not-lowest-ever",
+   "passed": true,
+   "problems": [],
+   "source": "ai",
+   "first_try_ok": true,
+   "first_try_problems": [],
+   "guard_first": [],
+   "calls": 3,
+   "tools": [
+    "rank_price_drops",
+    "compare_to_average",
+    "get_price_history"
+   ],
+   "cost_usd": 0.0,
+   "published": {
+    "no_standout": false,
+    "miner_id": "bitaxe-gamma-duo",
+    "retailer_name": "Solo Satoshi",
+    "price_usd": 106.11,
+    "drop_pct": 5.0,
+    "headline": "5% off its typical price at Solo Satoshi",
+    "summary": "It's $106.11 today, in stock at Solo Satoshi. Its typical price over the last 14 days was $111.69, so that's $5.58 (5%) less."
+   }
+  }
+ ]
+}
