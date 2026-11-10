@@ -109,14 +109,6 @@ button:disabled{opacity:.6;cursor:default}
 }
 .older{color:var(--muted);font-size:14px;margin-top:14px}
 
-/* ---- steps ---- */
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;list-style:none;padding:0;margin:0}
-.steps li{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px}
-.steps b{display:block;font-size:16px;margin-bottom:2px}
-.steps span{color:var(--muted);font-size:14px}
-.steps i{display:inline-flex;width:30px;height:30px;border-radius:50%;align-items:center;justify-content:center;background:rgba(247,147,26,.14);color:var(--accent);font-style:normal;font-weight:800;margin-bottom:8px}
-@media (max-width:700px){.steps{grid-template-columns:1fr}.steps li{display:grid;grid-template-columns:38px 1fr;column-gap:8px;padding:12px 14px}.steps i{grid-row:span 2;margin:0}}
-
 /* ---- best-deal box (model pages) ---- */
 .cta{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,440px));gap:12px;margin:18px 0}
 .cta>div{position:relative;background:linear-gradient(160deg,rgba(247,147,26,.16),rgba(247,147,26,.03) 60%),var(--panel);border:1.5px solid rgba(247,147,26,.6);border-radius:var(--r);padding:16px 18px}
@@ -175,7 +167,8 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:0;border
 .signup label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:var(--muted)}
 .signup-actions{display:flex!important;flex-wrap:wrap;gap:12px;align-items:center;margin-top:14px}
 .signup-actions button{padding:12px 22px;font-size:16px}
-.turnstile-slot{min-height:65px}
+.turnstile-slot{flex-basis:100%;order:3;min-height:0}   /* invisible bot check: only takes space if Cloudflare needs a click */
+.turnstile-slot:empty{display:none}
 .signup .hint{margin-bottom:0}
 .signup .nl-row{grid-template-columns:minmax(0,420px)}
 @media (max-width:700px){.signup{padding:16px}.signup .row{grid-template-columns:1fr}.signup-actions button{width:100%}}
@@ -628,4 +621,113 @@ table.eval-q tbody tr:hover,table.eval-runs tbody tr:hover{background:var(--pane
   .eval-reveal,.eval-score,.eval-ba article{opacity:1;transform:none;transition:none;box-shadow:none}
   .eval-score:hover,.eval-ba article:hover{transform:none}
   .eval-fold-body,.eval-fold summary::after{transition:none}
+}
+
+/* ---- price history chart (model pages) ---- */
+.pchart{margin:0;background:radial-gradient(120% 90% at 100% 0%,rgba(247,147,26,.07),transparent 60%),var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px 18px 12px}
+.pc-plot{position:relative;height:clamp(190px,44vw,290px);margin:10px 78px 30px 44px;touch-action:pan-y;cursor:crosshair}
+.pc-plot svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.pchart .grid{stroke:#223050;stroke-width:1;vector-effect:non-scaling-stroke}
+.pchart .ln{fill:none;stroke-width:3;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke;transition:opacity .2s}
+.pchart .ln.oos{stroke-dasharray:4 7;stroke-opacity:.6;stroke-width:2.25}
+.pchart .area{transition:opacity .2s}
+.pchart.focus .ln:not(.on),.pchart.focus .area{opacity:.12}
+.pc-ov{position:absolute;inset:0;pointer-events:none}
+.pc-ov .gy{position:absolute;left:-10px;transform:translate(-100%,-50%);font-size:12px;color:var(--faint);font-variant-numeric:tabular-nums;white-space:nowrap}
+.pc-ov .gx{position:absolute;bottom:-26px;font-size:12px;color:var(--faint);white-space:nowrap}
+.pc-ov .gx.l{left:0}.pc-ov .gx.r{right:0}
+.cdot{position:absolute;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:var(--c,var(--accent));box-shadow:0 0 0 3px var(--panel)}
+.cdot.now::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid var(--c,var(--accent));opacity:.5}
+.cdot.end{width:9px;height:9px;margin:-4.5px 0 0 -4.5px;box-shadow:0 0 0 2.5px var(--panel)}
+.cdot.low{width:10px;height:10px;margin:-5px 0 0 -5px;background:var(--panel);border:2.5px solid var(--good);box-shadow:none}
+.ctag{position:absolute;font-size:12.5px;font-weight:800;white-space:nowrap;line-height:1.15}
+.ctag.now{left:100%;margin-left:14px;transform:translateY(-50%);color:var(--text)}
+.ctag.now small{display:block;font-size:11px;font-weight:600;color:var(--muted)}
+.ctag.low{transform:translate(-50%,calc(-100% - 10px));background:var(--good-bg);color:var(--good);padding:2px 7px;border-radius:99px}
+.pc-guide{position:absolute;top:-6px;bottom:0;width:0;border-left:1px dashed var(--ring);pointer-events:none}
+.pc-tip{position:absolute;top:0;z-index:2;transform:translate(12px,-4px);min-width:150px;background:rgba(9,15,30,.96);border:1px solid var(--ring);border-radius:10px;padding:8px 10px;font-size:12.5px;line-height:1.35;box-shadow:0 10px 24px rgba(0,0,0,.45);pointer-events:none}
+.pc-tip.flip{transform:translate(calc(-100% - 12px),-4px)}
+.pc-tip b{display:block;color:var(--muted);font-weight:700;margin-bottom:3px}
+.pc-tip .tr{display:flex;align-items:center;gap:7px;white-space:nowrap}
+.pc-tip .tr i{width:9px;height:9px;border-radius:50%;flex:0 0 9px}
+.pc-tip .tr em{font-style:normal;color:var(--muted);flex:1}
+.pc-tip .tr strong{font-variant-numeric:tabular-nums}
+.pc-tip .tr.out strong{color:var(--muted);font-weight:600}
+.pc-legend{display:flex;flex-wrap:wrap;gap:8px;list-style:none;margin:6px 0 4px;padding:0}
+.pc-legend li{display:inline-flex;align-items:center;gap:7px;padding:6px 11px;border:1px solid var(--line);border-radius:99px;background:var(--bg2);font-size:13.5px;cursor:default;transition:border-color .15s,background .15s}
+.pc-legend li:hover{border-color:var(--ring);background:var(--panel2)}
+.pc-legend i{width:14px;height:4px;border-radius:2px}
+.pc-legend .lp{font-weight:800;font-variant-numeric:tabular-nums}
+.pc-legend .ls{font-size:11.5px;color:var(--good)}
+.pc-legend .ls.out{color:var(--muted)}
+.pchart figcaption{margin:8px 0 0}
+.chart-note{background:var(--good-bg);border:1px solid rgba(52,211,153,.25);border-radius:var(--r-sm);padding:9px 12px;font-size:14px;margin:12px 0}
+.chart-note b{color:var(--good)}
+@media (max-width:700px){
+  .pchart{padding:14px 12px 10px}
+  .pc-plot{margin:8px 66px 28px 38px}
+  .pc-ov .gy{font-size:11px;left:-7px}
+  .pc-plot{margin-right:74px}
+  .ctag.now{margin-left:10px;font-size:12px}
+  .ctag.now small{font-size:10.5px}
+  .pc-legend{gap:6px}
+  .pc-legend li{font-size:12.5px;padding:5px 9px;gap:6px}
+  .pc-legend .ls:not(.out){display:none}
+}
+
+/* ---- homepage: top-3 cards ---- */
+.cards.cards-top{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:900px) and (min-width:561px){.cards.cards-top{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.cards-top .card .price{font-size:25px}.cards-top .card .body{padding:12px}}
+@media (max-width:560px){.cards.cards-top{grid-template-columns:1fr}}
+.card{transition:border-color .2s,transform .25s cubic-bezier(.2,.8,.3,1),box-shadow .25s}
+.card:hover{border-color:rgba(247,147,26,.55);transform:translateY(-4px);box-shadow:0 14px 34px -12px rgba(0,0,0,.65),0 0 0 1px rgba(247,147,26,.15)}
+.card .art img{transition:transform .35s cubic-bezier(.2,.8,.3,1)}
+.card:hover .art img{transform:scale(1.06) translateY(-2px)}
+.btile{transition:border-color .2s,transform .25s cubic-bezier(.2,.8,.3,1),box-shadow .25s}
+.btile:hover{transform:translateY(-3px);box-shadow:0 12px 26px -14px rgba(247,147,26,.45)}
+.btile .bimg img{transition:transform .35s cubic-bezier(.2,.8,.3,1)}
+.btile:hover .bimg img{transform:scale(1.08)}
+.home-hero .hl{white-space:nowrap;background:linear-gradient(90deg,var(--accent),var(--accent-2),var(--accent));background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent}
+.chips strong{font-variant-numeric:tabular-nums}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+#faq details{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-sm);padding:4px 14px;margin:0 0 10px}
+#faq details[open]{border-color:var(--ring)}
+#faq summary{cursor:pointer;font-weight:700;padding:10px 0}
+
+/* Motion only when the visitor has not asked to reduce it. The hidden starting states are behind classes that
+   motion.js adds (.rv, .anim), so with JS off the finished page shows (docs/EVAL_DASHBOARD.md story #46). */
+@media (prefers-reduced-motion: no-preference){
+  .radar-sweep{transform-box:view-box;transform-origin:100px 100px;animation:radar-spin 7s linear infinite}
+  .home-hero .radar-bg{animation:radar-glow 7s ease-in-out infinite}
+  .home-hero .hl{animation:hl-shine 6s ease-in-out infinite}
+  .chips .live::before{animation:live-ping 2.4s ease-out infinite}
+  .rv [data-reveal-item],.rv .card,.rv .btile,.rv>.sec-head,.rv>.hint,.rv>h2,.rv>.lede,.rv>form{opacity:0;translate:0 16px}
+  .rv.is-in [data-reveal-item],.rv.is-in .card,.rv.is-in .btile,.rv.is-in>.sec-head,.rv.is-in>.hint,.rv.is-in>h2,.rv.is-in>.lede,.rv.is-in>form{animation:rv-in .6s cubic-bezier(.2,.8,.3,1) forwards;animation-delay:calc(var(--rv-i,0) * 90ms + 60ms)}
+  .rv.is-in>.sec-head,.rv.is-in>h2{animation-delay:0ms}
+  .rv.is-in>.hint,.rv.is-in>.lede{animation-delay:60ms}
+  .rv.is-in>form{animation-delay:140ms}
+  .pchart.anim .chart-reveal{transform-box:view-box;transform-origin:0 0;transform:scaleX(0)}
+  .pchart.anim.is-inview .chart-reveal{animation:pc-draw 1.5s cubic-bezier(.45,.05,.25,1) forwards}
+  .pchart.anim .cdot,.pchart.anim .ctag{opacity:0}
+  .pchart.anim.is-inview .cdot,.pchart.anim.is-inview .ctag{animation:pc-pop .45s cubic-bezier(.2,.9,.3,1.4) 1.35s forwards}
+  .pchart.anim.is-inview .cdot.low,.pchart.anim.is-inview .ctag.low{animation-delay:1.6s}
+  .pchart.anim .gy{opacity:0}
+  .pchart.anim.is-inview .gy{animation:rv-fade .5s ease forwards}
+  .cdot.now::after{animation:live-ring 2.2s ease-out 2s infinite}
+  .pc-legend li{opacity:1}
+  .pchart.anim .pc-legend li{opacity:0;translate:0 6px}
+  .pchart.anim.is-inview .pc-legend li{animation:rv-in .45s ease forwards}
+  .pchart.anim.is-inview .pc-legend li:nth-child(2){animation-delay:.08s}
+  .pchart.anim.is-inview .pc-legend li:nth-child(3){animation-delay:.16s}
+  .pchart.anim.is-inview .pc-legend li:nth-child(4){animation-delay:.24s}
+  .pchart.anim.is-inview .pc-legend li:nth-child(5){animation-delay:.32s}
+  @keyframes radar-spin{to{transform:rotate(360deg)}}
+  @keyframes radar-glow{0%,100%{opacity:.16}50%{opacity:.24}}
+  @keyframes hl-shine{0%,100%{background-position:0% 0}50%{background-position:100% 0}}
+  @keyframes live-ping{0%{box-shadow:0 0 0 0 rgba(52,211,153,.55)}80%,100%{box-shadow:0 0 0 7px rgba(52,211,153,0)}}
+  @keyframes live-ring{0%{transform:scale(.6);opacity:.7}100%{transform:scale(1.9);opacity:0}}
+  @keyframes rv-in{to{opacity:1;translate:0 0}}
+  @keyframes rv-fade{to{opacity:1}}
+  @keyframes pc-draw{to{transform:scaleX(1)}}
+  @keyframes pc-pop{from{opacity:0;scale:.5}to{opacity:1;scale:1}}
 }

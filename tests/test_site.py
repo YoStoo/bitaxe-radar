@@ -248,7 +248,7 @@ class SiteTests(unittest.TestCase):
         self.assertIn('id="miners"', home)
         self.assertGreaterEqual(home.count('class="card'), 4)
         self.assertIn('class="logo-mark"', home)
-        self.assertIn('id="cost"', home)
+        self.assertIn('id="cost"', (SITE / "faq" / "index.html").read_text())   # the power-cost calculator moved to /faq/
         self.assertIn("signup.js", home)
         self.assertIn("<svg", (SITE / "favicon.svg").read_text())
         # every product photo referenced anywhere exists and carries alt text and explicit dimensions

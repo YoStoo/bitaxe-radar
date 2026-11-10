@@ -680,7 +680,7 @@ LOGO_SVG = ('<svg class="logo-mark" viewBox="0 0 64 64" aria-hidden="true" focus
 WORDMARK = f'{LOGO_SVG}<span>Bitaxe <b>Radar</b></span>'
 RADAR_BG = ('<svg class="radar-bg" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><g fill="none" stroke="#8fa6d6" stroke-width="1.5">'
             '<circle cx="100" cy="100" r="96"/><circle cx="100" cy="100" r="72"/><circle cx="100" cy="100" r="48"/><circle cx="100" cy="100" r="24"/>'
-            '<path d="M100 0v200M0 100h200" stroke-opacity=".5"/></g><path d="M100 100 L132.8 9.8 A96 96 0 0 1 178.6 45 Z" fill="#f7931a" fill-opacity=".8"/></svg>')
+            '<path d="M100 0v200M0 100h200" stroke-opacity=".5"/></g><path class="radar-sweep" d="M100 100 L132.8 9.8 A96 96 0 0 1 178.6 45 Z" fill="#f7931a" fill-opacity=".8"/></svg>')
 CHIPS = {"bitaxe-supra": 1, "bitaxe-ultra": 1, "bitaxe-gamma": 1, "bitaxe-gamma-duo": 2, "bitaxe-gt-801": 2,
          "nerdaxe-gamma": 1, "nerdaxe-gaia": 1, "nerdqaxe-pp": 4, "nerdoctaxe": 4, "nerdqx": 4, "dcentral-stealthminer": 4, "bitaxe-702": 6, "nerdaxe-gaia-copper-pro": 1}
 SCREEN = {"nerdaxe-gamma", "nerdaxe-gaia", "nerdaxe-gaia-copper-pro", "bitaxe-touch", "hammer-thor-x1", "hammer-bc01", "gekko-terminus-a2x"}
@@ -902,7 +902,7 @@ FOOT_GROUPS = [
     ("Miners", [("/miners/", "All miners"), ("/solo-miners/", "Solo miners"), ("/pool-miners/", "Pool miners"), ("/heater-miners/", "Heater miners"),
                 ("/solo-odds/", "Solo odds"), ("/solo-wins/", "Solo wins"), ("/heat-calculator/", "Room heat calculator"), ("/deals/", "Deals"), ("/price-per-th/", "Price per TH/s"), ("/in-stock/", "In stock now"), ("/find-my-miner/", "Find my miner")]),
     ("Help", [("/guides/", "Guides"), ("/best/", "Best for…"), ("/compare/", "Compare"), ("/sellers/", "Shops"),
-              ("/where-to-buy-bitaxe/", "Where to buy"), ("/alerts/", "Price alerts"), ("/newsletter/", "Newsletter")]),
+              ("/where-to-buy-bitaxe/", "Where to buy"), ("/alerts/", "Price alerts"), ("/newsletter/", "Newsletter"), ("/faq/", "FAQ")]),
     ("About", [("/how-we-track/", "About & how we track"), ("/evals/", "Eval scores"), ("/advertise/", "Advertise"), ("/bitaxe-black-friday/", "Black Friday 2026"), (f"mailto:{CONTACT}", CONTACT)]),
 ]
 
@@ -931,6 +931,9 @@ def ask_widget_scripts():
     return (f'<script>window.RADAR_ASK={json.dumps(cfg, separators=(",", ":"))};</script>\n'
             '<script src="/ask-api.js" defer></script>\n'
             '<script src="/chat-widget.js" defer></script>\n')
+
+
+MOTION_SCRIPT = '<script src="/motion.js" defer></script>\n'
 
 
 def layout(path, title, desc, body, *, crumbs=None, jsonld=(), noindex=False, lastmod=None, scripts="", og_type="website", index_in_sitemap=True):
@@ -968,7 +971,7 @@ def layout(path, title, desc, body, *, crumbs=None, jsonld=(), noindex=False, la
 {body}
 </main>
 {footer_html()}
-{ask_widget_scripts()}{scripts}{calc_scripts() if "data-calc=" in body else ""}{ANALYTICS}
+{ask_widget_scripts()}{scripts}{calc_scripts() if "data-calc=" in body else ""}{MOTION_SCRIPT if ("pchart" in body or "data-reveal" in body) else ""}{ANALYTICS}
 </body>
 </html>
 """
@@ -1026,44 +1029,146 @@ def to_usd(p):
     return p["price"] * rate if rate else None
 
 
+CHART_MAX_SHOPS = 5      # more lines than this turns into spaghetti; every shop is still in the price log below
+
+
+def nice_step(span, target=4):
+    """A round gridline step ($1, $2, $5, $10, $20, $50 ...) giving about `target` lines over `span` dollars."""
+    raw = max(span / target, 0.01)
+    mag = 10 ** math.floor(math.log10(raw))
+    return next(m * mag for m in (1, 2, 2.5, 5, 10) if m * mag >= raw)
+
+
+def chart_money(v):
+    return f"${v:,.0f}" if v >= 100 or abs(v - round(v)) < 0.005 else f"${v:,.2f}"
+
+
 def chart_svg(mid):
+    """Price history: one stepped line per shop (a price holds until the next check), solid while in stock and dashed
+    while not. The cheapest shop right now gets a soft gradient fill, a "Now" dot and label, and the lowest in-stock
+    price in the window gets a marker. Lines draw in once on scroll (CSS, only when JS runs and motion is allowed).
+    Labels are HTML on top of a stretchable SVG, so text stays readable on a phone. A tap or hover tooltip (app.js)
+    reads the same numbers from data-chart. Returns "" when there is nothing worth charting."""
     series = []
-    for i, o in enumerate(sort_offers(offers_for(mid))):
-        pts = [(parse_t(p["t"]), to_usd(p), p) for p in hist_pts(o["id"])]
+    for o in sort_offers(offers_for(mid)):
+        pts = [(parse_t(p["t"]), to_usd(p), bool(p.get("in_stock"))) for p in hist_pts(o["id"])]
         pts = [x for x in pts if x[1] is not None]
+        # a stepped line only needs the checks where price or stock changed (plus the latest check)
+        pts = [x for i, x in enumerate(pts) if i in (0, len(pts) - 1) or (abs(x[1] - pts[i - 1][1]) > 0.004 or x[2] != pts[i - 1][2])]
         if pts:
-            series.append((o, COLORS[i % len(COLORS)], pts))
-    if not series or max(len(s[2]) for s in series) < 2:
+            series.append([o, None, pts])
+    if not series or max(len(hist_pts(x[0]["id"])) for x in series) < 2:
         return ""
-    W, Hh, ml, mr, mt, mb = 640, 320, 58, 14, 14, 34
-    allp = [p for s in series for p in s[2]]
+    # Keep the shops a buyer cares about: in stock now first, then cheapest now.
+    series.sort(key=lambda x: (not x[2][-1][2], x[2][-1][1]))
+    hidden = len(series) - CHART_MAX_SHOPS
+    series = series[:CHART_MAX_SHOPS]
+    for i, x in enumerate(series):
+        x[1] = COLORS[i % len(COLORS)]
+    allp = [p for x in series for p in x[2]]
     tmin, tmax = min(p[0] for p in allp), max(p[0] for p in allp)
-    vmin, vmax = min(p[1] for p in allp), max(p[1] for p in allp)
-    pad = max((vmax - vmin) * 0.15, vmax * 0.05)
-    vmin, vmax = max(0, vmin - pad), vmax + pad
-    span = (tmax - tmin).total_seconds() or 1
+    span_s = (tmax - tmin).total_seconds() or 1
+    lo, hi = min(p[1] for p in allp), max(p[1] for p in allp)
+    step = nice_step(max(hi - lo, hi * 0.08))
+    vmin = max(0, math.floor((lo - step * 0.35) / step) * step)
+    vmax = math.ceil((hi + step * 0.35) / step) * step
+    VW, VH = 1000, 400
 
-    def X(t):
-        return ml + (t - tmin).total_seconds() / span * (W - ml - mr)
+    def fx(t):          # 0..1 across the plot
+        return (t - tmin).total_seconds() / span_s
 
-    def Y(v):
-        return Hh - mb - (v - vmin) / (vmax - vmin) * (Hh - mt - mb)
-    g = []
-    for i in range(5):
-        v = vmin + (vmax - vmin) * i / 4
-        g.append(f'<line x1="{ml}" x2="{W - mr}" y1="{Y(v):.1f}" y2="{Y(v):.1f}" stroke="#24324f"/><text x="{ml - 8}" y="{Y(v) + 5:.1f}" text-anchor="end" fill="#97a3bb" font-size="15">${v:.0f}</text>')
-    g.append(f'<text x="{ml}" y="{Hh - 8}" fill="#97a3bb" font-size="15">{fmt_day(tmin)}</text><text x="{W - mr}" y="{Hh - 8}" text-anchor="end" fill="#97a3bb" font-size="15">{fmt_day(tmax)}</text>')
+    def fy(v):          # 0..1 down the plot
+        return 1 - (v - vmin) / (vmax - vmin)
+
+    def step_runs(pts):
+        """[(in_stock, "M.. H.. V.."), ...]: stepped path pieces, split where stock status changes."""
+        runs, cur, d = [], None, ""
+        for (t, v, ins), nxt in zip(pts, pts[1:] + [None]):
+            y0 = fy(v) * VH
+            if cur is None:
+                cur = ins
+                d = (d if d.endswith(f" {y0:.1f}") else d + f"V{y0:.1f}") if d else f"M{fx(t) * VW:.1f} {y0:.1f}"
+            if nxt is None:
+                break
+            x1 = fx(nxt[0]) * VW
+            d += f"H{x1:.1f}"
+            if nxt[2] == ins:
+                if abs(nxt[1] - v) > 0.004:
+                    d += f"V{fy(nxt[1]) * VH:.1f}"
+            else:                          # stock status flips at the next check: the next piece starts right here
+                runs.append((cur, d))
+                cur, d = None, f"M{x1:.1f} {y0:.1f}"
+        if cur is not None:
+            runs.append((cur, d))
+        return runs
+
+    best = STATS[mid]["best"]
+    lead = next((x for x in series if best and x[0]["id"] == best["id"]), series[0])
+    grid = []
+    v = vmin
+    while v <= vmax + 1e-9:
+        grid.append(v)
+        v += step
+    svg = [f'<defs><linearGradient id="cg-{mid}" x1="0" x2="0" y1="0" y2="1">'
+           f'<stop offset="0" stop-color="{lead[1]}" stop-opacity=".24"/><stop offset=".85" stop-color="{lead[1]}" stop-opacity="0"/></linearGradient>'
+           f'<clipPath id="cc-{mid}"><rect class="chart-reveal" x="0" y="-20" width="{VW}" height="{VH + 40}"/></clipPath></defs>']
+    svg += [f'<line class="grid" x1="0" x2="{VW}" y1="{fy(g) * VH:.1f}" y2="{fy(g) * VH:.1f}"/>' for g in grid]
+    lines = []
+    lp = lead[2]
+    area = "".join(d for _, d in step_runs(lp)).replace("M", "L")
+    area = f"M{fx(lp[0][0]) * VW:.1f} {VH}" + area + f"L{fx(lp[-1][0]) * VW:.1f} {VH}Z"
+    lines.append(f'<path class="area" d="{area}" fill="url(#cg-{mid})"/>')
+    for i, (o, col, pts) in reversed(list(enumerate(series))):   # lead (cheapest now) drawn last, on top
+        for ins, d in step_runs(pts):
+            lines.append(f'<path class="ln{"" if ins else " oos"}" data-i="{i}" d="{d}" stroke="{col}"/>')
+    svg.append(f'<g clip-path="url(#cc-{mid})">{"".join(lines)}</g>')
+
+    # HTML overlay: gridline prices, date range, "Now" dot + label, lowest-in-window marker
+    days = max(1, round(span_s / 86400))
+    ov = [f'<span class="gy" style="top:{fy(g) * 100:.2f}%">{chart_money(g)}</span>' for g in grid]
+    ov.append(f'<span class="gx l">{esc(fmt_day(tmin))}</span><span class="gx r">{esc(fmt_day(tmax))}</span>')
+    lt, lv, lins = lead[2][-1]
+    for o, col, pts in series:      # a small dot where every other shop's line ends (its price at the latest check)
+        if o is not lead[0]:
+            ov.append(f'<span class="cdot end" style="left:{fx(pts[-1][0]) * 100:.2f}%;top:{fy(pts[-1][1]) * 100:.2f}%;--c:{col}"></span>')
+    now_txt = f"Now {chart_money(lv)}" if lins else f"Last {chart_money(lv)} · sold out"
+    ov.append(f'<span class="cdot now" style="left:{fx(lt) * 100:.2f}%;top:{fy(lv) * 100:.2f}%;--c:{lead[1]}"></span>'
+              f'<span class="ctag now" style="top:{fy(lv) * 100:.2f}%">{now_txt}<small>{esc(sname(lead[0]["seller"]))}</small></span>')
+    ins_pts = [(parse_t(p["t"]), to_usd(p), x[0]) for x in series for p in hist_pts(x[0]["id"]) if p.get("in_stock") and to_usd(p) is not None]   # every check, not just the change points
+    low_note = ""
+    if ins_pts:
+        low_v = min(v for _, v, _ in ins_pts)
+        low_t, _, low_o = max((p for p in ins_pts if abs(p[1] - low_v) < 0.005), key=lambda p: p[0])   # most recent time at the low
+        at_low = lins and abs(lv - low_v) < 0.005
+        steady = len({round(v, 2) for _, v, ok in lead[2] if ok}) == 1
+        if at_low and steady:
+            low_note = (f'<p class="chart-note"><b>Steady at {chart_money(lv)}.</b> {esc(sname(lead[0]["seller"]))} has not changed this price since '
+                        f'{esc(fmt_day(tmin))}, and no shop has had it in stock for less.</p>')
+        elif at_low:
+            low_note = f'<p class="chart-note"><b>Now at its {days}-day low.</b> {chart_money(lv)} is the lowest in-stock price we have logged since {esc(fmt_day(tmin))}.</p>'
+        else:
+            left = min(max(fx(low_t) * 100, 6), 86)
+            ov.append(f'<span class="cdot low" style="left:{fx(low_t) * 100:.2f}%;top:{fy(low_v) * 100:.2f}%"></span>'
+                      f'<span class="ctag low" style="left:{left:.2f}%;top:{fy(low_v) * 100:.2f}%">Low {chart_money(low_v)}</span>')
+            low_note = (f'<p class="chart-note">Lowest in-stock price in the last {days} days: <b>{chart_money(low_v)}</b> at '
+                        f'{esc(sname(low_o["seller"]))}, last seen {esc(fmt_day(low_t))}.</p>')
+
     legend = []
-    for o, col, pts in series:
-        if len(pts) > 1:
-            g.append(f'<polyline fill="none" stroke="{col}" stroke-width="3" stroke-linejoin="round" points="{" ".join(f"{X(t):.1f},{Y(v):.1f}" for t, v, _ in pts)}"/>')
-        for t, v, p in pts:
-            fill = col if p.get("in_stock") else "#131d35"
-            g.append(f'<circle cx="{X(t):.1f}" cy="{Y(v):.1f}" r="5" fill="{fill}" stroke="{col}" stroke-width="2.5"><title>{esc(sname(o["seller"]))}: {esc(money(p["price"], p["currency"]))} ({esc(STATUS.get(p["status"], p["status"]))}) {esc(fmt_time(p["t"]))}</title></circle>')
-        legend.append(f'<span><i style="background:{col}"></i>{esc(sname(o["seller"]))}</span>')
-    legend.append("<span>● in stock · ○ not in stock</span>")
-    return (f'<div class="chart"><svg viewBox="0 0 {W} {Hh}" role="img" aria-label="Price history for {esc(SHORT[mid])} in USD (EUR sellers converted at the latest rate)">{"".join(g)}</svg></div>'
-            f'<div class="legend">{"".join(legend)}</div>')
+    for i, (o, col, pts) in enumerate(series):
+        t, v, ins = pts[-1]
+        legend.append(f'<li data-i="{i}"><i style="background:{col}"></i><b>{esc(sname(o["seller"]))}</b>'
+                      f'<span class="lp">{chart_money(v)}</span><span class="ls{"" if ins else " out"}">{"in stock" if ins else "sold out"}</span></li>')
+    more = f'<p class="hint">Showing the {CHART_MAX_SHOPS} most useful shops. {plural(hidden, "more shop")} in the price log below.</p>' if hidden > 0 else ""
+    data = {"t0": int(tmin.timestamp() * 1000), "t1": int(tmax.timestamp() * 1000), "lo": vmin, "hi": vmax,
+            "s": [{"n": sname(o["seller"]), "c": col, "p": [[round(fx(t), 4), round(v, 2), int(ok)] for t, v, ok in pts]} for o, col, pts in series]}
+    label = (f"Price history for {esc(SHORT[mid])} in US dollars over {days} days, {len(series)} shops. "
+             f"Cheapest now: {chart_money(lv)} at {esc(sname(lead[0]['seller']))}.")
+    return (f'<figure class="pchart" data-chart="{esc(json.dumps(data, separators=(",", ":")))}">'
+            f'<div class="pc-plot"><svg viewBox="0 0 {VW} {VH}" preserveAspectRatio="none" role="img" aria-label="{label}">{"".join(svg)}</svg>'
+            f'<div class="pc-ov" aria-hidden="true">{"".join(ov)}</div><div class="pc-tip" hidden></div></div>'
+            f'<ul class="pc-legend">{"".join(legend)}</ul>'
+            f'<figcaption class="hint">Solid line = in stock, dashed = sold out. Tap or hover the chart for exact prices.</figcaption>'
+            f'</figure>{low_note}{more}')
 
 
 def history_log_table(mid):
@@ -1188,7 +1293,7 @@ def build_model_page(mid):
     elec_tbl = ('<div class="tablewrap"><table><thead><tr><th>Power price</th>' + "".join(f'<th class="num">${r:.2f}/kWh</th>' for r in ELEC_RATES) + "</tr></thead>"
                 f'<tbody><tr><th scope="row">Cost per year, 24/7</th>{"".join(f"<td class=num>${kwh * r:,.0f}</td>" for r in ELEC_RATES)}</tr></tbody></table></div>')
     spec_note = (f'<p class="hint">{esc(m["note"])}. Running cost assumes full power 24/7; heater miners usually cycle with a thermostat, so real use is often lower.</p>' if home else
-                 f'<p class="hint">{esc(m["note"])}. Want your own rate? Use the <a href="/#cost">power-cost calculator</a>.</p>')
+                 f'<p class="hint">{esc(m["note"])}. Want your own rate? Use the <a href="/faq/#cost">power-cost calculator</a>.</p>')
 
     yrs = lottery_years(mid)
     rel_c = related_compare(mid)
@@ -3847,6 +3952,7 @@ def build_404():
 # HOME PAGE (template + pre-rendered summary)
 # ---------------------------------------------------------------------------------------------
 HOME_TIERS = [(0, 1.5), (1.5, 2), (2, 3), (3, 5), (5, 9), (9, 1e9)]   # TH/s size bands, one pick each
+HOME_CARDS = 3      # the homepage shows this many: the best $/TH among the size-band picks (3 keeps the grid even)
 
 
 def pick_price(mid):
@@ -3856,7 +3962,8 @@ def pick_price(mid):
 
 
 def home_picks():
-    """One Bitaxe-class desk miner (no heaters or boxed home miners) per size band by best $/TH, US shops first; never two with the same hashrate and watts."""
+    """Best $/TH Bitaxe-class desk miner (no heaters or boxed home miners) per size band, then the HOME_CARDS best of those
+    by $/TH, US shops first; never two with the same hashrate and watts. Shown smallest to biggest."""
     cands = [m for m in LIVE_TRACKED if m not in NOINDEX_MODELS and MODELS[m].get("category") != "home" and pick_price(m)]
     def key(m):
         o = pick_price(m)
@@ -3872,6 +3979,7 @@ def home_picks():
         tier = [m for m in uniq if lo <= MODELS[m]["hashrate_ths"] < hi]
         if tier:
             picks.append(min(tier, key=key))
+    picks = sorted(picks, key=key)[:HOME_CARDS]
     return sorted(picks, key=lambda m: (pick_price(m)["currency"] != "USD", MODELS[m]["hashrate_ths"]))
 
 
@@ -3897,6 +4005,39 @@ def home_card(mid, best_value):
             "</div></article>")
 
 
+# The homepage used to end with these questions. The Ask chat answers them now, so they live on /faq/ (with FAQPage
+# schema) instead of making the homepage longer. The power-cost calculator moved with them (/faq/#cost).
+HOME_FAQ = [
+    ("What is a Bitaxe?", "A small, open-source Bitcoin miner about the size of a phone. It uses about as much power as a light bulb and runs quietly on a desk. NerdQaxe and Nerdaxe are similar boards from other makers."),
+    ("Can a small miner make money?", 'Not reliably. It "solo mines": if it ever finds a block it wins the whole reward (about 3.125 BTC), but the odds are tiny and electricity costs money every year. Think of it as a lottery ticket and a fun gadget, not income. Nothing here is financial advice.'),
+    ("How much does it cost to run?", "Enter your electricity rate from your power bill. Watts are the sellers' stated figures, running 24/7."),
+    ("Which one should I buy?", "The Bitaxe Gamma is the usual first pick: cheap, quiet and efficient. Want more hashrate? Look at the GT 801 or NerdQaxe++, which use more power."),
+    ("Where do your prices come from?", "Straight from each shop's own product pages, checked every 6 hours. Prices are before shipping and tax, and stock can change fast, so always confirm on the shop's page."),
+    ("How does Bitaxe Radar make money?", "Some shop links are affiliate links: if you buy through one, the shop may pay us a small commission at no extra cost to you. It never changes which price we show first."),
+]
+
+
+def build_faq():
+    path = "/faq/"
+    extra = {
+        "How much does it cost to run?": ('<div class="calc"><label>Your rate ($ per kWh) <input id="rate" type="number" min="0" step="0.01" value="0.15" inputmode="decimal"></label></div>'
+                                          '<div class="tablewrap"><table id="costTable"><thead><tr><th>Miner</th><th class="num">Watts</th><th class="num">Per month</th><th class="num">Per year</th></tr></thead><tbody></tbody></table></div>'
+                                          '<noscript><p class="hint">The calculator needs JavaScript. Each model page shows its yearly cost at three power prices.</p></noscript>'),
+        "Which one should I buy?": "<p>Side by side:</p><ul class=\"links\">" + "".join(f'<li><a href="{compare_url(a, b)}">{esc(compare_label(a, b))}</a></li>' for a, b in BUILT_PAIRS) + "</ul>",
+        "Where do your prices come from?": '<p><a href="/how-we-track/">More about how we track</a>.</p>',
+    }
+    items = "".join(
+        f'<details{' id="cost"' if q.startswith("How much") else ""}{" open" if i == 0 else ""}><summary>{esc(q)}</summary><p>{esc(a)}</p>{extra.get(q, "")}</details>'
+        for i, (q, a) in enumerate(HOME_FAQ))
+    body = f"""<article><header class="hero"><h1>Questions</h1>
+<p class="lede">Quick answers about home Bitcoin miners and this site. Got a different question? <a href="/ask/">Ask Bitaxe Radar</a>, it answers from today's prices and our guides.</p></header>
+<section id="faq" aria-label="Frequently asked questions">{items}</section></article>"""
+    layout(path, "Bitaxe Radar FAQ: what a Bitaxe is, running cost, which to buy | Bitaxe Radar",
+           "What a Bitaxe is, whether a small miner makes money, what it costs to run (calculator), which to buy, and where our prices come from.",
+           body, crumbs=[("Home", "/"), ("FAQ", path)], jsonld=[faq_ld(HOME_FAQ)],
+           scripts='<script src="/data.js"></script>\n<script src="/app.js"></script>\n')
+
+
 def build_home():
     tpl = (ROOT / "templates" / "home.html").read_text().replace("<!--N-SHOPS-->", str(len(SELLERS))).replace("<!--N-MODELS-->", str(N_MODELS))
     t = re.search(r"<title>(.*?)</title>", tpl, re.S).group(1)
@@ -3913,8 +4054,8 @@ def build_home():
     {"@type": "WebSite", "@id": BASE + "/#site", "name": "Bitaxe Radar", "url": BASE + "/", "publisher": {"@id": BASE + "/#org"}}]})}
 {jsonld_tag(itemlist("Bitaxe-class miners tracked by Bitaxe Radar", items))}"""
     ins = [o for o in OFFERS if in_stock(o)]
-    chips = (f'<ul class="chips"><li class="live"><strong>{len(ins)}</strong> listings in stock</li>'
-             f'<li><strong>{N_MODELS}</strong> miners tracked</li><li><strong>{len(SELLERS)}</strong> shops checked</li>'
+    chips = (f'<ul class="chips"><li class="live"><strong data-count="{len(ins)}">{len(ins)}</strong> listings in stock</li>'
+             f'<li><strong data-count="{N_MODELS}">{N_MODELS}</strong> miners tracked</li><li><strong data-count="{len(SELLERS)}">{len(SELLERS)}</strong> shops checked</li>'
              f'<li>Updated <time id="freshness" datetime="{esc(latest["generated_at"])}">{esc(fmt_time(latest["generated_at"]))}</time></li></ul>')
     picks = home_picks()
     best_value = min(picks, key=lambda m: usd(pick_price(m)) / MODELS[m]["hashrate_ths"], default=None)
@@ -3922,19 +4063,19 @@ def build_home():
     older_html = ('<p class="older">Older models: ' + " · ".join(
         f'<a href="/models/{m}/">{esc(SHORT[m])}</a>' + (f' from {money(usd(STATS[m]["best"]))}' if STATS[m]["best"] else " (sold out)") for m in older) + "</p>") if older else ""
     dotd = deal_of_the_day_html(DEAL, compact=True) if DOTD.is_fresh(DEAL, bf_today().isoformat()) else ""
-    cards = dotd + f"""<section id="miners" aria-labelledby="h-miners">
+    cards = dotd + f"""<section id="miners" aria-labelledby="h-miners" data-reveal>
     <div class="sec-head"><h2 id="h-miners">Today's best prices</h2><a href="/in-stock/">Everything in stock →</a></div>
-    <p class="hint">The best price per TH/s in each size, from today's in-stock listings. US shops first.</p>
-    <div class="cards">{"".join(home_card(m, best_value) for m in picks)}</div>
+    <p class="hint">The {plural(len(picks), "miner")} with the most hashrate per dollar right now, one per size. In stock, US shops first.</p>
+    <div class="cards cards-top">{"".join(home_card(m, best_value) for m in picks)}</div>
     {older_html}
     <p class="older">Want one that heats a room too? <a href="/heater-miners/">See heater miners →</a></p>
   </section>"""
-    compare_links = '<ul class="links">' + "".join(f'<li><a href="{compare_url(a, b)}">{esc(compare_label(a, b))}</a></li>' for a, b in BUILT_PAIRS) + "</ul>"
     sellers_line = ('<p>Shops we check: ' + " · ".join(seller_a(sid) for sid in SELLERS if sid in BUILT_SELLERS) + "</p>\n  ")
     out = (tpl.replace("<!--HEAD-->", head).replace("<!--HEADER-->", header_html()).replace("<!--RADAR-BG-->", RADAR_BG)
-           .replace("<!--HERO-CHIPS-->", chips).replace("<!--BROWSE-->", bf_banner() + browse_tiles() + "\n" + best_pills()).replace("<!--CARDS-->", cards).replace("<!--SIGNUP-->", signup_html("any"))
-           .replace("<!--COMPARE-LINKS-->", compare_links).replace("<!--FOOTER-->", footer_html())
-           .replace('<script src="/app.js"></script>', '<script src="/app.js"></script>\n' + SIGNUP_SCRIPTS)
+           .replace("<!--HERO-CHIPS-->", chips).replace("<!--BROWSE-->", bf_banner() + browse_tiles().replace('class="browse-tiles"', 'class="browse-tiles" data-reveal', 1) + "\n" + best_pills())
+           .replace("<!--CARDS-->", cards).replace("<!--SIGNUP-->", signup_html("any").replace('<section id="alerts"', '<section id="alerts" data-reveal', 1))
+           .replace("<!--FOOTER-->", footer_html())
+           .replace('<script src="/app.js"></script>', '<script src="/app.js"></script>\n' + SIGNUP_SCRIPTS + '\n<script src="/motion.js" defer></script>')
            .replace("</body>", ask_widget_scripts() + ANALYTICS + "</body>"))
     assert "<!--" not in out, "unfilled placeholder in home template"
     (SITE / "index.html").write_text(out)
@@ -4400,6 +4541,7 @@ def main():
     build_evals()
     build_advertise()
     build_404()
+    build_faq()
     build_home()
     write_sitemap()
     print(f"built {len(PAGES)} indexable pages in sitemap.xml; {len(TRACKED)} model pages ({len(NOINDEX_MODELS & set(TRACKED))} noindex)")
