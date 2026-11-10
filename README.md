@@ -16,6 +16,7 @@ The site checks shops every 6 hours and publishes a static site. A Cloudflare Wo
 - **Ask Bitaxe Radar.** A Claude chat on every page that searches, looks up, or compares miners from the live table. Answers stay short. Off-topic questions are refused.
 - **SQL price history.** A SQLite database (miners, retailers, offers, daily price snapshots) updated every collector run, idempotently. The chat's `get_price_history` tool queries it. See [SQL, explained simply](docs/SQL.md).
 - **RAG over the guides.** 114 guide passages, hybrid search (Workers AI embeddings + BM25, merged with reciprocal rank fusion), top 3 passages to Claude, citations checked in code. See [RAG, explained simply](docs/RAG.md).
+- **Deal of the Day agent.** Once a day, after prices are collected, Claude runs a tool loop over today's prices and the SQL history, picks the in-stock miner furthest below its 14-day typical price, and writes a short summary. Code checks every price, % and shop before it's published, with one retry, then a template fallback. See [Deal agent, explained simply](docs/DEAL_AGENT.md). *(Branch `feature/deal-agent`, not live yet.)*
 - **Evals.** 48 code-graded cases that check rankings, follow-ups, refusals, prompt injection, price history, and RAG retrieval, citations, grounding and "I don't know". See the scores below.
 
 ## How the AI chat works
@@ -60,6 +61,22 @@ Then 6 price-history cases and 11 RAG cases were added (48 total). Before, the l
 
 Walkthrough: [Evals, explained simply](docs/EVALS.md).
 
+## The Deal of the Day agent
+
+Agents plus automation: a scheduled GitHub Actions job runs `python3 -m deal_agent` after the price collector.
+
+1. **Tools, not a data dump.** Claude gets 5 tools: `list_current_offers`, `rank_price_drops`, `compare_to_average`, `get_price_history` (SQL), and `submit_deal`. A normal run takes 3 calls: screen, check the top pick's history, submit.
+2. **Structured output.** `submit_deal` is a strict JSON-schema tool: miner, shop, price, typical price, drop %, lowest-ever, headline, summary.
+3. **Grounding guardrail.** `deal_agent/guard.py` checks the JSON fields against the data, and every `$` and `%` in the text, the shop and miner names, and any "lowest ever" claim. Fail → one retry with the exact errors → fail again → a template written straight from the data. The site never shows a made-up number.
+4. **Caps.** 4 tool rounds, 7 API calls, and $0.02 per run. A normal run is about $0.001. Once a day (US Eastern). No key or an API error keeps yesterday's deal and never blocks the deploy.
+5. **Evals.** 11 code-graded cases (`evals/deal/`) with answer keys computed from the case data. Traps include exchange-rate noise, one-day spikes, sold-out listings, stale prices and false "lowest ever" claims. Before: 0/11. Template and scripted-loop harness: 11/11. The live-Claude score is pending an API key.
+
+```bash
+python3 -m deal_agent --dry-run     # needs ANTHROPIC_API_KEY; prints the deal, writes nothing
+python3 -m deal_agent --template    # no AI: the code-only version
+python3 evals/deal/run_deal_evals.py --mode scripted
+```
+
 ## Architecture
 
 ```mermaid
@@ -84,13 +101,19 @@ flowchart TD
   rag --> claude
   claude -->|respond| worker
   worker --> chat[Answer on the site]
+
+  pricedb --> deal[Deal of the Day agent: Claude + tools, daily]
+  data --> deal
+  deal --> guard[Code checks every number]
+  guard --> dealjson["data/deal_of_the_day.json"]
+  dealjson --> build
 ```
 
 `ASK_TOOLS=off` switches the Worker back to the older "paste the whole table into the prompt" path.
 
 ## Tech stack
 
-- **Python 3** for the collector, the site builder, the eval runner and grader, and 179 unit tests
+- **Python 3** for the collector, the site builder, the eval runner and grader, and 230 unit tests
 - **JavaScript** for the static site (no frontend framework) and the Cloudflare Worker
 - **Claude Haiku** (`claude-haiku-5-5`) through the Messages API, with tool calling
 - **Cloudflare Workers** and KV for `/ask`, alert signups, the daily question counter, and cached embeddings
@@ -139,6 +162,7 @@ These are the ones I would talk through in an interview. The full list is in the
 - **Evals beat "looks good."** 32 code-graded cases caught a wrong `in_data` label and a prompt-injection hole in chat history. The score went from 30/32 to 32/32 on the live Worker. See [Evals, explained simply](docs/EVALS.md).
 - **Hybrid search covers blind spots.** Keyword search said "replace thermal paste on an Antminer S19" matched a Bitaxe guide (it mentions thermal paste). Embeddings scored it 0.58, under the 0.6 cutoff, so the chat says our guides don't cover it. See [RAG](docs/RAG.md).
 - **Test in the real runtime early.** sql.js passed every Node test, then failed 3 different ways inside a Cloudflare Worker. A test Worker under another name found all three in under an hour. See [SQL](docs/SQL.md).
+- **Check the AI's numbers in code, and check real data first.** The deal agent's guardrail rejects any price, % or shop that isn't in the data. On real data, the first "new all-time low" turned out to be the Canadian dollar moving, not the price. See [Deal agent](docs/DEAL_AGENT.md).
 - **Grade the grader.** One "failure" was my refusal checker missing a phrase. I fixed the grader and added a test for it before I changed the bot.
 
 ## Docs
@@ -147,5 +171,6 @@ These are the ones I would talk through in an interview. The full list is in the
 - [Evals, explained simply](docs/EVALS.md)
 - [SQL price history, explained simply](docs/SQL.md)
 - [RAG, explained simply](docs/RAG.md)
+- [Deal of the Day agent, explained simply](docs/DEAL_AGENT.md)
 - [Ask build log](docs/BUILD_LOG_ASK.md)
 - [How we verify prices](docs/DATA_VERIFICATION.md)
