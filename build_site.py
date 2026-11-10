@@ -4139,16 +4139,45 @@ def build_alerts():
 # ---------------------------------------------------------------------------------------------
 def build_ask():
     path = "/ask/"
-    body = f"""<article>
-<header class="hero"><h1>Ask Bitaxe Radar</h1>
-<p class="lede">Ask about home Bitcoin miners. An AI (Claude) answers using only today's prices and specs from this site.</p></header>
-<form id="ask-form" class="signup">
-<label for="ask-q">Your question</label>
-<textarea id="ask-q" name="question" maxlength="300" rows="3" required placeholder="What's the cheapest miner with at least 1 TH/s in stock?"></textarea>
-<p><button class="btn" type="submit">Ask</button></p>
+    # Example chips fill the box and submit. Keep wording short and concrete.
+    chips = [
+        ("What's the cheapest miner with at least 1 TH/s in stock?", "Cheapest 1+ TH/s in stock"),
+        ("Has the Bitaxe Gamma gotten cheaper this month?", "Has the Gamma gotten cheaper this month?"),
+        ("What power supply does a Bitaxe Gamma need?", "What power supply does a Bitaxe Gamma need?"),
+        ("What's the best quiet miner for a bedroom?", "Best quiet miner for a bedroom"),
+    ]
+    chip_html = "".join(
+        f'<li><button type="button" class="ask-chip" data-q="{esc(q)}">{esc(label)}</button></li>'
+        for q, label in chips
+    )
+    body = f"""<article class="ask-page" id="ask-page">
+<header class="hero ask-hero ask-reveal">
+<h1>Ask Bitaxe Radar</h1>
+<p class="lede">Ask about home Bitcoin miners. An AI (Claude) answers using only today's prices and specs from this site.</p>
+</header>
+<section class="ask-composer ask-reveal" aria-labelledby="ask-q-label">
+<form id="ask-form">
+<label id="ask-q-label" for="ask-q">Your question</label>
+<textarea id="ask-q" name="question" maxlength="300" rows="2" required autocomplete="off" placeholder="What's the cheapest miner with at least 1 TH/s in stock?"></textarea>
+<div class="ask-bar">
+<span class="ask-count" aria-live="polite"><span id="ask-count">0</span>/300</span>
+<button class="btn ask-submit" type="submit"><span class="ask-submit-label">Ask</span></button>
+</div>
 </form>
-<div id="ask-answer" aria-live="polite"></div>
-<p class="hint">Answers can be wrong. Prices change often; check the miner page before you buy. Questions are sent to Anthropic's API; don't type personal info.</p>
+<ul class="ask-chips" aria-label="Example questions">{chip_html}</ul>
+<noscript><p class="ask-noscript">The answer box needs JavaScript to send your question to the chat.</p></noscript>
+</section>
+<div id="ask-answer" class="ask-answer" aria-live="polite"></div>
+<section class="ask-how ask-reveal" aria-labelledby="h-ask-how">
+<h2 id="h-ask-how">How it works</h2>
+<ul class="ask-how-grid">
+<li><b>Live prices</b><span>Tools look up today's table, not a remembered number.</span></li>
+<li><b>Price history</b><span>SQL answers “has it gotten cheaper?” from the database.</span></li>
+<li><b>Guide search</b><span>How-to questions pull from the site's guides, with sources.</span></li>
+<li><b>Checked by evals</b><span>Automatic quizzes grade the answers. <a href="/evals/">See the scores</a>.</span></li>
+</ul>
+</section>
+<p class="ask-disclaimer">Answers can be wrong. Prices change often; check the miner page before you buy. Questions are sent to Anthropic's API; don't type personal info.</p>
 </article>"""
     # ask-api.js + chat-widget.js come from ask_widget_scripts() in layout(); ask.js wires the page form.
     scripts = '<script src="/ask.js" defer></script>'
