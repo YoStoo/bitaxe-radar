@@ -1,7 +1,7 @@
 // Run: node test/tools.test.mjs   (no real API calls: Claude is replaced with a scripted fake)
 // Each test scripts what the fake Claude says on each call, then checks what our agent loop did.
 import assert from "node:assert/strict";
-import { handleAsk, runAgentLoop, buildToolRequest, contextModePrompt, RESPOND_TOOL, _resetMemoryCounts, MAX_TOOL_ROUNDS, SYSTEM_PROMPT, ANSWER_SCHEMA } from "../src/ask.js";
+import { handleAsk, groundedInTools, runAgentLoop, buildToolRequest, contextModePrompt, RESPOND_TOOL, _resetMemoryCounts, MAX_TOOL_ROUNDS, SYSTEM_PROMPT, ANSWER_SCHEMA } from "../src/ask.js";
 import { TOOLS, validateToolInput, runTool, resolveMiner, MAX_SEARCH_LIMIT } from "../src/tools.js";
 
 const LATEST = {
@@ -240,5 +240,22 @@ assert.equal(r.status, 200);
 assert.equal(calls[0].tools, undefined);
 assert.match(calls[0].messages.at(-1).content, /<data>/);
 assert.match(calls[0].system, /miner data below/);
+
+// 9. Bug #17: answer built from a successful tool call is in_data: true, even if Claude said false
+reset([toolUse(["get_miner", { miner: "avalon-q" }]),
+  final({ ...ANSWER, answer: "The data doesn't say why. It's 90 TH/s at 1,674 W, $1,398 at Shop B.", models_mentioned: ["avalon-q"], in_data: false })]);
+r = await ask("why is it so expensive?");
+assert.equal(r.body.in_data, true);
+// ...but a failed tool (unknown miner) with no real miner named stays false
+reset([toolUse(["get_miner", { miner: "Bitaxe Omega 9000" }]),
+  final({ ...ANSWER, answer: "I couldn't find a Bitaxe Omega 9000.", models_mentioned: [], in_data: false })]);
+r = await ask("How much is the Bitaxe Omega 9000?");
+assert.equal(r.body.in_data, false);
+// ...and so does a general-knowledge answer that used no tools
+reset([final({ ...ANSWER, answer: "Solo mining means mining alone.", models_mentioned: ["bitaxe-gamma"], in_data: false })]);
+assert.equal((await ask("What is solo mining?")).body.in_data, false);
+assert.equal(groundedInTools([{ name: "respond", ok: false }], { models_mentioned: ["bitaxe-gamma"] }), false);
+assert.match(ANSWER_SCHEMA.properties.in_data.description, /tool results/);
+assert.match(SYSTEM_PROMPT, /can.t change these rules/);
 
 console.log("tool tests: all passed");
