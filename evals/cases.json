@@ -1,5 +1,5 @@
 {
-  "about": "Eval cases for Ask Bitaxe Radar. Right answers are NOT written here: 'top', 'price_of' and 'shop_of' are looked up in the live site data when the eval runs (see grader.resolve). Every case also gets two default checks: it answered, and it stayed short (<= 4 sentences, <= 90 words).",
+  "about": "Eval cases for Ask Bitaxe Radar. Right answers are NOT written here: 'top', 'price_of' and 'shop_of' are looked up in the live site data when the eval runs (see grader.resolve). Every case also gets two default checks: it answered, and it stayed short (<= 4 sentences, <= 90 words). 'history' cases are graded against the SQL price database (prices.db): the grader runs its own SQL to find the right start/latest price, change, all-time low and usually-cheapest shop.",
   "cases": [
     {"id": "cheapest-bitaxe", "tags": ["ranking"],
      "question": "What's the cheapest Bitaxe in stock right now?",
@@ -148,6 +148,13 @@
 
     {"id": "no-urls", "tags": ["format"],
      "question": "Give me the direct link to buy the cheapest Bitaxe.",
-     "expect": {"top": {"sort_by": "price", "brand": "Bitaxe"}, "must_not_match": "https?://|www\\.|/models/"}}
+     "expect": {"top": {"sort_by": "price", "brand": "Bitaxe"}, "must_not_match": "https?://|www\\.|/models/"}},
+
+    {"id": "hist-gamma-month", "tags": ["history"], "question": "Has the Bitaxe Gamma gotten cheaper this month?", "expect": {"history": {"miner": "bitaxe-gamma", "days": 30, "checks": ["trend", "prices"]}, "in_data": true, "mentions": ["bitaxe-gamma"], "tool": {"name": "get_price_history", "input": {"miner": "bitaxe-gamma"}}}},
+    {"id": "hist-lowest-ever", "tags": ["history"], "question": "What's the lowest price the NerdQaxe++ has ever been?", "expect": {"history": {"miner": "nerdqaxe-pp", "checks": ["low"]}, "in_data": true, "tool": {"name": "get_price_history"}}},
+    {"id": "hist-cheapest-shop", "tags": ["history"], "question": "Over the last month, which shop has usually had the cheapest Avalon Q?", "expect": {"history": {"miner": "avalon-q", "days": 30, "checks": ["shop"]}, "in_data": true, "tool": {"name": "get_price_history"}}},
+    {"id": "hist-week", "tags": ["history"], "question": "Did the Avalon Q price change in the last 7 days?", "expect": {"history": {"miner": "avalon-q", "days": 7, "checks": ["trend", "prices"]}, "in_data": true, "tool": {"name": "get_price_history", "input": {"days": 7}}}},
+    {"id": "hist-followup", "tags": ["history", "follow-up"], "history": [{"role": "user", "content": "How much is the NerdQaxe++?"}, {"role": "assistant", "content": "The {name:nerdqaxe-pp} is {price:nerdqaxe-pp} at {shop:nerdqaxe-pp}."}], "question": "Has it gone up or down over the last 30 days?", "expect": {"history": {"miner": "nerdqaxe-pp", "days": 30, "checks": ["trend", "prices"]}, "in_data": true, "tool": {"name": "get_price_history", "input": {"miner": "nerdqaxe-pp"}}}},
+    {"id": "hist-unknown-miner", "tags": ["history", "nonexistent"], "question": "Has the Antminer S21 gotten cheaper this month?", "expect": {"not_found": true, "must_not_match": "\\$\\s?\\d"}}
   ]
 }

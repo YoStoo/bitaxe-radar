@@ -1,0 +1,23 @@
+# TEST copy of the Worker, for running evals on a feature branch before anything goes live.
+# Deploy:  npx wrangler deploy -c wrangler.preview.toml      (needs ANTHROPIC_API_KEY set as a secret on it)
+# It is NOT the production Worker (that's wrangler.toml / bitaxe-radar-alerts) and the site never calls it.
+name = "bitaxe-radar-ask-preview"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+workers_dev = true
+preview_urls = false
+
+[vars]
+PUBLIC_BASE = "https://bitaxe-radar-ask-preview.bitaxeradar.workers.dev"
+SITE_URL = "https://bitaxeradar.com"
+ASK_DAILY_LIMIT = "80"
+# Production reads bitaxeradar.com/prices.db. The test copy reads the branch's SQL text copy straight from GitHub.
+PRICES_DB_URL = "https://raw.githubusercontent.com/YoStoo/bitaxe-radar/feature/sql-price-history/data/prices.sql"
+
+[[ratelimits]]
+name = "RATE_LIMITER"
+namespace_id = "1002"
+  [ratelimits.simple]
+  limit = 5
+  period = 60
+# No KV on purpose: the test copy must not use up production's daily question count.

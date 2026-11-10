@@ -149,6 +149,30 @@ def check_regex(answer, pattern):
     return m is not None, f"matched {m.group(0)!r}" if m else f"no match for /{pattern}/"
 
 
+# ---------- price history checks (get_price_history cases) ----------
+TREND_WORDS = {
+    "cheaper": re.compile(r"cheaper|dropped|drop|down|fell|fallen|lower|decreas|less|cut|discount", re.I),
+    "pricier": re.compile(r"pricier|more expensive|up\b|rose|risen|higher|increas|went up", re.I),
+    "flat": re.compile(r"same|flat|unchanged|steady|stable|hasn'?t changed|has not changed|no change|didn'?t change|held", re.I),
+}
+
+
+def check_trend(answer, trend):
+    ok = bool(TREND_WORDS[trend].search(answer))
+    return ok, f"says {trend}" if ok else f"expected the answer to say it got {trend}"
+
+
+def check_history_prices(answer, h):
+    """Latest price, plus either the starting price or the size of the change."""
+    amounts = dollar_amounts(answer)
+    has_latest = any(close(a, h["latest_usd"]) for a in amounts)
+    has_start = any(close(a, h["start_usd"]) for a in amounts)
+    has_change = h["trend"] == "flat" or any(close(a, abs(h["change_usd"])) for a in amounts)
+    ok = has_latest and (has_start or has_change)
+    return ok, (f"${h['start_usd']:g} -> ${h['latest_usd']:g} (change {h['change_usd']:+g}) "
+                f"{'found' if ok else 'not found'} in {amounts}")
+
+
 # ---------- turn a case's "expect" block into concrete checks, using TODAY's data ----------
 def resolve(case, latest):
     """Returns a list of (check_name, function_taking(answer, resp)) built from current prices.
@@ -179,6 +203,22 @@ def resolve(case, latest):
                 checks.append(("price", lambda a, r, x=top: check_price(a, x["id"], x["cheapest_usd"])))
             if t.get("sort_by") == "price_per_th":
                 checks.append(("usd_per_th", lambda a, r, x=top: check_per_th(a, x["id"], x["usd_per_th"])))
+
+    if "history" in e:   # e.g. {"miner": "bitaxe-gamma", "days": 30, "checks": ["trend", "prices"]}
+        hx = e["history"]
+        hist = R.price_history(R.load_prices_db(), hx["miner"], hx.get("days", 30))
+        if hist is None:
+            checks.append(("history", lambda a, r: (False, "no price history for this miner; update the case")))
+        else:
+            for c in hx.get("checks", ["trend", "prices"]):
+                if c == "trend":
+                    checks.append(("trend", lambda a, r, h=hist: check_trend(a, h["trend"])))
+                elif c == "prices":
+                    checks.append(("history_prices", lambda a, r, h=hist: check_history_prices(a, h)))
+                elif c == "low":
+                    checks.append(("all_time_low", lambda a, r, h=hist: check_price(a, hx["miner"], h["all_time_low"]["usd"])))
+                elif c == "shop":
+                    checks.append(("top_shop", lambda a, r, h=hist: check_shop(a, [h["top_shop"]])))
 
     if "mentions" in e:
         checks.append(("mentions", lambda a, r: check_mentions(a, r, e["mentions"], latest)))

@@ -18,6 +18,11 @@
 // Optional KV storage for the daily counter:      binding name ASK_KV (see wrangler.toml)
 
 import { TOOLS, runTool } from "./tools.js";
+import { HISTORY_TOOL, runHistoryTool } from "./history.js";
+
+// Every tool Claude may call. The first three read today's live data (sync); get_price_history runs SQL (async).
+export const ALL_TOOLS = [...TOOLS, HISTORY_TOOL];
+const ASYNC_TOOLS = { [HISTORY_TOOL.name]: runHistoryTool };
 
 // ---------- settings ----------
 export const MAX_QUESTION_CHARS = 300;
@@ -46,6 +51,9 @@ about the home Bitcoin miners on bitaxeradar.com.
    miner data from your tools. Never guess a price.
    Call a tool before naming any price; one or two
    calls is usually enough. Then call respond.
+   For price changes over time ("cheaper this
+   month?", "lowest ever"), use get_price_history
+   and give the dates and dollar change.
 2. If the data doesn't have the answer, say so. For
    general mining questions, you may use general
    knowledge, but set in_data to false.
@@ -236,7 +244,7 @@ export function buildToolRequest(messages, systemPrompt, model = DEFAULT_MODEL, 
     system: systemPrompt,
     thinking: { type: "disabled" },
     output_config: { effort: "low" },
-    tools: [...TOOLS, RESPOND_TOOL],       // always sent: earlier tool_use blocks in `messages` refer to them
+    tools: [...ALL_TOOLS, RESPOND_TOOL],   // always sent: earlier tool_use blocks in `messages` refer to them
     tool_choice: forceFinal ? { type: "tool", name: RESPOND_TOOL.name } : { type: "any" },
     messages,
   };
@@ -251,7 +259,7 @@ export function respondInput(data) {
 }
 
 // The agent loop. Returns the final Claude reply plus what happened along the way (for logs and teaching).
-export async function runAgentLoop(env, { question, history = [], systemPrompt, latest, model = DEFAULT_MODEL, deadline = Date.now() + ASK_TOTAL_TIMEOUT_MS }) {
+export async function runAgentLoop(env, { question, history = [], systemPrompt, latest, model = DEFAULT_MODEL, deadline = Date.now() + ASK_TOTAL_TIMEOUT_MS, openDb = null }) {
   const messages = [...history.map((m) => ({ role: m.role, content: m.content })), { role: "user", content: `<question>${question}</question>` }];
   const toolsUsed = [];
   const usage = { input_tokens: 0, output_tokens: 0 };
@@ -272,10 +280,11 @@ export async function runAgentLoop(env, { question, history = [], systemPrompt, 
     // Claude asked for data tool(s): keep its turn in the conversation, run each tool, send ALL results back
     // in ONE user turn (every tool_use needs a matching tool_result, or the API rejects the next call).
     messages.push({ role: "assistant", content: data.content });
-    const results = toolBlocks.map((b) => b.name === RESPOND_TOOL.name
+    const ctx = { env, latest, openDb };
+    const results = await Promise.all(toolBlocks.map((b) => b.name === RESPOND_TOOL.name
       // respond in the SAME turn as a data tool = an answer written before seeing the data. Bounce it.
       ? { result: { type: "tool_result", tool_use_id: b.id, content: "Not sent. Read the tool results first, then call respond.", is_error: true }, log: { name: b.name, input: {}, ok: false } }
-      : runTool(latest, b));
+      : ASYNC_TOOLS[b.name] ? ASYNC_TOOLS[b.name](ctx, b) : runTool(latest, b)));
     results.forEach((r) => toolsUsed.push(r.log));
     messages.push({ role: "user", content: results.map((r) => r.result) });
   }
@@ -376,7 +385,7 @@ export async function handleAsk(request, env, json, deps = {}) {
       usage = data?.usage;
       result = parseClaudeReply(data, knownIds);
     } else {
-      const loop = await runAgentLoop(env, { question: v.question, history, systemPrompt, latest, model });
+      const loop = await runAgentLoop(env, { question: v.question, history, systemPrompt, latest, model, openDb: deps.openDb ?? null });
       ({ toolsUsed, usage, calls } = loop);
       // Normal path: the respond tool's input. Fallback: a plain JSON text reply (shouldn't happen with
       // tool_choice "any", but if it ever does, the same checks apply instead of failing the visitor).

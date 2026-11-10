@@ -1,7 +1,7 @@
 // Run: node test/tools.test.mjs   (no real API calls: Claude is replaced with a scripted fake)
 // Each test scripts what the fake Claude says on each call, then checks what our agent loop did.
 import assert from "node:assert/strict";
-import { handleAsk, groundedInTools, runAgentLoop, buildToolRequest, contextModePrompt, RESPOND_TOOL, _resetMemoryCounts, MAX_TOOL_ROUNDS, SYSTEM_PROMPT, ANSWER_SCHEMA } from "../src/ask.js";
+import { ALL_TOOLS, handleAsk, groundedInTools, runAgentLoop, buildToolRequest, contextModePrompt, RESPOND_TOOL, _resetMemoryCounts, MAX_TOOL_ROUNDS, SYSTEM_PROMPT, ANSWER_SCHEMA } from "../src/ask.js";
 import { TOOLS, validateToolInput, runTool, resolveMiner, MAX_SEARCH_LIMIT } from "../src/tools.js";
 
 const LATEST = {
@@ -106,7 +106,7 @@ assert.deepEqual(t.out.miners.map((m) => m.id), ["bitaxe-gamma", "nerdqaxe-pp"])
 
 // ---- request shape ----
 const req = buildToolRequest([{ role: "user", content: "hi" }], "rules");
-assert.deepEqual(req.tools, [...TOOLS, RESPOND_TOOL]);
+assert.deepEqual(req.tools, [...ALL_TOOLS, RESPOND_TOOL]);
 assert.deepEqual(req.tool_choice, { type: "any" });                 // must call a tool: data tool or respond
 assert.equal(req.output_config.format, undefined);                   // JSON format crowded out tool calls (bug #14)
 assert.deepEqual(RESPOND_TOOL.input_schema, ANSWER_SCHEMA);           // same answer shape as before

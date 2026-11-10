@@ -5,6 +5,7 @@ Usage (from the repo root):
   python3 evals/run_evals.py --only refuse,inject # just cases whose id or tag contains these words
   python3 evals/run_evals.py --url http://localhost:8787/ask   # a local `wrangler dev` Worker
   python3 evals/run_evals.py --dry-run            # show the resolved checks, send nothing
+  python3 evals/run_evals.py --only history --url https://<test-worker>/ask --prices-db <same .sql/.db the Worker reads>
   python3 evals/run_evals.py --regrade evals/results/X.json   # re-grade saved answers (after a grader fix), no requests
 
 Costs: about $0.0007 of Claude time per question, and each question uses 1 of the 200/day slots.
@@ -64,9 +65,13 @@ def main(argv=None):
     p.add_argument("--delay", type=float, default=13.0, help="seconds between questions (rate limit is 5/min)")
     p.add_argument("--label", default="", help="name for this run, e.g. baseline or after-fix")
     p.add_argument("--local-data", action="store_true", help="grade against data/latest.json instead of the live site")
+    p.add_argument("--prices-db", help="price history database the Worker reads (.db or .sql URL/path); "
+                   "default bitaxeradar.com/prices.db, or data/prices.db with --local-data")
     p.add_argument("--dry-run", action="store_true")
     p.add_argument("--regrade", help="saved results .json: grade its answers again with the current grader, send nothing")
     a = p.parse_args(argv)
+    if a.prices_db or a.local_data:
+        R.PRICES_DB_URL = a.prices_db or str(R.ROOT / "data" / "prices.db")
     if a.regrade:
         return regrade(Path(a.regrade), a)
 

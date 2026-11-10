@@ -104,3 +104,67 @@ def miners_in_text(text, latest):
             t = t[:i + 1] + "#" * len(alias) + t[i + 1 + len(alias):]   # blank it out so shorter names can't reuse it
             i = t.find(needle)
     return [mid for mid, _ in sorted(found.items(), key=lambda kv: kv[1])]
+
+
+# ---------- price history (for get_price_history cases) ----------
+# The grader works out the right history answer itself, from the SAME database file the Worker reads,
+# using its own SQL. Two independent implementations agreeing = good evidence both are right.
+import sqlite3  # noqa: E402
+import tempfile  # noqa: E402
+from datetime import date, timedelta  # noqa: E402
+
+PRICES_DB_URL = SITE + "/prices.db"   # run_evals.py --prices-db overrides this (e.g. a test Worker's copy)
+_db_cache = {}
+
+
+def load_prices_db(url=None):
+    """Open the price database. url can be a .db file, a .sql text copy, or a local path."""
+    url = url or PRICES_DB_URL
+    if url in _db_cache:
+        return _db_cache[url]
+    if url.startswith("http"):
+        req = urllib.request.Request(url, headers={"User-Agent": "bitaxe-radar-evals"})
+        with urllib.request.urlopen(req, timeout=30) as r:
+            raw = r.read()
+    else:
+        raw = Path(url).read_bytes()
+    if url.endswith(".sql"):
+        con = sqlite3.connect(":memory:")
+        con.executescript(raw.decode("utf-8"))
+    else:
+        f = tempfile.NamedTemporaryFile(suffix=".db", delete=False)
+        f.write(raw)
+        f.close()
+        con = sqlite3.connect(f.name)
+    _db_cache[url] = con
+    return con
+
+
+def price_history(con, mid, days=30):
+    """Same facts as the Worker's get_price_history: start, latest, change, lows, cheapest shop."""
+    last = con.execute("SELECT MAX(day) FROM price_snapshots").fetchone()[0]
+    since = (date.fromisoformat(last) - timedelta(days=days)).isoformat()
+    daily = {}
+    for day, usd, shop in con.execute(
+            """SELECT s.day, s.price_usd, r.name FROM price_snapshots s JOIN offers o ON o.id = s.offer_id
+               JOIN retailers r ON r.id = o.retailer_id
+               WHERE o.miner_id = ? AND s.in_stock = 1 AND s.price_usd IS NOT NULL AND s.day >= ?
+               ORDER BY s.day, s.price_usd""", (mid, since)):
+        daily.setdefault(day, (usd, shop))   # first row per day = cheapest (ordered by price)
+    if not daily:
+        return None
+    days_sorted = sorted(daily)
+    start, latest = daily[days_sorted[0]], daily[days_sorted[-1]]
+    cheapest_count = {}
+    for usd, shop in daily.values():
+        cheapest_count[shop] = cheapest_count.get(shop, 0) + 1
+    atl = con.execute(
+        """SELECT s.day, s.price_usd, r.name FROM price_snapshots s JOIN offers o ON o.id = s.offer_id
+           JOIN retailers r ON r.id = o.retailer_id WHERE o.miner_id = ? AND s.in_stock = 1 AND s.price_usd IS NOT NULL
+           ORDER BY s.price_usd, s.day LIMIT 1""", (mid,)).fetchone()
+    change = round(latest[0] - start[0], 2)
+    return {"start_usd": start[0], "latest_usd": latest[0], "change_usd": change,
+            "trend": "flat" if abs(change) < 0.01 else ("cheaper" if change < 0 else "pricier"),
+            "low_usd": min(v[0] for v in daily.values()),
+            "all_time_low": {"day": atl[0], "usd": atl[1], "shop": atl[2]},
+            "top_shop": max(cheapest_count.items(), key=lambda kv: kv[1])[0]}

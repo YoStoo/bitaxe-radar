@@ -50,6 +50,19 @@ payload = {"latest": _public_latest, "history": history}
 (SITE / "data.js").write_text("window.RADAR = " + json.dumps(payload, ensure_ascii=False, separators=(",", ":")) + ";\n")
 print("wrote site/data.js:", len(latest["offers"]), "offers,", len(history), "history series")
 
+# 1b) prices.db: the SQL price history as a real SQLite file, for the Ask chat's get_price_history tool.
+# Built from the text copy in git (data/prices.sql, updated by collector/price_db.py). See docs/SQL.md.
+import sqlite3 as _sqlite3
+_dump = ROOT / "data" / "prices.sql"
+_db_path = SITE / "prices.db"
+if _dump.exists():
+    _db_path.unlink(missing_ok=True)
+    _con = _sqlite3.connect(_db_path)
+    _con.executescript(_dump.read_text())
+    _con.execute("VACUUM")
+    _con.close()
+    print("wrote site/prices.db:", _db_path.stat().st_size, "bytes")
+
 # ---------------------------------------------------------------------------------------------
 # 2) shared config parsed from app.js (single source of truth for affiliate params + signup Worker)
 # ---------------------------------------------------------------------------------------------

@@ -32,6 +32,7 @@ site/heat-calculator/
 site/price-per-th/
 site/newsletter/
 site/about/
+site/prices.db
 # private research notes (kept local, not published)
 docs/REDDIT_RESEARCH.md
 docs/REBRAND_RESEARCH.md
@@ -41,3 +42,9 @@ docs/BACKUP_IDEAS.md
 .dev.vars
 .dev.vars.*
 .wrangler/
+
+# SQL price history: the text copy data/prices.sql is in git; the binary .db files are rebuilt from it
+data/prices.db
+
+# npm packages (installed by `npm ci` in worker/)
+worker/node_modules/

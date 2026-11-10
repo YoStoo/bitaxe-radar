@@ -17,6 +17,8 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
       - run: python3 collector/collect.py
+      # SQL price history: add today's prices to data/prices.sql (idempotent, one row per listing per day).
+      - run: python3 collector/price_db.py
       # Solo-mined blocks (mempool.space + SoloLuck.io). A failure keeps the last data and never blocks the deploy.
       - run: python3 collector/solo_wins.py
         continue-on-error: true

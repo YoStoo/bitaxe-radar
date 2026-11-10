@@ -26,9 +26,12 @@ jobs:
         run: python3 build_site.py
       - name: Python tests
         run: python3 -m unittest discover -s tests -p "test_*.py"
-      # No npm install: the Worker has no package dependencies. Tests mock fetch.
+      # One npm package: sql.js (SQLite in WebAssembly) for the price-history tool. Tests mock fetch.
       # Live evals (evals/run_evals.py) are not run here. They need a network
       # call to /ask, cost about $0.02, and use 32 of the 200 daily question slots.
+      - name: Worker packages
+        working-directory: worker
+        run: npm ci
       - name: Worker tests
         working-directory: worker
         run: npm test

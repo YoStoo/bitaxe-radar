@@ -125,10 +125,70 @@ class GradeTests(unittest.TestCase):
 
     def test_every_real_case_resolves(self):
         import json
+        R.PRICES_DB_URL = str(ROOT / "data" / "prices.sql")   # the committed text copy; no network
         cases = json.loads((ROOT / "evals" / "cases.json").read_text())["cases"]
         latest = R.load_local()
         for c in cases:
             self.assertGreaterEqual(len(G.resolve(c, latest)), 3, c["id"])
+
+
+
+class HistoryChecks(unittest.TestCase):
+    """History cases: the grader works out the right answer from a tiny SQL database."""
+
+    @classmethod
+    def setUpClass(cls):
+        import sqlite3
+        import tempfile
+        sys.path.insert(0, str(ROOT / "collector"))
+        import price_db as P
+        latest = dict(LATEST, sellers={"s1": {"name": "Solo Satoshi"}, "s2": {"name": "Altair Technology"}},
+                      offers=[dict(offer("avalon-q", 1398, "s2"), id="s2:avalon-q", price=1398, currency="USD", checked_at="2026-11-10T00:00:00Z")])
+        con = P.connect(Path("/nonexistent.sql"))
+        P.add_latest(con, latest)
+        P.add_history(con, {"s2:avalon-q": [{"t": "2026-10-15T00:00:00Z", "price": 1499, "currency": "USD", "in_stock": True}],
+                            "s1:avalon-q": [{"t": "2026-10-20T00:00:00Z", "price": 1349, "currency": "USD", "in_stock": True}]}, None)
+        con.commit()
+        cls.tmp = tempfile.TemporaryDirectory()
+        path = Path(cls.tmp.name) / "prices.db"
+        con.backup(sqlite3.connect(path))
+        R.PRICES_DB_URL = str(path)
+        R._db_cache.clear()
+
+    @classmethod
+    def tearDownClass(cls):
+        R._db_cache.clear()
+        cls.tmp.cleanup()
+
+    def test_price_history_facts(self):
+        h = R.price_history(R.load_prices_db(), "avalon-q", 30)
+        self.assertEqual((h["start_usd"], h["latest_usd"], h["change_usd"], h["trend"]), (1499, 1398, -101, "cheaper"))
+        self.assertEqual(h["all_time_low"], {"day": "2026-10-20", "usd": 1349, "shop": "Solo Satoshi"})
+        self.assertIsNone(R.price_history(R.load_prices_db(), "bitaxe-gamma", 30))
+
+    def test_trend_and_prices(self):
+        case = {"id": "h", "question": "q", "expect": {"history": {"miner": "avalon-q", "days": 30}}}
+        good = G.grade(case, resp("Yes. The Canaan Avalon Q dropped from $1,499 on Oct 15 to $1,398 now, $101 cheaper."), LATEST)
+        self.assertTrue(good["pass"], good)
+        only_change = G.grade(case, resp("Yes, it's $101 cheaper than a month ago: $1,398 today."), LATEST)
+        self.assertTrue(only_change["pass"], only_change)
+        wrong_way = G.grade(case, resp("It went up to $1,398 from $1,499."), LATEST)
+        self.assertFalse(wrong_way["pass"])
+        no_numbers = G.grade(case, resp("Yes, it got cheaper."), LATEST)
+        self.assertFalse(no_numbers["pass"])
+
+    def test_low_and_shop(self):
+        low = {"id": "l", "question": "q", "expect": {"history": {"miner": "avalon-q", "checks": ["low", "shop"]}}}
+        # Altair was cheapest on 2 of the 3 days; the one-day low was at Solo Satoshi.
+        ok = G.grade(low, resp("Altair Technology was usually cheapest. The lowest ever was $1,349 at Solo Satoshi."), LATEST)
+        self.assertTrue(ok["pass"], ok)
+        self.assertFalse(G.grade(low, resp("Its lowest was $1,398 at Solo Satoshi."), LATEST)["pass"])
+
+    def test_missing_history_fails_with_reason(self):
+        case = {"id": "m", "question": "q", "expect": {"history": {"miner": "bitaxe-gamma"}}}
+        g = G.grade(case, resp("It got cheaper, $67."), LATEST)
+        self.assertFalse(g["pass"])
+        self.assertIn("update the case", [c for c in g["checks"] if c["check"] == "history"][0]["why"])
 
 
 if __name__ == "__main__":
