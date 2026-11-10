@@ -1,6 +1,10 @@
-// Price-alert signup for the pre-rendered pages (model pages). Same flow as the home page form in app.js:
-// double opt-in, Cloudflare Turnstile bot check, POST to the Cloudflare Worker. Config comes from build_site.py,
-// which reads WORKER_URL / TURNSTILE_SITEKEY from app.js and writes window.RADAR_SIGNUP into the page.
+// Price-alert signup for the pre-rendered pages (home and model pages): double opt-in, Cloudflare Turnstile bot
+// check, POST to the Cloudflare Worker. Config comes from build_site.py, which reads WORKER_URL / TURNSTILE_SITEKEY
+// from app.js and writes window.RADAR_SIGNUP into the page.
+//
+// The bot check is invisible: Turnstile runs with appearance "interaction-only", so nothing shows unless Cloudflare
+// actually needs the visitor to click. The Worker still verifies the same cf-turnstile-response token.
+
 // Shared Turnstile loader: the script is injected once even when a page has both the alerts and newsletter forms.
 window.radarTurnstileReady = window.radarTurnstileReady || (function () {
   var q = [], state = 0;
@@ -14,41 +18,69 @@ window.radarTurnstileReady = window.radarTurnstileReady || (function () {
     document.head.appendChild(s);
   };
 })();
+
+// One invisible bot check per form. get(cb) calls cb(token), or cb("") if the check failed or timed out.
+window.radarBotCheck = window.radarBotCheck || function (host, sitekey) {
+  var widget = null, token = "", waiters = [], loaded = false, timer = null;
+  function flush() { clearTimeout(timer); timer = null; waiters.splice(0).forEach(function (f) { f(token); }); }
+  function load() {
+    if (loaded) return; loaded = true;
+    window.radarTurnstileReady(function () {
+      widget = window.turnstile.render(host, {
+        sitekey: sitekey, theme: "dark", appearance: "interaction-only",
+        callback: function (t) { token = t; host.classList.remove("ts-show"); flush(); },
+        "expired-callback": function () { token = ""; },
+        "error-callback": function () { token = ""; flush(); },
+        "before-interactive-callback": function () { host.classList.add("ts-show"); clearTimeout(timer); },
+        "after-interactive-callback": function () { host.classList.remove("ts-show"); }
+      });
+    });
+  }
+  return {
+    load: load,
+    get: function (cb) {
+      load();
+      if (token) return cb(token);
+      waiters.push(cb);
+      if (!timer) timer = setTimeout(flush, 20000);   // never leave the button stuck on "Checking…"
+    },
+    reset: function () { token = ""; if (window.turnstile && widget != null) window.turnstile.reset(widget); }
+  };
+};
+
 (function () {
   "use strict";
-  var tsReady = window.radarTurnstileReady;
   var C = window.RADAR_SIGNUP, form = document.getElementById("signup");
   if (!C || !form) return;
   var msg = document.getElementById("signupMsg"), btn = document.getElementById("signupBtn");
   var email = document.getElementById("email"), price = document.getElementById("alertPrice"), model = document.getElementById("alertModel");
-  var tsHost = document.getElementById("turnstile"), tsWidget = null, loaded = false;
-
-  function renderTurnstile() { if (window.turnstile && !tsWidget) tsWidget = window.turnstile.render(tsHost, { sitekey: C.sitekey, theme: "dark" }); }
-  function loadTurnstile() { if (loaded) return; loaded = true; tsReady(renderTurnstile); }
+  var bot = window.radarBotCheck(document.getElementById("turnstile"), C.sitekey);
   // Load the bot-check script only when the form is near the screen (keeps the page fast for readers who never sign up).
   if ("IntersectionObserver" in window) {
-    var io = new IntersectionObserver(function (es) { if (es.some(function (e) { return e.isIntersecting; })) { loadTurnstile(); io.disconnect(); } }, { rootMargin: "400px" });
+    var io = new IntersectionObserver(function (es) { if (es.some(function (e) { return e.isIntersecting; })) { bot.load(); io.disconnect(); } }, { rootMargin: "400px" });
     io.observe(form);
-  } else { loadTurnstile(); }
-  form.addEventListener("focusin", loadTurnstile);
+  } else { bot.load(); }
+  form.addEventListener("focusin", bot.load);
 
   form.addEventListener("submit", function (e) {
-    e.preventDefault(); loadTurnstile();
-    var tok = form.querySelector('[name="cf-turnstile-response"]');
+    e.preventDefault();
     var p = Number(price.value);
     if (!/^\S+@\S+\.\S+$/.test(email.value)) { msg.textContent = "Please enter a valid email address."; email.focus(); return; }
     if (!(p >= 1 && p <= 100000)) { msg.textContent = "Please enter a target price in USD (1 to 100000)."; price.focus(); return; }
-    if (!tok || !tok.value) { msg.textContent = "Please wait for the bot check to finish, then try again."; return; }
-    btn.disabled = true; msg.textContent = "Sending…";
-    fetch(C.workerUrl, {
-      method: "POST", headers: { "Content-Type": "application/json", "Accept": "application/json" },
-      body: JSON.stringify({ email: email.value.trim(), model: model.value, target_price: p, website: document.getElementById("website").value, "cf-turnstile-response": tok.value })
-    }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) { return { ok: r.ok && d.ok, d: d }; }); })
-      .then(function (res) {
-        if (res.ok) { msg.textContent = res.d.message || "Check your inbox to confirm."; email.value = ""; price.value = ""; }
-        else { msg.textContent = res.d.error || "Something went wrong. Please try again."; }
-      })
-      .catch(function () { msg.textContent = "Network error. Please try again."; })
-      .then(function () { btn.disabled = false; if (window.turnstile && tsWidget != null) window.turnstile.reset(tsWidget); });
+    btn.disabled = true; msg.textContent = "Checking you're not a bot…";
+    bot.get(function (tok) {
+      if (!tok) { msg.textContent = "The bot check didn't finish. Please reload the page and try again."; btn.disabled = false; return; }
+      msg.textContent = "Sending…";
+      fetch(C.workerUrl, {
+        method: "POST", headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({ email: email.value.trim(), model: model.value, target_price: p, website: document.getElementById("website").value, "cf-turnstile-response": tok })
+      }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) { return { ok: r.ok && d.ok, d: d }; }); })
+        .then(function (res) {
+          if (res.ok) { msg.textContent = res.d.message || "Check your inbox to confirm."; email.value = ""; price.value = ""; }
+          else { msg.textContent = res.d.error || "Something went wrong. Please try again."; }
+        })
+        .catch(function () { msg.textContent = "Network error. Please try again."; })
+        .then(function () { btn.disabled = false; bot.reset(); });
+    });
   });
 })();

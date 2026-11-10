@@ -61,7 +61,7 @@ class ReviewFixes(unittest.TestCase):
         n_shops = len(latest["sellers"])
         self.assertIn(f"price-checked</span> across {n_shops} shops.</h1>", home)
         self.assertNotIn("Every home Bitcoin miner", home)
-        n = re.search(r"<strong>(\d+)</strong> miners tracked", home).group(1)
+        n = re.search(r"<strong[^>]*>(\d+)</strong> miners tracked", home).group(1)
         self.assertIn(f"{n} home Bitcoin miners", read("/models/"))
         self.assertIn(f"on our {n} miner pages", read("/advertise/"))
         self.assertIn(f"All {n} home Bitcoin miners we track", read("/miners/"))
