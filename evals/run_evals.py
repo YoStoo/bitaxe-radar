@@ -122,6 +122,12 @@ def save(graded, a, latest):
     (out_dir / f"{name}.json").write_text(json.dumps(summary, indent=2))
     (out_dir / f"{name}.md").write_text(markdown(summary))
     print(f"Saved evals/results/{name}.json and .md")
+    try:
+        import build_history
+        build_history.rebuild()
+        print("Updated data/eval_history.json")
+    except Exception as e:
+        print(f"(eval history not updated: {e})")
 
 
 def regrade(path, a):

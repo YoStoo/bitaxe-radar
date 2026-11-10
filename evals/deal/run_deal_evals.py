@@ -98,6 +98,13 @@ def main(argv=None):
     for r in rows:
         md.append(f"| {'✅' if r['passed'] else '❌'} | `{r['id']}` | {r.get('source')} | {'; '.join(r['problems'])} | {((r.get('published') or {}).get('headline') or '').replace('|', '/')} |")
     (out / f"{name}.md").write_text("\n".join(md) + "\n")
+    try:
+        sys.path.insert(0, str(HERE.parent))
+        import build_history
+        build_history.rebuild()
+        print("Updated data/eval_history.json")
+    except Exception as e:
+        print(f"(eval history not updated: {e})")
     return 0
 
 
