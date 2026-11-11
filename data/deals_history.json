@@ -1,5 +1,29 @@
 [
  {
+  "date": "2026-11-11",
+  "data_checked_at": "2026-11-11T06:20:53Z",
+  "written_at": "2026-11-11T06:22:19Z",
+  "source": "ai",
+  "model": "claude-haiku-5-5",
+  "no_standout": true,
+  "headline": "No deal today: no miner is 3% below typical",
+  "summary": "No miner is 3% or more below its typical price today. The biggest drop we see is under 3%, so there is no deal of the day.",
+  "check": {
+   "passed": true,
+   "attempts": 1,
+   "first_try_problems": []
+  },
+  "run": {
+   "calls": 2,
+   "tools": [
+    "rank_price_drops"
+   ],
+   "input_tokens": 5838,
+   "output_tokens": 397,
+   "cost_usd": 0.00078
+  }
+ },
+ {
   "date": "2026-11-10",
   "data_checked_at": "2026-11-10T22:01:16Z",
   "written_at": "2026-11-10T22:02:44Z",
