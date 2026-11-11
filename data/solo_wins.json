@@ -1,11 +1,22 @@
 {
- "fetched_at": "2026-11-11T06:22:13Z",
- "checked_at": "2026-11-11T06:22:13Z",
+ "fetched_at": "2026-11-11T19:37:04Z",
+ "checked_at": "2026-11-11T19:37:04Z",
  "status": {
   "mempool.space": "ok",
   "sololuck.io": "ok"
  },
  "wins": [
+  {
+   "height": 975427,
+   "hash": "00000000000000000000bc99d243029a18c26b2eaac0f76e2c4c4b6de04721a5",
+   "time": "2026-11-11T11:08:00Z",
+   "pool": "Solo CKPool",
+   "reward_btc": 3.15405535,
+   "source": "mempool.space",
+   "hashrate_hs": null,
+   "hardware": null,
+   "rented": false
+  },
   {
    "height": 974930,
    "hash": "00000000000000000000642ee55c6672864ce72cb64e30c7e4361845c7d453e4",
