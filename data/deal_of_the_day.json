@@ -1,12 +1,12 @@
 {
- "date": "2026-11-12",
- "data_checked_at": "2026-11-12T07:10:26Z",
- "written_at": "2026-11-12T07:11:54Z",
+ "date": "2026-11-13",
+ "data_checked_at": "2026-11-13T06:46:07Z",
+ "written_at": "2026-11-13T06:47:28Z",
  "source": "ai",
  "model": "claude-haiku-5-5",
  "no_standout": true,
- "headline": "No deal of the day today",
- "summary": "No miner is 3% or more below its typical price today. The closest, D-Central StealthMiner, is only slightly below its usual price, so we are not naming a deal.",
+ "headline": "No deal today: no miner is 3% below typical",
+ "summary": "No miner is 3% or more below its typical price today. The biggest drop is under 3%, so there is no deal of the day.",
  "check": {
   "passed": true,
   "attempts": 1,
@@ -18,7 +18,7 @@
    "rank_price_drops"
   ],
   "input_tokens": 5830,
-  "output_tokens": 432,
-  "cost_usd": 0.0008
+  "output_tokens": 395,
+  "cost_usd": 0.00078
  }
 }
