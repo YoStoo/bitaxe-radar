@@ -1,5 +1,29 @@
 [
  {
+  "date": "2026-11-16",
+  "data_checked_at": "2026-11-16T06:29:30Z",
+  "written_at": "2026-11-16T06:30:57Z",
+  "source": "ai",
+  "model": "claude-haiku-5-5",
+  "no_standout": true,
+  "headline": "No deal of the day today",
+  "summary": "No miner is 3% or more below its typical price today. We will check again with the next price update.",
+  "check": {
+   "passed": true,
+   "attempts": 1,
+   "first_try_problems": []
+  },
+  "run": {
+   "calls": 2,
+   "tools": [
+    "rank_price_drops"
+   ],
+   "input_tokens": 5838,
+   "output_tokens": 380,
+   "cost_usd": 0.00077
+  }
+ },
+ {
   "date": "2026-11-15",
   "data_checked_at": "2026-11-15T06:31:49Z",
   "written_at": "2026-11-15T06:33:18Z",

@@ -1,41 +1,24 @@
 {
- "date": "2026-11-15",
- "data_checked_at": "2026-11-15T06:31:49Z",
- "written_at": "2026-11-15T06:33:18Z",
+ "date": "2026-11-16",
+ "data_checked_at": "2026-11-16T06:29:30Z",
+ "written_at": "2026-11-16T06:30:57Z",
  "source": "ai",
  "model": "claude-haiku-5-5",
- "no_standout": false,
- "headline": "Hammer Miner BC01 drops to $99 at Altair Technology",
- "summary": "The Hammer Miner BC01 is $99 at Altair Technology today, 9.2% below its typical $109. It was $109 from Nov 6 through Nov 14, and this is a new low we've logged.",
- "miner_id": "hammer-bc01",
- "miner_name": "Hammer Miner BC01",
- "offer_id": "altair:hammer-bc01",
- "retailer_id": "altair",
- "retailer_name": "Altair Technology",
- "price_usd": 99.0,
- "price": 99.0,
- "currency": "USD",
- "typical_usd": 109.0,
- "drop_usd": 10.0,
- "drop_pct": 9.2,
- "lowest_ever": true,
- "new_low": true,
- "history_days": 9,
- "window_days": 14,
+ "no_standout": true,
+ "headline": "No deal of the day today",
+ "summary": "No miner is 3% or more below its typical price today. We will check again with the next price update.",
  "check": {
   "passed": true,
   "attempts": 1,
   "first_try_problems": []
  },
  "run": {
-  "calls": 3,
+  "calls": 2,
   "tools": [
-   "rank_price_drops",
-   "compare_to_average",
-   "get_price_history"
+   "rank_price_drops"
   ],
-  "input_tokens": 10191,
-  "output_tokens": 598,
-  "cost_usd": 0.00132
+  "input_tokens": 5838,
+  "output_tokens": 380,
+  "cost_usd": 0.00077
  }
 }
