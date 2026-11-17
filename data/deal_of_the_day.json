@@ -1,24 +1,41 @@
 {
- "date": "2026-11-16",
- "data_checked_at": "2026-11-16T06:29:30Z",
- "written_at": "2026-11-16T06:30:57Z",
+ "date": "2026-11-17",
+ "data_checked_at": "2026-11-17T07:54:50Z",
+ "written_at": "2026-11-17T07:57:23Z",
  "source": "ai",
  "model": "claude-haiku-5-5",
- "no_standout": true,
- "headline": "No deal of the day today",
- "summary": "No miner is 3% or more below its typical price today. We will check again with the next price update.",
+ "no_standout": false,
+ "headline": "NMMiner NMQAxe++ Nexus down 10% to $359",
+ "summary": "The NMQAxe++ Nexus is $359 at NMMiner today, versus a typical $399 over the past 14 days. This ties the lowest price we've logged, and it has been at $359 since 2026-11-16.",
+ "miner_id": "nmqaxe-nexus",
+ "miner_name": "NMMiner NMQAxe++ Nexus",
+ "offer_id": "nmminer:nmqaxe-nexus",
+ "retailer_id": "nmminer",
+ "retailer_name": "NMMiner",
+ "price_usd": 359.0,
+ "price": 359.0,
+ "currency": "USD",
+ "typical_usd": 399.0,
+ "drop_usd": 40.0,
+ "drop_pct": 10.0,
+ "lowest_ever": true,
+ "new_low": false,
+ "history_days": 14,
+ "window_days": 14,
  "check": {
   "passed": true,
   "attempts": 1,
   "first_try_problems": []
  },
  "run": {
-  "calls": 2,
+  "calls": 3,
   "tools": [
-   "rank_price_drops"
+   "rank_price_drops",
+   "compare_to_average",
+   "get_price_history"
   ],
-  "input_tokens": 5838,
-  "output_tokens": 380,
-  "cost_usd": 0.00077
+  "input_tokens": 10228,
+  "output_tokens": 654,
+  "cost_usd": 0.00135
  }
 }
