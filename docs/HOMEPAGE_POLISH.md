@@ -1,6 +1,6 @@
 # Homepage polish, explained simply
 
-Branch `feature/homepage-polish` (Nov 10, 2026). Not live until Shervin says yes.
+Shipped on `main` Nov 10, 2026 (`d249ccc`; originally branch `feature/homepage-polish`).
 
 ## What changed
 

@@ -496,7 +496,9 @@ class SitePages(unittest.TestCase):
             self.assertNotIn(render.esc(rec["headline"]), h)
             return
         self.assertIn(render.esc(rec["headline"]), h)
-        if "affiliate link" in h:
+        # Footer disclosure always mentions "affiliate link"; the shop button only
+        # gets the label and rel when that shop actually has an affiliate program.
+        if 'class="ph">affiliate link<' in h:
             self.assertIn('rel="sponsored nofollow noopener"', h)
 
 

@@ -955,7 +955,7 @@ def layout(path, title, desc, body, *, crumbs=None, jsonld=(), noindex=False, la
 <meta name="theme-color" content="#0b1222">
 <title>{esc(title)}</title>
 <meta name="description" content="{esc(desc)}">
-{robots}{canon}<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+{robots}{canon}<link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="icon" href="/favicon.ico" sizes="48x48">
 <meta property="og:site_name" content="Bitaxe Radar">
 <meta property="og:type" content="{og_type}">
 <meta property="og:title" content="{esc(title)}">
@@ -4046,7 +4046,7 @@ def build_home():
     d = re.search(r'<meta name="description" content="(.*?)">', tpl, re.S).group(1)
     items = [(SHORT[m], f"/models/{m}/") for m in home_picks()]
     head = f"""<link rel="canonical" href="{BASE}/">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="icon" href="/favicon.ico" sizes="48x48">
 <meta property="og:site_name" content="Bitaxe Radar"><meta property="og:type" content="website">
 <meta property="og:title" content="{t}"><meta property="og:description" content="{d}">
 <meta property="og:url" content="{BASE}/"><meta property="og:image" content="{BASE}/og-image.png">

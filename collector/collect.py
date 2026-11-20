@@ -122,11 +122,11 @@ SELLERS = {
     "bitcoinmerch": {"name": "Bitcoin Merch", "url": "https://bitcoinmerch.com", "currency": "USD", "method": "Shopify products.json",
                      "affiliate": "Program found via search (3.3% reported); not yet joined"},
     "solosatoshi":  {"name": "Solo Satoshi", "url": "https://www.solosatoshi.com", "currency": "USD", "method": "WooCommerce Store API (variation-level stock)",
-                     "affiliate": "Unknown - not checked"},
+                     "affiliate": "Affiliate program approved Oct 26, 2026; links use /aff/8840/"},
     "bitaxede":     {"name": "Bitaxe.de", "url": "https://bitaxe.de", "currency": "EUR", "method": "Product-page schema.org JSON-LD",
                      "affiliate": "Affiliate program joined Oct 24, 2026 (5%, ref=bitaxeradar)"},
     "powermining":  {"name": "Power Mining", "url": "https://powermining.io", "currency": "EUR", "method": "Shopify products.json (US storefront via localization cookie: ex-VAT prices)",
-                     "affiliate": "Up to 10% via GoAffPro (powermining.io/pages/affiliate); not yet joined"},
+                     "affiliate": "Affiliate account active; links use ?ref=bitaxeradar (up to 10% via GoAffPro)"},
     "altair":       {"name": "Altair Technology", "url": "https://altairtech.io", "currency": "USD", "method": "Product page (WooCommerce variation data / JSON-LD)",
                      "affiliate": "Program exists; not yet approved - plain links only"},
     "heatbit":      {"name": "Heatbit", "url": "https://heatbit.com", "currency": "USD", "method": "Shopify products.json + product page pre-order check",
@@ -191,7 +191,7 @@ BITAXEDE = {  # product page slug
 }
 POWERMINING = {  # Shopify handle
     "bitaxe-gamma":  "bitaxe-gamma",
-    "nerdaxe-gamma": "nerdaxe-gamma",
+    # nerdaxe-gamma (handle "nerdaxe-gamma") last appeared 2026-11-08 and is gone from their catalog.
     "nerdqaxe-pp":   "nerdqaxe",
     "bitcube":       "bitcube",
     "avalon-nano-3s": "canaan-avalon-nano-3s",

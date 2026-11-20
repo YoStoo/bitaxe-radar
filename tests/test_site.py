@@ -251,6 +251,7 @@ class SiteTests(unittest.TestCase):
         self.assertIn('id="cost"', (SITE / "faq" / "index.html").read_text())   # the power-cost calculator moved to /faq/
         self.assertIn("signup.js", home)
         self.assertIn("<svg", (SITE / "favicon.svg").read_text())
+        self.assertGreater((SITE / "favicon.ico").stat().st_size, 0)
         # every product photo referenced anywhere exists and carries alt text and explicit dimensions
         for f in list(SITE.rglob("*.html")):
             for tag in re.findall(r"<img [^>]*>", f.read_text()):
