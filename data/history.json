@@ -2092,6 +2092,13 @@
    "currency": "USD",
    "in_stock": false,
    "status": "out_of_stock"
+  },
+  {
+   "t": "2026-11-22T06:47:37Z",
+   "price": 69.69,
+   "currency": "USD",
+   "in_stock": false,
+   "status": "out_of_stock"
   }
  ],
  "solosatoshi:bitaxe-gamma": [
@@ -2349,6 +2356,13 @@
   },
   {
    "t": "2026-11-21T07:07:49Z",
+   "price": 67.0,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  },
+  {
+   "t": "2026-11-22T06:47:37Z",
    "price": 67.0,
    "currency": "USD",
    "in_stock": true,
@@ -2882,6 +2896,13 @@
    "currency": "USD",
    "in_stock": true,
    "status": "in_stock"
+  },
+  {
+   "t": "2026-11-22T06:47:37Z",
+   "price": 195.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
   }
  ],
  "solosatoshi:nerdqaxe-pp": [
@@ -3153,6 +3174,13 @@
   },
   {
    "t": "2026-11-21T07:07:49Z",
+   "price": 210.99,
+   "currency": "USD",
+   "in_stock": false,
+   "status": "out_of_stock"
+  },
+  {
+   "t": "2026-11-22T06:47:37Z",
    "price": 210.99,
    "currency": "USD",
    "in_stock": false,
@@ -5429,6 +5457,13 @@
    "currency": "USD",
    "in_stock": true,
    "status": "in_stock"
+  },
+  {
+   "t": "2026-11-22T06:47:37Z",
+   "price": 293.0,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
   }
  ],
  "solosatoshi:avalon-mini-3": [
@@ -5644,6 +5679,13 @@
   },
   {
    "t": "2026-11-21T07:07:49Z",
+   "price": 749.99,
+   "currency": "USD",
+   "in_stock": false,
+   "status": "out_of_stock"
+  },
+  {
+   "t": "2026-11-22T06:47:37Z",
    "price": 749.99,
    "currency": "USD",
    "in_stock": false,
@@ -5877,6 +5919,13 @@
   },
   {
    "t": "2026-11-21T07:07:49Z",
+   "price": 1599.0,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  },
+  {
+   "t": "2026-11-22T06:47:37Z",
    "price": 1599.0,
    "currency": "USD",
    "in_stock": true,
@@ -9793,6 +9842,13 @@
    "currency": "USD",
    "in_stock": false,
    "status": "out_of_stock"
+  },
+  {
+   "t": "2026-11-22T06:47:37Z",
+   "price": 449.99,
+   "currency": "USD",
+   "in_stock": false,
+   "status": "out_of_stock"
   }
  ],
  "solosatoshi:bitaxe-naja-duo": [
@@ -10019,6 +10075,13 @@
    "currency": "USD",
    "in_stock": true,
    "status": "in_stock"
+  },
+  {
+   "t": "2026-11-22T06:47:37Z",
+   "price": 385.0,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
   }
  ],
  "solosatoshi:heatbit-bitair": [
@@ -10185,6 +10248,13 @@
   },
   {
    "t": "2026-11-21T07:07:49Z",
+   "price": 179.99,
+   "currency": "USD",
+   "in_stock": false,
+   "status": "out_of_stock"
+  },
+  {
+   "t": "2026-11-22T06:47:37Z",
    "price": 179.99,
    "currency": "USD",
    "in_stock": false,
@@ -14499,6 +14569,13 @@
   },
   {
    "t": "2026-11-21T07:07:49Z",
+   "price": 149.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  },
+  {
+   "t": "2026-11-22T06:47:37Z",
    "price": 149.99,
    "currency": "USD",
    "in_stock": true,
