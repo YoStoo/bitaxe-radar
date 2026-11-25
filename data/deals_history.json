@@ -1,5 +1,46 @@
 [
  {
+  "date": "2026-11-25",
+  "data_checked_at": "2026-11-25T08:34:37Z",
+  "written_at": "2026-11-25T08:36:11Z",
+  "source": "ai",
+  "model": "claude-haiku-5-5",
+  "no_standout": false,
+  "headline": "NerdQaxe++ (4.8 TH/s) down 8% at Solo Satoshi",
+  "summary": "NerdQaxe++ (4.8 TH/s) is $211 at Solo Satoshi, versus a typical $230. This ties the lowest price we've logged, first seen 2026-10-27, and it has returned to that level several times since.",
+  "miner_id": "nerdqaxe-pp",
+  "miner_name": "NerdQaxe++ (4.8 TH/s)",
+  "offer_id": "solosatoshi:nerdqaxe-pp",
+  "retailer_id": "solosatoshi",
+  "retailer_name": "Solo Satoshi",
+  "price_usd": 210.99,
+  "price": 210.99,
+  "currency": "USD",
+  "typical_usd": 229.99,
+  "drop_usd": 19.0,
+  "drop_pct": 8.3,
+  "lowest_ever": true,
+  "new_low": false,
+  "history_days": 14,
+  "window_days": 14,
+  "check": {
+   "passed": true,
+   "attempts": 1,
+   "first_try_problems": []
+  },
+  "run": {
+   "calls": 3,
+   "tools": [
+    "rank_price_drops",
+    "compare_to_average",
+    "get_price_history"
+   ],
+   "input_tokens": 10309,
+   "output_tokens": 646,
+   "cost_usd": 0.00135
+  }
+ },
+ {
   "date": "2026-11-24",
   "data_checked_at": "2026-11-24T09:54:47Z",
   "written_at": "2026-11-24T09:56:36Z",
