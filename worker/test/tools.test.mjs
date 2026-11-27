@@ -1,7 +1,7 @@
 // Run: node test/tools.test.mjs   (no real API calls: Claude is replaced with a scripted fake)
 // Each test scripts what the fake Claude says on each call, then checks what our agent loop did.
 import assert from "node:assert/strict";
-import { ALL_TOOLS, handleAsk, groundedInTools, runAgentLoop, buildToolRequest, contextModePrompt, RESPOND_TOOL, _resetMemoryCounts, MAX_TOOL_ROUNDS, SYSTEM_PROMPT, ANSWER_SCHEMA } from "../src/ask.js";
+import { ALL_TOOLS, handleAsk, groundedInTools, runAgentLoop, buildToolRequest, contextModePrompt, RESPOND_TOOL, _resetMemoryCounts, MAX_TOOL_ROUNDS, DEFAULT_MAX_TOKENS, SYSTEM_PROMPT, ANSWER_SCHEMA } from "../src/ask.js";
 import { TOOLS, validateToolInput, runTool, resolveMiner, MAX_SEARCH_LIMIT } from "../src/tools.js";
 
 const LATEST = {
@@ -210,6 +210,46 @@ assert.equal(r.body.answer, "The Gamma is cheaper; the NerdQaxe++ is faster.");
 assert.deepEqual(r.body.models_mentioned, ["bitaxe-gamma", "nerdqaxe-pp"]);
 reset([final({ ...ANSWER, answer: "</answer>junk" })]);
 assert.equal((await ask("x")).status, 502);                          // nothing left after cleaning -> friendly error
+
+// 5e. a complete respond that stopped at max_tokens is still a valid answer (live 502s, Nov 27)
+reset([{ stop_reason: "max_tokens", usage: { input_tokens: 500, output_tokens: 1200 }, content: [{ type: "tool_use", id: "tu_r_max", name: "respond", input: ANSWER }] }]);
+r = await ask("hi");
+assert.equal(r.status, 200);
+assert.equal(r.body.answer, ANSWER.answer);
+assert.equal(calls.length, 1);
+assert.equal(calls[0].max_tokens, DEFAULT_MAX_TOKENS);
+
+// 5f. plain-text "hi" (no respond tool) is retried with a forced respond — Shervin's live 502
+reset([
+  { stop_reason: "end_turn", usage: u, content: [{ type: "text", text: "Hi! I can help you find a miner." }] },
+  final({ working: "greeting", answer: "Hi. Ask me about miners, prices, or stock on Bitaxe Radar.", models_mentioned: [], confidence: "high", in_data: false }),
+]);
+r = await ask("hi");
+assert.equal(r.status, 200);
+assert.match(r.body.answer, /Hi/);
+assert.equal(calls.length, 2);
+assert.deepEqual(calls[1].tool_choice, { type: "tool", name: "respond" });
+assert.match(calls[1].messages.at(-1).content, /respond tool/);
+
+// 5g. same retry for a price question that skipped respond — "whats a good miner for around 200"
+reset([
+  { stop_reason: "end_turn", usage: u, content: [{ type: "text", text: "The Gamma is a solid pick around $200." }] },
+  final({ ...ANSWER, answer: "For around $200, the Bitaxe Gamma Duo is in stock at Shop A for $199.", models_mentioned: ["bitaxe-gamma-duo"] }),
+]);
+r = await ask("whats a good miner for around 200");
+assert.equal(r.status, 200);
+assert.equal(calls.length, 2);
+assert.deepEqual(r.body.models_mentioned, ["bitaxe-gamma-duo"]);
+
+// 5h. forced last turn with respond plus a leftover data tool still yields the answer
+reset([...loop, { stop_reason: "tool_use", usage: u, content: [
+  { type: "tool_use", id: "tu_leftover", name: "search_miners", input: { sort_by: "price" } },
+  { type: "tool_use", id: "tu_r_last", name: "respond", input: ANSWER },
+]}]);
+r = await ask("Still looping but answered");
+assert.equal(r.status, 200);
+assert.equal(r.body.answer, ANSWER.answer);
+assert.equal(calls.length, MAX_TOOL_ROUNDS + 1);
 
 // 6. history still works with tools; daily cap counts once per question, not per Claude call
 reset([toolUse(["get_miner", { miner: "avalon-q" }]), final({ ...ANSWER, models_mentioned: ["avalon-q"] })]);

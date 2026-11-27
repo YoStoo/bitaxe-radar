@@ -33,6 +33,7 @@ export const MAX_HISTORY_CONTENT = 1200;  // max chars per history message
 export const MAX_HISTORY_TOTAL = 4000;    // max chars across all history messages
 export const DEFAULT_DAILY_LIMIT = 200;      // ~200 questions/day x ~$0.0007 (tool way, ~2 calls) = about 14 cents/day; worst case 5 calls ~$0.30/day
 export const DEFAULT_MODEL = "claude-haiku-5-5";   // cheapest, fastest current Claude model
+export const DEFAULT_MAX_TOKENS = 4096;    // cap only; effort "low" + thinking off usually uses a few hundred. 1000 was too tight: Haiku 5.5 can fill `working` (or a thinking block if thinking is ever on) and stop with max_tokens before respond is usable, which became "Couldn't get a clear answer."
 export const MAX_TOOL_ROUNDS = 4;          // max times Claude may ask for tools before it must answer
 export const ASK_TOTAL_TIMEOUT_MS = 25000; // whole question (all Claude calls) must finish in 25 s
 const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
@@ -216,7 +217,7 @@ export function buildClaudeRequest(question, context, systemPrompt, model = DEFA
   const prior = Array.isArray(history) ? history : [];
   return {
     model,
-    max_tokens: 1000,                      // hard cap on reply length = hard cap on cost per question
+    max_tokens: DEFAULT_MAX_TOKENS,         // hard cap on reply length = hard cap on cost per question
     system: systemPrompt,                  // the rules
     thinking: { type: "disabled" },        // short lookups don't need "thinking" tokens (cheaper, faster)
     output_config: {
@@ -253,7 +254,7 @@ export const RESPOND_TOOL = {
 export function buildToolRequest(messages, systemPrompt, model = DEFAULT_MODEL, forceFinal = false) {
   return {
     model,
-    max_tokens: 1000,
+    max_tokens: DEFAULT_MAX_TOKENS,
     system: systemPrompt,
     thinking: { type: "disabled" },
     output_config: { effort: "low" },
@@ -263,12 +264,43 @@ export function buildToolRequest(messages, systemPrompt, model = DEFAULT_MODEL, 
   };
 }
 
-// Pull the answer out of a reply whose only tool call is "respond". Returns the raw object or null.
+// Pull the answer out of a "respond" tool call. Returns the raw object or null.
+// We used to require stop_reason !== "max_tokens" and exactly one tool_use. That dropped real
+// answers when Claude filled the token cap after finishing respond, or called respond alongside
+// a leftover data tool on the last turn (live 502s, Nov 27). Refusal is still rejected.
 export function respondInput(data) {
-  if (!data || data.stop_reason === "refusal" || data.stop_reason === "max_tokens") return null;
-  const blocks = (data.content || []).filter((b) => b.type === "tool_use");
-  if (blocks.length !== 1 || blocks[0].name !== RESPOND_TOOL.name) return null;
-  return blocks[0].input;
+  if (!data || data.stop_reason === "refusal") return null;
+  const blocks = (data.content || []).filter((b) => b.type === "tool_use" && b.name === RESPOND_TOOL.name);
+  if (!blocks.length) return null;
+  let input = blocks[blocks.length - 1].input;
+  if (typeof input === "string") {
+    try { input = JSON.parse(input); } catch { return null; }
+  }
+  return input && typeof input === "object" ? input : null;
+}
+
+// Compact log payload when the visitor would get "Couldn't get a clear answer." No message text.
+export function describeAskFailure(data) {
+  const content = data?.content || [];
+  return {
+    stop: data?.stop_reason || null,
+    out: data?.usage?.output_tokens || 0,
+    blocks: content.map((b) => (b.type === "tool_use" ? "tool:" + b.name : b.type)),
+  };
+}
+
+function textOnlyContent(data) {
+  const content = data?.content || [];
+  return content.length > 0 && content.every((b) => b.type === "text" || b.type === "thinking");
+}
+
+// True when Claude already produced a JSON/respond payload that checkAnswer may accept or reject.
+// In that case a forced retry won't help (e.g. an empty answer string) and shouldn't consume another call.
+function hasStructuredReply(data) {
+  if (respondInput(data)) return true;
+  const textBlock = (data?.content || []).find((b) => b.type === "text");
+  if (!textBlock || typeof textBlock.text !== "string") return false;
+  try { JSON.parse(textBlock.text); return true; } catch { return false; }
 }
 
 // The agent loop. Returns the final Claude reply plus what happened along the way (for logs and teaching).
@@ -288,18 +320,38 @@ export async function runAgentLoop(env, { question, history = [], systemPrompt, 
     usage.output_tokens += data?.usage?.output_tokens || 0;
     const toolBlocks = (data?.content || []).filter((b) => b.type === "tool_use");
     const dataTools = toolBlocks.filter((b) => b.name !== RESPOND_TOOL.name);
-    // Done when: Claude answered (respond only), stopped for any other reason, or this was the forced last call.
-    if (data?.stop_reason !== "tool_use" || !dataTools.length || forceFinal) return { data, answer: respondInput(data), toolsUsed, usage, calls, rounds: round };
-    // Claude asked for data tool(s): keep its turn in the conversation, run each tool, send ALL results back
-    // in ONE user turn (every tool_use needs a matching tool_result, or the API rejects the next call).
-    messages.push({ role: "assistant", content: data.content });
-    const ctx = { env, latest, openDb };
-    const results = await Promise.all(toolBlocks.map((b) => b.name === RESPOND_TOOL.name
-      // respond in the SAME turn as a data tool = an answer written before seeing the data. Bounce it.
-      ? { result: { type: "tool_result", tool_use_id: b.id, content: "Not sent. Read the tool results first, then call respond.", is_error: true }, log: { name: b.name, input: {}, ok: false } }
-      : ASYNC_TOOLS[b.name] ? ASYNC_TOOLS[b.name](ctx, b) : runTool(latest, b)));
-    results.forEach((r) => toolsUsed.push(r.log));
-    messages.push({ role: "user", content: results.map((r) => r.result) });
+    // If Claude asked for data tool(s) and this isn't the forced last call, run them and continue —
+    // even when stop_reason is max_tokens (a complete tool_use can still be usable).
+    if (dataTools.length && !forceFinal && data?.stop_reason !== "refusal") {
+      // Keep its turn in the conversation, run each tool, send ALL results back in ONE user turn
+      // (every tool_use needs a matching tool_result, or the API rejects the next call).
+      messages.push({ role: "assistant", content: data.content });
+      const ctx = { env, latest, openDb };
+      const results = await Promise.all(toolBlocks.map((b) => b.name === RESPOND_TOOL.name
+        // respond in the SAME turn as a data tool = an answer written before seeing the data. Bounce it.
+        ? { result: { type: "tool_result", tool_use_id: b.id, content: "Not sent. Read the tool results first, then call respond.", is_error: true }, log: { name: b.name, input: {}, ok: false } }
+        : ASYNC_TOOLS[b.name] ? ASYNC_TOOLS[b.name](ctx, b) : runTool(latest, b)));
+      results.forEach((r) => toolsUsed.push(r.log));
+      messages.push({ role: "user", content: results.map((r) => r.result) });
+      continue;
+    }
+    const answer = respondInput(data);
+    // One extra forced respond if Claude replied in plain text or otherwise skipped respond.
+    // Seen live (Nov 27): "hi" and some price questions returned 502 in one short call with no logs,
+    // which is this path (no valid respond). Don't retry after a refusal or a forced last call.
+    const leftNow = deadline - Date.now();
+    if (!answer && !hasStructuredReply(data) && !forceFinal && data?.stop_reason !== "refusal" && leftNow > 5000) {
+      if (textOnlyContent(data)) {
+        messages.push({ role: "assistant", content: data.content });
+        messages.push({ role: "user", content: "Call the respond tool with your final answer now. Do not call any other tool." });
+      }
+      const retry = await callClaude(env, buildToolRequest(messages, systemPrompt, model, true), Math.min(20000, leftNow));
+      calls++;
+      usage.input_tokens += retry?.usage?.input_tokens || 0;
+      usage.output_tokens += retry?.usage?.output_tokens || 0;
+      return { data: retry, answer: respondInput(retry), toolsUsed, usage, calls, rounds: round + 1 };
+    }
+    return { data, answer, toolsUsed, usage, calls, rounds: round };
   }
 }
 
@@ -323,7 +375,7 @@ export async function callClaude(env, body, timeoutMs = 20000) {
 // Even with structured output, a reply can be cut off (max_tokens) or be a refusal. And Claude could
 // name a miner that doesn't exist (a "hallucination"), so we drop any id that isn't in our data.
 export function parseClaudeReply(data, knownIds) {
-  if (!data || data.stop_reason === "refusal" || data.stop_reason === "max_tokens") return null;
+  if (!data || data.stop_reason === "refusal") return null;
   const textBlock = (data.content || []).find((b) => b.type === "text");
   if (!textBlock) return null;
   let out;
@@ -400,19 +452,24 @@ export async function handleAsk(request, env, json, deps = {}) {
     const latest = await loadLatest(env);
     const model = env.ASK_MODEL || DEFAULT_MODEL;
     const knownIds = new Set(Object.keys(latest.models || {}));
-    let result, toolsUsed = [], usage, calls = 1;
+    let result, toolsUsed = [], usage, calls = 1, raw = null;
     if (env.ASK_TOOLS === "off") {   // old way: paste every miner into the prompt, one call
       const data = await callClaude(env, buildClaudeRequest(v.question, buildContext(latest), deps.systemPrompt ?? contextModePrompt(SYSTEM_PROMPT), model, history));
+      raw = data;
       usage = data?.usage;
       result = parseClaudeReply(data, knownIds);
     } else {
       const loop = await runAgentLoop(env, { question: v.question, history, systemPrompt, latest, model, openDb: deps.openDb ?? null });
+      raw = loop.data;
       ({ toolsUsed, usage, calls } = loop);
       // Normal path: the respond tool's input. Fallback: a plain JSON text reply (shouldn't happen with
       // tool_choice "any", but if it ever does, the same checks apply instead of failing the visitor).
       result = loop.answer ? checkAnswer(loop.answer, knownIds) : parseClaudeReply(loop.data, knownIds);
     }
-    if (!result) return json({ ok: false, error: "Couldn't get a clear answer. Try rewording it." }, 502, request);
+    if (!result) {
+      console.warn("ask no clear answer", JSON.stringify(describeAskFailure(raw)));
+      return json({ ok: false, error: "Couldn't get a clear answer. Try rewording it." }, 502, request);
+    }
     const sources = citedSources(toolsUsed, result.guides_cited);
     delete result.guides_cited;
     // Price tools that named real miners prove the answer is grounded (bug #17). Citations do NOT flip in_data:

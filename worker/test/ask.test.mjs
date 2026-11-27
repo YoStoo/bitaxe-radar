@@ -65,7 +65,7 @@ const ids = new Set(Object.keys(LATEST.models));
 assert.deepEqual(parseClaudeReply(claudeSays(GOOD), ids).models_mentioned, ["bitaxe-gamma"]);
 assert.equal(parseClaudeReply(claudeSays(GOOD), ids).confidence, "high");
 assert.equal("working" in parseClaudeReply(claudeSays(GOOD), ids), false);   // scratch notes never reach visitors
-assert.equal(parseClaudeReply(claudeSays(GOOD, { stop_reason: "max_tokens" }), ids), null);
+assert.equal(parseClaudeReply(claudeSays(GOOD, { stop_reason: "max_tokens" }), ids).confidence, "high");  // complete JSON still usable if the token cap was hit
 assert.equal(parseClaudeReply(claudeSays(GOOD, { stop_reason: "refusal" }), ids), null);
 assert.equal(parseClaudeReply({ content: [{ type: "text", text: "not json" }] }, ids), null);
 assert.equal(parseClaudeReply(claudeSays({ ...GOOD, in_data: "yes" }), ids), null);

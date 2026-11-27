@@ -197,6 +197,16 @@ The site-wide floating chat bubble itself was Shervin's idea (example chips that
 
 **Lesson.** Evals have bugs too. When a case fails, read the answer first. Check the grader, then the bot.
 
+### 20. (Found live, Nov 27) "Couldn't get a clear answer" on ordinary questions
+
+**Bug.** The live chat returned HTTP 502 "Couldn't get a clear answer. Try rewording it." about half the time, including Shervin's "hi" and "whats a good miner for around 200" (and some "cheapest 1+ TH/s" / compare / general questions). A simple "cheapest Bitaxe Gamma" often worked. Not a rate limit, daily cap, or billing error (those use different messages). The new UI's history shape was fine: failed first-turn posts were just `{"question":"..."}`.
+
+**Cause.** Two gaps in how we read Claude's reply. (1) `max_tokens` was 1000, and `respondInput` / `parseClaudeReply` threw away the whole turn if `stop_reason` was `max_tokens`, even when `respond` was already complete. (2) If Claude answered in plain text instead of calling `respond`, we had no retry, so the visitor got a 502. Failures also left no Worker log, so the next time this happens we couldn't see `stop_reason`.
+
+**Fix.** Raise the output cap to 4096 (typical replies still use a few hundred tokens). Accept a complete `respond` (or complete JSON text) even if the token cap was hit. If the first call has no structured answer and wasn't a refusal or a forced last turn, make one more call with `tool_choice` forced to `respond`. Log `stop_reason`, output tokens, and block types on the remaining 502s.
+
+**Lesson.** A token cap is a ceiling, not a target — but if you discard `max_tokens` replies, a tight ceiling becomes a user-facing outage. And when the model skips the tool you require, retry that tool once before failing the visitor.
+
 ## How we checked it
 
 - Mocked Worker tests (`cd worker && npm test`) — free, repeatable, no API key.
