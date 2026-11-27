@@ -66,7 +66,8 @@ assert.deepEqual(parseClaudeReply(claudeSays(GOOD), ids).models_mentioned, ["bit
 assert.equal(parseClaudeReply(claudeSays(GOOD), ids).confidence, "high");
 assert.equal("working" in parseClaudeReply(claudeSays(GOOD), ids), false);   // scratch notes never reach visitors
 assert.equal(parseClaudeReply(claudeSays(GOOD, { stop_reason: "max_tokens" }), ids).confidence, "high");  // complete JSON still usable if the token cap was hit
-assert.equal(parseClaudeReply(claudeSays(GOOD, { stop_reason: "refusal" }), ids), null);
+assert.equal(parseClaudeReply(claudeSays(GOOD, { stop_reason: "refusal" }), ids).confidence, "high");  // complete JSON is still usable
+assert.equal(parseClaudeReply({ stop_reason: "refusal", content: [] }, ids), null);                  // an empty refusal is not
 assert.equal(parseClaudeReply({ content: [{ type: "text", text: "not json" }] }, ids), null);
 assert.equal(parseClaudeReply(claudeSays({ ...GOOD, in_data: "yes" }), ids), null);
 assert.equal(parseClaudeReply(claudeSays({ ...GOOD, confidence: "very" }), ids), null);

@@ -184,6 +184,11 @@ assert.deepEqual(r.body.tools_used, []);
 assert.equal(calls.length, 1);
 reset([{ stop_reason: "refusal", usage: u, content: [] }]);       // a real safety refusal still -> friendly 502
 assert.equal((await ask("something nasty")).status, 502);
+// ...but a refusal that already contains a complete respond is still a usable answer (live Nov 27)
+reset([{ stop_reason: "refusal", usage: { input_tokens: 500, output_tokens: 107 }, content: [{ type: "tool_use", id: "tu_r_ref", name: "respond", input: { ...ANSWER, answer: "For around $200, the Bitaxe Gamma Duo is in stock at Shop A for $199.", models_mentioned: ["bitaxe-gamma-duo"] } }] }]);
+r = await ask("whats a good miner for around 200");
+assert.equal(r.status, 200);
+assert.deepEqual(r.body.models_mentioned, ["bitaxe-gamma-duo"]);
 
 // 5b. respond in the SAME turn as a data tool is bounced (answer written before seeing data)
 reset([toolUse(["search_miners", { sort_by: "price" }], ["respond", ANSWER]), final(ANSWER)]);

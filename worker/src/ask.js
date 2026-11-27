@@ -98,9 +98,9 @@ export function contextModePrompt(p) { return p.replace(/1\. For prices[\s\S]*?i
 export const ANSWER_SCHEMA = {
   type: "object",
   properties: {
-    // "Scratch paper" Claude fills in FIRST: filter and compare rows here, so the answer itself stays clean.
-    // (Without it, Claude "thought out loud" inside the answer on comparison questions.) Never shown to visitors.
-    working: { type: "string", description: "Brief private notes: the rows you filtered and compared. Not shown to the visitor." },
+    // No "working"/scratch field: Haiku 5.5 can refuse the whole turn (stop_reason "refusal",
+    // category reasoning_extraction) if the schema asks it to write hidden reasoning. Keep the
+    // visible answer short via the description and the system prompt instead.
     answer: { type: "string", description: "Visitor-facing reply: 2-4 short sentences, under ~70 words. Lead with the answer; no padding." },   // shown to the visitor
     // "description" tells Claude what goes in each field, so the rules prompt can stay about behavior.
     models_mentioned: { type: "array", items: { type: "string" },   // miner ids, e.g. "bitaxe-gamma"
@@ -116,7 +116,7 @@ export const ANSWER_SCHEMA = {
         "it also says the data doesn't explain something. false only for general knowledge (including when you say our guides " +
         "don't cover it and answer generally), off-topic replies, or clarifying questions." },
   },
-  required: ["working", "answer", "models_mentioned", "guides_cited", "confidence", "in_data"],
+  required: ["answer", "models_mentioned", "guides_cited", "confidence", "in_data"],
   additionalProperties: false,
 };
 
@@ -269,7 +269,10 @@ export function buildToolRequest(messages, systemPrompt, model = DEFAULT_MODEL, 
 // answers when Claude filled the token cap after finishing respond, or called respond alongside
 // a leftover data tool on the last turn (live 502s, Nov 27). Refusal is still rejected.
 export function respondInput(data) {
-  if (!data || data.stop_reason === "refusal") return null;
+  if (!data) return null;
+  // A Haiku 5.5 safeguard refusal can still include a finished respond payload (seen live on
+  // "whats a good miner for around 200": stop_reason refusal, blocks: tool:respond). Use it.
+  // An empty refusal (no content) still returns null.
   const blocks = (data.content || []).filter((b) => b.type === "tool_use" && b.name === RESPOND_TOOL.name);
   if (!blocks.length) return null;
   let input = blocks[blocks.length - 1].input;
@@ -282,8 +285,10 @@ export function respondInput(data) {
 // Compact log payload when the visitor would get "Couldn't get a clear answer." No message text.
 export function describeAskFailure(data) {
   const content = data?.content || [];
+  const details = data?.stop_details;
   return {
     stop: data?.stop_reason || null,
+    category: details?.reason || details?.category || details?.type || null,
     out: data?.usage?.output_tokens || 0,
     blocks: content.map((b) => (b.type === "tool_use" ? "tool:" + b.name : b.type)),
   };
@@ -375,7 +380,7 @@ export async function callClaude(env, body, timeoutMs = 20000) {
 // Even with structured output, a reply can be cut off (max_tokens) or be a refusal. And Claude could
 // name a miner that doesn't exist (a "hallucination"), so we drop any id that isn't in our data.
 export function parseClaudeReply(data, knownIds) {
-  if (!data || data.stop_reason === "refusal") return null;
+  if (!data) return null;
   const textBlock = (data.content || []).find((b) => b.type === "text");
   if (!textBlock) return null;
   let out;
