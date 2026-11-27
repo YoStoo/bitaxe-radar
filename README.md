@@ -10,7 +10,7 @@ The site checks shops every 6 hours and publishes a static site. A Cloudflare Wo
 
 ## Features
 
-- **Prices and stock across 11 shops.** A Python collector pulls listings for Bitaxe, NerdQaxe, Avalon, Heatbit, and other home miners. A failing shop keeps its last data and is marked stale.
+- **Prices and stock across 11 shops** (the site counts a shop on days it has at least one listing). A Python collector pulls listings for Bitaxe, NerdQaxe, Avalon, Heatbit, and other home miners. A failing shop keeps its last data and is marked stale.
 - **Comparisons and estimates.** Side-by-side model pages, price history, electricity cost, and solo vs pool odds.
 - **Price-drop alerts.** Email signup through a Cloudflare Worker, with a collect-and-deploy job on GitHub Actions.
 - **Ask Bitaxe Radar.** A Claude chat on every page that searches, looks up, or compares miners from the live table. Answers stay short. Off-topic questions are refused.

@@ -73,6 +73,8 @@ class Photos(unittest.TestCase):
         missing = []
         for page in sorted((SITE / "models").glob("*/index.html")):
             mid = page.parent.name
+            if 'http-equiv="refresh"' in page.read_text():
+                continue      # no listings today: the URL redirects to All miners instead of 404ing
             if not (SITE / "img" / "models" / f"{mid}.webp").exists() or f'src="/img/models/{mid}.webp"' not in page.read_text():
                 missing.append(mid)
         self.assertEqual(missing, [])
@@ -128,7 +130,9 @@ class Chart(unittest.TestCase):
     def test_motion_is_opt_in_and_never_hides_content_without_js(self):
         css = (SITE / "style.css").read_text()
         block = css.split("@media (prefers-reduced-motion: no-preference){", 1)[1]
-        self.assertIn(".pchart.anim .chart-reveal", block)
+        # the price chart is never drawn hidden and revealed later: a late or missing scroll event used to leave it blank
+        self.assertNotIn("scaleX(0)", block)
+        self.assertNotRegex(block, r"\.pchart\.anim [^{]*\{[^}]*opacity:0")
         self.assertIn(".rv .card", block)
         # the classes that start hidden are only ever added by motion.js, never in the HTML
         for f in SITE.rglob("*.html"):

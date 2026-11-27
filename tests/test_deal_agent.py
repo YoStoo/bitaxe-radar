@@ -413,24 +413,33 @@ class Render(unittest.TestCase):
            "offer_id": "solosatoshi:bitaxe-gamma", "retailer_name": "Solo Satoshi", "price_usd": 59.99, "typical_usd": 67.0, "drop_pct": 10.5,
            "lowest_ever": True, "window_days": 14, "headline": "Gamma <b>down</b>", "summary": "<script>x</script> It's $59.99."}
 
-    def test_card_escapes_ai_text_and_labels_it(self):
-        h = render.deal_box(self.REC, {"stock_status": "in_stock", "price_usd_approx": 59.99}, '<a class="btn">View</a>')
+    def test_card_is_short_with_photo_and_one_price_sentence(self):
+        """Shervin, Nov 27: photo, centered, no "written by" note, one short price sentence. AI text stays off the card."""
+        h = render.deal_box(self.REC, {"stock_status": "in_stock", "price_usd_approx": 59.99}, '<a class="btn">View</a>', img_html='<img src="/x.webp" alt="">')
         self.assertNotIn("<script>", h)
-        self.assertIn("&lt;script&gt;", h)
-        self.assertIn(render.AI_NOTE, h)
+        self.assertNotIn("Gamma <b>down</b>", h)
+        self.assertNotIn("Written by", h)
+        self.assertNotIn("AI-written", h)
+        self.assertIn('class="dotd-img"', h)
+        self.assertIn('<img src="/x.webp" alt="">', h)
         self.assertIn('<a class="btn">View</a>', h)
         self.assertIn("$59.99", h)
+        self.assertIn("10.5% under its typical $67, the lowest we&#x27;ve logged.", h)
+        self.assertIn("Bitaxe Gamma (601/602)", h)
+
+    def test_price_sentence(self):
+        self.assertEqual(render.price_line({**self.REC, "lowest_ever": False, "typical_usd": 79.5, "drop_pct": 26.6}), "26.6% under its typical $79.50.")
+
+    def test_archive_escapes_ai_text(self):
+        rows = render.archive_rows([self.REC])
+        self.assertNotIn("<b>down</b>", rows)
+        self.assertIn("Gamma &lt;b&gt;down&lt;/b&gt;", rows)
 
     def test_price_change_and_sold_out_are_shown(self):
         self.assertIn("now $64.00", render.deal_box(self.REC, {"stock_status": "in_stock", "price_usd_approx": 64.0}, "L"))
         h = render.deal_box(self.REC, {"stock_status": "out_of_stock", "price_usd_approx": 59.99}, '<a class="btn">View</a>')
         self.assertIn("Sold out since", h)
         self.assertNotIn('class="btn"', h)
-
-    def test_template_label(self):
-        h = render.deal_box({**self.REC, "source": "template"}, {"stock_status": "in_stock", "price_usd_approx": 59.99}, "")
-        self.assertIn(render.TEMPLATE_NOTE, h)
-        self.assertNotIn(render.AI_NOTE, h)
 
     def test_no_deal_day_shows_nothing(self):
         """Shervin's rule: no real deal -> no card, no archive row. The record stays in the data file only."""

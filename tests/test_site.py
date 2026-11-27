@@ -13,6 +13,12 @@ SITE = Path(__file__).resolve().parent.parent / "site"
 BASE = "https://bitaxeradar.com"
 
 
+
+def is_redirect_stub(path):
+    """Moved or not-built-today pages (old URLs, a model or shop with no listings today) are meta-refresh stubs."""
+    f = SITE / path.strip("/") / "index.html"
+    return f.exists() and 'http-equiv="refresh"' in f.read_text()
+
 class P(HTMLParser):
     def __init__(self):
         super().__init__(convert_charrefs=True)
@@ -98,12 +104,13 @@ class SiteTests(unittest.TestCase):
             self.assertEqual(p.stack, [], path)
             self.assertEqual(p.h1, 1, f"{path} needs exactly one h1")
             self.assertTrue(p.title.strip(), path)
-            self.assertNotIn(p.title, titles, f"duplicate title {path} / {titles.get(p.title)}")
-            titles[p.title] = path
             d = p.meta.get("description", "")
             self.assertFalse(p.title.endswith("…"), f"{path} title was truncated")
-            if path in ("/404.html", "/home-miners/", "/about/", "/bitaxe-black-friday/"):     # 404 and redirect stubs (canonical points at the new URL)
+            if path == "/404.html" or is_redirect_stub(path):     # 404 and redirect stubs (canonical points at the new URL)
+                self.assertIn("noindex", p.meta.get("robots", ""), path)
                 continue
+            self.assertNotIn(p.title, titles, f"duplicate title {path} / {titles.get(p.title)}")
+            titles[p.title] = path
             self.assertFalse(d.endswith("…"), f"{path} description was truncated")
             self.assertTrue(70 <= len(d) <= 165, f"{path} description length {len(d)}")
             self.assertNotIn(d, descs, f"duplicate description {path}")
@@ -291,7 +298,7 @@ class SiteTests(unittest.TestCase):
         for f in list(SITE.rglob("*.html")):
             # /ask/ is a full-page chat shell (no site header/nav) and stays out of the menu on purpose.
             # /bitaxe-black-friday/ is a noindex redirect stub (no site header/nav).
-            if f.parent.name in ("home-miners", "about", "ask", "bitaxe-black-friday"):
+            if f.parent.name == "ask" or 'http-equiv="refresh"' in f.read_text():
                 continue
             nav = re.search(r'<nav aria-label="Main">(.*?)</nav>', f.read_text(), re.S)
             self.assertIsNotNone(nav, str(f))
@@ -461,7 +468,7 @@ class NavBuildTests(unittest.TestCase):
         self.assertEqual(head.count('class="browse"'), 1)                     # one type row (plus the best-for row)
         cards = re.findall(r'<h3><a href="/models/([^/]+)/">', solo)
         home = self.read("/")
-        n = int(re.search(r'class="btile" href="/solo-miners/">.*?<small>(\d+) miners</small>', home, re.S).group(1))
+        n = int(re.search(r'class="btile" href="/solo-miners/">.*?<small class="tn">(\d+) miners</small>', home, re.S).group(1))
         self.assertEqual(n, len(cards))                                       # tile count matches the page
         prices = []
         for art in re.findall(r'<article class="card">(.*?)</article>', solo, re.S):

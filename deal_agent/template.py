@@ -21,9 +21,8 @@ def template_deal(pd):
                     summary="No miner we track is at least 3% below its typical price of the last 14 days. "
                             "Prices are steady, so there's no rush today.")
     f = deals[0]
-    low = " That's the lowest price we've logged for it." if f["lowest_ever"] else ""
+    low = " The lowest we've logged." if f["lowest_ever"] else ""
     return dict(working="template", no_standout=False, miner_id=f["miner_id"], retailer_name=f["retailer_name"],
                 price_usd=f["price_usd"], typical_usd=f["typical_usd"], drop_pct=f["drop_pct"], lowest_ever=f["lowest_ever"],
                 headline=f"{pct(f['drop_pct'])} off its typical price at {f['retailer_name']}"[:90],
-                summary=f"It's {money(f['price_usd'])} today, in stock at {f['retailer_name']}. Its typical price over the last 14 days "
-                        f"was {money(f['typical_usd'])}, so that's {money(f['drop_usd'])} ({pct(f['drop_pct'])}) less.{low}")
+                summary=f"{money(f['price_usd'])} at {f['retailer_name']}, {pct(f['drop_pct'])} under its typical {money(f['typical_usd'])}.{low}")
