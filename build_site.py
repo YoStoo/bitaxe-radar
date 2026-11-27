@@ -201,6 +201,17 @@ def offer_link(o, text=None, cls="btn"):
     return a + ('<div class="ph">affiliate link</div>' if aff else "")
 
 
+def buy_row(mid, o):
+    """Card buttons once a miner is picked: the main button goes straight to the cheapest in-stock shop (same affiliate
+    link, rel and new tab as every shop button), with "See all prices" on our miner page as the secondary link."""
+    aff = aff_param(o["seller"])
+    rel = "sponsored nofollow noopener" if aff else "nofollow noopener"
+    price = ("≈" if o["currency"] != "USD" else "") + chart_money(usd(o))
+    label = f"View at {sname(o['seller'])}, {price} ↗"
+    return (f'<div class="buyrow"><a class="btn buy" href="{esc(offer_href(o))}" target="_blank" rel="{rel}">{esc(label)}</a>'
+            f'<div class="sub"><a href="/models/{mid}/">See all prices</a>' + (' · <span class="ph">affiliate link</span>' if aff else "") + "</div></div>")
+
+
 def best_cta(st):
     """Above-the-fold 'go to the best deal' box: cheapest in-stock listing, plus the cheapest USD-priced one if different."""
     best, usd_best = st["best"], st["best_usd"]
@@ -1124,20 +1135,24 @@ def chart_svg(mid):
     lines.append(f'<path class="area" d="{area}" fill="url(#cg-{mid})"/>')
     for i, (o, col, pts) in reversed(list(enumerate(series))):   # lead (cheapest now) drawn last, on top
         for ins, d in step_runs(pts):
-            lines.append(f'<path class="ln{"" if ins else " oos"}" data-i="{i}" d="{d}" stroke="{col}"/>')
+            lines.append(f'<path class="ln{"" if ins else " oos"}{" lead" if o is lead[0] else ""}" data-i="{i}" d="{d}" stroke="{col}"/>')
     svg.append(f'<g clip-path="url(#cc-{mid})">{"".join(lines)}</g>')
 
     # HTML overlay: gridline prices, date range, "Now" dot + label, lowest-in-window marker
     days = max(1, round(span_s / 86400))
     ov = [f'<span class="gy" style="top:{fy(g) * 100:.2f}%">{chart_money(g)}</span>' for g in grid]
     ov.append(f'<span class="gx l">{esc(fmt_day(tmin))}</span><span class="gx r">{esc(fmt_day(tmax))}</span>')
+    if days >= 8:   # a few dates along the bottom, so you can read when a price changed
+        for k in (1, 2, 3):
+            ov.append(f'<span class="gx m{" mid" if k == 2 else ""}" style="left:{k * 25}%">{esc(fmt_day(tmin + (tmax - tmin) * k / 4))}</span>')
+        svg[1:1] = [f'<line class="vgrid" x1="{k * VW / 4:.1f}" x2="{k * VW / 4:.1f}" y1="0" y2="{VH}"/>' for k in (1, 2, 3)]
     lt, lv, lins = lead[2][-1]
     for o, col, pts in series:      # a small dot where every other shop's line ends (its price at the latest check)
         if o is not lead[0]:
             ov.append(f'<span class="cdot end" style="left:{fx(pts[-1][0]) * 100:.2f}%;top:{fy(pts[-1][1]) * 100:.2f}%;--c:{col}"></span>')
     now_txt = f"Now {chart_money(lv)}" if lins else f"Last {chart_money(lv)} · sold out"
     ov.append(f'<span class="cdot now" style="left:{fx(lt) * 100:.2f}%;top:{fy(lv) * 100:.2f}%;--c:{lead[1]}"></span>'
-              f'<span class="ctag now" style="top:{fy(lv) * 100:.2f}%">{now_txt}<small>{esc(sname(lead[0]["seller"]))}</small></span>')
+              f'<span class="ctag now" style="top:{fy(lv) * 100:.2f}%;--c:{lead[1]}">{now_txt}<small>{esc(sname(lead[0]["seller"]))}</small></span>')
     ins_pts = [(parse_t(p["t"]), to_usd(p), x[0]) for x in series for p in hist_pts(x[0]["id"]) if p.get("in_stock") and to_usd(p) is not None]   # every check, not just the change points
     low_note = ""
     if ins_pts:
@@ -1157,6 +1172,14 @@ def chart_svg(mid):
             low_note = (f'<p class="chart-note">Lowest in-stock price in the last {days} days: <b>{chart_money(low_v)}</b> at '
                         f'{esc(sname(low_o["seller"]))}, last seen {esc(fmt_day(low_t))}.</p>')
 
+    stats = ""
+    if ins_pts:
+        hi_v = max(v for _, v, _ in ins_pts)
+        cells = [("Cheapest now", chart_money(lv) if lins else "Sold out", esc(sname(lead[0]["seller"])), "now"),
+                 ("Lowest in stock", chart_money(low_v), f'{esc(sname(low_o["seller"]))} · last seen {esc(fmt_day(low_t))}', "low"),
+                 ("Highest in stock", chart_money(hi_v), "across the shops below", "high"),
+                 ("Tracked", f"{days} days", f"since {esc(fmt_day(tmin))}", "")]
+        stats = '<dl class="pc-stats">' + "".join(f'<div class="{c}"><dt>{a}</dt><dd>{b}<small>{d}</small></dd></div>' for a, b, d, c in cells) + "</dl>"
     legend = []
     for i, (o, col, pts) in enumerate(series):
         t, v, ins = pts[-1]
@@ -1167,7 +1190,7 @@ def chart_svg(mid):
             "s": [{"n": sname(o["seller"]), "c": col, "p": [[round(fx(t), 4), round(v, 2), int(ok)] for t, v, ok in pts]} for o, col, pts in series]}
     label = (f"Price history for {esc(SHORT[mid])} in US dollars over {days} days, {len(series)} shops. "
              f"Cheapest now: {chart_money(lv)} at {esc(sname(lead[0]['seller']))}.")
-    return (f'<figure class="pchart" data-chart="{esc(json.dumps(data, separators=(",", ":")))}">'
+    return (f'<figure class="pchart" data-chart="{esc(json.dumps(data, separators=(",", ":")))}">{stats}'
             f'<div class="pc-plot"><svg viewBox="0 0 {VW} {VH}" preserveAspectRatio="none" role="img" aria-label="{label}">{"".join(svg)}</svg>'
             f'<div class="pc-ov" aria-hidden="true">{"".join(ov)}</div><div class="pc-tip" hidden></div></div>'
             f'<ul class="pc-legend">{"".join(legend)}</ul>'
@@ -1372,6 +1395,7 @@ def build_model_page(mid):
 </section>
 <section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{faq_html}</section>
 <section aria-labelledby="h-more"><h2 id="h-more">Keep comparing</h2>
+<p><a class="btn ghost sm" href="/compare/?a={mid}#pick">⇄ Compare {esc(SHORT[mid])} with any miner</a></p>
 {'<ul class="links">' + rel_links + "</ul>" if rel_links else ""}
 <ul class="links">{other_links}</ul>
 {'<p><a href="/heater-miners/">Heater miners</a> · <a href="/pool-miners/">Best for pool mining</a> · <a href="/guides/how-heater-miners-work/">How heater miners work</a> · <a href="/guides/solo-vs-pool-mining/">Solo vs pool</a></p>' if home else ""}</section>
@@ -1561,6 +1585,13 @@ def model_summary_table(models, *, usd_only=False):
 
 CURRENT_MODELS = [m for m in CORE_TRACKED if m not in NOINDEX_MODELS]
 N_MODELS = len([m for m in TRACKED if m not in NOINDEX_MODELS])   # the one model count shown anywhere on the site
+# One counting rule for every page (homepage, All miners, In stock, Shops, About): listings are the offers for the
+# N_MODELS current models (older noindex models are left out, like on All miners), and a shop counts when it has at
+# least one listing in today's data. A shop with nothing listed today (e.g. Bitaxe.de between restocks) isn't counted.
+COUNTED_OFFERS = [o for o in OFFERS if o["model"] in LIVE_TRACKED]
+COUNTED_IN_STOCK = [o for o in COUNTED_OFFERS if in_stock(o)]
+COUNTED_SELLERS = [sid for sid in SELLERS if sid in BUILT_SELLERS]
+N_SHOPS = len(COUNTED_SELLERS)
 
 
 TRUSTED_AFF_SELLERS = ("solosatoshi", "bitaxede", "powermining")   # tracked shops with affiliate codes, linked from the unknown-shop box
@@ -1662,13 +1693,14 @@ def deal_pills(current):
 def build_in_stock():
     path = "/in-stock/"
     trail = [("Home", "/"), ("Deals", "/deals/"), ("In stock now", path)]
-    order = {m: i for i, m in enumerate(MODELS)}
-
-    def srt(lst):
-        return sorted(lst, key=lambda o: (order[o["model"]], usd(o) if usd(o) is not None else 1e9))
-    ins = srt([o for o in OFFERS if in_stock(o)])
-    pre = srt([o for o in OFFERS if o["stock_status"] in ("preorder", "backorder")])
-    oos = srt([o for o in OFFERS if o["stock_status"] in ("out_of_stock", "unknown")])
+    def srt(lst):   # cheapest first (US-dollar estimate for euro and Canadian-dollar prices), then by name
+        return sorted(lst, key=lambda o: (usd(o) if usd(o) is not None else 1e9, SHORT[o["model"]], sname(o["seller"])))
+    ins = srt(list(COUNTED_IN_STOCK))
+    pre = srt([o for o in COUNTED_OFFERS if o["stock_status"] in ("preorder", "backorder")])
+    oos = srt([o for o in COUNTED_OFFERS if o["stock_status"] in ("out_of_stock", "unknown")])
+    older = [m for m in TRACKED if m in NOINDEX_MODELS]
+    older_html = ('<p class="older">Older models, not counted here: ' + " · ".join(
+        f'<a href="/models/{m}/">{esc(SHORT[m])}</a>' + (f' from {money(usd(STATS[m]["best"]))}' if STATS[m]["best"] else " (sold out)") for m in older) + "</p>") if older else ""
     none = [m for m in LIVE_TRACKED if not STATS[m]["in_stock"]]
     notes = []
     for mid in LIVE_TRACKED:
@@ -1679,14 +1711,14 @@ def build_in_stock():
         notes.append("Sold out everywhere we check: " + ", ".join(f'<a href="/models/{m}/">{esc(SHORT[m])}</a>' for m in none) + ".")
     n_sellers = len({o["seller"] for o in ins})
     title = f"Home Bitcoin miners in stock now: {len(ins)} listings at {plural(n_sellers, 'seller')} ({fmt_day(GEN)}) | Bitaxe Radar"
-    desc = f"What is in stock right now: {len(ins)} of {len(OFFERS)} tracked home miner listings (Bitaxe to heaters), plus {len(pre)} pre-order or backorder. Updated {fmt_day(GEN)}."
+    desc = f"What is in stock right now: {len(ins)} of {len(COUNTED_OFFERS)} tracked home miner listings (Bitaxe to heaters), plus {len(pre)} pre-order or backorder. Updated {fmt_day(GEN)}."
     body = f"""<article>
 <header class="hero"><h1>Home miners in stock now</h1>
 {deal_pills("/in-stock/")}
-<p class="lede">{len(ins)} of {len(OFFERS)} tracked listings are in stock at the last check. Another {len(pre)} are pre-order or backorder (not in stock yet) and {len(oos)} are sold out.</p>
+<p class="lede">{len(ins)} of {len(COUNTED_OFFERS)} tracked listings are in stock at the last check, cheapest first. Another {len(pre)} are pre-order or backorder (not in stock yet) and {len(oos)} are sold out.</p>
 <p class="meta">Checked {tag_time(latest['generated_at'])} · updated every 6 hours</p></header>
 <section aria-labelledby="h-n"><h2 id="h-n">What the stock picture means today</h2><ul>{"".join(f"<li>{x}</li>" for x in notes) or "<li>Nothing unusual at the last check.</li>"}</ul></section>
-<section aria-labelledby="h-i"><h2 id="h-i">In stock ({len(ins)})</h2>{offers_table(ins, show_model=True) if ins else "<p>Nothing is in stock at the tracked sellers at the last check.</p>"}</section>
+<section aria-labelledby="h-i"><h2 id="h-i">In stock ({len(ins)}), cheapest first</h2>{offers_table(ins, show_model=True) if ins else "<p>Nothing is in stock at the tracked sellers at the last check.</p>"}{older_html}</section>
 <section aria-labelledby="h-p"><h2 id="h-p">Pre-order and backorder ({len(pre)})</h2><p class="hint">Not in stock. Read the seller's shipping note before ordering.</p>{offers_table(pre, show_model=True) if pre else "<p>None right now.</p>"}</section>
 <section aria-labelledby="h-o"><h2 id="h-o">Sold out ({len(oos)})</h2>{offers_table(oos, show_model=True) if oos else "<p>None right now.</p>"}</section>
 <section><h2>Related</h2><p><a href="/miners/">All miners</a> · <a href="/deals/">Best deals</a> · <a href="/where-to-buy-bitaxe/">Where to buy a Bitaxe</a> · <a href="/how-we-track/">How we track</a></p></section>
@@ -1701,7 +1733,9 @@ def deal_of_the_day_html(rec, compact=False):
         return ""
     live = next((o for o in OFFERS if o["id"] == rec.get("offer_id")), None)
     link = offer_link(live, "View at " + sname(live["seller"]) + " ↗") if live else ""
-    return DOTD.deal_box(short_name(rec), live, link, compact=compact)
+    mid = rec.get("miner_id")
+    img = model_img(mid) if mid in MODELS else ""
+    return DOTD.deal_box(short_name(rec), live, link, compact=compact, img_html=img)
 
 
 def short_name(rec):
@@ -1937,20 +1971,23 @@ def browse_pills(current=None):
         f'<a href="{p}"' + (' aria-current="page"' if p == current else "") + f'>{esc(l)}</a>' for p, l in items) + "</nav>")
 
 
+TILE_SUB = {"solo": "A lottery shot at a whole block", "pool": "Small, steady payouts", "heat": "Heats a room while it mines"}   # same words as Find my miner
+
+
 def browse_tiles():
     tiles = []
     for key, path, label, h1, members, photo in CATS:
         n = len([m for m in members if m in TRACKED and m not in NOINDEX_MODELS])
         img = (f'<img src="/img/models/{photo}.webp" width="{MODEL_IMG[photo][0]}" height="{MODEL_IMG[photo][1]}" alt="{esc(MODEL_IMG[photo][2])}" loading="lazy" decoding="async">'
                if photo in MODEL_IMG else "")
-        tiles.append(f'<a class="btile" href="{path}"><span class="bimg">{img}</span><b>{esc(label)}</b><small>{n} miners</small></a>')
+        tiles.append(f'<a class="btile" href="{path}"><span class="bimg">{img}</span><b>{esc(label)}</b><small class="tsub">{esc(TILE_SUB[key])}</small><small class="tn">{n} miners</small></a>')
     tag = ('<svg viewBox="0 0 48 48" aria-hidden="true" focusable="false"><path d="M6 24 24 6h16a2 2 0 0 1 2 2v16L24 42a2 2 0 0 1-2.8 0L6 26.8A2 2 0 0 1 6 24Z" fill="#f7931a"/>'
            '<circle cx="34" cy="14" r="3.5" fill="#0f1a2e"/></svg>')
-    tiles.append(f'<a class="btile" href="/deals/"><span class="bimg">{tag}</span><b>Deals</b><small>Price drops</small></a>')
+    tiles.append(f'<a class="btile" href="/deals/"><span class="bimg">{tag}</span><b>Deals</b><small class="tsub">Price drops and lows</small><small class="tn">updated daily</small></a>')
     return '<section class="browse-tiles" aria-label="Browse by type"><div class="btiles">' + "".join(tiles) + "</div></section>"
 
 
-def hub_card(mid, heat=True, rank=None, why="", attrs=""):
+def hub_card(mid, heat=True, rank=None, why="", attrs="", buy=False):
     st, m = STATS[mid], MODELS[mid]
     b = st["best"]
     pre = [o for o in st["offers"] if o["stock_status"] in ("preorder", "backorder") and usd(o) is not None]
@@ -1977,8 +2014,9 @@ def hub_card(mid, heat=True, rank=None, why="", attrs=""):
             f'<div class="spec">≈{m["hashrate_ths"]:g} TH/s · ≈{m["watts"]:,g} W' + (f' · ≈{btu(m["watts"]):,.0f} BTU/h heat' if heat else "")
             + (f' (up to {btu(hw):,.0f} with heater on)' if heat and hw != m["watts"] else "") + '</div>'
             f'<div class="price">{price}</div><div class="where">{where}</div>{earn_line(mid, heat)}'
-            f'<div class="row">{status}<a class="btn sm" href="/models/{mid}/" aria-label="See {esc(SHORT[mid])} prices">See prices</a></div>'
-            "</div></article>")
+            + (f'<div class="row">{status}</div>{buy_row(mid, b)}' if buy and b else
+               f'<div class="row">{status}<a class="btn sm" href="/models/{mid}/" aria-label="See {esc(SHORT[mid])} prices">See prices</a></div>')
+            + "</div></article>")
 
 
 def build_home_miners():
@@ -2231,15 +2269,15 @@ def build_best(slug):
     title = f"{b['title']} ({fmt_day(GEN)}) | Bitaxe Radar"
     desc = shorten(f"Ranked picks: {b['what']}. Live prices and stock, updated every 6 hours.", 158)
     if b.get("groups"):
-        cards = "".join(f'<h2 id="h-{gid}">{esc(label)}</h2><div class="cards">' + "".join(hub_card(m, heat=False, rank=i + 1, why=why) for i, (m, why) in enumerate(xs)) + "</div>"
+        cards = "".join(f'<h2 id="h-{gid}">{esc(label)}</h2><div class="cards">' + "".join(hub_card(m, heat=False, rank=i + 1, why=why, buy=True) for i, (m, why) in enumerate(xs)) + "</div>"
                         for gid, label, xs in b["groups"])
         if b.get("pre"):
             cards += ('<h2 id="h-pre">Pre-order only</h2><p class="hint">These can be ordered now but ship later. Check the ship date on the shop before counting on it for a holiday.</p><div class="cards">'
                       + "".join(hub_card(m, heat=False) for m in b["pre"]) + "</div>")
     else:
-        cards = '<div class="cards">' + "".join(hub_card(m, heat=b.get("heat", False), rank=i + 1, why=why) for i, (m, why) in enumerate(b["picks"])) + "</div>"
+        cards = '<div class="cards">' + "".join(hub_card(m, heat=b.get("heat", False), rank=i + 1, why=why, buy=True) for i, (m, why) in enumerate(b["picks"])) + "</div>"
     more = b.get("more") or []
-    more_html = (f'<section aria-labelledby="h-more"><h2 id="h-more">Just over $100</h2><div class="cards">{"".join(hub_card(m, heat=False) for m in more)}</div></section>') if more else ""
+    more_html = (f'<section aria-labelledby="h-more"><h2 id="h-more">Just over $100</h2><div class="cards">{"".join(hub_card(m, heat=False, buy=True) for m in more)}</div></section>') if more else ""
     faq_html = "".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in b["faq"])
     hint = f'<p class="hint">{esc(b["hint"])}</p>' if b.get("hint") else ""
     if slug == "gifts":
@@ -3774,7 +3812,10 @@ def build_price_per_th():
 def build_method():
     path = "/how-we-track/"
     trail = [("Home", "/"), ("About & how we track", path)]
-    src_rows = "".join(f'<tr><td>{seller_a(sid)}</td><td>{esc(s["currency"])}</td><td>{esc(SELLER_COPY.get(sid, {}).get("region", ""))}</td></tr>' for sid, s in SELLERS.items())
+    src_rows = "".join(f'<tr><td>{seller_a(sid)}</td><td>{esc(SELLERS[sid]["currency"])}</td><td>{esc(SELLER_COPY.get(sid, {}).get("region", ""))}</td></tr>' for sid in COUNTED_SELLERS)
+    paused = [sid for sid in SELLERS if sid not in COUNTED_SELLERS]
+    paused_note = (f'<p class="hint">{N_SHOPS} shops had listings at the last check. Also checked, but with nothing listed right now: '
+                   + ", ".join(esc(sname(sid)) for sid in paused) + ". They come back automatically when they list a miner again.</p>") if paused else ""
     title = "How Bitaxe Radar tracks prices and stock (methodology) | Bitaxe Radar"
     desc = "How Bitaxe Radar collects Bitaxe and NerdQaxe prices and stock: sources, schedule, currency conversion, history, which sellers we list and affiliate income."
     body = f"""<article>
@@ -3782,7 +3823,7 @@ def build_method():
 <p class="lede">We check the shops that sell Bitaxe-style miners and heater and home miners every 6 hours, and show you who has each one in stock and for how much.</p></header>
 <section><h2>Where the prices come from</h2>
 <p>Straight from each shop's own product pages. We show the price and stock status the shop itself reports, and link you to that page so you can check it. Last check: {tag_time(latest['generated_at'])}.</p>
-<div class="tablewrap"><table><thead><tr><th>Shop</th><th>Currency</th><th>Pricing</th></tr></thead><tbody>{src_rows}</tbody></table></div></section>
+<div class="tablewrap"><table><thead><tr><th>Shop</th><th>Currency</th><th>Pricing</th></tr></thead><tbody>{src_rows}</tbody></table></div>{paused_note}</section>
 <section><h2>What a price means</h2><ul>
 <li>The shop's listed price for the bundle shown, <strong>before</strong> shipping, import duties and (unless noted) tax.</li>
 <li>Euro and Canadian-dollar prices are converted to US dollars at the ECB reference rates (€1 = ${esc(FX.get('EUR_USD', 'n/a'))}, CA$1 = ${esc(FX.get('CAD_USD', 'n/a'))} on {esc(FX.get('date', ''))}), so treat them as estimates.</li>
@@ -3885,8 +3926,9 @@ def home_card(mid, best_value):
             f'<h3><a href="/models/{mid}/">{esc(SHORT[mid])}</a></h3>'
             f'<div class="spec">≈{m["hashrate_ths"]:g} TH/s · ≈{m["watts"]:g} W</div>'
             f'<div class="price">{price}</div><div class="where">{where}</div>{earn_line(mid)}'
-            f'<div class="row">{status}<a class="btn sm" href="/models/{mid}/" aria-label="See {esc(SHORT[mid])} prices">See prices</a></div>'
-            "</div></article>")
+            + (f'<div class="row">{status}</div>{buy_row(mid, b)}' if b and in_stock(b) else
+               f'<div class="row">{status}<a class="btn sm" href="/models/{mid}/" aria-label="See {esc(SHORT[mid])} prices">See prices</a></div>')
+            + "</div></article>")
 
 
 # The homepage used to end with these questions. The Ask chat answers them now, so they live on /faq/ (with FAQPage
@@ -3922,8 +3964,28 @@ def build_faq():
            scripts='<script src="/data.js"></script>\n<script src="/app.js"></script>\n')
 
 
+def hero_pick():
+    """Phones: a real miner, price and shop button on the first screen. The cheapest in-stock listing of any current
+    model (US shops first, so the button doesn't land a US visitor on an EU shop)."""
+    cands = [m for m in LIVE_TRACKED if STATS[m]["best"]]
+    if not cands:
+        return ""
+    def o_of(m):
+        return STATS[m]["best_usd"] or STATS[m]["best"]
+    mid = min(cands, key=lambda m: (o_of(m)["currency"] != "USD", usd(o_of(m))))
+    o = o_of(mid)
+    aff = aff_param(o["seller"])
+    rel = "sponsored nofollow noopener" if aff else "nofollow noopener"
+    price = ("≈" if o["currency"] != "USD" else "") + chart_money(usd(o))
+    return (f'<div class="hero-pick"><a class="hp-img" href="/models/{mid}/" tabindex="-1" aria-hidden="true">{model_img(mid, lazy=False)}</a>'
+            f'<div class="hp-txt"><small>Cheapest in stock today</small><a class="hp-name" href="/models/{mid}/">{esc(SHORT[mid])}</a>'
+            f'<span class="hp-price"><b>{price}</b> at {esc(sname(o["seller"]))}</span></div>'
+            f'<div class="hp-buy"><a class="btn sm" href="{esc(offer_href(o))}" target="_blank" rel="{rel}">View ↗</a>'
+            + ('<span class="ph">affiliate link</span>' if aff else "") + '</div></div>')
+
+
 def build_home():
-    tpl = (ROOT / "templates" / "home.html").read_text().replace("<!--N-SHOPS-->", str(len(SELLERS))).replace("<!--N-MODELS-->", str(N_MODELS))
+    tpl = (ROOT / "templates" / "home.html").read_text().replace("<!--N-SHOPS-->", str(N_SHOPS)).replace("<!--N-MODELS-->", str(N_MODELS))
     t = re.search(r"<title>(.*?)</title>", tpl, re.S).group(1)
     d = re.search(r'<meta name="description" content="(.*?)">', tpl, re.S).group(1)
     items = [(SHORT[m], f"/models/{m}/") for m in home_picks()]
@@ -3937,9 +3999,9 @@ def build_home():
     {"@type": "Organization", "@id": BASE + "/#org", "name": "Bitaxe Radar", "url": BASE + "/", "email": CONTACT},
     {"@type": "WebSite", "@id": BASE + "/#site", "name": "Bitaxe Radar", "url": BASE + "/", "publisher": {"@id": BASE + "/#org"}}]})}
 {jsonld_tag(itemlist("Bitaxe-class miners tracked by Bitaxe Radar", items))}"""
-    ins = [o for o in OFFERS if in_stock(o)]
+    ins = COUNTED_IN_STOCK
     chips = (f'<ul class="chips"><li class="live"><strong data-count="{len(ins)}">{len(ins)}</strong> listings in stock</li>'
-             f'<li><strong data-count="{N_MODELS}">{N_MODELS}</strong> miners tracked</li><li><strong data-count="{len(SELLERS)}">{len(SELLERS)}</strong> shops checked</li>'
+             f'<li><strong data-count="{N_MODELS}">{N_MODELS}</strong> miners tracked</li><li><strong data-count="{N_SHOPS}">{N_SHOPS}</strong> shops checked</li>'
              f'<li>Updated <time id="freshness" datetime="{esc(latest["generated_at"])}">{esc(fmt_time(latest["generated_at"]))}</time></li></ul>')
     picks = home_picks()
     best_value = min(picks, key=lambda m: usd(pick_price(m)) / MODELS[m]["hashrate_ths"], default=None)
@@ -3956,7 +4018,7 @@ def build_home():
   </section>"""
     sellers_line = ('<p>Shops we check: ' + " · ".join(seller_a(sid) for sid in SELLERS if sid in BUILT_SELLERS) + "</p>\n  ")
     out = (tpl.replace("<!--HEAD-->", head).replace("<!--HEADER-->", header_html()).replace("<!--RADAR-BG-->", RADAR_BG)
-           .replace("<!--HERO-CHIPS-->", chips).replace("<!--BROWSE-->", browse_tiles().replace('class="browse-tiles"', 'class="browse-tiles" data-reveal', 1) + "\n" + best_pills())
+           .replace("<!--HERO-CHIPS-->", hero_pick() + "\n    " + chips).replace("<!--BROWSE-->", browse_tiles().replace('class="browse-tiles"', 'class="browse-tiles" data-reveal', 1) + "\n" + best_pills())
            .replace("<!--CARDS-->", cards).replace("<!--SIGNUP-->", signup_html("any").replace('<section id="alerts"', '<section id="alerts" data-reveal', 1))
            .replace("<!--FOOTER-->", footer_html())
            .replace('<script src="/app.js"></script>', '<script src="/app.js"></script>\n' + SIGNUP_SCRIPTS + '\n<script src="/motion.js" defer></script>')
@@ -4030,7 +4092,10 @@ MINERS_JS = """<script>
 var f=document.getElementById('mf'),grid=document.getElementById('grid'),n=document.getElementById('mcount');if(!f||!grid)return;
 f.hidden=false;[].forEach.call(document.querySelectorAll('.nojs'),function(e){e.hidden=true;});var cards=[].slice.call(grid.children),q=new URLSearchParams(location.search);
 ['type','price','power','sort'].forEach(function(k){var v=q.get(k);if(v===null)return;var el=f.querySelector('[name="'+k+'"][value="'+v+'"]')||(k==='sort'&&f.elements.sort);if(el){if(el.tagName==='SELECT')el.value=v;else el.checked=true;}});
-if(q.get('stock')==='1')f.elements.stock.checked=true;
+if(q.get('stock')==='0')f.elements.stock.checked=false;
+var tg=document.getElementById('mftoggle');function openF(o){f.classList.toggle('fopen',o);tg.setAttribute('aria-expanded',o?'true':'false');}
+tg.addEventListener('click',function(){openF(!f.classList.contains('fopen'));});
+if(q.get('type')||q.get('price')||q.get('power')||location.hash==='#rate')openF(true);
 function rng(v,x){if(!v)return true;if(x==='')return false;var p=v.split('-');x=+x;return x>=+p[0]&&(p[1]===''||x<+p[1]);}
 function val(k){var el=f.querySelector('[name="'+k+'"]:checked');return el?el.value:'';}
 function run(){var t=val('type'),pr=val('price'),pw=val('power'),st=f.elements.stock.checked,so=f.elements.sort.value,shown=0;
@@ -4039,8 +4104,8 @@ function run(){var t=val('type'),pr=val('price'),pw=val('power'),st=f.elements.s
   if(so==='th')return (+B.th)-(+A.th);
   var pa=A.price===''?1e9:+A.price,pb=B.price===''?1e9:+B.price;return (B.stock-A.stock)||(pa-pb);});
  s.forEach(function(c){grid.appendChild(c);});
- n.textContent='Showing '+shown+' of '+cards.length;
- var o=new URLSearchParams();if(t)o.set('type',t);if(pr)o.set('price',pr);if(pw)o.set('power',pw);if(st)o.set('stock','1');if(so!=='price')o.set('sort',so);
+ n.textContent='Showing '+shown+' of '+cards.length+' miners'+(st?', in stock only':'');
+ var o=new URLSearchParams();if(t)o.set('type',t);if(pr)o.set('price',pr);if(pw)o.set('power',pw);if(!st)o.set('stock','0');if(so!=='price')o.set('sort',so);
  history.replaceState(null,'',location.pathname+(o.toString()?'?'+o:''));}
 f.addEventListener('change',run);f.addEventListener('submit',function(e){e.preventDefault();});
 document.getElementById('mreset').addEventListener('click',function(){f.reset();run();});run();
@@ -4057,8 +4122,9 @@ def build_miners():
         f'<label><input type="radio" name="{k}" value="{v}"{" checked" if v == "" else ""}><span>{esc(t)}</span></label>' for v, t in opts) + "</div></fieldset>"
         for k, lab, opts in FILTERS)
     form = f"""<form id="mf" class="filters" hidden aria-label="Filter miners">
-{groups}
-<div class="frow"><label class="tog"><input type="checkbox" name="stock" value="1"><span>In stock only</span></label>
+<button type="button" class="ftoggle" id="mftoggle" aria-expanded="false" aria-controls="mfg">Filters: type, price, power<span aria-hidden="true"></span></button>
+<div class="fgroups" id="mfg">{groups}</div>
+<div class="frow"><label class="tog"><input type="checkbox" name="stock" value="1" checked><span>In stock only</span></label>
 <label class="sortby">Sort <select name="sort"><option value="price">Price, low to high</option><option value="th">Hashrate, high to low</option></select></label>
 <button type="button" class="btn ghost sm" id="mreset">Reset</button></div>
 <p class="meta" id="mcount" role="status" aria-live="polite"></p>
@@ -4070,6 +4136,7 @@ def build_miners():
 <header class="hero"><h1>All home Bitcoin miners</h1>
 <p class="lede">Every miner we track, from small Bitaxe boards to room heaters. Not sure? <a href="/find-my-miner/">Find my miner</a>.</p>
 <p class="meta">{len(ms)} miners · {n_in} of {len(offs)} listings in stock · checked {tag_time(latest['generated_at'])}</p>
+<p class="mlinks"><a href="/compare/#pick">⇄ Compare any two miners</a><a href="/in-stock/">In stock, cheapest first →</a></p>
 <div class="nojs">{browse_pills("/miners/")}</div>
 {best_pills()}</header>
 {form}
@@ -4145,7 +4212,7 @@ def build_quiz():
     qs = "".join(f'<fieldset class="q"><legend><i>{i}</i>{esc(t)}</legend><div class="opts col">' + "".join(
         f'<label><input type="radio" name="{k}" value="{v}" required><span>{esc(lab)}</span></label>' for v, lab in opts) + "</div></fieldset>"
         for i, (k, t, opts) in enumerate(QUIZ, 1))
-    cards = "".join(hub_card(m, heat=(m in HEAT_SET), rank=1, why=" ", attrs=card_data(m)).replace('<div class="why"> </div>', '<div class="why" hidden></div>')
+    cards = "".join(hub_card(m, heat=(m in HEAT_SET), rank=1, why=" ", attrs=card_data(m), buy=True).replace('<div class="why"> </div>', '<div class="why" hidden></div>')
                     for m in miners_sorted() if show_price(m) is not None)
     body = f"""<article>
 <header class="hero"><h1>Find my miner</h1>
@@ -4322,6 +4389,95 @@ def tile(href, mid, title, sub):
     return f'<a class="btile" href="{href}"><span class="bimg">{img}</span><b>{esc(title)}</b><small>{esc(sub)}</small></a>'
 
 
+def compare_data():
+    """Per-model facts for the pick-two compare tool. Every number comes from the same helpers the miner pages use."""
+    out = {}
+    for mid in sorted(LIVE_TRACKED, key=lambda m: SHORT[m].lower()):
+        st, m = STATS[mid], MODELS[mid]
+        b = st["best"]
+        pre = [o for o in st["offers"] if o["stock_status"] in ("preorder", "backorder") and usd(o) is not None]
+        o = b or (min(pre, key=usd) if pre else None)
+        e = earn(mid)
+        d = {"n": SHORT[mid], "th": m["hashrate_ths"], "w": m["watts"], "jth": round(jth(mid), 1),
+             "img": f"/img/models/{mid}.webp" if mid in MODEL_IMG else "",
+             "stock": "in" if b else ("pre" if pre else "out"),
+             "types": [lab for key, path, lab, h1, members, _ in CATS if mid in members]}
+        if o:
+            aff = aff_param(o["seller"])
+            d.update(p=round(usd(o), 2), eu=o["currency"] != "USD", shop=sname(o["seller"]), href=offer_href(o),
+                     rel="sponsored nofollow noopener" if aff else "nofollow noopener", aff=bool(aff))
+            if b:
+                d["pth"] = round(usd(b) / m["hashrate_ths"], 2)
+        if e:
+            d["pow"] = round(e["power"], 2)
+            d["odds"] = E.fmt_big(e["solo"]["one_in_year"])
+        if mid in NOISE:
+            d["db"] = NOISE[mid][0]
+        out[mid] = d
+    pages = {f"{a}|{b}": compare_url(a, b) for a, b in BUILT_PAIRS}
+    return out, pages
+
+
+def compare_picker():
+    data, pages = compare_data()
+    ids = list(data)
+    opts = "".join(f'<option value="{m}">{esc(data[m]["n"])}</option>' for m in ids)
+    payload = json.dumps({"m": data, "pages": pages}, separators=(",", ":")).replace("</", "<\\/")
+    return f"""<section id="pick" class="pick" aria-labelledby="h-pick"><h2 id="h-pick">Pick two miners</h2>
+<form class="pick-form" id="pickf" hidden><label><span>Miner 1</span><select name="a">{opts}</select></label>
+<span class="pick-vs" aria-hidden="true">vs</span><label><span>Miner 2</span><select name="b">{opts}</select></label>
+<button type="button" class="btn ghost sm" id="pickswap" aria-label="Swap the two miners">⇄ Swap</button></form>
+<div id="pickout" aria-live="polite"></div>
+<noscript><p>The picker needs JavaScript. Every miner page has its full specs and prices: <a href="/models/">models A to Z</a>.</p></noscript>
+<p class="hint">Prices are today's cheapest in-stock listing (or the cheapest pre-order, labelled), before shipping and tax; euro and Canadian-dollar prices are converted as an estimate. Hashrate and watts are the sellers' stated figures. Power cost assumes ${E.POWER_RATE:.2f}/kWh, 24/7. Checked {tag_time(latest['generated_at'])}.</p>
+<script type="application/json" id="pickdata">{payload}</script></section>"""
+
+
+COMPARE_JS = """<script>
+(function(){
+var f=document.getElementById('pickf'),out=document.getElementById('pickout'),D=JSON.parse(document.getElementById('pickdata').textContent);if(!f)return;
+f.hidden=false;var M=D.m,ids=Object.keys(M),q=new URLSearchParams(location.search);
+function ok(x){return x&&M[x]?x:null;}
+var a=ok(q.get('a'))||'bitaxe-gamma',b=ok(q.get('b'));if(!M[a])a=ids[0];
+if(!b||b===a){b=a!=='nerdqaxe-pp'&&M['nerdqaxe-pp']?'nerdqaxe-pp':ids.filter(function(x){return x!==a;})[0];}
+f.elements.a.value=a;f.elements.b.value=b;
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function usd(x){return '$'+(Math.abs(x-Math.round(x))<0.005?Math.round(x).toLocaleString('en-US'):x.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}));}
+function price(d){if(d.p==null)return 'Sold out';return (d.eu?'≈ ':'')+usd(d.p)+(d.stock==='pre'?' <small>pre-order</small>':'');}
+function buy(d){if(d.p==null||d.stock!=='in')return '<a href="/models/'+d.id+'/">See all prices</a>';
+ return '<a class="btn sm" href="'+esc(d.href)+'" target="_blank" rel="'+d.rel+'">View at '+esc(d.shop)+' ↗</a>'+(d.aff?'<div class="ph">affiliate link</div>':'')+'<div><a href="/models/'+d.id+'/">See all prices</a></div>';}
+// row: label, value(d), number for "better" (or null), lower is better?
+var ROWS=[['Price today',price,function(d){return d.p;},true],
+ ['Hashrate',function(d){return '≈'+d.th+' TH/s';},function(d){return d.th;},false],
+ ['Power',function(d){return '≈'+d.w.toLocaleString('en-US')+' W';},function(d){return d.w;},true],
+ ['Efficiency',function(d){return d.jth+' J/TH';},function(d){return d.jth;},true],
+ ['Price per TH/s',function(d){return d.pth!=null?usd(d.pth):'–';},function(d){return d.pth;},true],
+ ['Power cost',function(d){return d.pow!=null?usd(d.pow)+'/mo':'–';},function(d){return d.pow;},true],
+ ['Noise',function(d){return d.db==null?'not stated':(d.db===0?'silent (no fans)':d.db+' dB stated');},function(d){return d.db;},true],
+ ['Solo block odds',function(d){return d.odds?'1 in '+d.odds+'/yr':'–';},null,false],
+ ['Best for',function(d){return d.types.join(', ')||'–';},null,false]];
+function run(){a=f.elements.a.value;b=f.elements.b.value;var A=M[a],B=M[b];A.id=a;B.id=b;
+ if(a===b){out.innerHTML='<p class="hint">Pick two different miners.</p>';return;}
+ var h='<div class="tablewrap"><table class="pick-t"><thead><tr><th><span class="sr">Spec</span></th>';
+ [A,B].forEach(function(d){h+='<th scope="col"><a class="pick-h" href="/models/'+d.id+'/" data-img="'+esc(d.img)+'"><span>'+esc(d.n)+'</span></a></th>';});
+ h+='</tr></thead><tbody>';
+ ROWS.forEach(function(r){var va=r[2]?r[2](A):null,vb=r[2]?r[2](B):null,wa='',wb='';
+  if(va!=null&&vb!=null&&va!==vb){var aw=r[3]?va<vb:va>vb;wa=aw?' class="win"':'';wb=aw?'':' class="win"';}
+  h+='<tr><th scope="row">'+r[0]+'</th><td'+wa+'>'+r[1](A)+'</td><td'+wb+'>'+r[1](B)+'</td></tr>';});
+ h+='<tr class="pick-buy"><th scope="row"><span class="sr">Buy</span></th><td>'+buy(A)+'</td><td>'+buy(B)+'</td></tr></tbody></table></div>';
+ var s=[];if(A.p!=null&&B.p!=null){var c=A.p<=B.p?A:B,x=c===A?B:A;if(Math.abs(A.p-B.p)>=0.01)s.push('The '+esc(c.n)+' is '+usd(x.p-c.p)+' cheaper today.');}
+ var hr=A.th>=B.th?A:B,lr=hr===A?B:A;if(A.th!==B.th)s.push('The '+esc(hr.n)+' has '+(hr.th/lr.th).toFixed(1)+'× the hashrate and uses '+(hr.w/lr.w).toFixed(1)+'× the power.');
+ var pg=D.pages[a+'|'+b]||D.pages[b+'|'+a];if(pg)s.push('<a href="'+pg+'">Read our full comparison →</a>');
+ out.innerHTML=(s.length?'<p class="pick-sum">'+s.join(' ')+'</p>':'')+h;
+ [].forEach.call(out.querySelectorAll('.pick-h[data-img]'),function(el){var src=el.getAttribute('data-img');if(!src)return;var im=document.createElement('img');im.src=src;im.alt='';im.width=80;im.height=80;el.insertBefore(im,el.firstChild);});
+ history.replaceState(null,'',location.pathname+'?a='+a+'&b='+b+'#pick');}
+f.addEventListener('change',run);
+document.getElementById('pickswap').addEventListener('click',function(){var t=f.elements.a.value;f.elements.a.value=f.elements.b.value;f.elements.b.value=t;run();});
+run();
+})();
+</script>"""
+
+
 def build_indexes():
     # /models/: A to Z
     rows = "".join(f'<li><a href="/models/{m}/">{esc(SHORT[m])}</a> <span>≈{MODELS[m]["hashrate_ths"]:g} TH/s · '
@@ -4339,7 +4495,7 @@ def build_indexes():
         if sid not in SELLER_COPY or not any(o["seller"] == sid for o in OFFERS):
             continue
         shop_ids.append(sid)
-        offs = [o for o in OFFERS if o["seller"] == sid]
+        offs = [o for o in COUNTED_OFFERS if o["seller"] == sid]   # same counting rule as the homepage and In stock
         n_in = sum(1 for o in offs if in_stock(o))
         shops.append(f'<li><a class="shop" href="/sellers/{sid}/"><b>{esc(s["name"])}</b><span>{plural(len({o["model"] for o in offs}), "miner")} · {n_in} in stock · prices in {esc(s["currency"])}</span></a></li>')
     body = f"""<article><header class="hero"><h1>Shops we check</h1>
@@ -4360,10 +4516,12 @@ def build_indexes():
     # /compare/
     pairs = BUILT_PAIRS
     body = f"""<article><header class="hero"><h1>Compare miners</h1>
-<p class="lede">Side by side: price, hashrate, power and running cost.</p></header>
-<ul class="links">{"".join(f'<li><a href="{compare_url(a, b)}">{esc(compare_label(a, b))}</a></li>' for a, b in pairs)}</ul></article>"""
-    layout("/compare/", "Compare home Bitcoin miners side by side | Bitaxe Radar", "Head-to-head comparisons of popular home Bitcoin miners: price, hashrate, power use and running cost.",
-           body, crumbs=[("Home", "/"), ("Guides", "/guides/"), ("Compare", "/compare/")])
+<p class="lede">Pick any two miners and see them side by side: today's price, hashrate, power and running cost.</p></header>
+{compare_picker()}
+<section aria-labelledby="h-pairs"><h2 id="h-pairs">Popular match-ups, explained</h2>
+<ul class="links">{"".join(f'<li><a href="{compare_url(a, b)}">{esc(compare_label(a, b))}</a></li>' for a, b in pairs)}</ul></section></article>"""
+    layout("/compare/", "Compare home Bitcoin miners side by side | Bitaxe Radar", "Pick any two home Bitcoin miners and compare price, hashrate, power use and running cost side by side, from today's prices.",
+           body, crumbs=[("Home", "/"), ("Guides", "/guides/"), ("Compare", "/compare/")], scripts=COMPARE_JS)
     # /guides/
     gl = [("/guides/is-home-mining-worth-it/", "Is home mining worth it?", "Check it at your electricity price."),
           ("/solo-odds/", "Solo odds calculator", "Your real chance of finding a block."),
@@ -4443,6 +4601,16 @@ def main():
     build_redirect("/bitaxe-black-friday/", "/deals/", "Best deals")
     build_redirect("/home-miners/", "/miners/", "All miners")
     build_redirect("/about/", "/how-we-track/", "About & how we track")
+    # Pages that come and go with the data (a model or shop with no listings today) redirect instead of 404ing.
+    for mid in MODELS:
+        if mid not in TRACKED:
+            build_redirect(f"/models/{mid}/", "/miners/", "All miners")
+    for a, b in COMPARE_PAIRS:
+        if (a, b) not in BUILT_PAIRS:
+            build_redirect(compare_url(a, b), "/compare/", "Compare miners")
+    for sid in SELLERS:
+        if sid not in BUILT_SELLERS:
+            build_redirect(f"/sellers/{sid}/", "/sellers/", "Shops we check")
     build_miners()
     build_quiz()
     build_alerts()

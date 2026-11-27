@@ -6,8 +6,6 @@ affiliate codes work exactly like every other shop link on the site). Every bit 
 import html
 from datetime import date
 
-AI_NOTE = "AI-written, checked against our price data"
-TEMPLATE_NOTE = "Written by a fixed template straight from our price data (no AI text today)"
 HOME_MAX_AGE_DAYS = 2        # an old deal (agent not running) quietly drops off the homepage; the archive keeps it
 EMPTY_ARCHIVE = "No deal of the day yet. A deal shows up here on days when a miner is at least 3% under its typical price."
 
@@ -34,17 +32,21 @@ def nice_date(iso):
     return f"{d:%b} {d.day}, {d.year}"
 
 
-def source_note(rec):
-    note = AI_NOTE if rec.get("source") == "ai" else TEMPLATE_NOTE
-    return f'<p class="ph dotd-note">{esc(note)} · <a href="/deals/daily/#how">how this works</a></p>'
-
-
 def is_fresh(rec, today):
     return is_real(rec) and (date.fromisoformat(today) - date.fromisoformat(rec["date"])).days <= HOME_MAX_AGE_DAYS
 
 
-def deal_box(rec, live=None, link_html="", *, compact=False):
-    """The card. live = today's listing for the picked offer (or None if it's gone), link_html = the shop button.
+def price_line(rec):
+    """One short sentence under the price, e.g. "26.6% under its typical $293, the lowest we've logged." """
+    typ = rec["typical_usd"]
+    typ_txt = f"${typ:,.0f}" if abs(typ - round(typ)) < 0.005 else money(typ)
+    low = ", the lowest we've logged" if rec.get("lowest_ever") else ""
+    return f'{rec["drop_pct"]:g}% under its typical {typ_txt}{low}.'
+
+
+def deal_box(rec, live=None, link_html="", *, compact=False, img_html=""):
+    """The card. live = today's listing for the picked offer (or None if it's gone), link_html = the shop button,
+    img_html = the miner's photo. Short on purpose: photo, name, price, one sentence, button.
     Empty on a no-deal day: we show nothing rather than "no deal today"."""
     if not is_real(rec):
         return ""
@@ -55,15 +57,13 @@ def deal_box(rec, live=None, link_html="", *, compact=False):
         link_html = ""
     elif abs((live.get("price_usd_approx") or 0) - rec["price_usd"]) > 0.005:
         now = f'<p class="hint dotd-now">Price has changed since we picked it: now {money(live["price_usd_approx"])}.</p>'
-    low = ' <span class="badge b-in_stock">Lowest we\'ve logged</span>' if rec.get("lowest_ever") else ""
-    body = (f'<h3><a href="/models/{esc(rec["miner_id"])}/">{esc(rec["miner_name"])}</a></h3>'
-            f'<p class="dotd-price"><b>{money(rec["price_usd"])}</b> <span class="dotd-drop">{rec["drop_pct"]:g}% under its typical {money(rec["typical_usd"])}</span>{low}</p>'
-            f'<p class="dotd-head">{esc(rec["headline"])}</p>'
-            + ("" if compact else f'<p>{esc(rec["summary"])}</p>')
-            + f'<p class="hint">at <strong>{esc(rec["retailer_name"])}</strong> · typical = middle price of the last {rec.get("window_days", 14)} days</p>'
+    img = f'<a class="dotd-img" href="/models/{esc(rec["miner_id"])}/" tabindex="-1" aria-hidden="true">{img_html}</a>' if img_html else ""
+    body = (f'{img}<h3><a href="/models/{esc(rec["miner_id"])}/">{esc(rec["miner_name"])}</a></h3>'
+            f'<p class="dotd-price"><b>{money(rec["price_usd"])}</b> <span class="dotd-at">at {esc(rec["retailer_name"])}</span></p>'
+            f'<p class="dotd-line">{esc(price_line(rec))}</p>'
             + now + link_html)
     more = '<p class="hint"><a href="/deals/daily/">Past deals of the day →</a></p>' if compact else ""
-    return f'<section class="dotd" aria-label="Deal of the day">{head}{body}{source_note(rec)}{more}</section>'
+    return f'<section class="dotd" aria-label="Deal of the day">{head}{body}{more}</section>'
 
 
 def archive_rows(history):

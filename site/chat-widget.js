@@ -333,6 +333,7 @@
     root.classList.remove("ra-open");
     stopViewportWatch();
     fitPanelToViewport(); // clears inline styles
+    queueDodge();
     unlockBody();
     if (lastFocus && lastFocus.focus) lastFocus.focus();
     else bubble.focus();
@@ -406,15 +407,44 @@
     chipsEl.hidden = false;
   }
 
-  // On phones, don't cover the primary Buy CTA — wait until it scrolls above the widget.
+  // On phones, pages with a shop button (miner pages) skip the suggestion chip: the buy button matters more.
   function ctaIsClear() {
     if (!isMobile()) return true;
-    var cta = document.querySelector(".model-deal a.btn, .cta a.btn, .model-deal .btn");
-    if (!cta) return true;
-    var r = cta.getBoundingClientRect();
-    var box = root.getBoundingClientRect();
-    return r.bottom < box.top - 6;
+    return !document.querySelector(".model-deal a.btn, .cta a.btn, .model-deal .btn");
   }
+
+  // Never sit on top of a primary button. The Ask button (and its chip) steps aside (fades out, not clickable) while
+  // any button on the page is under it, and comes back once you scroll past.
+  var PRIMARY = "main a.btn, main button.btn, main .cta a, .dotd a.btn";
+  var dodgeQueued = false;
+  function overlaps(a, b) {
+    return a.left < b.right + 6 && a.right > b.left - 6 && a.top < b.bottom + 6 && a.bottom > b.top - 6;
+  }
+  function dodge() {
+    dodgeQueued = false;
+    if (open) { root.classList.remove("ra-dodge"); return; }
+    var box = bubble.getBoundingClientRect();
+    if (!chipsEl.hidden) {
+      var c = chipsEl.getBoundingClientRect();
+      box = { left: Math.min(box.left, c.left), right: Math.max(box.right, c.right), top: Math.min(box.top, c.top), bottom: Math.max(box.bottom, c.bottom) };
+    }
+    var hit = false, els = document.querySelectorAll(PRIMARY);
+    for (var i = 0; i < els.length && !hit; i++) {
+      if (root.contains(els[i])) continue;
+      var r = els[i].getBoundingClientRect();
+      if (r.width && r.height && r.bottom > 0 && r.top < window.innerHeight && overlaps(box, r)) hit = true;
+    }
+    root.classList.toggle("ra-dodge", hit);
+  }
+  function queueDodge() {
+    if (dodgeQueued) return;
+    dodgeQueued = true;
+    (window.requestAnimationFrame || setTimeout)(dodge);
+  }
+  window.addEventListener("scroll", queueDodge, { passive: true });
+  window.addEventListener("resize", queueDodge, { passive: true });
+  window.addEventListener("load", queueDodge);
+  setTimeout(queueDodge, 0);
 
   function startChips() {
     if (chipsDismissed()) return;
@@ -422,6 +452,7 @@
       if (chipsDismissed() || open) return;
       if (!ctaIsClear()) { chipsEl.hidden = true; return; }
       renderChip();
+      queueDodge();
     }
     showIfClear();
     window.addEventListener("scroll", showIfClear, { passive: true });

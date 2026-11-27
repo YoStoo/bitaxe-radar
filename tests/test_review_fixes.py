@@ -58,8 +58,12 @@ class ReviewFixes(unittest.TestCase):
     def test_hero_counts_come_from_data(self):
         latest = json.loads((ROOT / "data" / "latest.json").read_text())
         home = read("/")
-        n_shops = len(latest["sellers"])
+        # one counting rule: a shop counts when it has at least one listing today (same number on Shops and About)
+        n_shops = len({o["seller"] for o in latest["offers"]})
         self.assertIn(f"price-checked</span> across {n_shops} shops.</h1>", home)
+        self.assertIn(f'data-count="{n_shops}">{n_shops}</strong> shops checked', home)
+        self.assertIn(f"<p class=\"lede\">{n_shops} shops, checked every 6 hours.", read("/sellers/"))
+        self.assertEqual(read("/how-we-track/").split("<th>Pricing</th>")[1].split("</table>")[0].count("<tr>"), n_shops)
         self.assertNotIn("Every home Bitcoin miner", home)
         n = re.search(r"<strong[^>]*>(\d+)</strong> miners tracked", home).group(1)
         self.assertIn(f"{n} home Bitcoin miners", read("/models/"))
@@ -87,7 +91,8 @@ class ReviewFixes(unittest.TestCase):
         aff = dict(re.findall(r'(\w+):\s*"([^"]+)"', re.search(r"var AFFILIATE = \{(.*?)\}", (SITE / "app.js").read_text(), re.S).group(1)))
         self.assertIn("powermining", aff)
         for sid, code in aff.items():
-            if not (SITE / "sellers" / sid / "index.html").exists():
+            f = SITE / "sellers" / sid / "index.html"
+            if not f.exists() or 'http-equiv="refresh"' in f.read_text():
                 continue      # no listings from this shop today, so no shop page is built (and nothing links to it)
             h = read(f"/sellers/{sid}/")
             m = re.search(r'Store: <a href="([^"]+)" rel="([^"]+)"', h)

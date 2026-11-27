@@ -881,21 +881,8 @@ body.ask-app{min-height:100dvh;background:var(--bg);touch-action:manipulation}
   .rv.is-in>.sec-head,.rv.is-in>h2{animation-delay:0ms}
   .rv.is-in>.hint,.rv.is-in>.lede{animation-delay:60ms}
   .rv.is-in>form{animation-delay:140ms}
-  .pchart.anim .chart-reveal{transform-box:view-box;transform-origin:0 0;transform:scaleX(0)}
-  .pchart.anim.is-inview .chart-reveal{animation:pc-draw 1.5s cubic-bezier(.45,.05,.25,1) forwards}
-  .pchart.anim .cdot,.pchart.anim .ctag{opacity:0}
-  .pchart.anim.is-inview .cdot,.pchart.anim.is-inview .ctag{animation:pc-pop .45s cubic-bezier(.2,.9,.3,1.4) 1.35s forwards}
-  .pchart.anim.is-inview .cdot.low,.pchart.anim.is-inview .ctag.low{animation-delay:1.6s}
-  .pchart.anim .gy{opacity:0}
-  .pchart.anim.is-inview .gy{animation:rv-fade .5s ease forwards}
   .cdot.now::after{animation:live-ring 2.2s ease-out 2s infinite}
-  .pc-legend li{opacity:1}
-  .pchart.anim .pc-legend li{opacity:0;translate:0 6px}
-  .pchart.anim.is-inview .pc-legend li{animation:rv-in .45s ease forwards}
-  .pchart.anim.is-inview .pc-legend li:nth-child(2){animation-delay:.08s}
-  .pchart.anim.is-inview .pc-legend li:nth-child(3){animation-delay:.16s}
-  .pchart.anim.is-inview .pc-legend li:nth-child(4){animation-delay:.24s}
-  .pchart.anim.is-inview .pc-legend li:nth-child(5){animation-delay:.32s}
+  .pchart.anim.is-inview .ln.lead{animation:pc-glow 1.2s ease-out 1}
   @keyframes radar-spin{to{transform:rotate(360deg)}}
   @keyframes radar-glow{0%,100%{opacity:.16}50%{opacity:.24}}
   @keyframes hl-shine{0%,100%{background-position:0% 0}50%{background-position:100% 0}}
@@ -903,6 +890,137 @@ body.ask-app{min-height:100dvh;background:var(--bg);touch-action:manipulation}
   @keyframes live-ring{0%{transform:scale(.6);opacity:.7}100%{transform:scale(1.9);opacity:0}}
   @keyframes rv-in{to{opacity:1;translate:0 0}}
   @keyframes rv-fade{to{opacity:1}}
-  @keyframes pc-draw{to{transform:scaleX(1)}}
-  @keyframes pc-pop{from{opacity:0;scale:.5}to{opacity:1;scale:1}}
+  @keyframes pc-glow{0%{stroke-width:7}100%{stroke-width:4}}
+}
+
+/* ---- UX fixes (Nov 27): All miners filters fold away on phones; quick links ---- */
+.ftoggle{display:none}
+.mlinks{display:flex;flex-wrap:wrap;gap:8px 16px;margin:8px 0 4px;font-size:14.5px;font-weight:650}
+.mlinks a{color:var(--accent-2);text-decoration:none}
+.mlinks a:hover{text-decoration:underline}
+@media (max-width:640px){
+  .ftoggle{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:44px;padding:0 4px;background:none;border:0;color:var(--text);font:700 15px/1 var(--font);cursor:pointer}
+  .ftoggle span::after{content:"+";font-size:20px;color:var(--accent-2)}
+  #mf.fopen .ftoggle span::after{content:"–"}
+  #mf:not(.fopen) .fgroups{display:none}
+  #mf.fopen .fgroups{margin-top:8px}
+  #mf:not(.fopen) + .ratebox{display:none}
+  .filters{padding:6px 12px 10px;margin:10px 0 12px}
+  .filters .frow{margin-top:0}
+}
+
+/* ---- UX fixes: a picked miner's card goes straight to the shop ---- */
+.card .buyrow{position:relative;z-index:1;display:flex;flex-direction:column;align-items:stretch;gap:6px;padding-top:8px}
+.card .row:has(+ .buyrow){margin-top:auto;padding-top:6px}
+.card .btn.buy{width:100%;justify-content:center;text-align:center;white-space:normal;line-height:1.25;min-height:44px}
+.card .buyrow .sub{display:flex;flex-wrap:wrap;justify-content:center;align-items:baseline;gap:4px;font-size:13px}
+.card .buyrow .sub a{color:var(--accent-2);font-weight:650}
+.card .buyrow .sub .ph{display:inline;margin:0}
+
+/* ---- UX fixes: homepage tiles say what Solo / Pool / Heaters mean; phones see a real price first ---- */
+.btile .tsub{color:var(--text);opacity:.85;font-size:12.5px;line-height:1.3;text-align:center;max-width:22ch}
+.btile .tn{color:var(--faint);font-size:11.5px;margin-top:2px}
+.hero-pick{display:none}
+@media (max-width:640px){
+  .btile .tsub{font-size:11px;line-height:1.25}
+  .btile .tn{font-size:10.5px}
+  .home-hero{padding-top:18px}
+  .home-hero h1{font-size:28px;margin-bottom:6px}
+  .home-hero .lede{font-size:15.5px;margin:6px 0}
+  .hero-btns{margin:12px 0 4px}
+  .hero-pick{display:flex;align-items:center;gap:10px;margin:12px 0 4px;padding:8px 10px 8px 8px;border:1.5px solid rgba(247,147,26,.55);border-radius:var(--r);background:linear-gradient(160deg,rgba(247,147,26,.14),rgba(247,147,26,.02) 70%),var(--panel)}
+  .hp-img{flex:none;display:grid;place-items:center;width:58px;height:58px;border-radius:10px;background:radial-gradient(80% 80% at 50% 45%,#24365e 0%,#131d35 75%)}
+  .hp-img img,.hp-img svg{max-width:52px;max-height:52px;width:auto;height:auto}
+  .hp-txt{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.25}
+  .hp-txt small{color:var(--accent-2);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+  .hp-name{color:var(--text);font-weight:750;font-size:15px;text-decoration:none}
+  .hp-price{color:var(--muted);font-size:13px}
+  .hp-price b{color:var(--text);font-size:17px;font-weight:850}
+  .hp-buy{flex:none;display:flex;flex-direction:column;align-items:center}
+  .hp-buy .btn{min-height:40px;padding:0 14px}
+  .hp-buy .ph{margin-top:2px;font-size:10px}
+  .home-hero .chips{margin-top:10px;gap:6px}
+  .home-hero .chips li{font-size:12px;padding:4px 9px}
+}
+
+/* ---- UX fixes: the floating Ask button never covers a buy button on phones ---- */
+#radar-ask-root{transition:opacity .18s ease,transform .18s ease}
+#radar-ask-root.ra-dodge{opacity:0;transform:translateY(14px)}
+#radar-ask-root.ra-dodge > *{pointer-events:none}
+@media (max-width:520px){body:not(.ask-app){padding-bottom:76px}}
+
+/* ---- UX fixes: price history you can read at a glance (always drawn, never hidden behind an animation) ---- */
+.pc-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0 0 14px}
+.pc-stats div{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-width:0}
+.pc-stats dt{font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.pc-stats dd{margin:2px 0 0;font-size:22px;font-weight:850;font-variant-numeric:tabular-nums;color:var(--text);line-height:1.15}
+.pc-stats dd small{display:block;font-size:11.5px;font-weight:600;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pc-stats .now{border-color:rgba(247,147,26,.6)}.pc-stats .now dd{color:var(--accent-2)}
+.pc-stats .low dd{color:var(--good)}
+.pc-plot{background:#0c1529;border:1px solid #2a3b5f;border-radius:10px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02)}
+.pchart .grid{stroke:#34486f;stroke-width:1}
+.pchart .vgrid{stroke:#24345a;stroke-width:1;stroke-dasharray:3 5;vector-effect:non-scaling-stroke}
+.pchart .ln{stroke-width:2.75;opacity:.9}
+.pchart .ln.lead{stroke-width:4;opacity:1;filter:drop-shadow(0 0 4px rgba(247,147,26,.45))}
+.pchart .ln.oos{stroke-opacity:.75}
+.pc-ov .gy{color:#c3cee6;font-size:12.5px;font-weight:650}
+.pc-ov .gx{color:#c3cee6;font-size:12.5px;font-weight:600}
+.pc-ov .gx.m{transform:translateX(-50%)}
+.ctag.now{background:var(--c,var(--accent));color:#111;padding:4px 9px;border-radius:8px;font-size:13px;box-shadow:0 4px 12px rgba(0,0,0,.4)}
+.ctag.now small{color:#1b1b1b;opacity:.8}
+.pchart figcaption{color:var(--muted)}
+@media (max-width:700px){
+  .pc-stats{grid-template-columns:1fr 1fr;gap:6px}
+  .pc-stats dd{font-size:19px}
+  .pc-stats dd small{white-space:normal}
+  .pc-ov .gx.m:not(.mid){display:none}
+  .pc-ov .gy,.pc-ov .gx{font-size:11.5px}
+}
+
+/* ---- UX fixes: deal of the day, centered with the miner's photo ---- */
+.dotd{text-align:center;margin-left:auto;margin-right:auto;max-width:520px;padding:18px 20px}
+.dotd>small{text-align:center}
+.dotd-img{display:flex;align-items:center;justify-content:center;height:150px;margin:6px auto 8px;border-radius:12px;background:radial-gradient(70% 80% at 50% 45%,#24365e 0%,#131d35 70%,transparent 100%)}
+.dotd-img img,.dotd-img svg{max-height:136px;max-width:80%;width:auto;height:auto;filter:drop-shadow(0 8px 14px rgba(0,0,0,.5))}
+.dotd h3{font-size:22px;margin:4px 0 2px}
+.dotd-price{margin:2px 0 0}
+.dotd-price b{margin-right:4px}
+.dotd-at{color:var(--muted);font-weight:650}
+.dotd-line{color:var(--good);font-weight:700;font-size:15px;margin:2px 0 4px}
+.dotd .ph{text-align:center}
+@media (max-width:520px){.dotd-img{height:120px}.dotd-img img{max-height:108px}}
+
+/* ---- UX fixes: pick-two compare tool ---- */
+.pick{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;margin:10px 0 24px}
+.pick h2{margin-top:0}
+.pick-form{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 12px;margin:0 0 14px}
+.pick-form label{display:flex;flex-direction:column;gap:4px;flex:1 1 200px;font-size:12.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.pick-form select{min-height:46px;background:var(--panel2);color:var(--text);border:1px solid var(--ring);border-radius:10px;padding:0 10px;font:650 16px/1 var(--font);text-transform:none;letter-spacing:0}
+.pick-vs{align-self:center;margin-top:18px;font-weight:850;color:var(--accent-2)}
+.pick-sum{font-size:15px;margin:0 0 10px}
+.pick-t{width:100%;table-layout:fixed}
+.pick-t thead th{text-align:center;vertical-align:bottom;text-transform:none;letter-spacing:0;white-space:normal}
+.pick-h{display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--text);text-decoration:none;font-size:16px;font-weight:800}
+.pick-h img{height:80px;width:auto;max-width:100%;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45))}
+.pick-t tbody th{text-align:left;color:var(--muted);font-weight:650;width:30%}
+.pick-t td{text-align:center;font-variant-numeric:tabular-nums}
+.pick-t td.win{color:var(--good);font-weight:800}
+.pick-t td small{color:var(--warn);font-weight:700}
+.pick-buy td{vertical-align:top}
+.pick-buy td>div{margin-top:4px;font-size:13px}
+@media (max-width:560px){
+  .pick{padding:12px}
+  .pick-vs{display:none}
+  .pick-form label{flex-basis:100%}
+  .pick-t tbody th{width:28%;font-size:13px}
+  .pick-t td{font-size:13.5px}
+  .pick-h img{height:60px}
+  .pick-h{font-size:14px}
+  .pick-buy .btn{padding:0 8px;font-size:13px;white-space:normal;line-height:1.2;min-height:40px}
+}
+@media (max-width:640px){
+  .hero:has(+ #mf) .lede{font-size:15.5px;margin:6px 0}
+  .hero:has(+ #mf) .mlinks{gap:4px 14px;font-size:13.5px;margin:6px 0 2px}
+  .hero:has(+ #mf) .best-row{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+  .hero:has(+ #mf) .best-row a{flex:none}
 }
