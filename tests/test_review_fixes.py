@@ -77,10 +77,11 @@ class ReviewFixes(unittest.TestCase):
         self.assertIn('name="robots" content="noindex', a)
         self.assertNotIn("/about/<", (SITE / "sitemap.xml").read_text())
 
-    def test_black_friday_wording_is_modest(self):
+    def test_black_friday_redirects_to_deals(self):
         bf = read("/bitaxe-black-friday/")
-        self.assertNotIn("lowest logged", bf)
-        self.assertIn("We started tracking on", bf)
+        self.assertIn("url=/deals/", bf)
+        self.assertIn('name="robots" content="noindex', bf)
+        self.assertNotIn("/bitaxe-black-friday/<", (SITE / "sitemap.xml").read_text())
 
     def test_shop_store_link_carries_affiliate_code(self):
         aff = dict(re.findall(r'(\w+):\s*"([^"]+)"', re.search(r"var AFFILIATE = \{(.*?)\}", (SITE / "app.js").read_text(), re.S).group(1)))

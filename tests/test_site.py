@@ -102,7 +102,7 @@ class SiteTests(unittest.TestCase):
             titles[p.title] = path
             d = p.meta.get("description", "")
             self.assertFalse(p.title.endswith("…"), f"{path} title was truncated")
-            if path in ("/404.html", "/home-miners/", "/about/"):     # 404 and the redirect stub (canonical points at /miners/)
+            if path in ("/404.html", "/home-miners/", "/about/", "/bitaxe-black-friday/"):     # 404 and redirect stubs (canonical points at the new URL)
                 continue
             self.assertFalse(d.endswith("…"), f"{path} description was truncated")
             self.assertTrue(70 <= len(d) <= 165, f"{path} description length {len(d)}")
@@ -210,12 +210,12 @@ class SiteTests(unittest.TestCase):
         self.assertIn("/models/bitaxe-gamma/", home)
 
 
-    def test_black_friday_page(self):
+    def test_black_friday_page_redirects_to_deals(self):
         self.assertIn("/bitaxe-black-friday/", self.pages)
-        self.assertIn(BASE + "/bitaxe-black-friday/", self.sitemap)
+        self.assertNotIn(BASE + "/bitaxe-black-friday/", self.sitemap)
         html = (SITE / "bitaxe-black-friday" / "index.html").read_text()
-        self.assertIn("November 27", html)
-        self.assertIn('id="alerts"', html) if 'id="alerts"' in (SITE / "models" / "bitaxe-gamma" / "index.html").read_text() else None
+        self.assertIn("url=/deals/", html)
+        self.assertIn("noindex", self.pages["/bitaxe-black-friday/"].meta.get("robots", ""))
 
     def test_cta_sponsor_and_advertise(self):
         self.assertIn("/advertise/", self.pages)
@@ -289,7 +289,7 @@ class SiteTests(unittest.TestCase):
         # one menu on every page: All miners · Deals · Find my miner · Guides + Alerts, no sideways scroller
         want = ["/miners/", "/deals/", "/find-my-miner/", "/guides/", "/alerts/"]
         for f in list(SITE.rglob("*.html")):
-            if f.parent.name in ("home-miners", "about"):
+            if f.parent.name in ("home-miners", "about", "bitaxe-black-friday"):
                 continue
             nav = re.search(r'<nav aria-label="Main">(.*?)</nav>', f.read_text(), re.S)
             self.assertIsNotNone(nav, str(f))
@@ -297,7 +297,7 @@ class SiteTests(unittest.TestCase):
         css = (SITE / "style.css").read_text()
         self.assertNotRegex(re.search(r"\.top nav\{[^}]*\}", css).group(0), "overflow-x")
         # Bitaxe-only home sections still exclude home miners (Deals and In stock now cover everything)
-        for page in ["where-to-buy-bitaxe/index.html"]:   # (the Black Friday tracker covers every miner type since Oct 25)
+        for page in ["where-to-buy-bitaxe/index.html"]:   # Bitaxe-only page; Deals and In stock now cover every miner type
             txt = (SITE / page).read_text()
             for mid in home_ids:
                 self.assertNotIn(f'href="/models/{mid}/"', txt.split('<footer')[0].split('id="alerts"')[0], f"{page} lists {mid}")
@@ -467,8 +467,9 @@ class NavBuildTests(unittest.TestCase):
                 prices.append(float(re.search(r'<div class="price">(?:≈ )?\$([\d,.]+)', art).group(1).replace(",", "")))
         self.assertEqual(prices, sorted(prices))                              # cheapest first
         foot = home.split('<footer')[1]
-        for p in ("/how-we-track/", "/advertise/", "/bitaxe-black-friday/"):
+        for p in ("/how-we-track/", "/advertise/"):
             self.assertIn(f'href="{p}"', foot)
+        self.assertNotIn("/bitaxe-black-friday/", foot)
         nav = re.search(r'<nav aria-label="Main">(.*?)</nav>', home, re.S).group(1)
         for p in ("/how-we-track/", "/advertise/", "/bitaxe-black-friday/"):
             self.assertNotIn(p, nav)

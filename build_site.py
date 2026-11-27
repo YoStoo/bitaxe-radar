@@ -655,7 +655,7 @@ FACTS_NOTE = ('<p class="hint">Ships from and warranty come from each shop\'s ow
 # Same menu on every page, desktop and phone (docs/NAV_AUDIT.md): All miners · Deals · Find my miner · Guides + Alerts button
 NAV = [("/miners/", "All miners", "Miners"), ("/deals/", "Deals", "Deals"), ("/find-my-miner/", "Find my miner", "Find"), ("/guides/", "Guides", "Guides")]
 NAV_SECTIONS = {"/miners/": ("/miners/", "/solo-miners/", "/pool-miners/", "/heater-miners/", "/models/", "/home-miners/"),
-                "/deals/": ("/deals/", "/in-stock/", "/price-per-th/", "/bitaxe-black-friday/"), "/find-my-miner/": ("/find-my-miner/",),
+                "/deals/": ("/deals/", "/in-stock/", "/price-per-th/"), "/find-my-miner/": ("/find-my-miner/",),
                 "/guides/": ("/guides/", "/solo-odds/", "/heat-calculator/", "/solo-wins/", "/best/", "/compare/", "/how-we-track/", "/where-to-buy-bitaxe/", "/sellers/")}
 
 # Browse-by-type categories. Any miner can solo or pool mine; these say what each is best suited to. A miner can be in several.
@@ -905,7 +905,7 @@ FOOT_GROUPS = [
                 ("/solo-odds/", "Solo odds"), ("/solo-wins/", "Solo wins"), ("/heat-calculator/", "Room heat calculator"), ("/deals/", "Deals"), ("/price-per-th/", "Price per TH/s"), ("/in-stock/", "In stock now"), ("/find-my-miner/", "Find my miner")]),
     ("Help", [("/guides/", "Guides"), ("/best/", "Best for…"), ("/compare/", "Compare"), ("/sellers/", "Shops"),
               ("/where-to-buy-bitaxe/", "Where to buy"), ("/alerts/", "Price alerts"), ("/newsletter/", "Newsletter"), ("/faq/", "FAQ")]),
-    ("About", [("/how-we-track/", "About & how we track"), ("/evals/", "Eval scores"), ("/advertise/", "Advertise"), ("/bitaxe-black-friday/", "Black Friday 2026"), (f"mailto:{CONTACT}", CONTACT)]),
+    ("About", [("/how-we-track/", "About & how we track"), ("/evals/", "Eval scores"), ("/advertise/", "Advertise"), (f"mailto:{CONTACT}", CONTACT)]),
 ]
 
 
@@ -1653,7 +1653,7 @@ def build_where_to_buy():
 
 def deal_pills(current):
     return ('<nav class="browse" aria-label="Deals filter">' + "".join(f'<a href="{p}"' + (' aria-current="page"' if p == current else "") + f'>{l}</a>'
-            for p, l in (("/deals/", "All deals"), ("/price-per-th/", "Price per TH/s"), ("/in-stock/", "In stock only"), ("/deals/daily/", "Deal of the day"), (BF_PATH, "Black Friday 2026"))
+            for p, l in (("/deals/", "All deals"), ("/price-per-th/", "Price per TH/s"), ("/in-stock/", "In stock only"), ("/deals/daily/", "Deal of the day"))
             if p != "/deals/daily/" or REAL_DEALS) + "</nav>")   # the archive joins the nav with the first real deal
 
 
@@ -1681,7 +1681,6 @@ def build_in_stock():
     body = f"""<article>
 <header class="hero"><h1>Home miners in stock now</h1>
 {deal_pills("/in-stock/")}
-{bf_banner()}
 <p class="lede">{len(ins)} of {len(OFFERS)} tracked listings are in stock at the last check. Another {len(pre)} are pre-order or backorder (not in stock yet) and {len(oos)} are sold out.</p>
 <p class="meta">Checked {tag_time(latest['generated_at'])} · updated every 6 hours</p></header>
 <section aria-labelledby="h-n"><h2 id="h-n">What the stock picture means today</h2><ul>{"".join(f"<li>{x}</li>" for x in notes) or "<li>Nothing unusual at the last check.</li>"}</ul></section>
@@ -1718,7 +1717,7 @@ def build_deal_archive():
 <header class="hero"><h1>Deal of the day</h1>
 {deal_pills(path)}
 <p class="lede">Once a day, an AI agent reads our price history and picks the in-stock miner that's furthest below its usual price. Our code checks every number before it goes up.</p></header>
-{deal_of_the_day_html(DEAL) if DOTD.is_fresh(DEAL, bf_today().isoformat()) else ""}
+{deal_of_the_day_html(DEAL) if DOTD.is_fresh(DEAL, today_et().isoformat()) else ""}
 <section aria-labelledby="h-past"><h2 id="h-past">Past picks</h2>{table}
 <p class="hint">Prices are the ones at the time of each pick, not today's. <a href="/deals/">Today's best prices →</a></p></section>
 {DOTD.HOW_IT_WORKS}
@@ -1772,10 +1771,9 @@ def build_deals():
     body = f"""<article>
 <header class="hero"><h1>Best deals right now</h1>
 {deal_pills("/deals/")}
-{bf_banner()}
 <p class="lede">The cheapest in-stock price for each miner, ranked by how much hashrate you get per dollar.</p>
 <p class="meta">Data collected {tag_time(latest['generated_at'])}</p></header>
-{deal_of_the_day_html(DEAL) if DOTD.is_fresh(DEAL, bf_today().isoformat()) else ""}
+{deal_of_the_day_html(DEAL) if DOTD.is_fresh(DEAL, today_et().isoformat()) else ""}
 <section aria-labelledby="h-r"><h2 id="h-r">Cheapest in stock, ranked by price per TH/s</h2>{rank_tbl}
 <p class="hint">Uses seller-stated hashrate and ignores power cost, shipping and bundle differences.</p></section>
 <section aria-labelledby="h-d"><h2 id="h-d">Seller-listed discounts</h2>{disc_html}</section>
@@ -1783,132 +1781,15 @@ def build_deals():
 <section aria-labelledby="h-g"><h2 id="h-g">Cheaper listings that are not in stock</h2><p>Some of the lowest prices we see are on sold-out, backorder or pre-order listings. This shows how much more the cheapest in-stock listing costs.</p>{gap_html}</section>
 <section aria-labelledby="h-s"><h2 id="h-s">Price spread between sellers (in stock)</h2>{spread_html}</section>
 <section><h2>Want a heads-up?</h2><p>Pick a model and a target price on its page and we email you once when it is in stock at or under that price: <a href="/alerts/">set an alert</a>.</p>
-<p><a href="/in-stock/">Everything in stock now</a> · <a href="/where-to-buy-bitaxe/">Where to buy</a> · <a href="/bitaxe-black-friday/">Black Friday 2026 tracker</a></p></section>
+<p><a href="/in-stock/">Everything in stock now</a> · <a href="/where-to-buy-bitaxe/">Where to buy</a></p></section>
 </article>"""
     items = [(f"{SHORT[m]} {money(usd(STATS[m]['best']))}", f"/models/{m}/") for m in ranked]
     layout(path, title, desc, body, crumbs=trail, jsonld=[itemlist("Cheapest in-stock home miners by price per TH/s", items)])
 
 
-BF_DATES = dict(bf="2026-11-27", cm="2026-11-30")   # Black Friday / Cyber Monday 2026
-BF_BANNER = ("2026-11-20", "2026-12-01")              # the site-wide Black Friday banner shows on these dates (inclusive, US Eastern)
-BF_PATH = "/bitaxe-black-friday/"
-BF_GROUPS = [  # key, heading, one-line who-it's-for
-    ("bitaxe", "Bitaxe-class solo miners", "Small open-source boards like the Bitaxe and NerdQaxe. Cheap to run, mostly bought as a solo lottery ticket."),
-    ("home", "Home and desk miners", "Finished boxes for a desk or shelf, from small lottery miners to quiet 10 TH/s+ home units."),
-    ("heater", "Heater miners", "Miners built to heat a room (or your water) while they mine. Most useful in the cold months."),
-]
-
-
-def bf_group(mid):
-    """Which Black Friday group a miner belongs to: Bitaxe-class boards, heater miners, or other home/desk miners."""
-    if not is_home(mid):
-        return "bitaxe"
-    kind = (MODELS[mid].get("kind") or "").lower()
-    return "heater" if "heater" in kind and not kind.startswith("desk") else "home"
-
-
-def bf_today(now=None):
-    """Calendar date in US Eastern (UTC-5 is close enough for a day-level banner)."""
+def today_et(now=None):
+    """Calendar date in US Eastern (UTC-5 is close enough for a day-level check)."""
     return ((now or GEN) - timedelta(hours=5)).date()
-
-
-def bf_banner(now=None):
-    """Site-wide Black Friday banner. Empty outside BF_BANNER, so it switches itself on and off with the 6-hourly rebuilds."""
-    d = bf_today(now)
-    lo, hi = (datetime.strptime(x, "%Y-%m-%d").date() for x in BF_BANNER)
-    if not lo <= d <= hi:
-        return ""
-    bf, cm = (datetime.strptime(BF_DATES[k], "%Y-%m-%d").date() for k in ("bf", "cm"))
-    if d < bf:
-        n = (bf - d).days
-        msg = f"Black Friday is Friday, November 27 ({'tomorrow' if n == 1 else f'in {n} days'})."
-    elif d < cm:
-        msg = "Black Friday weekend is on."
-    elif d == cm:
-        msg = "It's Cyber Monday."
-    else:
-        msg = "Some Cyber Monday deals run through today."
-    return (f'<aside class="bf-banner" aria-label="Black Friday 2026"><p><b>{esc(msg)}</b> See every miner\'s price today next to the lowest price we\'ve logged so far. '
-            f'<a class="btn sm" href="{BF_PATH}">Black Friday tracker →</a></p></aside>')
-
-
-def bf_row(mid):
-    """(table row html, at-our-low?) for one miner: cheapest in stock now vs the lowest in-stock price we've logged so far."""
-    st, b = STATS[mid], STATS[mid]["best"]
-    lo, lo_t, first = model_price_low(mid)
-    now = usd(b) if b else None
-    at_low = False
-    if now is not None and lo is not None and now <= lo + 0.01:
-        verdict, at_low = '<span class="badge pc-low">At the lowest we\'ve logged so far</span>', True
-    elif now is not None and lo is not None:
-        verdict = f"{money(now - lo)} above it ({(now / lo - 1) * 100:.0f}%)"
-    elif now is not None:
-        verdict = "No earlier in-stock price logged yet"
-    else:
-        c = st["low_any"]
-        verdict = (f"Not in stock now. {esc(STATUS.get(c['stock_status'], c['stock_status']))}: {'≈ ' if c['currency'] != 'USD' else ''}{money(usd(c))} at {esc(sname(c['seller']))}"
-                   if c else "Not in stock now")
-    now_cell = (("≈ " if b["currency"] != "USD" else "") + money(now)) if b else "&ndash;"
-    lo_cell = f'{money(lo)}<br><small>{esc(fmt_day(lo_t))}</small>' if lo is not None else "&ndash;"
-    buy = offer_link(b, "View ↗") if b else f'<a href="/models/{mid}/#alerts">Get alert</a>'
-    # data-label = the column name, shown above each value when the row turns into a card on phones (see .bf-table in style.css)
-    return (f'<tr><td class="bf-miner"><a href="/models/{mid}/">{esc(SHORT[mid])}</a></td>'
-            f'<td class="num bf-now" data-label="Cheapest in stock">{now_cell}</td>'
-            f'<td class="bf-shop" data-label="Shop">{esc(sname(b["seller"])) if b else "&ndash;"}</td>'
-            f'<td class="num bf-low" data-label="Lowest we\'ve logged">{lo_cell}</td>'
-            f'<td class="bf-vs" data-label="Today vs that low">{verdict}</td><td class="bf-buy">{buy}</td></tr>'), at_low
-
-
-def bf_sort_key(mid):
-    """In-stock miners first (cheapest first), then the rest by their cheapest listing."""
-    b, c = STATS[mid]["best"], STATS[mid]["low_any"]
-    price = usd(b) if b else (usd(c) if c else None)
-    return (b is None, price if price is not None else 1e9)
-
-
-def build_black_friday():
-    path = BF_PATH
-    trail = [("Home", "/"), ("Deals", "/deals/"), ("Black Friday 2026", path)]
-    first = min((pts[0]["t"] for pts in history.values() if pts), default=latest["generated_at"])
-    days = max(0, (GEN - parse_t(first)).days)
-    head = ('<thead><tr><th>Miner</th><th class="num">Cheapest in stock</th><th>Shop</th>'
-            '<th class="num" title="Lowest in-stock price we\'ve logged so far">Lowest we\'ve logged</th>'
-            '<th>Today vs that low</th><th>Buy</th></tr></thead>')
-    sections, jump, items, n_all, n_low_all = [], [], [], 0, 0
-    for key, h, blurb in BF_GROUPS:
-        mids = sorted([m for m in LIVE_TRACKED if bf_group(m) == key], key=bf_sort_key)
-        if not mids:
-            continue
-        rows = [bf_row(m) for m in mids]
-        n_ins = sum(1 for m in mids if STATS[m]["best"])
-        n_low = sum(1 for _, at in rows if at)
-        n_all, n_low_all = n_all + len(mids), n_low_all + n_low
-        items += [(SHORT[m], f"/models/{m}/") for m in mids]
-        jump.append(f'<a href="#bf-{key}">{esc(h)} ({len(mids)})</a>')
-        sections.append(f'<section aria-labelledby="bf-{key}" class="bf-group"><h2 id="bf-{key}">{esc(h)}</h2><p>{esc(blurb)}</p>'
-                        f'<p class="meta">{len(mids)} miners · {n_ins} in stock now · {n_low} at the lowest in-stock price we\'ve logged so far</p>'
-                        f'<div class="tablewrap bf-wrap"><table class="bf-table">{head}<tbody>{"".join(r for r, _ in rows)}</tbody></table></div></section>')
-    title = "Bitaxe & home miner Black Friday 2026 deals: live prices vs our price log | Bitaxe Radar"
-    desc = f"Black Friday 2026 deals on {n_all} home Bitcoin miners (Bitaxe, desk and heater miners): today's price vs the lowest we've logged so far."
-    body = f"""<article>
-<header class="hero"><h1>Bitaxe and home miner Black Friday 2026 deals</h1>
-{deal_pills(path)}
-<p class="lede">Black Friday is November 27 and Cyber Monday is November 30. We check every shop every 6 hours, so this page shows how today's price compares with the lowest in-stock price we've logged so far, for every miner we track.</p>
-<p class="meta">Prices checked {tag_time(latest['generated_at'])} · tracking since {esc(fmt_day(first))} · {n_low_all} of {n_all} miners at the lowest we've logged so far</p>
-<nav class="browse" aria-label="Miner types">{"".join(jump)}</nav></header>
-{"".join(sections)}
-<p class="hint">We started tracking on {esc(fmt_day(first))}, so "the lowest we've logged so far" only covers the last {plural(days, "day")} and only the shops we check. Treat it as a rough guide until we have a few months of history. Prices are before shipping and tax; euro and Canadian-dollar prices are converted to US dollars as an estimate.</p>
-<section aria-labelledby="h-a"><h2 id="h-a">Get a Black Friday price alert</h2><p>Pick a miner and your target price. We email you once when it's in stock at or under that price, so you don't have to refresh shop pages all week.</p>{signup_html("any")}</section>
-<section aria-labelledby="h-h"><h2 id="h-h">How to spot a real Black Friday deal</h2><ul>
-<li>Compare against the price history on each miner's page, not the shop's "was" price.</li>
-<li>Check what's in the box: some bundles include a power supply or stand, some don't.</li>
-<li>Stock moves fast on popular models. Sold-out listings drop off the "cheapest in stock" column.</li>
-<li>Heater miners on pre-order may not ship before winter. Read the shop's shipping date before you pay.</li>
-<li>A small miner is a lottery ticket, not an investment. Buy one because you want to run it.</li></ul></section>
-<section><h2>More</h2><p><a href="/deals/">Best deals right now</a> · <a href="/price-per-th/">Price per TH/s</a> · <a href="/in-stock/">Everything in stock</a> · <a href="/heater-miners/">Heater miners</a> · <a href="/where-to-buy-bitaxe/">Where to buy a Bitaxe</a></p></section>
-</article>"""
-    layout(path, title, desc, body, crumbs=trail, scripts=SIGNUP_SCRIPTS, jsonld=[itemlist("Home Bitcoin miners on the Black Friday 2026 tracker", items)])
-
 
 
 # ---------------------------------------------------------------------------------------------
@@ -2360,7 +2241,7 @@ def build_best(slug):
     faq_html = "".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in b["faq"])
     hint = f'<p class="hint">{esc(b["hint"])}</p>' if b.get("hint") else ""
     if slug == "gifts":
-        hint += '<p class="hint">Next steps for a new owner: <a href="/guides/bitaxe-setup/">first-hour setup checklist</a> · <a href="/guides/bitcoin-mining-pools/">which pool to use</a> · <a href="/bitaxe-black-friday/">Black Friday prices</a></p>'
+        hint += '<p class="hint">Next steps for a new owner: <a href="/guides/bitaxe-setup/">first-hour setup checklist</a> · <a href="/guides/bitcoin-mining-pools/">which pool to use</a> · <a href="/deals/">Best deals</a></p>'
     if slug == "quiet":
         hint += '<p class="hint">Full noise table with sources and buy links: <a href="/guides/bitaxe-noise/">how loud are home Bitcoin miners?</a></p>'
     body = f"""<article>
@@ -3872,7 +3753,6 @@ def build_price_per_th():
     body = f"""<article>
 <header class="hero"><h1>Price per TH/s leaderboard</h1>
 {deal_pills(path)}
-{bf_banner()}
 <p class="lede">Which miners give you the most hashrate per dollar today, and whether today's price is a good one.</p>
 <p>{lead}</p>
 <p class="meta">Checked {tag_time(latest['generated_at'])} · updated every 6 hours · hashrate is the maker's stated figure</p></header>
@@ -4064,7 +3944,7 @@ def build_home():
     older = [m for m in TRACKED if m in NOINDEX_MODELS]
     older_html = ('<p class="older">Older models: ' + " · ".join(
         f'<a href="/models/{m}/">{esc(SHORT[m])}</a>' + (f' from {money(usd(STATS[m]["best"]))}' if STATS[m]["best"] else " (sold out)") for m in older) + "</p>") if older else ""
-    dotd = deal_of_the_day_html(DEAL, compact=True) if DOTD.is_fresh(DEAL, bf_today().isoformat()) else ""
+    dotd = deal_of_the_day_html(DEAL, compact=True) if DOTD.is_fresh(DEAL, today_et().isoformat()) else ""
     cards = dotd + f"""<section id="miners" aria-labelledby="h-miners" data-reveal>
     <div class="sec-head"><h2 id="h-miners">Today's best prices</h2><a href="/in-stock/">Everything in stock →</a></div>
     <p class="hint">The {plural(len(picks), "miner")} with the most hashrate per dollar right now, one per size. In stock, US shops first.</p>
@@ -4074,7 +3954,7 @@ def build_home():
   </section>"""
     sellers_line = ('<p>Shops we check: ' + " · ".join(seller_a(sid) for sid in SELLERS if sid in BUILT_SELLERS) + "</p>\n  ")
     out = (tpl.replace("<!--HEAD-->", head).replace("<!--HEADER-->", header_html()).replace("<!--RADAR-BG-->", RADAR_BG)
-           .replace("<!--HERO-CHIPS-->", chips).replace("<!--BROWSE-->", bf_banner() + browse_tiles().replace('class="browse-tiles"', 'class="browse-tiles" data-reveal', 1) + "\n" + best_pills())
+           .replace("<!--HERO-CHIPS-->", chips).replace("<!--BROWSE-->", browse_tiles().replace('class="browse-tiles"', 'class="browse-tiles" data-reveal', 1) + "\n" + best_pills())
            .replace("<!--CARDS-->", cards).replace("<!--SIGNUP-->", signup_html("any").replace('<section id="alerts"', '<section id="alerts" data-reveal', 1))
            .replace("<!--FOOTER-->", footer_html())
            .replace('<script src="/app.js"></script>', '<script src="/app.js"></script>\n' + SIGNUP_SCRIPTS + '\n<script src="/motion.js" defer></script>')
@@ -4538,7 +4418,7 @@ def main():
     build_deals()
     build_deal_archive()
     build_price_per_th()
-    build_black_friday()
+    build_redirect("/bitaxe-black-friday/", "/deals/", "Best deals")
     build_redirect("/home-miners/", "/miners/", "All miners")
     build_redirect("/about/", "/how-we-track/", "About & how we track")
     build_miners()
