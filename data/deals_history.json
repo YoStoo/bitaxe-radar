@@ -1,5 +1,42 @@
 [
  {
+  "date": "2026-11-27",
+  "data_checked_at": "2026-11-27T08:33:32Z",
+  "written_at": "2026-11-27T08:35:08Z",
+  "source": "template",
+  "model": null,
+  "no_standout": false,
+  "headline": "26.6% off its typical price at Solo Satoshi",
+  "summary": "It's $215.00 today, in stock at Solo Satoshi. Its typical price over the last 14 days was $293.00, so that's $78.00 (26.6%) less. That's the lowest price we've logged for it.",
+  "miner_id": "avalon-nano-3s",
+  "miner_name": "Canaan Avalon Nano 3S",
+  "offer_id": "solosatoshi:avalon-nano-3s",
+  "retailer_id": "solosatoshi",
+  "retailer_name": "Solo Satoshi",
+  "price_usd": 215.0,
+  "price": 215.0,
+  "currency": "USD",
+  "typical_usd": 293.0,
+  "drop_usd": 78.0,
+  "drop_pct": 26.6,
+  "lowest_ever": true,
+  "new_low": false,
+  "history_days": 14,
+  "window_days": 14,
+  "check": {
+   "passed": true,
+   "attempts": 0,
+   "first_try_problems": []
+  },
+  "run": {
+   "calls": 1,
+   "tools": [],
+   "input_tokens": 2354,
+   "output_tokens": 0,
+   "cost_usd": 0.00024
+  }
+ },
+ {
   "date": "2026-11-26",
   "data_checked_at": "2026-11-26T08:17:40Z",
   "written_at": "2026-11-26T08:19:17Z",

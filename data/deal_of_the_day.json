@@ -1,12 +1,12 @@
 {
- "date": "2026-11-26",
- "data_checked_at": "2026-11-26T08:17:40Z",
- "written_at": "2026-11-26T08:19:17Z",
- "source": "ai",
- "model": "claude-haiku-5-5",
+ "date": "2026-11-27",
+ "data_checked_at": "2026-11-27T08:33:32Z",
+ "written_at": "2026-11-27T08:35:08Z",
+ "source": "template",
+ "model": null,
  "no_standout": false,
- "headline": "Canaan Avalon Nano 3S hits new low at $215",
- "summary": "The Avalon Nano 3S is $215 at Solo Satoshi today, against a typical price of $293. That is a 26.6% drop and a new low, below the $219 we logged before today.",
+ "headline": "26.6% off its typical price at Solo Satoshi",
+ "summary": "It's $215.00 today, in stock at Solo Satoshi. Its typical price over the last 14 days was $293.00, so that's $78.00 (26.6%) less. That's the lowest price we've logged for it.",
  "miner_id": "avalon-nano-3s",
  "miner_name": "Canaan Avalon Nano 3S",
  "offer_id": "solosatoshi:avalon-nano-3s",
@@ -19,23 +19,19 @@
  "drop_usd": 78.0,
  "drop_pct": 26.6,
  "lowest_ever": true,
- "new_low": true,
+ "new_low": false,
  "history_days": 14,
  "window_days": 14,
  "check": {
   "passed": true,
-  "attempts": 1,
+  "attempts": 0,
   "first_try_problems": []
  },
  "run": {
-  "calls": 3,
-  "tools": [
-   "rank_price_drops",
-   "compare_to_average",
-   "get_price_history"
-  ],
-  "input_tokens": 10245,
-  "output_tokens": 637,
-  "cost_usd": 0.00134
+  "calls": 1,
+  "tools": [],
+  "input_tokens": 2354,
+  "output_tokens": 0,
+  "cost_usd": 0.00024
  }
 }
