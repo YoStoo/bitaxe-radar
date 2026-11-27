@@ -26,6 +26,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import earnings as E
+import guide_kit as G
 import newsletter as NL
 import newlows
 from deal_agent import render as DOTD   # deal of the day (AI agent output, checked; docs/DEAL_AGENT.md)
@@ -2187,11 +2188,13 @@ def best_defs():
     d["heating-a-room"] = dict(label="Heating a room", h1="Best miners for heating a room",
         lede="Miners built to heat a whole room like a space heater while they mine.",
         picks=[x for x in heat if x[0] in TRACKED], heat=True,
-        title="Best Bitcoin miners for heating a room this winter",
+        title="Best Bitcoin heater miners for a room or bedroom",
         what="Bitcoin heater miners for heating a room: Avalon Mini 3, Heatbit Maxi, Heatbit Trio, Avalon Q",
         faq=[("What is the best heater miner?", "For a medium room, the Avalon Mini 3 (about 800 W). For a bigger room, the Heatbit Maxi or Trio (up to 1,500 W). The Avalon Q gives the most heat but suits a garage or basement."),
              ("Does a heater miner heat as well as a space heater?", "Yes, watt for watt. Nearly all the electricity becomes heat, just like an electric heater."),
-             ("Will it pay my heating bill?", "Part of it at best, and nothing is guaranteed. In a pool it earns small amounts that offset some of the power cost.")],
+             ("Will it pay my heating bill?", "Part of it at best, and nothing is guaranteed. In a pool it earns small amounts that offset some of the power cost."),
+             ("Is a heater miner safe in a bedroom?", "Use it like any electric space heater: wall outlet, 3 feet of clear space, vents uncovered. The US CPSC advises turning space heaters off while you sleep, so warm the room first or use a timer."),
+             ("Is a heater miner safe around kids and pets?", "Treat it like a space heater: put it where it can't be knocked over or blocked, keep cords out of reach, and supervise small children.")],
         hint="Smaller heater miners like the Heatbit Canvas and Avalon Nano 3S warm a person or desk rather than a whole room: see all heater miners.")
     g = gift_groups()
     if g:
@@ -2246,14 +2249,27 @@ def build_best(slug):
         hint += '<p class="hint">Next steps for a new owner: <a href="/guides/bitaxe-setup/">first-hour setup checklist</a> · <a href="/guides/bitcoin-mining-pools/">which pool to use</a> · <a href="/deals/">Best deals</a></p>'
     if slug == "quiet":
         hint += '<p class="hint">Full noise table with sources and buy links: <a href="/guides/bitaxe-noise/">how loud are home Bitcoin miners?</a></p>'
+    top, safe = "", ""
+    if slug == "heating-a-room":
+        top = (G.tldr(["<b>Medium room:</b> Avalon Mini 3 (about 800 W). <b>Bigger room:</b> Heatbit Maxi or Trio (up to 1,500 W).",
+                       "Watt for watt it heats like a space heater, and pays a little back.",
+                       'Bedroom, kids or pets? Treat it like any space heater. <a href="#h-safe">Safety basics ↓</a>']))
+        noise_bits = [f'{esc(SHORT[m])}: {esc(NOISE[m][1][:1].lower() + NOISE[m][1][1:])}' for m in ("heatbit-canvas", "heatbit-trio", "avalon-mini-3", "heatbit-maxi") if m in NOISE and m in TRACKED]
+        safe = G.section("h-how", "How a heater miner heats a room", G.fig(G.heat_room_svg(800), "An 800 W miner puts out about the same heat as an 800 W space heater, and mines while it does.")
+                         + '<p><a href="/guides/how-heater-miners-work/">How heater miners work →</a></p>')
+        safe += G.section("h-safe", "Safe in a bedroom, or around kids and pets?",
+                         "<p>Same rules as any electric space heater (" + g_ext(CPSC_HEATER_URL, "US CPSC") + "):</p>" + heater_safety_cards()
+                         + (f'<p class="hint">Stated noise: {"; ".join(noise_bits)}. <a href="/guides/bitaxe-noise/">Full noise table</a> · <a href="/guides/how-heater-miners-work/">How heater miners work</a>.</p>' if noise_bits else ""))
     body = f"""<article>
 <header class="hero"><h1>{esc(b['h1'])}</h1>
 <p class="lede">{esc(b['lede'])}</p>
 <p class="meta">checked {tag_time(latest['generated_at'])}</p>
 {best_pills(slug)}
 {rate_box()}</header>
+{top}
 <section aria-label="Ranked picks">{cards}{hint}</section>
 {more_html}
+{safe}
 <section id="faq" aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{faq_html}</section>
 <section class="guides-line"><p>Browse: <a href="/miners/">All miners</a> · <a href="/solo-miners/">Solo</a> · <a href="/pool-miners/">Pool</a> · <a href="/heater-miners/">Heaters</a> · <a href="/guides/solo-vs-pool-mining/">Solo vs pool</a></p>
 <p class="hint">Hashrate and watts are the sellers' stated figures. Prices are before shipping and tax. Pool and power figures are estimates; {EARN_NOTE.lower()}</p></section>
@@ -2359,46 +2375,124 @@ Bitaxe Radar is independent. Some shop links are affiliate links; they never cha
 
 def guide_ld(path, headline, desc):
     return {"@context": "https://schema.org", "@type": "Article", "headline": headline, "description": desc, "url": BASE + path,
-            "datePublished": GUIDE_UPDATED, "dateModified": GUIDE_UPDATED, "image": f"{BASE}/og-image.png",
+            "datePublished": GUIDE_UPDATED, "dateModified": GUIDES_REFRESHED, "image": f"{BASE}/og-image.png",
             "author": {"@type": "Organization", "name": "Bitaxe Radar", "url": BASE + "/"},
             "publisher": {"@type": "Organization", "name": "Bitaxe Radar", "url": BASE + "/"}}
+
+
+GUIDES_REFRESHED = "2026-11-27"   # the skimmable rewrite of every guide (text, layout, diagrams); data facts keep their own "checked" dates
+CPSC_HEATER_URL = "https://www.cpsc.gov/Newsroom/News-Releases/2026/Keep-Warm-and-Safe-This-Winter-Tips-for-Using-Generators-Furnaces-and-Space-Heaters"
+
+
+def iso_day(iso):
+    d = datetime.strptime(iso, "%Y-%m-%d")
+    return f"{d:%b} {d.day}, {d.year}"
+
+
+def g_chips(minutes, updated=GUIDES_REFRESHED, live=False, checked=None):
+    out = [f"⏱ {minutes}-min read", f'Updated <time datetime="{updated}">{iso_day(updated)}</time>']
+    if live:
+        out.append(("live", "Live prices"))
+    if checked:
+        out.append(checked)
+    return out
+
+
+def a_an(word):
+    """Article for a model name or a number of watts ('an Avalon', 'an 800 W')."""
+    return "an" if str(word)[:1].lower() in "aeiou8" else "a"
+
+
+def g_ext(url, text):
+    return f'<a href="{esc(url)}" rel="nofollow noopener" target="_blank">{text}</a>'
+
+
+def buy_box(picks, title="Best price today", note=""):
+    """'Buy here' box for a guide: today's cheapest in-stock listing per model (pre-order if none in stock), with the
+    shop's normal link through offer_link (affiliate code only where the shop already has one). picks: (model id, why)."""
+    rows = []
+    for mid, why in picks:
+        if mid not in TRACKED:
+            continue
+        st = STATS[mid]
+        o = st["best"]
+        if not o:
+            pre = [x for x in st["offers"] if x["stock_status"] in ("preorder", "backorder") and usd(x) is not None]
+            if not pre:
+                continue
+            o = min(pre, key=usd)
+        conv = o["currency"] != "USD" and usd(o) is not None
+        price = money(o["price"], o["currency"]) + (f"<small>≈ {money(usd(o))}</small>" if conv else "")
+        rows.append(f'<div class="g-buy-row" data-reveal-item><div class="g-buy-img">{model_img(mid)}</div>'
+                    f'<div class="g-buy-name"><a href="/models/{mid}/">{esc(SHORT[mid])}</a><small>{esc(why)}</small></div>'
+                    f'<div class="g-buy-price">{price}</div>'
+                    f'<div class="g-buy-at">at <strong>{esc(sname(o["seller"]))}</strong> {badge(o["stock_status"])}</div>'
+                    f'<div class="g-buy-go">{offer_link(o, ("Buy at " if in_stock(o) else "Pre-order at ") + sname(o["seller"]) + " ↗")}</div></div>')
+    rows = rows[:3]   # three fit side by side on desktop
+    if not rows:
+        return ""
+    return (f'<section class="g-buy" aria-labelledby="h-buy" data-reveal><div class="g-buy-h"><h2 id="h-buy">{title}</h2>'
+            f'<p class="hint">checked {tag_time(latest["generated_at"])}</p></div>'
+            f'<div class="g-buy-rows">{"".join(rows)}</div>'
+            f'<p class="hint">{note}Prices before shipping and tax. Some links are affiliate links; they never change rankings.</p></section>')
+
+
+def hero_img(mid):
+    return model_img(mid, lazy=False) if mid in MODEL_IMG else ""
+
+
+def heater_safety_cards():
+    """Space-heater safety basics from the US CPSC (Jan 2026 winter release), applied to heater miners. No model-specific claims."""
+    return G.cards([
+        ("🔌", "Straight into the wall", "No extension cord or power strip. Big units on their own circuit.", "yellow"),
+        ("📏", "3 feet of clear space", "Keep beds and curtains back. Never cover the vents.", "blue"),
+        ("😴", "Off while you sleep", "The CPSC's advice for any space heater. Warm the room first, or use a timer.", "purple"),
+        ("🧒", "Kids and pets", "Somewhere it can't be knocked over or blocked. Supervise small children.", "green"),
+        ("🤫", "Pick a quiet one", "Low stated dB or a night mode for bedrooms.", "orange"),
+        ("📘", "Follow the manual", "The maker's placement and circuit guidance comes first.", "red"),
+    ])
 
 
 def build_guide_heaters():
     path = "/guides/how-heater-miners-work/"
     trail = [("Home", "/"), ("Guides", "/guides/"), ("How heater miners work", path)]
-    title = "How a Bitcoin heater miner works (plain English) | Bitaxe Radar"
-    desc = "How a Bitcoin heater miner works: why a miner heats a room like a space heater, how pool mining offsets part of the power bill, and what to check first."
-    ex = [m for m in ("avalon-nano-3s", "avalon-mini-3", "heatbit-maxi") if m in HOME_TRACKED]
-    ex_rows = "".join(f'<tr><td><a href="/models/{m}/">{esc(SHORT[m])}</a></td><td class="num">≈{MODELS[m]["watts"]:,g} W</td><td class="num">≈{btu(MODELS[m]["watts"]):,.0f}</td></tr>' for m in ex)
-    ex_tbl = (f'<div class="tablewrap"><table><thead><tr><th>Miner</th><th class="num">Stated power</th><th class="num">Heat (BTU/h)</th></tr></thead><tbody>{ex_rows}</tbody></table></div>'
-              '<p class="hint">Heat = stated watts × 3.412, at full power.</p>') if ex else ""
+    title = "How Bitcoin heater miners work, and are they safe in a bedroom? | Bitaxe Radar"
+    desc = "A Bitcoin heater miner heats a room like an electric space heater while it mines. How it works, bedroom and kid and pet safety, and today's prices."
+    ex = [m for m in ("avalon-nano-3s", "avalon-mini-3", "heatbit-maxi", "avalon-q") if m in HOME_TRACKED]
+    chart = G.bars([(f'<a href="/models/{m}/">{esc(SHORT[m])}</a><small>≈{MODELS[m]["watts"]:,g} W stated</small>', btu(MODELS[m]["watts"]),
+                     f'{btu(MODELS[m]["watts"]):,.0f} BTU/h', "orange") for m in ex],
+                   max([btu(MODELS[m]["watts"]) for m in ex] or [1]), caption="Heat = stated watts × 3.412, at full power.") if ex else ""
+    noise_bits = [f'{esc(SHORT[m])}: {esc(NOISE[m][1][:1].lower() + NOISE[m][1][1:])}' for m in ("heatbit-canvas", "heatbit-trio", "avalon-mini-3") if m in NOISE and m in TRACKED]
+    faq = [("Is a Bitcoin heater miner safe in a bedroom?", "Use it like any electric space heater: wall outlet, 3 feet of clear space, vents uncovered. The US CPSC advises turning space heaters off while you sleep, so warm the room first or use a timer."),
+           ("Are heater miners safe around kids and pets?", "Treat it like a space heater: put it where it can't be knocked over or blocked, keep cords out of reach, and supervise small children."),
+           ("Does a heater miner heat as well as a space heater?", "Yes, watt for watt. Nearly all the electricity becomes heat."),
+           ("Will it pay my heating bill?", "Part of it at best, and nothing is guaranteed.")]
+    picks = [(m, w) for m, w in (("avalon-mini-3", "Medium room, about 800 W"), ("heatbit-trio", "Heater and air purifier in one"), ("heatbit-maxi", "Bigger room, up to 1,500 W"), ("avalon-nano-3s", "Desk-size warmth, quiet"))]
     body = f"""<article>
-<header class="hero"><h1>How a heater miner works</h1>
-<p class="lede">The short version: a Bitcoin miner is a space heater that also does mining work. Here's what that means for your room and your power bill.</p>
-<p class="meta">Updated <time datetime="{GUIDE_UPDATED}">Oct 21, 2026</time> · 2-minute read</p></header>
-<section aria-labelledby="h-1"><h2 id="h-1">1. Electricity in, heat out</h2>
-<p>A mining chip does billions of calculations a second, and nearly every watt it uses ends up as heat, just like an electric space heater. So a 1,000 W miner warms a room about as much as a 1,000 W heater.</p>
-<p>A heater miner puts that chip in a quiet, room-friendly case with a fan, a thermostat or app, and heater-style modes. You run it when you want heat, and it mines while it does.</p>
-{ex_tbl}</section>
-<section aria-labelledby="h-2"><h2 id="h-2">2. Where the money comes from</h2>
-<p>While it heats, the miner can earn bitcoin. There are two ways to run it:</p>
-<ul><li><strong>Pool mining:</strong> you join thousands of other miners. The pool finds blocks often and pays you a small share for your work, minus a pool fee. You get small, steady payouts that knock part of the power bill back down.</li>
-<li><strong>Solo mining:</strong> you try to find a whole block on your own. If you do, you get the full reward (about 3.125 BTC plus fees), but for one home miner that's a long-shot lottery, and most of the time you get nothing.</li></ul>
-<p>Most heater-miner owners pool. <a href="/guides/solo-vs-pool-mining/">Solo vs pool, explained</a>.</p></section>
-<section aria-labelledby="h-3"><h2 id="h-3">3. What it won't do</h2>
-<ul><li><strong>It won't usually cover your whole power bill.</strong> Pool earnings rise and fall with Bitcoin's price and the network's total hashrate. Your electricity rate decides how much they offset. We don't show earnings promises.</li>
-<li><strong>It's not the cheapest heat.</strong> A heat pump can move several units of heat for each unit of electricity, so it heats for less than any electric heater, miners included. Heater miners make the most sense in place of a plain electric heater.</li>
-<li><strong>It's not free in summer.</strong> If you don't need the heat, you're paying for power just to mine.</li></ul></section>
-<section aria-labelledby="h-4"><h2 id="h-4">4. Before you buy</h2>
-<ul><li><strong>Size:</strong> about 300–800 W suits a small or medium room. 1,500 W-class units are like a full-size space heater on high.</li>
-<li><strong>Circuit:</strong> a US 15 A, 120 V circuit should carry about 1,440 W continuously. Put big units on their own circuit, and follow the maker's guidance.</li>
-<li><strong>Noise:</strong> fans are louder in high-heat modes. Check the stated decibels.</li>
-<li><strong>Stock:</strong> many heater miners sell out before winter, and pre-orders ship later. Check the badge on each listing.</li></ul></section>
-<section><h2>Compare heater miners</h2><p><a class="btn" href="/heater-miners/">See heater miners</a> <a class="btn ghost" href="/heat-calculator/">Which one fits my room?</a></p>
-<p><a href="/guides/bitcoin-mining-heat-your-home/">Does it save money? Miner vs space heater vs heat pump →</a></p></section>
+{G.hero("How a Bitcoin heater miner works", "It's an electric space heater that mines Bitcoin while it warms your room.", g_chips(2, live=True), hero_img("avalon-mini-3"))}
+{G.tldr(["Nearly every watt becomes heat. A 1,000 W miner warms a room like a 1,000 W space heater.",
+         "While it heats, it mines. In a pool it pays a little back.",
+         'Bedroom, kids or pets? Treat it like any space heater. <a href="#h-safe">Safety basics ↓</a>'])}
+{G.section("h-1", "Electricity in, heat out", G.fig(G.heat_room_svg(1000), "Power in, the same power out as heat.") + chart)}
+{G.section("h-2", "Where the money comes from", G.steps([
+        ("🔌", "Plug in", "Pick a heat level, like a heater."),
+        ("⚙️", "The chip mines", "Mining work makes the heat."),
+        ("🤝", "A pool pays a little", 'Small payouts trim the bill. <a href="/guides/solo-vs-pool-mining/">Solo vs pool</a>')]))}
+{G.section("h-safe", "Safe in a bedroom, or around kids and pets?", "<p>Same rules as any electric space heater (" + g_ext(CPSC_HEATER_URL, "US CPSC") + "):</p>" + heater_safety_cards()
+           + (f'<p class="hint">Stated noise: {"; ".join(noise_bits)}. <a href="/guides/bitaxe-noise/">Full noise table</a>.</p>' if noise_bits else ""))}
+{G.section("h-3", "What it won't do", G.cards([
+        ("💸", "Cover your whole bill", "Earnings move with Bitcoin's price. No promises.", "red"),
+        ("♨️", "Beat a heat pump", "A heat pump makes more heat per watt.", "blue"),
+        ("☀️", "Pay off in summer", "No heat needed = paying just to mine.", "yellow")]))}
+{G.section("h-4", "Before you buy", G.cards([
+        ("📐", "Size", "300–800 W: small or medium room. 1,500 W: a full space heater on high.", "orange"),
+        ("⚡", "Circuit", "A US 15 A, 120 V circuit carries about 1,440 W continuously.", "yellow"),
+        ("📦", "Stock", "Many sell out before winter.", "green")]))}
+{buy_box(picks, "Heater miners, best price today")}
+{G.faq(faq, esc)}
+{G.more([("/best/heating-a-room/", "Best for heating a room"), ("/heat-calculator/", "Which one fits my room?"), ("/guides/bitcoin-mining-heat-your-home/", "Miner vs space heater vs heat pump"), ("/heater-miners/", "All heater miners")])}
 </article>"""
-    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "How a Bitcoin heater miner works", desc)], lastmod=GUIDE_UPDATED, og_type="article")
+    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "How a Bitcoin heater miner works", desc), faq_ld(faq)], lastmod=GUIDES_REFRESHED, og_type="article")
 
 
 def build_guide_pool():
@@ -2407,28 +2501,31 @@ def build_guide_pool():
     title = "Solo vs pool mining, explained simply | Bitaxe Radar"
     desc = "Solo vs pool Bitcoin mining in plain words: solo is a lottery for a whole block, pool pays small steady amounts. Which suits a Bitaxe or a heater miner."
     ex = [m for m in ("bitaxe-gamma", "avalon-nano-3s", "avalon-mini-3", "avalon-q") if m in TRACKED]
-    rows = "".join(f'<tr><td><a href="/models/{m}/">{esc(SHORT[m])}</a></td><td class="num">≈{MODELS[m]["hashrate_ths"]:g} TH/s</td><td class="num">~{sig2(lottery_years(m))} yrs</td></tr>' for m in ex)
-    tbl = (f'<div class="tablewrap"><table><thead><tr><th>Miner</th><th class="num">Stated hashrate</th><th class="num">Avg. wait for a solo block</th></tr></thead><tbody>{rows}</tbody></table></div>'
-           f'<p class="hint">Illustration only: assumes a network of {NETWORK_EH_ILLUSTRATION:,} EH/s (mempool.space showed {NETWORK_EH_SEEN} on Oct 21, 2026) and 144 blocks a day. '
-           "It's an average: a block could come tomorrow or never, and the network keeps growing, which makes the odds worse.</p>") if ex else ""
+    yrs = {m: lottery_years(m) for m in ex}
+    chart = G.bars([(f'<a href="/models/{m}/">{esc(SHORT[m])}</a><small>≈{MODELS[m]["hashrate_ths"]:g} TH/s</small>', math.log10(yrs[m] + 1),
+                     f"~{sig2(yrs[m])} yrs", "blue") for m in ex], max([math.log10(v + 1) for v in yrs.values()] or [1]),
+                   caption=f"Average wait for one solo block (log scale), assuming a {NETWORK_EH_ILLUSTRATION:,} EH/s network (mempool.space showed {NETWORK_EH_SEEN} on Oct 21, 2026). "
+                           "It's an average: a block could come tomorrow or never.") if ex else ""
+    picks = [("bitaxe-gamma", "The usual solo lottery ticket"), ("avalon-nano-3s", "Quiet desk miner, solo or pool"), ("avalon-mini-3", "Room heater that pool-mines")]
     body = f"""<article>
-<header class="hero"><h1>Solo vs pool mining</h1>
-<p class="lede">Every miner, from a Bitaxe to a heater miner, can run one of two ways. One is a lottery ticket, the other is a small, steady paycheck.</p>
-<p class="meta">Updated <time datetime="{GUIDE_UPDATED}">Oct 21, 2026</time> · 2-minute read</p></header>
-<section aria-labelledby="h-s"><h2 id="h-s">Solo: the lottery</h2>
-<p>Your miner tries to find the next Bitcoin block by itself. If it wins, you get the whole block reward, about 3.125 BTC plus fees. If it doesn't, you get nothing. For a home miner the odds are tiny, but small solo miners have won blocks, and that thrill is why many Bitaxe owners run solo.</p>
-{tbl}</section>
-<section aria-labelledby="h-p"><h2 id="h-p">Pool: the steady paycheck</h2>
-<p>Thousands of miners combine their hashrate in a pool. The pool finds blocks regularly and splits each reward by how much work everyone did, minus a pool fee. You get small, regular payouts instead of all or nothing.</p>
-<p>On average a pool pays about what solo mining would over a very long time, just smoothed out, minus the fee. Pool payouts move with Bitcoin's price and the network's total hashrate, so nobody can promise a fixed amount.</p></section>
-<section aria-labelledby="h-w"><h2 id="h-w">Which should you pick?</h2>
-<ul><li><strong>Bitaxe and other tiny miners:</strong> usually solo. A pool would pay them very little, so the long-shot is the fun part. <a href="/solo-miners/">Best for solo mining</a>.</li>
-<li><strong>Heater miners:</strong> usually pool, so the heat you'd pay for anyway earns a little back. <a href="/pool-miners/">Best for pool mining</a> · <a href="/heater-miners/">Heater miners</a>.</li>
-<li><strong>You can switch anytime.</strong> It's a setting in the miner (the pool address), not a different device.</li></ul></section>
-<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/bitcoin-mining-pools/">Which mining pool should I use?</a></li><li><a href="/guides/how-heater-miners-work/">How a heater miner works</a></li><li><a href="/miners/">All miner prices</a></li><li><a href="/#miners">Bitaxe prices</a></li></ul>
-<p class="hint">Not financial advice. Mining costs electricity, and earnings aren't guaranteed.</p></section>
+{G.hero("Solo vs pool mining", "Every miner can run one of two ways. One is a lottery ticket, the other a small, steady paycheck.", g_chips(1, live=True), hero_img("bitaxe-gamma"))}
+{G.tldr(["<b>Solo:</b> find a whole block yourself (about 3.125 BTC plus fees) or get nothing.",
+         "<b>Pool:</b> share the work with thousands of miners and get small, regular payouts, minus a fee.",
+         "Tiny miners usually go solo. Heater miners usually pool. You can switch anytime."])}
+{G.section("h-s", "The two ways, in one picture", G.fig(G.solo_pool_svg(), "Same miner, same odds of finding a block. Only the payout changes."))}
+{G.section("h-p", "Side by side", G.vs(
+        ("🎟", "Solo", "The lottery", ["Whole block reward, or nothing", "Tiny odds, but small miners have won"], "orange"),
+        ("🤝", "Pool", "The steady paycheck", ["Small payouts for the work you did", "Minus a pool fee (often about 2%)"], "blue")))}
+{G.section("h-odds", "How long is the solo wait?", chart)}
+{G.section("h-w", "Which should you pick?", G.cards([
+        ("🟧", "Bitaxe and tiny miners", 'Usually solo. A pool would pay them very little. <a href="/solo-miners/">Best for solo</a>', "orange"),
+        ("🔥", "Heater miners", 'Usually pool, so heat you\'d pay for anyway earns a little back. <a href="/pool-miners/">Best for pool</a>', "red"),
+        ("🔁", "Switch anytime", "It's a setting in the miner (the pool address), not a different device.", "green")]))}
+{buy_box(picks)}
+{G.more([("/guides/bitcoin-mining-pools/", "Which mining pool should I use?"), ("/guides/how-heater-miners-work/", "How a heater miner works"), ("/solo-odds/", "Solo odds calculator"), ("/miners/", "All miner prices")],
+        "Not financial advice. Earnings aren't guaranteed.")}
 </article>"""
-    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Solo vs pool mining, explained simply", desc)], lastmod=GUIDE_UPDATED, og_type="article")
+    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Solo vs pool mining, explained simply", desc)], lastmod=GUIDES_REFRESHED, og_type="article")
 
 
 def build_guide_worth():
@@ -2439,44 +2536,46 @@ def build_guide_worth():
     if not (NET and NET_OK):
         return
     ex = [m for m in ("bitaxe-gamma", "nerdqaxe-pp", "avalon-nano-3s", "hammer-thor-p2", "gekko-kbox-22", "gekko-kbeast-50", "avalon-mini-3", "avalon-q") if m in TRACKED]
+    be = {m: E.breakeven_rate(MODELS[m]["hashrate_ths"], mine_watts(m), NET) for m in ex}
     rows = "".join(f'<tr><td><a href="/models/{m}/">{esc(SHORT[m])}</a></td><td class="num">{E.fmt_usd(earn(m)["pool"]["usd_month_shown"])}</td>'
                    f'<td class="num" data-calc="power"{calc_attrs(m)}>{E.fmt_usd(earn(m)["power"])}</td>'
                    f'<td class="num net {net_cls(m)}" data-calc="netnum"{calc_attrs(m)}>{E.net_short(MODELS[m]["hashrate_ths"], mine_watts(m), NET)}</td>'
-                   f'<td class="num">{E.fmt_rate(E.breakeven_rate(MODELS[m]["hashrate_ths"], mine_watts(m), NET))}</td></tr>' for m in ex)
+                   f'<td class="num">{E.fmt_rate(be[m])}</td></tr>' for m in ex)
     tbl = (f'<div class="tablewrap"><table class="calc-tbl"><thead><tr><th>Miner</th><th class="num">Pool /mo</th><th class="num">Power /mo</th><th class="num">Net /mo</th><th class="num">Break-even /kWh</th></tr></thead>'
-           f'<tbody>{rows}</tbody></table></div>')
+           f'<tbody>{rows}</tbody></table></div>'
+           f'<p class="hint">Pool estimate minus a 2% fee and a 10% safety margin. Power 24/7 at full draw. {EARN_NOTE}</p>')
+    chart = G.bars([(f'<a href="/models/{m}/">{esc(SHORT[m])}</a>', be[m], f"{E.fmt_rate(be[m])}", "green" if be[m] >= E.POWER_RATE else "orange") for m in ex],
+                   max(max(be.values()), E.POWER_RATE) * 1.1, marker=(E.POWER_RATE, f"Example power price: {E.fmt_rate(E.POWER_RATE)}/kWh"),
+                   caption="Below its break-even price, a miner's pool estimate covers its power bill.")
     g = "bitaxe-gamma" if "bitaxe-gamma" in TRACKED else ex[0]
     so = E.solo_odds(MODELS[g]["hashrate_ths"], NET)
     h = next((m for m in ("avalon-mini-3", "heatbit-maxi", "avalon-q") if m in TRACKED), None)
-    heat_p = ""
+    heat_txt = "If you'd run electric heat anyway, the power is a cost you'd pay regardless."
     if h:
-        heat_p = (f"<p>Example: the {esc(SHORT[h])} draws about {mine_watts(h):,g} W. An electric space heater of the same size would cost about "
-                  f'<b data-calc="heat"{calc_attrs(h)}>{E.fmt_usd(E.heat_value_month(mine_watts(h)))}</b>/mo to run 24/7 at <span data-calc="rate">{E.fmt_rate(E.POWER_RATE)}</span>/kWh. '
-                  f"The miner makes the same heat and its pool estimate is about {E.fmt_usd(earn(h)['pool']['usd_month_shown'])}/mo back. That's an estimate, and only real if you'd run electric heat anyway.</p>")
-    faq = [("Is home Bitcoin mining worth it?", "Usually not for the money at typical US power prices. A small miner's pool estimate is often less than its power bill. It can make sense with very cheap power, as a heater you'd run anyway, or as a hobby and a solo lottery ticket."),
-           ("What electricity price makes mining break even?", "It depends on the miner's efficiency. Each miner page shows a break-even power price; for the miners we track today it is roughly "
-            f"${min(E.breakeven_rate(MODELS[m]['hashrate_ths'], mine_watts(m), NET) for m in ex):.2f} to ${max(E.breakeven_rate(MODELS[m]['hashrate_ths'], mine_watts(m), NET) for m in ex):.2f} per kWh, and it moves with Bitcoin's price and difficulty."),
-           ("Does a heater miner save money?", "Only against electric resistance heat you'd use anyway. Then the power is heat you'd pay for regardless and the mining is a small rebate. A heat pump or gas heat is usually cheaper per unit of heat.")]
+        heat_txt = (f"{a_an(SHORT[h]).capitalize()} {esc(SHORT[h])} heats like {a_an(str(mine_watts(h)))} {mine_watts(h):,g} W space heater "
+                    f'(<b data-calc="heat"{calc_attrs(h)}>{E.fmt_usd(E.heat_value_month(mine_watts(h)))}</b>/mo at <span data-calc="rate">{E.fmt_rate(E.POWER_RATE)}</span>/kWh) '
+                    f"and pays back about {E.fmt_usd(earn(h)['pool']['usd_month_shown'])}/mo.")
+    faq = [("Is home Bitcoin mining worth it?", "Usually not for the money at typical US power prices. It can make sense with very cheap power, as a heater you'd run anyway, or as a hobby and lottery ticket."),
+           ("What electricity price makes mining break even?", "It depends on the miner. For the miners here it's roughly "
+            f"${min(be.values()):.2f} to ${max(be.values()):.2f} per kWh today, and it moves with Bitcoin's price and difficulty."),
+           ("Does a heater miner save money?", "Only against electric heat you'd use anyway; then mining is a small rebate. A heat pump or gas is usually cheaper heat.")]
+    picks = [("bitaxe-gamma", "Cheap solo lottery ticket"), ("avalon-mini-3", "Mines and heats a room"), ("avalon-nano-3s", "Quiet desk miner and small heater")]
     body = f"""<article>
-<header class="hero"><h1>Is home mining worth it?</h1>
-<p class="lede">Short answer: for the money alone, usually not at typical US power prices. It depends on what you pay for electricity, and whether you want the heat or the lottery.</p>
-<p class="meta">Updated <time datetime="{GUIDE_UPDATED}">Oct 21, 2026</time> · 2-minute read · live numbers</p>
-{rate_box()}</header>
-<section aria-labelledby="h-p"><h2 id="h-p">1. It depends on your power price</h2>
-<p>A miner earns a little bitcoin and spends electricity all day. If the power costs more than the bitcoin is worth, you lose money each month. Type your price above and the table updates.</p>
-{tbl}
-<p class="hint">Pool estimate: share of the network × 144 blocks a day × the block reward, minus a 2% pool fee and a 10% safety margin, rounded down. Power runs 24/7 at full draw. {EARN_NOTE} Reddit commenters often quote about $0.06/kWh as a cut-off; the break-even column shows it varies by miner.</p>
-<p><a href="/miners/#rate">Check every miner at your price →</a></p></section>
-<section aria-labelledby="h-s"><h2 id="h-s">2. Solo mining is a lottery</h2>
-<p>Run solo and a miner either finds a whole block, worth about {block_usd_text(so)} right now, or gets nothing. A {esc(SHORT[g])} has about a 1 in {E.fmt_big(so["one_in_year"])} chance a year. People do win, but plan on paying the power bill for a ticket, not for income. <a href="/guides/solo-vs-pool-mining/">Solo vs pool</a>.</p></section>
-<section aria-labelledby="h-h"><h2 id="h-h">3. Heat changes the math</h2>
-<p>A miner turns almost all its power into heat, like an electric space heater. If you'd heat a room with electric heat anyway, that power is a cost you'd have paid regardless, and the mining earns a little of it back.</p>
-{heat_p}
-<p><a href="/heater-miners/">Heater miners</a> · <a href="/best/heating-a-room/">Best for heating a room</a> · <a href="/guides/how-heater-miners-work/">How heater miners work</a> · <a href="/guides/bitcoin-mining-heat-your-home/">Mining to heat your home</a></p></section>
-<section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
-<section><p class="hint">Not financial advice. Earnings aren't guaranteed and change with Bitcoin's price and network difficulty.</p></section>
+{G.hero("Is home mining worth it?", "For the money alone, usually not at typical US power prices. It comes down to your power price, the heat, or the lottery.", g_chips(2, live=True), hero_img("avalon-mini-3"), rate_box())}
+{G.tldr([f"Break-even power prices today: about <b>${min(be.values()):.2f} to ${max(be.values()):.2f}/kWh</b>. Pay more and you lose money.",
+         "Need the heat anyway? Then mining is a small rebate on it.",
+         "Solo is a lottery ticket, not income."])}
+{G.section("h-p", "It depends on your power price", chart + '<p>Type your price above and the table updates. <a href="/miners/#rate">Check every miner at your price →</a></p>' + tbl)}
+{G.section("h-s", "Three reasons people mine anyway", G.cards([
+        ("🎟", "The lottery", f"A {esc(SHORT[g])} has about a 1 in {E.fmt_big(so['one_in_year'])} chance a year at a block worth about {block_usd_text(so)}.", "orange"),
+        ("🔥", "The heat", heat_txt + ' <a href="/guides/bitcoin-mining-heat-your-home/">Heat your home</a>', "red"),
+        ("⚡", "Cheap or spare power", 'Below break-even, mining beats the bill. <a href="/guides/solar-bitcoin-mining/">Solar</a>', "green")]))}
+{buy_box(picks)}
+{G.faq(faq, esc)}
+{G.more([("/heater-miners/", "Heater miners"), ("/best/heating-a-room/", "Best for heating a room"), ("/solo-odds/", "Solo odds calculator"), ("/price-per-th/", "Price per TH/s")],
+        "Not financial advice. Earnings aren't guaranteed and change with Bitcoin's price and network difficulty.")}
 </article>"""
-    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Is home Bitcoin mining worth it?", desc), faq_ld(faq)], lastmod=GUIDE_UPDATED, og_type="article")
+    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Is home Bitcoin mining worth it?", desc), faq_ld(faq)], lastmod=GUIDES_REFRESHED, og_type="article")
 
 
 # Solar guide (/guides/solar-bitcoin-mining/). Assumptions are stated on the page and sourced:
@@ -2494,55 +2593,49 @@ def solar_panel_kwh_day():
 def build_guide_solar():
     path = "/guides/solar-bitcoin-mining/"
     trail = [("Home", "/"), ("Guides", "/guides/"), ("Solar mining", path)]
-    title = "Can solar power a Bitcoin miner? Panels needed per miner | Bitaxe Radar"
-    desc = "Can you run a Bitaxe or home Bitcoin miner on solar? Plain-words math: how many 400 W panels each miner needs, daytime-only vs batteries, and today's prices."
+    title = "Solar Bitcoin mining at home: how many panels per miner? | Bitaxe Radar"
+    desc = "Solar Bitcoin mining, simply: a Bitaxe runs on one panel, a heater-size miner needs a roof. Panels per miner, battery or daytime-only, and today's prices."
     pk = solar_panel_kwh_day()
-    ex = [m for m in ("bitaxe-gamma", "nerdqaxe-pp", "avalon-nano-3s", "nmqaxe-nexus", "hammer-thor-p2", "avalon-mini-3", "heatbit-maxi", "avalon-q") if m in TRACKED]
+    ex = sorted([m for m in ("bitaxe-gamma", "nerdqaxe-pp", "avalon-nano-3s", "nmqaxe-nexus", "hammer-thor-p2", "avalon-mini-3", "heatbit-maxi", "avalon-q") if m in TRACKED], key=mine_watts)
+    panels = {m: max(1, math.ceil(mine_watts(m) * 24 / 1000 / pk)) for m in ex}
 
-    def price_cell(m):
+    def price_txt(m):
         c = cheapest([o for o in offers_for(m) if in_stock(o)])
-        return f'<a href="/models/{m}/">from ${usd(c):,.0f}</a>' if c else f'<a href="/models/{m}/">see shops</a>'
-    rows = "".join(f'<tr><td><a href="/models/{m}/">{esc(SHORT[m])}</a></td><td class="num">≈{mine_watts(m):,g} W</td>'
-                   f'<td class="num">{mine_watts(m) * 24 / 1000:,.1f}</td><td class="num">{max(1, math.ceil(mine_watts(m) * 24 / 1000 / pk)):,}</td>'
-                   f'<td class="num">{price_cell(m)}</td></tr>' for m in ex)
-    tbl = (f'<div class="tablewrap"><table><thead><tr><th>Miner</th><th class="num">Stated power</th><th class="num">kWh a day (24/7)</th>'
-           f'<th class="num">400 W panels for 24/7*</th><th class="num">Price today</th></tr></thead><tbody>{rows}</tbody></table></div>'
-           f'<p class="hint">*Example only: one {SOLAR_PANEL_W} W panel × {SOLAR_SUN_HOURS} peak sun hours × (1 − {SOLAR_LOSS:.0%} losses) ≈ {pk:.2f} kWh a day. '
-           'Running 24/7 also needs a battery big enough to cover the night, and winter or cloudy days make less. Rounded up to whole panels. '
-           'Prices are the cheapest in-stock listing we found, before shipping and tax.</p>')
+        return f"from ${usd(c):,.0f}" if c else "see shops"
+    chart = G.bars([(f'<a href="/models/{m}/">{esc(SHORT[m])}</a><small>≈{mine_watts(m):,g} W</small>', panels[m],
+                     f"{panels[m]} panel{'s' if panels[m] > 1 else ''}", "green" if panels[m] <= 2 else ("yellow" if panels[m] <= 10 else "orange")) for m in ex],
+                   max(panels.values()) if panels else 1,
+                   caption=f"Panels for 24/7: one {SOLAR_PANEL_W} W panel × {SOLAR_SUN_HOURS} sun hours × (1 − {SOLAR_LOSS:.0%} losses) ≈ {pk:.2f} kWh a day, rounded up. "
+                           f"US sun hours: about 3 to 6.5 a day ({g_ext('https://www.unboundsolar.com/solar-information/sun-hours-us-map', 'map')}); 14% losses is NREL {g_ext('https://pvwatts.nlr.gov/docs/help_system_sysloss.php', 'PVWatts')}' default. Winter makes less.")
     g = "bitaxe-gamma" if "bitaxe-gamma" in TRACKED else (ex[0] if ex else None)
-    small = ""
+    big = next((m for m in ("avalon-mini-3", "avalon-q", "heatbit-maxi") if m in ex), None)
+    tl = ["Yes. Solar can run any miner. The only question is how many panels."]
     if g:
-        small = (f"<p>A {esc(SHORT[g])} draws about {mine_watts(g):,g} W. That's tiny: a single {SOLAR_PANEL_W} W panel in full sun makes many times more than it needs. "
-                 f"Over a whole day it uses about {mine_watts(g) * 24 / 1000:.1f} kWh, which one panel can cover on a decent day, as long as a battery carries it through the night.</p>")
-    faq = [("Can a solar panel run a Bitaxe?", "Yes. A Bitaxe-class miner draws around 15 to 25 W, so one normal home panel makes more than enough in daylight. For night-time mining you need a battery and a charge controller or a small power station."),
-           ("Can I mine only when the sun is out?", "Yes. A miner can be switched on and off, so daytime-only mining with no battery works. It just mines fewer hours, so it earns less and has lower solo odds than running 24/7."),
-           ("Is solar mining free?", "Not quite. The panels and batteries cost money, and power you'd otherwise use in your home or sell back to the grid has value. Solar makes the most sense with spare power you can't use or sell for much."),
-           ("How many panels does a big home miner need?", f"Roughly the miner's watts × 24 hours, divided by what one panel makes in a day. With our example of about {pk:.2f} kWh per {SOLAR_PANEL_W} W panel a day, a 500 W miner needs about 9 panels plus a battery to run around the clock.")]
+        tl.append(f"A {esc(SHORT[g])} (≈{mine_watts(g):,g} W) needs <b>1 panel</b>." + (f" {a_an(SHORT[big]).capitalize()} {esc(SHORT[big])} (≈{mine_watts(big):,g} W) needs about <b>{panels[big]}</b>." if big else ""))
+    tl.append("Mining at night? Add a battery. Otherwise mine in daylight only.")
+    faq = [("Can a solar panel run a Bitaxe?", "Yes. A Bitaxe draws about 15 to 25 W, so one home panel is plenty in daylight. For nights, add a battery or a small power station."),
+           ("Can I mine only when the sun is out?", "Yes. It just mines fewer hours, so it earns less and gets fewer solo chances."),
+           ("Is solar mining free?", "Not quite. Panels and batteries cost money, and power you could use or sell has value. It's best with spare power you can't sell for much."),
+           ("How many panels does a big home miner need?", f"Watts × 24 hours ÷ what one panel makes a day. At about {pk:.2f} kWh per {SOLAR_PANEL_W} W panel, a 500 W miner needs about 9 panels plus a battery for 24/7.")]
+    picks = [(m, f"≈{mine_watts(m):,g} W · {panels[m]} panel{'s' if panels[m] > 1 else ''} for 24/7") for m in ("bitaxe-gamma", "nerdqaxe-pp", "avalon-nano-3s") if m in panels]
     body = f"""<article>
-<header class="hero"><h1>Can solar power a Bitcoin miner?</h1>
-<p class="lede">Short answer: yes. Small miners like a Bitaxe need only one panel. Big heater-size miners need a whole roof, plus batteries if you want them running at night.</p>
-<p class="meta">Updated <time datetime="2026-10-24">Oct 24, 2026</time> · 3-minute read · live prices</p></header>
-<section aria-labelledby="h-1"><h2 id="h-1">1. The simple math</h2>
-<p>Every miner draws a steady number of watts. Run it all day and it uses watts × 24 hours of energy. A solar panel makes its rated watts only in full sun, so what it makes in a day depends on how many hours of strong sun you get.</p>
-<p>Solar people call that <strong>peak sun hours</strong>. Across the US it ranges from about 3 to 6.5 a day depending on where you live (see <a href="https://www.unboundsolar.com/solar-information/sun-hours-us-map" rel="nofollow noopener" target="_blank">this US sun-hours map</a>). Real systems also lose a bit to dust, wiring and shade. NREL's PVWatts calculator uses <a href="https://pvwatts.nlr.gov/docs/help_system_sysloss.php" rel="nofollow noopener" target="_blank">14% losses</a> by default.</p>
-<p>So in our example, one {SOLAR_PANEL_W} W panel with {SOLAR_SUN_HOURS} peak sun hours makes about <strong>{pk:.2f} kWh a day</strong>.</p>
-{tbl}</section>
-<section aria-labelledby="h-2"><h2 id="h-2">2. Small miners: easy</h2>
-{small}
-<p>That makes a Bitaxe a fun first solar project: a panel, a small battery or power station, and a USB-C or 5 V supply. It's a solo lottery ticket powered by the sun. <a href="/solo-odds/">Check the solo odds</a>.</p></section>
-<section aria-labelledby="h-3"><h2 id="h-3">3. Big miners: a roof's worth</h2>
-<p>Heater-size miners draw hundreds of watts or more, so running one 24/7 takes many panels and a large battery. Most home solar owners with a big miner run it in the daytime only, when the panels make more than the house uses, instead of sending that power back to the grid for a low buy-back rate.</p>
-<p>In winter the sun is weaker but you need heat anyway, so a <a href="/heater-miners/">heater miner</a> can still make sense on grid power. <a href="/guides/how-heater-miners-work/">How heater miners work</a> · <a href="/heat-calculator/">Room heat calculator</a>.</p></section>
-<section aria-labelledby="h-4"><h2 id="h-4">4. Daytime only or 24/7?</h2>
-<ul><li><strong>Daytime only:</strong> no battery, cheapest setup. The miner runs fewer hours, so it earns less and gets fewer solo chances.</li>
-<li><strong>24/7 with a battery:</strong> more hours mining, but batteries cost money and lose some energy charging and discharging.</li>
-<li><strong>Grid-tied panels:</strong> if you already have solar on the roof, the real question is what your spare power is worth. Compare it with the break-even power price on each <a href="/miners/">miner page</a>.</li></ul></section>
-<section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
-<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/is-home-mining-worth-it/">Is home mining worth it?</a></li><li><a href="/price-per-th/">Most hashrate per dollar</a></li><li><a href="/miners/">All miner prices</a></li></ul>
-<p class="hint">Not financial advice. These are rough examples; a solar installer or NREL's PVWatts calculator can estimate your own roof. Earnings aren't guaranteed.</p></section>
+{G.hero("Solar Bitcoin mining: how many panels does a miner need?", "Yes, solar can run a miner. A Bitaxe needs one panel. A big heater-size miner needs a whole roof.", g_chips(2, live=True), hero_img("bitaxe-gamma"))}
+{G.tldr(tl)}
+{G.section("h-1", "How the power flows", G.fig(G.solar_svg(pk), "Sun → panel → battery (only for nights) → miner."))}
+{G.section("h-2", "Panels needed for each miner", chart)}
+{G.section("h-3", "Pick your setup", G.cards([
+        ("☀️", "Daytime only", "No battery, cheapest. Fewer hours, so it earns less.", "yellow"),
+        ("🔋", "24/7 with a battery", "Mines all night. Batteries cost money and lose a little energy.", "green"),
+        ("🏠", "Rooftop solar already?", 'Compare your spare power\'s value with each <a href="/miners/">miner\'s</a> break-even price.', "blue")]))}
+{G.section("h-4", "Small miner vs big miner", G.vs(
+        ("🟧", "Bitaxe-size", "A fun first solar project.", ["1 panel is plenty", "Small power station for nights", 'A sun-powered lottery ticket. <a href="/solo-odds/">Odds</a>'], "green"),
+        ("🔥", "Heater-size", "A roof's worth of panels.", ["Hundreds of watts, all day", "Most run daytime only, on surplus", 'Winter: a <a href="/heater-miners/">heater miner</a> on grid power'], "orange")))}
+{buy_box(picks, "Solar-friendly miners, best price today")}
+{G.faq(faq, esc)}
+{G.more([("/guides/is-home-mining-worth-it/", "Is home mining worth it?"), ("/guides/how-heater-miners-work/", "How heater miners work"), ("/price-per-th/", "Most hashrate per dollar"), ("/miners/", "All miner prices")],
+        "Rough examples, not financial advice. A solar installer can size your own roof.")}
 </article>"""
-    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Can solar power a Bitcoin miner?", desc), faq_ld(faq)], lastmod="2026-10-24", og_type="article")
+    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Solar Bitcoin mining: how many panels does a miner need?", desc), faq_ld(faq)], lastmod=GUIDES_REFRESHED, og_type="article")
 
 
 # Heat-reuse guide (/guides/bitcoin-mining-heat-your-home/). The heat-pump comparison uses the US DOE's statement that modern
@@ -2577,52 +2670,43 @@ def build_guide_heat_home():
                    f'<td class="num">{E.fmt_rate(heat_pump_beat_rate(m))}</td><td class="num">{price_cell(m)}</td></tr>' for m in ex)
     tbl = (f'<div class="tablewrap"><table class="calc-tbl"><thead><tr><th>Miner</th><th class="num">Heat (BTU/h)</th><th class="num">Power /mo</th>'
            f'<th class="num">Mining pays back /mo</th><th class="num">Beats a heat pump below</th><th class="num">Price today</th></tr></thead><tbody>{rows}</tbody></table></div>'
-           f'<p class="hint">Running 24/7 at the stated mining watts. Heat = watts × 3.412. "Mining pays back" is the pool estimate, which changes with Bitcoin\'s price and network difficulty. '
-           '"Beats a heat pump below" is the power price under which the miner\'s heat, after the mining payback, costs less than a heat pump making the same heat with about half the electricity. '
-           'Prices are the cheapest in-stock listing we found, before shipping and tax.</p>') if ex else ""
+           '<p class="hint">24/7 at stated watts. "Pays back" is the pool estimate. "Beats a heat pump below": the power price under which the miner\'s heat, after payback, costs less than a heat pump\'s.</p>') if ex else ""
     h = next((m for m in ("avalon-mini-3", "heatbit-maxi", "avalon-q") if m in ex), ex[0] if ex else None)
-    worked = ""
+    chart, tl2 = "", ""
     if h:
         e = earn(h)
         p, back = e["power"], e["pool"]["usd_month_shown"]
-        worked = (f"<p>Take the {esc(SHORT[h])}. It mines at about {mine_watts(h):,g} W, so running it all month costs about "
-                  f"<b>{E.fmt_usd(p)}</b> at {E.fmt_rate(E.POWER_RATE)}/kWh. "
-                  f"{'An' if str(int(mine_watts(h)))[0] == '8' else 'A'} {mine_watts(h):,g} W space heater would cost the same and give the same heat. The miner also pays back about {E.fmt_usd(back)}/mo from pool mining, "
-                  f"so your heat costs about {E.fmt_usd(max(0, p - back))}/mo instead of {E.fmt_usd(p)}.</p>")
+        costs = [("🔌 Electric space heater", p, "red"), (f"⛏️ {esc(SHORT[h])}", max(0, p - back), "orange"), ("♨️ Heat pump", p * HEAT_PUMP_POWER_SHARE, "green")]
+        chart = G.bars([(lab, v, E.fmt_usd(v) + "/mo", tone) for lab, v, tone in costs], p,
+                       caption=f"Heat from {mine_watts(h):,g} W all month at {E.fmt_rate(E.POWER_RATE)}/kWh. Miner = power minus pool estimate. "
+                               f"Heat pump ≈ half the power ({g_ext('https://www.energy.gov/articles/pump-your-savings-heat-pumps', 'US Dept. of Energy')}).")
+        tl2 = f"Example: {a_an(SHORT[h])} {esc(SHORT[h])}'s heat costs about <b>{E.fmt_usd(max(0, p - back))}/mo</b> instead of {E.fmt_usd(p)} for a space heater."
     bw = ""
     if "heatbit-bitwater" in TRACKED:
-        bw = (f'<p>Hot water is the other big heat bill. The <a href="/models/heatbit-bitwater/">Heatbit Bitwater</a> swaps the lower element in an electric tank water heater for mining chips, '
-              "so the tank heats your water while it mines. It's a pre-order that Heatbit says ships in early 2027, and it only fits standard electric tank heaters.</p>")
-    faq = [("Can a Bitcoin miner heat a room?", "Yes. Nearly every watt a miner uses comes out as heat, like an electric space heater, so a 1,000 W miner warms a room about as much as a 1,000 W heater."),
-           ("Is a heater miner cheaper than a space heater?", "Usually a little. Both turn the same power into the same heat, and the miner also earns a small amount from pool mining, so your heat costs a bit less. How much depends on Bitcoin's price and the network."),
-           ("Is a heater miner cheaper than a heat pump?", "Usually not at typical US power prices. The US Department of Energy says a modern heat pump uses about half the electricity of electric resistance heat for the same warmth. The table shows the power price below which each miner wins."),
-           ("What about summer?", "If you don't need the heat, the power is just a mining cost. Most owners turn heater miners down or off in warm months, or run them only on cheap power.")]
+        bw = ("💧", "Hot water", 'The <a href="/models/heatbit-bitwater/">Heatbit Bitwater</a> mines inside an electric water tank. Pre-order, early 2027 per Heatbit.', "blue")
+    faq = [("Can a Bitcoin miner heat a room?", "Yes. Nearly every watt becomes heat, so a 1,000 W miner warms a room like a 1,000 W heater."),
+           ("Is a heater miner cheaper than a space heater?", "Usually a little: same heat for the same power, plus a small pool payback."),
+           ("Is a heater miner cheaper than a heat pump?", "Usually not at typical US power prices. The US Department of Energy says a heat pump uses about half the electricity for the same warmth."),
+           ("What about summer?", "Without a need for heat, the power is just a mining cost. Most owners turn them down or off.")]
+    picks = [("avalon-mini-3", "Medium room, about 800 W"), ("heatbit-maxi", "Bigger room, up to 1,500 W"), ("avalon-nano-3s", "Desk-size warmth")]
     body = f"""<article>
-<header class="hero"><h1>Mining to heat your home</h1>
-<p class="lede">Short answer: a miner heats a room exactly like an electric space heater, and pays a little back while it does. It beats a plain space heater, but usually not a heat pump.</p>
-<p class="meta">Updated <time datetime="2026-10-24">Oct 24, 2026</time> · 3-minute read · live numbers</p>
-{rate_box()}</header>
-<section aria-labelledby="h-1"><h2 id="h-1">1. The heat isn't wasted</h2>
-<p>A mining chip turns almost all of its electricity into heat. In a data center that heat is a problem someone pays to blow away. In your home in winter, it's heat you'd pay for anyway. That's the whole idea: use one bill twice, once for warmth and once for mining.</p>
-{worked}</section>
-<section aria-labelledby="h-2"><h2 id="h-2">2. Heater miners side by side</h2>
-<p>Type your power price above and the power column updates.</p>
-{tbl}
-<p><a href="/heat-calculator/">Which one fits my room?</a> · <a href="/heater-miners/">All heater miners</a></p></section>
-<section aria-labelledby="h-3"><h2 id="h-3">3. What it beats, and what it doesn't</h2>
-<ul><li><strong>Beats a plain electric space heater or baseboard heat:</strong> same power, same heat, plus the mining payback.</li>
-<li><strong>Usually loses to a heat pump:</strong> a heat pump moves heat in from outside instead of making it, and the <a href="https://www.energy.gov/articles/pump-your-savings-heat-pumps" rel="nofollow noopener" target="_blank">US Department of Energy</a> says that cuts electricity for heating by about 50%. A miner only wins with cheap power, as the last column shows.</li>
-<li><strong>Gas heat:</strong> depends on your gas and power prices. Compare your bills before switching.</li></ul></section>
-<section aria-labelledby="h-4"><h2 id="h-4">4. Other ways to reuse the heat</h2>
-{bw}
-<ul><li><strong>Run it only in heating season:</strong> on in the cold months, down or off in summer, so you only pay for heat you want.</li>
-<li><strong>Put it where you need warmth:</strong> a cold bedroom, a home office, a basement or a garage workshop.</li>
-<li><strong>Use a thermostat or low mode:</strong> most heater miners can run cooler, so a big one won't overheat a small room.</li></ul></section>
-<section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
-<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/how-heater-miners-work/">How a heater miner works</a></li><li><a href="/guides/solar-bitcoin-mining/">Can solar power a miner?</a></li><li><a href="/guides/is-home-mining-worth-it/">Is home mining worth it?</a></li><li><a href="/best/heating-a-room/">Best for heating a room</a></li></ul>
-<p class="hint">Not financial advice. These are estimates; mining earnings aren't guaranteed and change with Bitcoin's price and network difficulty. Follow the maker's guidance on circuits and placement.</p></section>
+{G.hero("Mining to heat your home", "A miner heats like an electric space heater and pays a little back. It beats a space heater, but usually not a heat pump.", g_chips(2, live=True), hero_img("heatbit-maxi"), rate_box())}
+{G.tldr(["The heat isn't wasted: use one power bill twice, for warmth and for mining.", tl2 or "Same heat as a space heater, plus a small mining payback.", "A heat pump is usually still cheaper heat."])}
+{G.section("h-1", "Same heat, three ways to pay", chart)}
+{G.section("h-2", "Heater miners side by side", '<p>Type your power price above and the power column updates.</p>' + tbl + '<p><a href="/heat-calculator/">Which one fits my room?</a> · <a href="/heater-miners/">All heater miners</a></p>')}
+{G.section("h-3", "What it beats, and what it doesn't", G.cards([
+        ("✅", "Beats a space heater", "Same heat, plus the mining payback.", "green"),
+        ("♨️", "Usually loses to a heat pump", "Unless your power is cheap.", "blue"),
+        ("🔥", "Gas heat: it depends", "Compare your gas and power prices.", "yellow")]))}
+{G.section("h-4", "Get the most from the heat", G.cards([c for c in (bw,) if c] + [
+        ("🗓️", "Heating season only", "Down or off in summer.", "orange"),
+        ("🛏️", "Where you need warmth", 'Cold office, basement or bedroom. <a href="/guides/how-heater-miners-work/#h-safe">Safety</a>', "purple")]))}
+{buy_box(picks, "Heater miners, best price today")}
+{G.faq(faq, esc)}
+{G.more([("/guides/how-heater-miners-work/", "How a heater miner works"), ("/guides/solar-bitcoin-mining/", "Can solar power a miner?"), ("/guides/is-home-mining-worth-it/", "Is home mining worth it?"), ("/best/heating-a-room/", "Best for heating a room")],
+        "Estimates, not financial advice. Follow the maker's guidance on circuits and placement.")}
 </article>"""
-    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Mining Bitcoin to heat your home", desc), faq_ld(faq)], lastmod="2026-10-24", og_type="article")
+    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Mining Bitcoin to heat your home", desc), faq_ld(faq)], lastmod=GUIDES_REFRESHED, og_type="article")
 
 
 # Pool guide (/guides/bitcoin-mining-pools/). Pool facts as published on each pool's own page, checked 2026-10-26:
@@ -2656,12 +2740,11 @@ def build_guide_pools():
     trail = [("Home", "/"), ("Guides", "/guides/"), ("Which pool?", path)]
     title = "Best Bitcoin mining pool for a Bitaxe or home miner (fees compared) | Bitaxe Radar"
     desc = "Which Bitcoin mining pool should a home miner use? Public Pool, CKPool, Parasite, OCEAN and Braiins compared: fees, payouts and live sats per miner."
-    # data-label = column name shown above each value when the row becomes a card on phones (.pool-tbl in style.css)
     prow = "".join(f'<tr><td class="pool-name"><a href="{esc(u)}" rel="nofollow noopener" target="_blank">{esc(n)}</a></td><td data-label="Type">{esc(t)}</td>'
-                   f'<td data-label="Fee">{esc(f)}</td><td class="pool-wide" data-label="How you get paid">{esc(how)}</td><td class="pool-wide" data-label="Good for">{esc(best)}</td></tr>'
+                   f'<td data-label="Fee">{esc(f)}</td><td class="pool-wide" data-label="How you get paid">{esc(how)}</td></tr>'
                    for n, u, t, f, how, best in POOLS)
-    ptbl = (f'<div class="tablewrap pool-wrap"><table class="pool-tbl"><thead><tr><th>Pool</th><th>Type</th><th>Fee</th><th>How you get paid</th><th>Good for</th></tr></thead><tbody>{prow}</tbody></table></div>'
-            f'<p class="hint">Fees and payout rules as each pool states them on its own site, checked <time datetime="{POOLS_CHECKED}">Oct 26, 2026</time>. Parasite Pool\'s rules are as reported by CoinDesk (Apr 2026). Pools can change their terms, so check before you switch. Bitcoin only.</p>')
+    ptbl = (f'<div class="tablewrap pool-wrap"><table class="pool-tbl"><thead><tr><th>Pool</th><th>Type</th><th>Fee</th><th>How you get paid</th></tr></thead><tbody>{prow}</tbody></table></div>'
+            f'<p class="hint">From each pool\'s own site, checked <time datetime="{POOLS_CHECKED}">Oct 26, 2026</time>; Parasite\'s rules per CoinDesk (Apr 2026). Terms can change.</p>')
     ex = [m for m in ("bitaxe-gamma", "nerdqaxe-pp", "avalon-nano-3s", "avalon-mini-3", "avalon-q") if m in TRACKED]
 
     def sats(btc):
@@ -2678,58 +2761,46 @@ def build_guide_pools():
                     f'<td class="num" data-label="Avg. wait for a solo block">{E.fmt_wait(1 / E.solo_rate(th, NET))}</td></tr>')
     ltbl = (f'<div class="tablewrap pool-wrap"><table class="pool-tbl"><thead><tr><th>Miner</th><th class="num">Stated hashrate</th><th class="num">Shared pool, per day</th>'
             f'<th class="num">To reach OCEAN\'s payout</th><th class="num">Avg. wait for a solo block</th></tr></thead><tbody>{"".join(rows)}</tbody></table></div>'
-            f'<p class="hint">Live estimate from mempool.space network data (BTC ≈ ${NET["btc_usd"]:,.0f}, network ≈ {NET["network_hashrate_hs"] / 1e18:,.0f} EH/s). '
-            "Shared-pool sats use Braiins' 2.5% fee, the OCEAN column its 2% fee, both with a 10% safety margin, so real payouts can be a bit higher or lower and change every day. "
-            "The solo wait is an average: a block could come tomorrow or never.</p>") if rows else ""
+            f'<p class="hint">Live estimate (BTC ≈ ${NET["btc_usd"]:,.0f}, network ≈ {NET["network_hashrate_hs"] / 1e18:,.0f} EH/s, mempool.space). '
+            "Braiins' 2.5% fee, OCEAN's 2%, 10% safety margin. Payouts vary daily.</p>") if rows else ""
     g = "bitaxe-gamma" if "bitaxe-gamma" in TRACKED else (ex[0] if ex else None)
     gline = ""
     if g:
         so = E.solo_odds(MODELS[g]["hashrate_ths"], NET)
-        gline = (f"<p>Example: a {esc(SHORT[g])} has about a 1 in {E.fmt_big(so['one_in_year'])} chance a year of finding a block. "
-                 f"Solo, that win is the whole reward, about {block_usd_text(so)} minus any fee. On Parasite Pool the same win pays 1 BTC, "
-                 "and each time the pool finds a block you also get a small share of it. Same odds, different prize.</p>")
-    picks = []
-    for m, why in (("bitaxe-gamma", "the usual first solo miner"), ("avalon-nano-3s", "a quiet desk miner and small heater"), ("avalon-mini-3", "a room heater that pool-mines")):
-        if m in TRACKED and STATS[m]["best"]:
-            o = STATS[m]["best"]
-            picks.append(f'<li><p><a href="/models/{m}/"><b>{esc(SHORT[m])}</b></a>: {esc(why)}. From {money(o["price"], o["currency"])} at {esc(sname(o["seller"]))} today.</p>{offer_link(o, "Go to " + sname(o["seller"]) + " ↗", cls="btn ghost")}</li>')
-    pick_sec = (f'<section aria-labelledby="h-buy"><h2 id="h-buy">Still picking a miner?</h2><ul class="pool-picks">{"".join(picks)}</ul>'
-                '<p><a href="/solo-miners/">Best for solo</a> · <a href="/pool-miners/">Best for pool</a> · <a href="/find-my-miner/">Find my miner</a></p></section>') if picks else ""
-    faq = [("What is the best mining pool for a Bitaxe?", "Most Bitaxe owners mine solo, because a shared pool pays a tiny miner only a few sats a day. Public Pool (no fee) and Solo CKPool (2% of a block you find) are the common solo picks. Parasite Pool is a middle ground: 1 BTC if your miner finds the block, plus a share of every block the pool finds."),
-           ("Which pool should a heater miner use?", "Usually a shared pool, so the heat you'd pay for anyway earns a little back each day. An FPPS pool like Braiins pays daily whether or not it found a block. OCEAN pays from the blocks it finds, once you pass its payout threshold."),
-           ("Does the pool change my chance of finding a block?", "No. Your chance depends on your miner's hashrate versus the whole network. The pool only decides how a block's reward is shared and what fee you pay."),
-           ("Can I switch pools?", "Yes, anytime. It's a setting in your miner (the pool address and your Bitcoin address). Most miners also have a fallback pool setting in case the main one goes down."),
-           ("Do I need an account?", "Not for Public Pool, Solo CKPool or OCEAN: you use your Bitcoin address as the username. Braiins Pool uses an account.")]
+        gline = (f'<p class="hint">A {esc(SHORT[g])}: about 1 in {E.fmt_big(so["one_in_year"])} a year. Solo, a win pays the whole block (about {block_usd_text(so)}); on Parasite, 1 BTC. Same odds, different prize.</p>')
+    faq = [("What is the best mining pool for a Bitaxe?", "Most Bitaxe owners mine solo on Public Pool (no fee) or Solo CKPool (2% of a block you find). Parasite Pool is a middle ground."),
+           ("Which pool should a heater miner use?", "Usually a shared pool. Braiins (FPPS) pays daily; OCEAN pays from its blocks once you pass its threshold."),
+           ("Does the pool change my chance of finding a block?", "No. That depends on your hashrate versus the network. The pool only decides how rewards are shared."),
+           ("Can I switch pools?", "Yes, anytime. It's a setting in your miner. Set a fallback pool too."),
+           ("Do I need an account?", "Not for Public Pool, Solo CKPool or OCEAN: your Bitcoin address is the username. Braiins uses an account.")]
+    picks = [("bitaxe-gamma", "The usual first solo miner"), ("avalon-nano-3s", "Quiet desk miner and small heater"), ("avalon-mini-3", "Room heater that pool-mines")]
     body = f"""<article>
-<header class="hero"><h1>Which mining pool should I use?</h1>
-<p class="lede">Short answer: tiny miners like a Bitaxe usually go solo, heater miners usually join a shared pool, and a hybrid pool sits in between. Here's how the popular Bitcoin pools compare.</p>
-<p class="meta">Updated <time datetime="{POOLS_CHECKED}">Oct 26, 2026</time> · 3-minute read · live numbers</p></header>
-<section aria-labelledby="h-1"><h2 id="h-1">1. Three kinds of pool</h2>
-<ul><li><strong>Solo:</strong> your miner works alone. Find a block and you keep the whole reward; otherwise you get nothing. A lottery ticket.</li>
-<li><strong>Shared:</strong> thousands of miners split every block the pool finds, minus a fee. Small, steady payouts.</li>
-<li><strong>Hybrid:</strong> the miner that finds a block gets a big prize, and everyone else shares the rest.</li></ul>
-<p>The pool never changes your odds of finding a block. It only decides who gets paid what. <a href="/guides/solo-vs-pool-mining/">Solo vs pool, in plain words</a>.</p></section>
-<section aria-labelledby="h-2"><h2 id="h-2">2. Popular pools side by side</h2>
-{ptbl}</section>
-<section aria-labelledby="h-3"><h2 id="h-3">3. What each choice means for your miner</h2>
-<p>How many sats a shared pool would pay each miner, how long it takes to reach OCEAN's payout threshold, and the average wait for a solo block.</p>
-{ltbl}
-{gline}</section>
-<section aria-labelledby="h-4"><h2 id="h-4">4. Which should you pick?</h2>
-<ul><li><strong>Bitaxe or another tiny miner:</strong> solo on Public Pool or Solo CKPool, or Parasite Pool if you'd like a few sats along the way. A shared pool pays these miners only pennies.</li>
-<li><strong>Desk miner (5–10 TH/s):</strong> either. Solo is still a long shot; a shared pool like Braiins pays a small amount every day over Lightning (see the table).</li>
-<li><strong>Heater miner:</strong> a shared pool, so your heat earns a little back. Braiins for daily payouts, OCEAN if you're fine waiting for its threshold.</li></ul></section>
-<section aria-labelledby="h-5"><h2 id="h-5">5. Safety tips</h2>
-<ul><li><strong>Use your own Bitcoin address</strong> from a wallet you control. Never type in an address someone sends you.</li>
-<li><strong>Set a fallback pool.</strong> New pools sometimes go offline, so give your miner a second pool to switch to.</li>
-<li><strong>Watch for hidden fees in firmware.</strong> Some modified firmware on used miners sends part of your hashrate elsewhere. Stick to the maker's firmware or open-source builds.</li>
-<li><strong>Be wary of "pools" that sell tokens or cloud contracts.</strong> A real Bitcoin pool just needs your miner and your address.</li></ul></section>
-{pick_sec}
-<section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
-<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a></li><li><a href="/solo-odds/">Solo odds calculator</a></li><li><a href="/solo-wins/">Recent solo block wins</a></li><li><a href="/guides/is-home-mining-worth-it/">Is home mining worth it?</a></li></ul>
-<p class="hint">Not financial advice. We're not paid by any pool. Earnings aren't guaranteed and change with Bitcoin's price and network difficulty.</p></section>
+{G.hero("Which mining pool should I use?", "Tiny miners usually go solo, heater miners join a shared pool, and hybrid pools sit in between.", g_chips(2, checked=f'Pools checked <time datetime="{POOLS_CHECKED}">Oct 26, 2026</time>'), hero_img("bitaxe-gamma"))}
+{G.tldr(["<b>Bitaxe:</b> solo on Public Pool (no fee) or Solo CKPool (2% of a block you find).",
+         "<b>Heater miner:</b> a shared pool like Braiins (daily payouts) or OCEAN.",
+         "The pool never changes your odds. It only decides who gets paid what."])}
+{G.section("h-1", "Three kinds of pool", G.cards([
+        ("🎟", "Solo", "Whole block reward, or nothing.", "orange"),
+        ("🤝", "Shared", "Everyone splits every block, minus a fee.", "blue"),
+        ("🎯", "Hybrid", "Big prize for the finder, shares for the rest.", "purple")])
+        + '<p><a href="/guides/solo-vs-pool-mining/">Solo vs pool, in one picture →</a></p>')}
+{G.section("h-2", "Popular pools side by side", ptbl)}
+{G.section("h-3", "What each choice pays your miner", ltbl + gline)}
+{G.section("h-4", "Which should you pick?", G.cards([
+        ("🟧", "Bitaxe or tiny miner", "Solo: Public Pool or Solo CKPool. Parasite for a few sats too.", "orange"),
+        ("🖥️", "Desk miner (5–10 TH/s)", "Either. Braiins pays a little daily over Lightning.", "green"),
+        ("🔥", "Heater miner", "Shared: Braiins (daily) or OCEAN (threshold).", "red")]))}
+{G.section("h-5", "Stay safe", G.cards([
+        ("🔑", "Your own address", "From a wallet you control. Never one someone sends you.", "green"),
+        ("🛟", "Set a fallback pool", "In case the first goes offline.", "blue"),
+        ("🕵️", "Hidden firmware fees", "Use official open-source firmware.", "yellow"),
+        ("🚩", "Skip token 'pools'", "A real pool needs only your miner and address.", "red")]))}
+{buy_box(picks, "Still picking a miner? Best price today")}
+{G.faq(faq, esc)}
+{G.more([("/guides/is-my-bitaxe-normal/", "Is my Bitaxe normal?"), ("/solo-odds/", "Solo odds calculator"), ("/solo-wins/", "Recent solo block wins"), ("/guides/is-home-mining-worth-it/", "Is home mining worth it?")],
+        "Not financial advice. We're not paid by any pool.")}
 </article>"""
-    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Which Bitcoin mining pool should I use?", desc), faq_ld(faq)], lastmod=POOLS_CHECKED, og_type="article")
+    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Which Bitcoin mining pool should I use?", desc), faq_ld(faq)], lastmod=GUIDES_REFRESHED, og_type="article")
 
 
 # "Is my Bitaxe normal?" guide (/guides/is-my-bitaxe-normal/). Stock numbers come from the open-source AxeOS firmware
@@ -2779,67 +2850,49 @@ def build_guide_normal():
     tbl = (f'<div class="tablewrap pool-wrap"><table class="pool-tbl"><thead><tr><th>Board</th><th>Chip</th><th class="num">Stock settings</th>'
            f'<th class="num">Expected at stock</th><th class="num">Self-test pass mark</th><th class="num">Seller-stated power</th><th class="num">Power input</th></tr></thead>'
            f'<tbody>{"".join(rows)}</tbody></table></div>'
-           f'<p class="hint">Stock frequency, voltage and the expected-hashrate formula (frequency × cores × chips) are from the open-source '
-           f'<a href="{AXEOS_SRC}" rel="nofollow noopener" target="_blank">AxeOS firmware (ESP-Miner)</a>, checked <time datetime="{AXEOS_CHECKED}">Oct 28, 2026</time>. '
-           "The pass mark is the share of that number the firmware's own self-test asks for. Power is what sellers state for the model, so your reading can differ a little. "
-           "Shop listings often quote higher hashrates than these because they assume a higher frequency.</p>")
-    picks = []
-    for m, why in (("bitaxe-gamma", "the usual first miner"), ("bitaxe-gt-801", "two chips, about twice the hashrate"), ("bitaxe-naja-duo", "the newest two-chip board")):
-        if m in TRACKED and STATS[m]["best"]:
-            o = STATS[m]["best"]
-            picks.append(f'<li><p><a href="/models/{m}/"><b>{esc(SHORT[m])}</b></a>: {esc(why)}. New from {money(o["price"], o["currency"])} at {esc(sname(o["seller"]))} today.</p>'
-                         f'{offer_link(o, "Go to " + sname(o["seller"]) + " ↗", cls="btn ghost")}</li>')
-    pick_sec = (f'<section aria-labelledby="h-new"><h2 id="h-new">Thinking of buying used? Check today\'s new price first</h2>'
-                "<p>A used miner usually comes without the shop's warranty, so compare its price with a new one. Here's what new costs today:</p>"
-                f'<ul class="pool-picks">{"".join(picks)}</ul><p><a href="/where-to-buy-bitaxe/">Every shop, ranked by today\'s price</a> · <a href="/alerts/">Get a price-drop alert</a></p></section>') if picks else ""
+           f'<p class="hint">From the open-source {g_ext(AXEOS_SRC, "AxeOS firmware (ESP-Miner)")} (frequency × cores × chips), checked <time datetime="{AXEOS_CHECKED}">Oct 28, 2026</time>. Pass mark = the firmware self-test.</p>')
+    gx = axeos_expected_ghs(525, 2040, 1)
     faq = [("Why is my Bitaxe Gamma under 1.2 TH/s?",
-            "At stock settings (525 MHz) the firmware expects about 1.07 TH/s from a Gamma 601 or 602. Many listings quote 1.2 TH/s or more, which assumes a higher frequency. "
-            "Look at the 10-minute or 1-hour average, not the live number, which jumps around."),
+            "At stock (525 MHz) the firmware expects about 1.07 TH/s. Listings quoting 1.2+ assume a higher frequency. Check the 10-minute average."),
            ("What temperature is normal for a Bitaxe?",
-            f"AxeOS's automatic fan aims for an ASIC temperature of {AXEOS_TEMP_TARGET}°C by default, so readings around there are by design. "
-            f"If the ASIC goes above {AXEOS_ASIC_STOP}°C, or the voltage regulator above {AXEOS_VR_STOP}°C, the firmware stops mining and runs the fan at full speed."),
+            f"The auto fan aims for {AXEOS_TEMP_TARGET}°C. Above {AXEOS_ASIC_STOP}°C on the chip, or {AXEOS_VR_STOP}°C on the regulator, it stops mining."),
            ("What does the error percentage mean?",
-            "It's the share of the chip's work that came back wrong. A small number is normal. A high or rising number usually means the chip is too hot, or the voltage is too low for the frequency it's set to."),
+            "Work that came back wrong. Small is normal; high or rising usually means too hot or too little voltage."),
            ("Does a higher best difficulty mean I'm closer to a block?",
-            "No. Every share is a fresh draw, so past shares don't move you closer. The solo odds page shows what your best difficulty means next to the network's."),
+            "No. Every share is a fresh draw."),
            ("Is a used Bitaxe worth it?",
-            "It can be, if it hits the stock numbers above, runs official open-source firmware and the price is well under a new one. Check the pool settings yourself before you trust it.")]
+            "If it hits the stock numbers, runs official firmware and costs well under new. Re-enter the pool settings yourself.")]
+    picks = [("bitaxe-gamma", "The usual first miner"), ("bitaxe-gt-801", "Two chips, about twice the hashrate"), ("bitaxe-naja-duo", "The newest two-chip board")]
     body = f"""<article>
-<header class="hero"><h1>Is my Bitaxe normal?</h1>
-<p class="lede">Just got a Bitaxe, new or used, and not sure the numbers look right? Here are the stock numbers from the Bitaxe's own firmware, board by board, and what to check first.</p>
-<p class="meta">Updated <time datetime="{AXEOS_CHECKED}">Oct 28, 2026</time> · 4-minute read</p></header>
-<section aria-labelledby="h-1"><h2 id="h-1">1. The one-minute check</h2>
-<p>Open your miner's dashboard (type its IP address into a browser on the same Wi-Fi). Look at five things:</p>
-<ul><li><strong>Hashrate:</strong> use the 10-minute or 1-hour average. The live number swings a lot.</li>
-<li><strong>ASIC temperature:</strong> the automatic fan aims for {AXEOS_TEMP_TARGET}°C by default.</li>
-<li><strong>Power:</strong> close to the seller-stated figure in the table below.</li>
-<li><strong>Frequency and core voltage</strong> (Settings): stock values are in the table. A used miner may have been overclocked.</li>
-<li><strong>Pool and fallback pool</strong> (Settings): both should be pools you chose, paying a Bitcoin address you own.</li></ul></section>
-<section aria-labelledby="h-2"><h2 id="h-2">2. Stock numbers for each Bitaxe</h2>
-<p>At stock settings, a healthy board's average hashrate lands near "Expected at stock". The firmware's own self-test passes a board that reaches the pass mark.</p>
-{tbl}</section>
-<section aria-labelledby="h-3"><h2 id="h-3">3. Hashrate lower than it should be?</h2>
-<ol><li><strong>Wait 10 minutes</strong> and read the average, not the live number.</li>
-<li><strong>Check the power supply.</strong> The 600-series and older boards run on 5 V; the 801, 1201 and 1300 run on 12 V. A weak or wrong supply is a common cause of low hashrate and restarts.</li>
-<li><strong>Put settings back to stock</strong> (table above). Overclocks from a previous owner can make a chip unstable.</li>
-<li><strong>Check the fan and heatsink.</strong> Dust, a loose heatsink or dried-out thermal paste make the chip run hot and slow.</li>
-<li><strong>Update to the latest official AxeOS</strong> from the <a href="{AXEOS_SRC}/releases" rel="nofollow noopener" target="_blank">ESP-Miner releases page</a>.</li></ol></section>
-<section aria-labelledby="h-4"><h2 id="h-4">4. Running hot?</h2>
-<ul><li>Around {AXEOS_TEMP_TARGET}°C with the fan on auto is normal: that's what the fan aims for.</li>
-<li>Above {AXEOS_ASIC_STOP}°C on the chip (or {AXEOS_VR_STOP}°C on the voltage regulator), AxeOS stops mining, sets the fan to 100% and shows an overheat message. Fix the cooling before you turn it back on.</li>
-<li>Give it open air: not in a cupboard, not against a wall, not in direct sun.</li>
-<li>A louder fan is the trade-off for a cooler chip. Lowering the frequency a little cuts both heat and noise.</li></ul></section>
-<section aria-labelledby="h-5"><h2 id="h-5">5. Bought it used? Check these too</h2>
-<ul><li><strong>Firmware:</strong> the System page shows the version. Official AxeOS is open source; if it's a build you can't find on the releases page, reflash the official one.</li>
-<li><strong>Hidden fees:</strong> some modified firmware on resold miners sends part of the hashrate to someone else. Official firmware plus your own pool settings avoids this.</li>
-<li><strong>Pool settings:</strong> re-enter the pool, the fallback pool and your own Bitcoin address yourself.</li>
-<li><strong>Power supply:</strong> make sure it came with the right one (5 V or 12 V, see the table) and that it isn't a no-name brick that runs hot.</li></ul></section>
-{pick_sec}
-<section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
-<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/bitaxe-setup/">First-hour setup checklist</a></li><li><a href="/guides/bitaxe-firmware/">Bitaxe firmware compared</a></li><li><a href="/solo-odds/#h-best">What your best difficulty means</a></li><li><a href="/guides/bitcoin-mining-pools/">Which mining pool should I use?</a></li><li><a href="/guides/is-home-mining-worth-it/">Is home mining worth it?</a></li><li><a href="/guides/bitaxe-monitoring-apps/">Apps to monitor your Bitaxe</a></li></ul>
-<p class="hint">General guidance only. Follow the maker's instructions for your board and power supply. We're not paid by any firmware project.</p></section>
+{G.hero("Is my Bitaxe normal?", "New or used and not sure the numbers look right? Check them against the stock numbers in the Bitaxe's own firmware.", g_chips(2, checked=f'Firmware checked <time datetime="{AXEOS_CHECKED}">Oct 28, 2026</time>'), hero_img("bitaxe-gamma"))}
+{G.tldr([f"A Gamma at stock lands near <b>≈{fmt_ghs(gx)}</b> (10-minute average), not the 1.2+ TH/s many listings quote.",
+         f"The fan aims for <b>{AXEOS_TEMP_TARGET}°C</b>. Above {AXEOS_ASIC_STOP}°C the chip stops mining to protect itself.",
+         "Bought used? Re-enter the pool and your own Bitcoin address yourself."])}
+{G.section("h-1", "The one-minute check", "<p>Type the miner's IP address into a browser on the same Wi-Fi, then look at:</p>" + G.steps([
+        ("📈", "Hashrate", "Use the 10-minute or 1-hour average. The live number swings."),
+        ("🌡️", "ASIC temp", f"The auto fan aims for {AXEOS_TEMP_TARGET}°C."),
+        ("⚡", "Power", "Close to the seller-stated figure below."),
+        ("🎛️", "Frequency and voltage", "Stock values are below. A used miner may be overclocked."),
+        ("🏊", "Pool and fallback", "Both pools you chose, paying your own address.")]))}
+{G.section("h-temp", "What the temperatures mean", G.fig(G.temp_scale_svg(AXEOS_TEMP_TARGET, AXEOS_ASIC_STOP, AXEOS_VR_STOP), "From the AxeOS firmware defaults. Above the stop points it mines nothing and runs the fan at 100%."))}
+{G.section("h-2", "Stock numbers for each Bitaxe", tbl)}
+{G.section("h-3", "Hashrate too low? Try these in order", G.steps([
+        ("Wait 10 minutes", "Read the average, not the live number."),
+        ("Check the power supply", 'The 600-series and older run on 5 V; the 801, 1201 and 1300 on 12 V. <a href="/guides/bitaxe-power-supply/">Which supply?</a>'),
+        ("Back to stock settings", "A previous owner's overclock can make a chip unstable."),
+        ("Clean the cooling", "Dust, a loose heatsink or dry thermal paste make it hot and slow."),
+        ("Update AxeOS", f'Get the latest official build from the {g_ext(AXEOS_SRC + "/releases", "releases page")}.')]))}
+{G.section("h-5", "Bought it used? Check these too", G.cards([
+        ("💾", "Firmware", 'Official AxeOS is open source. Can\'t find the version on the releases page? Reflash it. <a href="/guides/bitaxe-firmware/">Firmware guide</a>', "blue"),
+        ("🕵️", "Hidden fees", "Modified firmware can send part of your hashrate to someone else.", "red"),
+        ("🔑", "Pool settings", "Re-enter the pool, fallback and your own address yourself.", "green"),
+        ("🔌", "Power supply", "Right voltage (5 V or 12 V) and not a no-name brick that runs hot.", "yellow")]))}
+{buy_box(picks, "Buying used? Check today's new price first", "A used miner usually has no shop warranty. ")}
+{G.faq(faq, esc)}
+{G.more([("/guides/bitaxe-setup/", "First-hour setup checklist"), ("/guides/bitaxe-firmware/", "Bitaxe firmware compared"), ("/solo-odds/#h-best", "What your best difficulty means"), ("/guides/bitcoin-mining-pools/", "Which mining pool?"), ("/guides/bitaxe-monitoring-apps/", "Apps to monitor your Bitaxe")],
+        "General guidance only. Follow the maker's instructions. We're not paid by any firmware project.")}
 </article>"""
-    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Is my Bitaxe normal?", desc), faq_ld(faq)], lastmod=AXEOS_CHECKED, og_type="article")
+    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Is my Bitaxe normal?", desc), faq_ld(faq)], lastmod=GUIDES_REFRESHED, og_type="article")
 
 
 # Firmware roundup (/guides/bitaxe-firmware/). Facts come from each project's GitHub repo and latest release (checked Oct 28 2026):
@@ -2868,48 +2921,43 @@ def build_guide_firmware():
     trail = [("Home", "/"), ("Guides", "/guides/"), ("Bitaxe firmware", path)]
     title = "Bitaxe and NerdQaxe firmware compared (AxeOS, AxeForge) | Bitaxe Radar"
     desc = "AxeOS, NerdQAxe, AxeForge and NerdMiner compared: which boards each runs on, license, latest release, and how to update safely."
-    rows, cards = [], []
-    for name, who, repo, lic, ver, date, boards, mids, note, flasher in FIRMWARE:
+    tones = ("orange", "blue", "purple", "green")
+    icons = ("🟧", "🟦", "🧪", "🎲")
+    cards = []
+    for i, (name, who, repo, lic, ver, date, boards, mids, note, flasher) in enumerate(FIRMWARE):
         links = ", ".join(f'<a href="/models/{m}/">{esc(SHORT[m])}</a>' for m in mids if m in TRACKED)
-        rows.append(f'<tr><td class="pool-name"><a href="{repo}" rel="nofollow noopener" target="_blank">{esc(name)}</a></td>'
-                    f'<td data-label="Runs on">{esc(boards)}</td><td data-label="Open source">Yes ({esc(lic)})</td>'
-                    f'<td class="num" data-label="Latest release">{esc(ver)} <small>({esc(date)})</small></td><td data-label="Good to know">{esc(note)}</td></tr>')
-        fl = f' Easiest way to install: the <a href="{flasher}" rel="nofollow noopener" target="_blank">web flasher</a> (works in Chrome or Edge over USB).' if flasher else ""
-        cards.append(f'<h3>{esc(name)}</h3><p>Made by {esc(who)}. {esc(note)}{fl}</p>' + (f"<p>Miners we track that run it: {links}.</p>" if links else ""))
-    tbl = (f'<div class="tablewrap pool-wrap"><table class="pool-tbl"><thead><tr><th>Firmware</th><th>Runs on</th><th>Open source</th><th class="num">Latest release</th><th>Good to know</th></tr></thead>'
-           f'<tbody>{"".join(rows)}</tbody></table></div>'
-           f'<p class="hint">License, latest release and supported boards are from each project\'s GitHub page, checked <time datetime="{FIRMWARE_CHECKED}">Oct 28, 2026</time>. New versions come out often, so check the releases page before you flash.</p>')
+        txt = (f'{esc(note)} <br><small>Runs on: {esc(boards)}. Open source ({esc(lic)}). Latest {g_ext(repo + "/releases", esc(ver))} ({esc(date)}).'
+               + (f' Install with the {g_ext(flasher, "web flasher")} (Chrome or Edge, USB).' if flasher else "")
+               + (f" Miners we track: {links}." if links else "") + "</small>")
+        cards.append((icons[i % 4], g_ext(repo, esc(name)), txt, tones[i % 4]))
     faq = [("Which firmware should I run on my Bitaxe?",
-            "The official AxeOS from the Bitaxe project's releases page. Pick the file that matches the board number printed on your Bitaxe (for example 601 or 602 for a Gamma)."),
+            "Official AxeOS. Pick the file matching your board number (601 or 602 for a Gamma)."),
            ("Which firmware runs on a NerdQaxe++?",
-            "The NerdQAxe firmware from shufps is the official one. AxeForge is a newer community alternative for the NerdQaxe++ only."),
+            "The official NerdQAxe firmware from shufps. AxeForge is a newer community option."),
            ("Can I put AxeOS on a NerdQaxe?",
-            "No. Use the firmware made for your board. Flashing a file built for a different board can stop it mining until you flash the right one."),
+            "No. Use the firmware made for your board."),
            ("How do I know my firmware has no hidden fee?",
-            "Install it yourself from the project's official GitHub releases page, then set your own pool and Bitcoin address. Some resold miners come with modified firmware that sends part of the hashrate elsewhere."),
+            "Install it yourself from the project's GitHub releases page and set your own pool and address."),
            ("Will updating erase my settings?",
-            "A normal update from the miner's own dashboard keeps your Wi-Fi and pool settings. A full 'factory' flash over USB can reset them, so write them down first.")]
+            "A dashboard update keeps them. A full USB flash can reset them, so write them down.")]
+    picks = [("bitaxe-gamma", "Runs AxeOS"), ("nerdqaxe-pp", "Runs NerdQAxe firmware (or AxeForge)"), ("bitaxe-gt-801", "Runs AxeOS")]
     body = f"""<article>
-<header class="hero"><h1>Bitaxe and NerdQaxe firmware, compared</h1>
-<p class="lede">Firmware is the software inside your miner. It runs the chip, the fan and the dashboard you open in your browser. Here's which firmware runs on which home miner, and how to update without trouble.</p>
-<p class="meta">Updated <time datetime="{FIRMWARE_CHECKED}">Oct 28, 2026</time> · 3-minute read</p></header>
-<section aria-labelledby="h-1"><h2 id="h-1">1. The short answer</h2>
-<ul><li><strong>Bitaxe:</strong> run the official AxeOS.</li>
-<li><strong>NerdAxe, NerdQaxe, NerdOCTAXE, NerdQX:</strong> run the official NerdQAxe firmware.</li>
-<li><strong>Custom firmware</strong> like AxeForge can be fun, but stick to open-source projects and download only from their own GitHub page.</li></ul></section>
-<section aria-labelledby="h-2"><h2 id="h-2">2. Every option side by side</h2>{tbl}</section>
-<section aria-labelledby="h-3"><h2 id="h-3">3. What each one is</h2>{"".join(cards)}</section>
-<section aria-labelledby="h-4"><h2 id="h-4">4. How to update safely</h2>
-<ol><li><strong>Find your board number</strong> on the miner or its System page (for example 602 or 801).</li>
-<li><strong>Download only from the official releases page</strong> of the firmware's GitHub project, or use its web flasher.</li>
-<li><strong>Write down your Wi-Fi, pool and Bitcoin address</strong> in case a full flash resets them.</li>
-<li><strong>Update from the miner's dashboard</strong> when you can (upload the firmware file, then the web file if the project ships one).</li>
-<li><strong>After it restarts, check the pool settings</strong> and that your hashrate looks right: see <a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a></li></ol></section>
-<section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
-<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/bitaxe-setup/">First-hour setup checklist</a></li><li><a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a></li><li><a href="/guides/bitcoin-mining-pools/">Which mining pool should I use?</a></li><li><a href="/guides/bitaxe-chips/">Bitaxe chips compared</a></li><li><a href="/where-to-buy-bitaxe/">Where to buy a Bitaxe</a></li></ul>
-<p class="hint">General guidance only. Flashing firmware is at your own risk; follow each project's instructions. We're not paid by any firmware project.</p></section>
+{G.hero("Bitaxe and NerdQaxe firmware, compared", "Firmware is the software inside your miner: it runs the chip, the fan and the dashboard. Here's which one to run.", g_chips(1, checked=f'Releases checked <time datetime="{FIRMWARE_CHECKED}">Oct 28, 2026</time>'), hero_img("nerdqaxe-pp"))}
+{G.tldr(["<b>Bitaxe:</b> run the official AxeOS.", "<b>NerdAxe, NerdQaxe, NerdOCTAXE, NerdQX:</b> run the official NerdQAxe firmware.",
+         "Custom builds like AxeForge? Open source only, downloaded from the project's own GitHub."])}
+{G.section("h-2", "The four options", G.cards(cards) + f'<p class="hint">From each project\'s GitHub page, checked <time datetime="{FIRMWARE_CHECKED}">Oct 28, 2026</time>. New versions come out often.</p>')}
+{G.section("h-4", "Update safely in 5 steps", G.steps([
+        ("🔢", "Find your board number", "On the board or the System page (like 602 or 801)."),
+        ("⬇️", "Official download only", "The project's GitHub releases page or its web flasher."),
+        ("📝", "Write down your settings", "Wi-Fi, pool and Bitcoin address, in case a full flash resets them."),
+        ("⬆️", "Update from the dashboard", "Upload the firmware file, then the web file if there is one."),
+        ("✅", "Check it after", 'Pool settings and hashrate. See <a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a>')]))}
+{buy_box(picks)}
+{G.faq(faq, esc)}
+{G.more([("/guides/bitaxe-setup/", "First-hour setup checklist"), ("/guides/is-my-bitaxe-normal/", "Is my Bitaxe normal?"), ("/guides/bitcoin-mining-pools/", "Which mining pool?"), ("/guides/bitaxe-chips/", "Bitaxe chips compared"), ("/where-to-buy-bitaxe/", "Where to buy a Bitaxe")],
+        "Flashing firmware is at your own risk; follow each project's instructions. We're not paid by any firmware project.")}
 </article>"""
-    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Bitaxe and NerdQaxe firmware compared", desc), faq_ld(faq)], lastmod=FIRMWARE_CHECKED, og_type="article")
+    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Bitaxe and NerdQaxe firmware compared", desc), faq_ld(faq)], lastmod=GUIDES_REFRESHED, og_type="article")
 
 
 # Chip guide (/guides/bitaxe-chips/): which Bitmain BM-series chip each home miner uses, grouped by chip, with the
@@ -2949,14 +2997,13 @@ def build_guide_chips():
     title = "BM1366 vs BM1368 vs BM1370 vs BM1373: Bitaxe chips compared | Bitaxe Radar"
     desc = "Which chip is in each Bitaxe and NerdQaxe, how much power each chip uses per TH/s, and what each one costs today."
     groups = chip_groups()
-    summary, sections = [], []
+    sections, best_eff, picks = [], [], []
     for f, ms in groups.items():
-        effs = [jth(m) for m in ms]
+        best_eff.append((f, min(jth(m) for m in ms), len(ms)))
         priced = [m for m in ms if STATS[m]["best"]]
-        cheap = min(priced, key=lambda m: usd(STATS[m]["best"])) if priced else None
-        cheap_txt = (f'{money(STATS[cheap]["best"]["price"], STATS[cheap]["best"]["currency"])} (<a href="/models/{cheap}/">{esc(SHORT[cheap])}</a>)' if cheap else "none in stock today")
-        summary.append(f'<tr><td class="pool-name"><b>{f}</b></td><td class="num" data-label="Miners we track">{len(ms)}</td>'
-                       f'<td class="num" data-label="Power per TH/s">{(f"{min(effs):.0f} to {max(effs):.0f}" if round(min(effs)) != round(max(effs)) else f"{min(effs):.0f}")} J/TH</td><td data-label="Cheapest in stock">{cheap_txt}</td></tr>')
+        if priced:
+            c = min(priced, key=lambda m: usd(STATS[m]["best"]))
+            picks.append((c, f"Cheapest {f} board · {jth(c):.0f} J/TH"))
         rows = []
         for m in ms:
             mm, st = MODELS[m], STATS[m]
@@ -2965,49 +3012,42 @@ def build_guide_chips():
             per = f'${st["per_th"]:,.0f}' if st["per_th"] else "–"
             rows.append(f'<tr><td class="pool-name"><a href="/models/{m}/">{esc(SHORT[m])}</a></td><td class="num" data-label="Chips">{chip_count(m)}</td>'
                         f'<td class="num" data-label="Hashrate">{mm["hashrate_ths"]:g} TH/s</td><td class="num" data-label="Power">{mm["watts"]:g} W</td>'
-                        f'<td class="num" data-label="Efficiency"><b>{jth(m):.0f} J/TH</b></td><td class="num" data-label="Power cost a year">${kwh_year(m) * CHIP_RATE:,.0f}</td>'
-                        f'<td class="num" data-label="Cheapest in stock">{price}</td><td class="num" data-label="Price per TH/s">{per}</td></tr>')
-        sections.append(f'<h3 id="{f.lower()}">{f} miners</h3><div class="tablewrap pool-wrap"><table class="pool-tbl"><thead><tr><th>Miner</th><th class="num">Chips</th>'
-                        f'<th class="num">Hashrate</th><th class="num">Power</th><th class="num">Efficiency</th><th class="num">Power cost a year</th>'
-                        f'<th class="num">Cheapest in stock</th><th class="num">Price per TH/s</th></tr></thead><tbody>{"".join(rows)}</tbody></table></div>')
-    stbl = (f'<div class="tablewrap pool-wrap"><table class="pool-tbl"><thead><tr><th>Chip</th><th class="num">Miners we track</th><th class="num">Power per TH/s</th>'
-            f'<th>Cheapest in stock</th></tr></thead><tbody>{"".join(summary)}</tbody></table></div>')
-    g = "bitaxe-gamma"
+                        f'<td class="num" data-label="Efficiency"><b>{jth(m):.0f} J/TH</b></td><td class="num" data-label="Power a year">${kwh_year(m) * CHIP_RATE:,.0f}</td>'
+                        f'<td class="num" data-label="Cheapest in stock">{price}</td><td class="num" data-label="Per TH/s">{per}</td></tr>')
+        sections.append(f'<details{" open" if f == "BM1370" else ""}><summary id="{f.lower()}">{f} miners ({len(ms)})</summary><div class="tablewrap pool-wrap"><table class="pool-tbl"><thead><tr><th>Miner</th><th class="num">Chips</th>'
+                        f'<th class="num">Hashrate</th><th class="num">Power</th><th class="num">Efficiency</th><th class="num">Power a year</th>'
+                        f'<th class="num">Cheapest in stock</th><th class="num">Per TH/s</th></tr></thead><tbody>{"".join(rows)}</tbody></table></div></details>')
+    tones = {"BM1366": "red", "BM1368": "yellow", "BM1370": "orange", "BM1373": "green"}
+    chart = G.bars([(f"<b>{f}</b><small>{n} miner{'s' if n > 1 else ''} we track</small>", e, f"{e:.0f} J/TH", tones.get(f, "blue")) for f, e, n in best_eff],
+                   max([e for _, e, _ in best_eff] or [1]), caption="Best efficiency per chip in our data: stated watts ÷ stated TH/s. Shorter bar = less electricity for the same work.")
+    g, new = "bitaxe-gamma", groups.get("BM1373", [])
     ex = ""
-    new = groups.get("BM1373", [])
     if g in TRACKED and new:
         n = new[0]
-        ex = (f"<p>Example: a {esc(SHORT[g])} (BM1370) uses about {jth(g):.0f} joules per TH/s, and a {esc(SHORT[n])} (BM1373) about {jth(n):.0f}. "
-              f"For the same hashrate, the {esc(SHORT[n])} uses about {1 - jth(n) / jth(g):.0%} less electricity.</p>")
+        ex = f"{a_an(SHORT[n]).capitalize()} {esc(SHORT[n])} (BM1373) uses about <b>{1 - jth(n) / jth(g):.0%} less power</b> than a {esc(SHORT[g])} (BM1370) for the same hashrate."
     faq = [("Which chip does the Bitaxe Gamma use?",
-            "One BM1370. Most current Bitaxe and NerdQaxe boards use the BM1370; boards with more chips simply have more of them."),
+            "One BM1370, like most current Bitaxe and NerdQaxe boards."),
            ("What does J/TH mean?",
-            "Joules per terahash: how much electricity a miner uses for each unit of work. Lower is better. It's the stated watts divided by the stated TH/s."),
+            "Joules per terahash: electricity per unit of work. Lower is better."),
            ("Should I wait for a newer chip?",
-            "Newer chips use less power per TH/s, but they don't always cost less per TH/s, so compare both columns above. If your electricity is cheap, the cheapest price per TH/s matters most. If it's expensive, a lower J/TH saves more over a year."),
+            "Newer chips use less power, but don't always cost less per TH/s. Cheap power: buy on price per TH/s. Expensive power: buy on J/TH."),
            ("Is a BM1366 Bitaxe Ultra still worth buying?",
-            "Only if it's cheap. It uses noticeably more power per TH/s than a BM1370 board, so compare its price per TH/s and yearly power cost in the tables above."),
+            "Only if it's cheap. It uses noticeably more power per TH/s than a BM1370 board."),
            ("Why are these numbers different from my miner's dashboard?",
-            "They're what sellers state for each model. Your miner's real hashrate and power depend on its frequency, voltage, cooling and power supply.")]
+            "They're sellers' stated figures. Real numbers depend on frequency, voltage, cooling and power supply.")]
     body = f"""<article>
-<header class="hero"><h1>BM1366, BM1368, BM1370, BM1373: which chip is in your miner?</h1>
-<p class="lede">Every Bitaxe-style miner is built around one or more Bitmain mining chips. The chip decides how much power the miner needs for each unit of work. Here's which chip is in each home miner we track, and what it costs today.</p>
-<p class="meta">Prices updated {fmt_time(latest["generated_at"])} · 3-minute read</p></header>
-<section aria-labelledby="h-1"><h2 id="h-1">1. The short answer</h2>
-<ul><li><strong>The chip number goes up with each new generation.</strong> In our data, each newer chip uses less electricity per TH/s.</li>
-<li><strong>More chips means more hashrate,</strong> not better efficiency. A 4-chip board makes about 4 times the hashrate and uses about 4 times the power.</li>
-<li><strong>Most boards on sale today use the BM1370.</strong> The BM1373 is the newest chip we see in shops.</li></ul>
-{ex}</section>
-<section aria-labelledby="h-2"><h2 id="h-2">2. The chips side by side</h2>{stbl}
-<p class="hint">Efficiency is the seller-stated power divided by the seller-stated hashrate. Lower J/TH means less electricity for the same work.</p></section>
-<section aria-labelledby="h-3"><h2 id="h-3">3. Every miner, by chip</h2>{"".join(sections)}
-<p class="hint">Hashrate and power are what sellers state for each model. Power cost assumes ${CHIP_RATE:.2f}/kWh, running 24/7. Prices are the cheapest in-stock offer we found at {fmt_time(latest["generated_at"])}.</p></section>
-<section aria-labelledby="h-4"><h2 id="h-4">4. How to pick</h2>
-<ul><li><strong>Cheap electricity</strong> (under about $0.10/kWh): go for the lowest price per TH/s. See the <a href="/price-per-th/">price per TH/s leaderboard</a>.</li>
-<li><strong>Expensive electricity</strong>: a lower J/TH saves money every month. Check the power cost column.</li>
-<li><strong>Just want a lottery ticket</strong>: any single-chip board works. See {("<a href=\"/best/under-100/\">best under $100</a>" if under_price(100) else "<a href=\"/best/beginners/\">best for beginners</a>")}.</li></ul></section>
-<section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
-<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a></li><li><a href="/guides/bitaxe-firmware/">Bitaxe firmware compared</a></li><li><a href="/guides/is-home-mining-worth-it/">Is home mining worth it?</a></li><li><a href="/guides/bitaxe-power-supply/">Which power supply?</a></li><li><a href="/compare/">Compare two miners</a></li></ul></section>
+{G.hero("BM1366, BM1368, BM1370, BM1373: which chip is in your miner?", "The chip decides how much power a miner needs for each unit of work. Newer number, less power.", g_chips(1, live=True), hero_img("bitaxe-gamma"))}
+{G.tldr(["Each newer chip uses less electricity per TH/s in our data.", "More chips = more hashrate, not better efficiency.",
+         "Most boards on sale use the BM1370. The BM1373 is the newest we see in shops." + (f" {ex}" if ex else "")])}
+{G.section("h-2", "Power per TH/s, chip by chip", chart)}
+{G.section("h-3", "Every miner, by chip", "".join(sections) + f'<p class="hint">Sellers\' stated hashrate and power. Power a year at ${CHIP_RATE:.2f}/kWh, 24/7. Prices: cheapest in-stock offer at {fmt_time(latest["generated_at"])}.</p>')}
+{G.section("h-4", "How to pick", G.cards([
+        ("💲", "Cheap electricity", 'Under about $0.10/kWh: lowest price per TH/s wins. <a href="/price-per-th/">Leaderboard</a>', "green"),
+        ("⚡", "Expensive electricity", "A lower J/TH saves money every month. Check the power column.", "orange"),
+        ("🎟", "Just a lottery ticket", "Any single-chip board works. " + ('<a href="/best/under-100/">Best under $100</a>' if under_price(100) else '<a href="/best/beginners/">Best for beginners</a>'), "blue")]))}
+{buy_box(picks[::-1], "Cheapest board per chip today")}
+{G.faq(faq, esc)}
+{G.more([("/guides/is-my-bitaxe-normal/", "Is my Bitaxe normal?"), ("/guides/bitaxe-firmware/", "Bitaxe firmware compared"), ("/guides/is-home-mining-worth-it/", "Is home mining worth it?"), ("/guides/bitaxe-power-supply/", "Which power supply?"), ("/compare/", "Compare two miners")])}
 </article>"""
     layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Bitaxe chips compared: BM1366, BM1368, BM1370, BM1373", desc), faq_ld(faq)], og_type="article")
 
@@ -3077,58 +3117,44 @@ def build_guide_psu():
                 f'<th>Supply the seller offers</th></tr></thead><tbody>{"".join(rows)}</tbody></table></div>')
     buy_tbl = (f'<div class="tablewrap pool-wrap"><table class="pool-tbl"><thead><tr><th>Miner</th><th class="num">Cheapest with a supply in the box</th><th></th></tr></thead>'
                f'<tbody>{"".join(buy)}</tbody></table></div>')
-    # Live stated watts for the multi-miner worked example (same numbers as the model pages).
-    w_oct = MODELS["nerdoctaxe"]["watts"]
-    w_nq = MODELS["nerdqaxe-pp"]["watts"]
-    w_g = MODELS["bitaxe-gamma"]["watts"]
-    w_hex = MODELS["bitaxe-gamma-hex"]["watts"]
+    w_oct, w_nq = MODELS["nerdoctaxe"]["watts"], MODELS["nerdqaxe-pp"]["watts"]
+    w_g, w_hex = MODELS["bitaxe-gamma"]["watts"], MODELS["bitaxe-gamma-hex"]["watts"]
     combo = w_oct + w_nq
     need80 = int(round(combo / 0.8))
     headroom350 = int(round(350 * 0.8))
-    multi = f"""<section aria-labelledby="h-4"><h2 id="h-4">4. Several miners on one power supply</h2>
-<p>People often run two or more boards from one big 12V supply (a Mean Well-style brick is a common pick). That can work, but only if every miner on that supply uses the <strong>same voltage</strong>, and the total load stays well under the supply's continuous rating. Guidance below is general (Nov 3, 2026); always follow the maker's instructions for your boards and supply.</p>
-<ul>
-<li><strong>Same voltage only.</strong> A 12V supply can feed 12V boards (for example a <a href="/models/nerdoctaxe/">{esc(SHORT["nerdoctaxe"])}</a>, a <a href="/models/nerdqaxe-pp/">{esc(SHORT["nerdqaxe-pp"])}</a> or a <a href="/models/bitaxe-gamma-hex/">{esc(SHORT["bitaxe-gamma-hex"])}</a>). Never feed a 5V board like the <a href="/models/bitaxe-gamma/">{esc(SHORT["bitaxe-gamma"])}</a> from a 12V rail — wrong voltage can damage the board. Give each voltage its own supply.</li>
-<li><strong>Keep 24/7 load under about 80% of continuous rating.</strong> Example with our stated watts: {esc(SHORT["nerdoctaxe"])} ≈{w_oct:g} W plus {esc(SHORT["nerdqaxe-pp"])} ≈{w_nq:g} W is about <strong>{combo:g} W</strong>. At the 80% rule you want a supply rated about <strong>{need80:g} W</strong> continuous or more. A 350 W unit has about <strong>{headroom350:g} W</strong> of headroom at 80%, so those two 12V boards fit. Adding another ≈{w_hex:g} W 12V board (Gamma Hex) would push you over that headroom.</li>
-<li><strong>A 5V Gamma on that 12V brick is the wrong idea anyway.</strong> Even if {combo:g} W + ≈{w_g:g} W (Gamma) still looks under {headroom350:g} W on paper, the Gamma needs its own 5V supply — different voltage rail, separate brick.</li>
-<li><strong>Wall watts vs dashboard watts.</strong> The number on the miner dashboard is usually the board's DC draw. A wall (AC) meter is often about 15–20% higher because the supply itself wastes some power as heat. Size the supply from the higher figure if you measured at the wall, or add that margin if you only have the dashboard number.</li>
-<li><strong>Power strips are an AC limit too.</strong> If several supplies plug into one strip, check the strip's <em>continuous</em> load rating (not only the surge number) and keep the total wall draw under that for long runs.</li>
-</ul>
-<p class="hint">Stated watts above match our model pages (Gamma ≈{w_g:g} W, NerdQaxe++ ≈{w_nq:g} W, NerdOCTaxe ≈{w_oct:g} W, Gamma Hex ≈{w_hex:g} W). Overclocking draws more — leave extra headroom.</p></section>"""
+    gauge = G.bars([(f'{esc(SHORT["nerdoctaxe"])} + {esc(SHORT["nerdqaxe-pp"])}', combo, f"{combo:g} W", "green"),
+                    (f'+ a {esc(SHORT["bitaxe-gamma-hex"])}', combo + w_hex, f"{combo + w_hex:g} W", "red")], 350,
+                   marker=(headroom350, f"80% of a 350 W supply = {headroom350:g} W"),
+                   caption=f'Stated: <a href="/models/nerdoctaxe/">{esc(SHORT["nerdoctaxe"])}</a> ≈{w_oct:g} W, <a href="/models/nerdqaxe-pp/">{esc(SHORT["nerdqaxe-pp"])}</a> ≈{w_nq:g} W, {esc(SHORT["bitaxe-gamma-hex"])} ≈{w_hex:g} W. Two fit; a third goes over.')
+    multi = G.section("h-4", "Several miners on one power supply", gauge + G.cards([
+        ("🔁", "Same voltage only", f'12V boards only on a 12V brick. Never feed a 5V board like the <a href="/models/bitaxe-gamma/">{esc(SHORT["bitaxe-gamma"])}</a> from a 12V rail.', "red"),
+        ("📊", "Stay under 80%", f"Of the continuous rating, 24/7. ≈{combo:g} W of boards wants {need80:g} W or more.", "green"),
+        ("🔌", "Wall watts vs dashboard watts", "A wall meter often reads 15–20% higher. Size from the higher number.", "yellow"),
+        ("🧯", "Mind the power strip", "Check its continuous rating, not just the surge number.", "blue")])
+        + '<p class="hint">General guidance (Nov 3, 2026). Overclocking draws more.</p>')
     faq = [("Can I use a phone charger for my Bitaxe Gamma?",
-            "No. The Gamma needs a steady 5V supply with a 5.5 × 2.1 mm barrel plug and about 4 A or more. Phone chargers don't have that plug and most can't deliver that current for hours."),
+            "No. It needs a steady 5V supply with a 5.5 × 2.1 mm barrel plug and about 4 A or more."),
            ("Can I plug a 12V supply into a 5V Bitaxe?",
-            "No. 5V boards like the Gamma, Gamma Duo and Nerdaxe Gamma can be damaged by 12V. Boards with an XT30 plug (GT 801, Naja Duo, NerdQaxe++) need 12V, and a 5V supply won't run them."),
+            "No. 12V can damage 5V boards, and a 5V supply won't run 12V (XT30) boards."),
            ("Can several miners share one power supply?",
-            f"Yes, if they all use the same voltage and the combined 24/7 load stays under about 80% of the supply's continuous rating. Example: a NerdOCTaxe (≈{w_oct:g} W) plus a NerdQaxe++ (≈{w_nq:g} W) is about {combo:g} W, so you want roughly a {need80:g} W continuous supply or bigger. Never mix 5V and 12V boards on one rail."),
-           ("What does the 80% rule mean for a 350 W supply?",
-            f"Plan to run at most about {headroom350:g} W continuous on a 350 W unit (80% of 350). That leaves room for heat and small spikes. Two 12V boards at ≈{combo:g} W fit; adding more 12V load or a 5V Gamma on that same brick does not."),
+            f"Yes, if they share a voltage and stay under about 80% of the continuous rating. A NerdOCTaxe plus a NerdQaxe++ (≈{combo:g} W) wants about {need80:g} W or more."),
            ("How big a power supply should I get?",
-            "Pick one rated well above what the miner draws. A simple rule: at least a quarter more than the stated watts, and more if you plan to overclock. For several miners, size from the combined watts and keep about 20% spare (the 80% rule)."),
+            "At least a quarter more than the stated watts, more if you overclock."),
            ("Do all shops include the power supply?",
-            "No. Some sell the miner alone and the supply as an add-on. The second table only counts listings that say the supply is in the box."),
-           ("Why does overclocking need a bigger supply?",
-            "Overclocking raises the power the miner draws. If the supply runs near its limit for hours it gets hot and can shut off or fail.")]
+            "No. The table above only counts listings that say it's in the box.")]
     body = f"""<article>
-<header class="hero"><h1>What power supply does a Bitaxe need?</h1>
-<p class="lede">Small Bitaxe boards run on 5 volts. Bigger ones, like the GT, Naja Duo and NerdQaxe++, run on 12 volts and use a different plug. Using the wrong supply can damage the board, so here's what each miner needs, how to size a supply for one board or several on the same rail, and where to buy one with the right supply in the box.</p>
-<p class="meta">Prices updated {fmt_time(latest["generated_at"])} · 4-minute read</p></header>
-<section aria-labelledby="h-1"><h2 id="h-1">1. The short answer</h2>
-<ul><li><strong>Bitaxe Gamma, Gamma Duo and Nerdaxe Gamma: 5V</strong> through a round 5.5 × 2.1 mm barrel plug.</li>
-<li><strong>Bitaxe GT 801, Naja Duo and NerdQaxe++: 12V</strong> through a yellow XT30 plug. Never use a 5V Gamma supply on these, or a 12V supply on a 5V board.</li>
-<li><strong>Get a supply rated above what the miner draws.</strong> Example: a Gamma draws about 20 W. At 5V that's about 4 A, so a 6 A (30 W) supply has room to spare.</li>
-<li><strong>Several miners on one supply:</strong> same voltage only, and keep the combined 24/7 load under about 80% of the continuous rating (see section 4).</li>
-<li><strong>Easiest option for a gift:</strong> buy a listing that includes the supply (see section 3).</li></ul></section>
-<section aria-labelledby="h-2"><h2 id="h-2">2. Which supply each miner needs</h2>{spec_tbl}
-<p class="hint">Input, plug and supply details are from Solo Satoshi's product pages, checked Nov 1, 2026. Stated power is the seller's stock figure; overclocking draws more.</p></section>
-<section aria-labelledby="h-3"><h2 id="h-3">3. Cheapest with the power supply in the box</h2>{buy_tbl}
-<p class="hint">Only in-stock listings that say the supply is included. Prices checked {fmt_time(latest["generated_at"])}. Some shops sell the supply as an add-on, so the miner-only price can be lower: see each model's page for every price.</p></section>
+{G.hero("What power supply does a Bitaxe need?", "Small Bitaxe boards run on 5 volts. Bigger ones run on 12 volts with a different plug. The wrong one can damage the board.", g_chips(2, live=True), hero_img("bitaxe-gt-801"))}
+{G.tldr(["<b>5V:</b> Bitaxe Gamma, Gamma Duo, Nerdaxe Gamma (round barrel plug).", "<b>12V:</b> Bitaxe GT 801, Naja Duo, NerdQaxe++ (yellow XT30 plug). Never swap them.",
+         "Size it above the draw: a Gamma (≈20 W) needs about 4 A, so a 6 A supply is plenty."])}
+{G.section("h-1", "Know your plug", G.fig(G.plugs_svg(), "Round barrel = 5V. Yellow XT30 = 12V. (Gamma Hex: 6-pin. Avalon Nano 3S: USB-C.)"))}
+{G.section("h-2", "Which supply each miner needs", spec_tbl + '<p class="hint">From Solo Satoshi\'s product pages, checked Nov 1, 2026.</p>')}
+{G.section("h-3", "Cheapest with the power supply in the box", buy_tbl + f'<p class="hint">In-stock listings that say the supply is included, checked {fmt_time(latest["generated_at"])}.</p>')}
 {multi}
-<section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
-<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/bitaxe-setup/">First-hour setup checklist</a></li><li><a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a></li><li><a href="/guides/bitaxe-chips/">Bitaxe chips compared</a></li><li><a href="/best/gifts/">Bitcoin miner gift ideas</a></li></ul>
-<p class="hint">General guidance only. Follow the maker's instructions for your board.</p></section>
+{G.faq(faq, esc)}
+{G.more([("/guides/bitaxe-setup/", "First-hour setup checklist"), ("/guides/is-my-bitaxe-normal/", "Is my Bitaxe normal?"), ("/guides/bitaxe-chips/", "Bitaxe chips compared"), ("/best/gifts/", "Bitcoin miner gift ideas")],
+        "General guidance only. Follow the maker's instructions for your board.")}
 </article>"""
-    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "What power supply does a Bitaxe need?", desc), faq_ld(faq)], lastmod="2026-11-03", og_type="article")
+    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "What power supply does a Bitaxe need?", desc), faq_ld(faq)], lastmod=GUIDES_REFRESHED, og_type="article")
 
 
 
@@ -3171,49 +3197,42 @@ def build_guide_monitoring():
     trail = [("Home", "/"), ("Guides", "/guides/"), ("Monitoring apps", path)]
     title = "Best Bitaxe monitoring apps: HashWatcher, Bitaxe Baller and more | Bitaxe Radar"
     desc = "Five apps that watch your Bitaxe, NerdQaxe or Avalon Nano: what each runs on, what it costs, and which ones can alert you when you're away from home."
-    rows = "".join(
-        f'<tr><td class="pool-name"><a href="{esc(u)}" rel="nofollow noopener" target="_blank">{esc(n)}</a><br><small>{esc(best)}</small></td>'
-        f'<td data-label="Runs on">{esc(plat)}</td><td data-label="Price">{esc(price)}</td>'
-        f'<td data-label="Works with">{esc(works)}</td><td data-label="Away from home">{esc(away)}</td></tr>'
-        for n, u, plat, price, works, away, best in MON_APPS)
-    tbl = (f'<div class="tablewrap pool-wrap"><table class="pool-tbl"><thead><tr><th>App</th><th>Runs on</th><th>Price</th>'
-           f'<th>Works with</th><th>Away from home</th></tr></thead><tbody>{rows}</tbody></table></div>')
+    tones = ("blue", "orange", "green", "purple", "yellow")
+    icons = ("📱", "🖥️", "🏊", "🛡️", "⌚")
+    app_cards = G.cards([(icons[i], g_ext(u, esc(n)),
+                          f"<b>{esc(best)}.</b> <br><small>📲 {esc(plat)}<br>💲 {esc(price)}<br>🌍 {esc(away)}</small>", tones[i])
+                         for i, (n, u, plat, price, works, away, best) in enumerate(MON_APPS)])
     faq = [("Do I need an app to monitor my Bitaxe?",
-            "No. Every Bitaxe has a built-in dashboard: type its IP address into a browser on the same Wi-Fi. Apps help when you have several miners, want alerts, or want to check from your phone."),
+            "No. Type its IP address into a browser on the same Wi-Fi. Apps add alerts and a phone view."),
            ("How can I check my Bitaxe when I'm not home?",
-            "The simplest free way is your pool's page: public-pool.io and solo.ckpool.org show your workers' hashrate when you look up your Bitcoin address. For the miner itself, HashWatcher offers a Hub device for remote access, and Bitaxe Baller Pro can send Discord alerts."),
+            "Free: look up your address on your pool's page (public-pool.io, solo.ckpool.org). Or HashWatcher's Hub, or Bitaxe Baller Pro alerts."),
            ("Should I open a port on my router to reach my miner?",
-            "We wouldn't. The miner's dashboard has no password, so anyone who finds it could change your pool or settings. Use your pool's stats page or an app's own remote option instead."),
+            "We wouldn't. The dashboard has no password, so anyone could change your pool."),
            ("Will an app slow down my miner?",
-            "No. These apps only read the stats the miner already reports. Changing frequency or voltage from an app is like doing it in the dashboard, so the same care applies."),
+            "No. They only read the stats the miner already reports."),
            ("Which app works with the Avalon Nano 3S?",
-            "Of the five here, HashWatcher lists the Avalon Nano 3 and 3S. The others are built for Bitaxe-style miners running AxeOS.")]
+            "Of these five, HashWatcher. The others are built for AxeOS miners.")]
     body = f"""<article>
-<header class="hero"><h1>Best apps to monitor your Bitaxe</h1>
-<p class="lede">Your miner already has a dashboard, but it only works on your home Wi-Fi and won't tell you when something goes wrong. These five apps add a phone or desktop view, alerts and, in some cases, a way to check in from anywhere.</p>
-<p class="meta">Prices and features checked <time datetime="{MON_CHECKED}">Nov 1, 2026</time> on each app's own listing · 3-minute read</p></header>
-<section aria-labelledby="h-1"><h2 id="h-1">1. The short answer</h2>
-<ul><li><strong>One Bitaxe, just curious:</strong> the built-in dashboard (type the miner's IP into your browser) plus your pool's stats page is enough, and free.</li>
-<li><strong>A few miners and an iPhone:</strong> <a href="https://apps.apple.com/us/app/axesentry/id6781810919" rel="nofollow noopener" target="_blank">AxeSentry</a> ($0.99) for alerts and auto-reboot, or <a href="https://www.addictingapps.org/apps/minermonitor/" rel="nofollow noopener" target="_blank">Miner Monitor</a> if you want pool stats on the go.</li>
-<li><strong>Mac or Windows, and free:</strong> <a href="https://bitaxeballer.com/" rel="nofollow noopener" target="_blank">Bitaxe Baller</a>, open source.</li>
-<li><strong>Mixed fleet, Android, or Avalon miners:</strong> <a href="https://apps.apple.com/us/app/hashwatcher-miner-dashboard/id6753040236" rel="nofollow noopener" target="_blank">HashWatcher</a>.</li></ul></section>
-<section aria-labelledby="h-2"><h2 id="h-2">2. The apps side by side</h2>
-{tbl}
-<p class="hint">Prices are as listed in the US App Store or on the maker's site on Nov 1, 2026 and can change. We have no deal with any of these apps.</p></section>
-<section aria-labelledby="h-3"><h2 id="h-3">3. Watching your miner when you're away</h2>
-<ul><li><strong>Free:</strong> look up your Bitcoin address on your pool's site (for example public-pool.io or solo.ckpool.org). If the hashrate there drops to zero, your miner is off or lost Wi-Fi.</li>
-<li><strong>Alerts to your phone:</strong> HashWatcher (with its Hub) and Bitaxe Baller Pro (Discord) can tell you a miner went offline while you're out. AxeSentry and Miner Monitor alert you on your home network.</li>
-<li><strong>Skip port forwarding.</strong> The miner's web page has no login, so opening it to the internet lets strangers change your pool.</li></ul></section>
-<section aria-labelledby="h-4"><h2 id="h-4">4. What to watch for</h2>
-<ul><li><strong>Hashrate</strong> well below normal for your board: see <a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a></li>
-<li><strong>Chip temperature</strong> climbing toward the point where mining stops.</li>
-<li><strong>Offline or zero shares</strong>: usually Wi-Fi or a wrong pool setting. Check the <a href="/guides/bitaxe-setup/">setup checklist</a>.</li>
-<li><strong>Best difficulty</strong> is your luckiest share so far. See what it means on the <a href="/solo-odds/#h-best">solo odds page</a>.</li></ul></section>
-<section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
-<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/bitaxe-setup/">First-hour setup checklist</a></li><li><a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a></li><li><a href="/guides/bitaxe-firmware/">Bitaxe firmware compared</a></li><li><a href="/best/beginners/">Best miners for beginners</a></li><li><a href="/guides/bitaxe-noise/">How loud are home miners?</a></li></ul>
-<p class="hint">Bitaxe Radar is independent and not paid by any app listed here.</p></section>
+{G.hero("Best apps to monitor your Bitaxe", "Your miner's dashboard only works on home Wi-Fi and never warns you. These apps add alerts and a phone view.", g_chips(2, checked=f'Apps checked <time datetime="{MON_CHECKED}">Nov 1, 2026</time>'), hero_img("bitaxe-gamma"))}
+{G.tldr(["<b>One miner:</b> the free dashboard plus your pool's stats page is enough.",
+         f'<b>iPhone + alerts:</b> {g_ext("https://apps.apple.com/us/app/axesentry/id6781810919", "AxeSentry")} ($0.99). <b>Free desktop:</b> {g_ext("https://bitaxeballer.com/", "Bitaxe Baller")}.',
+         f'<b>Mixed fleet, Android or Avalon:</b> {g_ext("https://apps.apple.com/us/app/hashwatcher-miner-dashboard/id6753040236", "HashWatcher")}.'])}
+{G.section("h-1", "At home vs away", G.fig(G.monitor_svg(), "At home your phone reads the miner over Wi-Fi. Away, your pool's stats page shows if it's still hashing."))}
+{G.section("h-2", "The five apps", app_cards + '<p class="hint">Prices as listed on Nov 1, 2026. HashWatcher also supports Avalon miners. No deals with any app.</p>')}
+{G.section("h-3", "Away from home", G.cards([
+        ("🆓", "Free way", "Your pool's site. Zero hashrate = off or lost Wi-Fi.", "green"),
+        ("🔔", "Phone alerts", "HashWatcher (with its Hub) or Bitaxe Baller Pro (Discord).", "blue"),
+        ("🚫", "No port forwarding", "The miner's page has no login.", "red")]))}
+{G.section("h-4", "What to watch for", G.cards([
+        ("📉", "Low hashrate", '<a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a>', "orange"),
+        ("🌡️", "Rising chip temp", "Near the stop point.", "red"),
+        ("📴", "Offline or zero shares", 'Usually Wi-Fi or a pool typo. <a href="/guides/bitaxe-setup/">Setup checklist</a>', "yellow"),
+        ("🏆", "Best difficulty", 'Your luckiest share so far. <a href="/solo-odds/#h-best">What it means</a>', "purple")]))}
+{G.faq(faq, esc)}
+{G.more([("/guides/bitaxe-setup/", "First-hour setup checklist"), ("/guides/is-my-bitaxe-normal/", "Is my Bitaxe normal?"), ("/guides/bitaxe-firmware/", "Bitaxe firmware compared"), ("/best/beginners/", "Best miners for beginners"), ("/guides/bitaxe-noise/", "How loud are home miners?")],
+        "Bitaxe Radar is independent and not paid by any app listed here.")}
 </article>"""
-    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Best apps to monitor your Bitaxe", desc), faq_ld(faq)], lastmod=MON_CHECKED, og_type="article")
+    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Best apps to monitor your Bitaxe", desc), faq_ld(faq)], lastmod=GUIDES_REFRESHED, og_type="article")
 
 
 
@@ -3237,58 +3256,47 @@ def build_guide_noise():
     rows = []
     for m in noise_models():
         db, text, src = NOISE[m]
-        st = STATS[m]
-        best = st["best"]
-        db_cell = "silent (no fans)" if db == 0 else f"{db:g} dB max stated"
-        if best:
-            buy = (f'<td class="num" data-label="Today\'s price">{money(best["price"], best["currency"])}'
-                   f'<br><small>at {esc(sname(best["seller"]))}</small></td>'
-                   f'<td data-label="">{offer_link(best, "Buy ↗")}</td>')
-        else:
-            buy = ('<td class="num" data-label="Today\'s price">not in stock</td>'
-                   f'<td data-label=""><a href="/models/{m}/">See prices</a></td>')
-        rows.append(
-            f'<tr><td class="pool-name"><a href="/models/{m}/">{esc(SHORT[m])}</a>'
-            f'<br><small>{MODELS[m]["hashrate_ths"]:g} TH/s · {MODELS[m]["watts"]:g} W</small></td>'
-            f'<td data-label="Stated noise"><b>{esc(db_cell)}</b><br><small>{esc(text)}</small></td>'
-            f'<td data-label="Source"><small>{esc(src)}</small></td>{buy}</tr>')
-    tbl = (f'<div class="tablewrap pool-wrap"><table class="pool-tbl"><thead><tr>'
-           f'<th>Miner</th><th>Stated noise</th><th>Source</th><th class="num">Today\'s price</th><th></th>'
+        best = STATS[m]["best"]
+        price = (f'{money(best["price"], best["currency"])} <small>at {esc(sname(best["seller"]))}</small>' if best else "not in stock")
+        go = offer_link(best, "Buy ↗", cls="btn sm") if best else f'<a href="/models/{m}/">See prices</a>'
+        rows.append(f'<tr><td class="pool-name"><a href="/models/{m}/">{esc(SHORT[m])}</a></td>'
+                    f'<td data-label="Stated noise"><b>{"silent (no fans)" if db == 0 else esc(text)}</b><br><small>{esc(src)}</small></td>'
+                    f'<td class="num" data-label="Today\'s price">{price}</td><td data-label="">{go}</td></tr>')
+    tbl = (f'<div class="tablewrap pool-wrap"><table class="pool-tbl"><thead><tr><th>Miner</th><th>Stated noise · source</th><th class="num">Today\'s price</th><th></th>'
            f'</tr></thead><tbody>{"".join(rows)}</tbody></table></div>')
+
+    def tone(db):
+        return "green" if db <= 35 else ("yellow" if db <= 45 else ("orange" if db <= 52 else "red"))
+    chart = G.bars([(f'<a href="/models/{m}/">{esc(SHORT[m])}</a>', NOISE[m][0], "silent" if NOISE[m][0] == 0 else f"{NOISE[m][0]:g} dB", tone(NOISE[m][0])) for m in noise_models()],
+                   60, caption="Highest stated figure per model (fanless = 0). dB figures are the makers' or sellers' own numbers, not our lab measurements.")
     faq = [("Are these our measurements?",
-            "No. Every dB figure is what the maker or a shop states on its own page. We label the source. Rooms, distance and power mode change what you hear."),
+            "No. They're the maker's or a shop's stated figures, with the source labeled."),
            ("How loud is 40 dB?",
-            "About a quiet library or a soft hum. Many people are fine with that on a desk. Under about 35 dB is usually comfortable in a bedroom; over about 50 dB is more of a garage or utility-room sound."),
+            "A quiet library. Under about 35 dB suits a bedroom; over 50 dB is garage territory."),
            ("Are Bitaxe Gamma boards quiet?",
-            "They're small with one little fan, so most owners find them fairly quiet, but shops don't publish a dB figure for the single-chip Gamma. We only list miners with a published number. See also the quietest miners list."),
+            "Most owners find them fairly quiet, but no shop publishes a dB figure, so we don't list it."),
            ("Does a lower power mode make a miner quieter?",
-            "Usually yes. Fans spin slower when the chips run cooler. Heater miners often have a night or eco mode that trades hashrate for less noise."),
+            "Usually yes. Cooler chips mean slower fans."),
            ("What if I need a silent room?",
-            "Pick a fanless design (Heatbit Canvas or Bitwater state no fans) or a liquid-cooled board with a published low figure, like the Gamma Hex at about 30 dB stated. Or put any miner in another room.")]
+            "Pick a fanless design (Heatbit Canvas or Bitwater) or put the miner in another room.")]
+    quiet = [m for m in noise_models() if STATS[m]["best"]][:3]
     body = f"""<article>
-<header class="hero"><h1>How loud are home Bitcoin miners?</h1>
-<p class="lede">Noise is the number-one question when a miner will sit in a bedroom or office. Here's every miner we track that publishes a noise figure, quietest first, with today's price and a link to buy.</p>
-<p class="meta">Stated noise figures checked <time datetime="{NOISE_CHECKED}">Nov 3, 2026</time> · prices updated {fmt_time(latest["generated_at"])} · 3-minute read</p></header>
-<section aria-labelledby="h-1"><h2 id="h-1">1. The short answer</h2>
-<ul><li><strong>Want silent:</strong> fanless heaters like the <a href="/models/heatbit-canvas/">Heatbit Canvas</a> or <a href="/models/heatbit-bitwater/">Bitwater</a> (maker-stated: no fans).</li>
-<li><strong>Want a quiet desk miner:</strong> look near <strong>30–40 dB</strong> stated — for example the <a href="/models/bitforge-nano/">BitForge Nano</a> (~29 dB), <a href="/models/bitaxe-gamma-hex/">Gamma Hex</a> (~30 dB, liquid-cooled), <a href="/models/hammer-bc04/">Hammer BC04</a> (32–36 dB) or <a href="/models/avalon-nano-3s/">Avalon Nano 3S</a> (33–40 dB).</li>
-<li><strong>Room heater class:</strong> often <strong>45–60 dB</strong> stated at full power; check for a night or eco mode.</li>
-<li><strong>No published dB?</strong> We don't invent one. Open-board Bitaxe units are usually quiet in practice, but they aren't ranked here without a shop figure. See <a href="/best/quiet/">quietest miners</a> for the ranked shortlist.</li></ul></section>
-<section aria-labelledby="h-2"><h2 id="h-2">2. Noise table (stated dB)</h2>
-{tbl}
-<p class="hint">dB figures are the makers' or sellers' own numbers, not our lab measurements. Sorting uses the highest stated figure for that model (or 0 for fanless). Prices are the cheapest in-stock listing we track right now, before shipping and tax.</p></section>
-<section aria-labelledby="h-3"><h2 id="h-3">3. What the numbers mean in a room</h2>
-<ul><li><strong>~0 / fanless:</strong> no fan whir — you may still hear a faint pump or nothing at all.</li>
-<li><strong>~30 dB:</strong> a whisper; fine for most bedrooms and offices.</li>
-<li><strong>~40 dB:</strong> a quiet library; many people leave this on a desk all day.</li>
-<li><strong>~50 dB:</strong> a normal conversation; better in a living room, garage or dedicated mining spot.</li>
-<li><strong>~60 dB:</strong> a loud conversation or dishwasher; plan for a utility room or put distance and a door between you and the miner.</li></ul>
-<p>Distance matters: moving a few feet away drops what you hear a lot. So does closing a door, and so does running a lower power mode.</p></section>
-<section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
-<section><h2>Keep reading</h2><ul class="links"><li><a href="/best/quiet/">Quietest Bitcoin miners</a></li><li><a href="/compare/avalon-nano-3s-vs-hammer-bc04/">Avalon Nano 3S vs Hammer BC04</a></li><li><a href="/guides/bitaxe-power-supply/">Which power supply?</a></li><li><a href="/guides/bitcoin-mining-heat-your-home/">Mining to heat your home</a></li><li><a href="/find-my-miner/">Find my miner quiz</a></li></ul>
-<p class="hint">Some shop links are affiliate links. They never change prices or rankings.</p></section>
+{G.hero("How loud are home Bitcoin miners?", "Every miner we track that publishes a noise figure, quietest first, with today's price.", g_chips(1, live=True, checked=f'Noise checked <time datetime="{NOISE_CHECKED}">Nov 3, 2026</time>'), hero_img("avalon-nano-3s"))}
+{G.tldr(['<b>Silent:</b> fanless heaters like the <a href="/models/heatbit-canvas/">Heatbit Canvas</a> (maker-stated: no fans).',
+         "<b>Quiet desk miner:</b> look for about 30–40 dB stated.", "<b>Room heaters:</b> often 45–60 dB at full power. Look for a night mode."])}
+{G.section("h-2", "Noise at a glance", chart)}
+{G.section("h-3", "What the numbers sound like", G.cards([
+        ("🤫", "~30 dB", "A whisper. Fine for most bedrooms.", "green"),
+        ("📚", "~40 dB", "A quiet library. OK on a desk all day.", "yellow"),
+        ("🗣️", "~50 dB", "Normal talking. Living room or garage.", "orange"),
+        ("🍽️", "~60 dB", "A dishwasher. Utility room, or a door between you.", "red")])
+        + "<p>Distance, a door and a low mode all help.</p>")}
+{G.section("h-4", "Full table with buy links", tbl + '<p class="hint">Before shipping and tax. Miners without a published figure aren\'t listed.</p>')}
+{buy_box([(m, f"Quiet pick · {NOISE[m][1]}") for m in quiet], "Quietest in stock today")}
+{G.faq(faq, esc)}
+{G.more([("/best/quiet/", "Quietest Bitcoin miners"), ("/compare/avalon-nano-3s-vs-hammer-bc04/", "Avalon Nano 3S vs Hammer BC04"), ("/guides/bitaxe-power-supply/", "Which power supply?"), ("/guides/bitcoin-mining-heat-your-home/", "Mining to heat your home"), ("/find-my-miner/", "Find my miner quiz")])}
 </article>"""
-    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "How loud are home Bitcoin miners?", desc), faq_ld(faq)], lastmod=NOISE_CHECKED, og_type="article")
+    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "How loud are home Bitcoin miners?", desc), faq_ld(faq)], lastmod=GUIDES_REFRESHED, og_type="article")
 
 
 # First-hour setup checklist (/guides/bitaxe-setup/). Facts from the open-source AxeOS firmware (ESP-Miner), checked Oct 29 2026:
@@ -3309,53 +3317,45 @@ def build_guide_setup():
     pu, pp = SETUP_DEFAULT_POOL
     fu, fp = SETUP_DEFAULT_FALLBACK
     faq = [("Why can't my Bitaxe find my Wi-Fi?",
-            "The Bitaxe's chip only works with 2.4 GHz Wi-Fi. If your router puts 2.4 and 5 GHz under one name, it usually still works; if not, turn on a separate 2.4 GHz network in your router settings."),
+            "It only works with 2.4 GHz Wi-Fi. If it can't see your network, turn on a separate 2.4 GHz network in your router."),
            ("What do I put in the User field?",
-            "Your own Bitcoin address, often followed by a dot and a name for the miner, like youraddress.bitaxe1. The Password field can usually stay as x. Check your pool's own page, since a few pools ask for something different."),
+            "Your own Bitcoin address, optionally plus a miner name (youraddress.bitaxe1). Password: usually x."),
            ("Do I need an account with the pool?",
-            "Not for solo pools like Public Pool or Solo CKPool: your Bitcoin address is your login. Some shared pools, like Braiins, ask you to sign up."),
+            "Not for Public Pool or Solo CKPool: your address is your login. Braiins asks you to sign up."),
            ("How do I find my Bitaxe's dashboard later?",
-            "Its IP address is on the miner's little screen once it's on your Wi-Fi. Type that number into a browser on a phone or computer connected to the same network."),
+            "Type the IP address from its screen into a browser on the same Wi-Fi."),
            ("My Bitaxe is on, but the hashrate is 0. What's wrong?",
-            "Usually the pool address or port has a typo, or the miner isn't on Wi-Fi yet. Open the Pool settings, check every field, save, and let it restart.")]
+            "Usually a typo in the pool address or port, or it's not on Wi-Fi yet. Check Pool settings and save.")]
     body = f"""<article>
-<header class="hero"><h1>Bitaxe setup: your first-hour checklist</h1>
-<p class="lede">Just unboxed your Bitaxe? Here's everything to do in the first hour: get it on Wi-Fi, point it at a pool that pays <em>your</em> Bitcoin address, and check it's running right.</p>
-<p class="meta">Updated <time datetime="{SETUP_CHECKED}">Oct 29, 2026</time> · 4-minute read</p></header>
-<section aria-labelledby="h-0"><h2 id="h-0">Before you start</h2>
-<ul><li><strong>A Bitcoin address you own</strong>, from your own wallet. This is where a block reward would go.</li>
-<li><strong>Your Wi-Fi name and password.</strong> The Bitaxe only works with 2.4 GHz Wi-Fi.</li>
-<li><strong>The power supply that came with it.</strong> Some boards take 5 V and others 12 V (see <a href="/guides/is-my-bitaxe-normal/">the board table</a>), so don't swap in a random one.</li>
-<li><strong>A spot with airflow</strong>, away from curtains, with the fan side clear.</li></ul></section>
-<section aria-labelledby="h-1"><h2 id="h-1">1. Plug it in and join its setup Wi-Fi</h2>
-<ol><li>Plug in the power supply. The screen lights up and shows a setup Wi-Fi name like <strong>Bitaxe_1A2B</strong> (the last four characters differ on every miner), plus a QR code.</li>
-<li>On your phone, scan the QR code or pick that Wi-Fi name in your Wi-Fi settings. It has no password.</li>
-<li>A setup page should pop up on its own. If it doesn't, open your phone's browser.</li></ol></section>
-<section aria-labelledby="h-2"><h2 id="h-2">2. Put it on your home Wi-Fi</h2>
-<ol><li>On the setup page, choose your home Wi-Fi (2.4 GHz) and type its password.</li>
-<li>Save. The miner restarts, joins your network, and shows its new IP address on the screen, something like 192.168.1.57. Write it down.</li>
-<li>Reconnect your phone to your normal Wi-Fi and type that IP address into the browser. That's your miner's dashboard (AxeOS).</li></ol></section>
-<section aria-labelledby="h-3"><h2 id="h-3">3. Set the pool and your Bitcoin address</h2>
-<p>This is the step people skip, and the one that matters most. Open <strong>Pool</strong> settings in the dashboard.</p>
-<ul><li><strong>Pool address and port:</strong> the firmware comes set to Public Pool ({esc(pu)}, port {pp}) with Solo CKPool ({esc(fu)}, port {fp}) as the backup. Both are solo pools. Keep them or pick another from <a href="/guides/bitcoin-mining-pools/">our pool comparison</a>.</li>
-<li><strong>User:</strong> replace it with your own Bitcoin address, plus a dot and a miner name if you like (youraddress.bitaxe1). If AxeOS shows a warning that you're using the default factory Bitcoin address, this field still needs changing.</li>
-<li><strong>Password:</strong> usually just x.</li>
-<li><strong>Do the backup pool too.</strong> Its User field should also be your address, or a reward found while it's on the backup won't reach you.</li></ul>
-<p>Save and let it restart.</p></section>
-<section aria-labelledby="h-4"><h2 id="h-4">4. Check it's mining</h2>
-<ul><li><strong>Shares accepted</strong> goes up within a few minutes.</li>
-<li><strong>Hashrate:</strong> give it 10 minutes, then compare the average with the stock numbers in <a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a> (a Gamma lands near 1.07 TH/s at stock).</li>
-<li><strong>Temperature:</strong> the fan aims for about {AXEOS_TEMP_TARGET}°C on the chip. If it goes above {AXEOS_ASIC_STOP}°C the firmware stops mining to protect it.</li>
-<li><strong>Best difficulty</strong> climbs over the first hours. See <a href="/solo-odds/#h-best">what your best difficulty means</a>.</li></ul></section>
-<section aria-labelledby="h-5"><h2 id="h-5">5. Nice to do in week one</h2>
-<ul><li><strong>Firmware:</strong> check you're on the latest official release. See <a href="/guides/bitaxe-firmware/">Bitaxe firmware compared</a> for how to update safely.</li>
-<li><strong>Power cost:</strong> see what it costs to run at your electricity price with <a href="/guides/is-home-mining-worth-it/">Is home mining worth it?</a></li>
-<li><strong>Odds:</strong> see your real chance of a block on the <a href="/solo-odds/">solo odds calculator</a>.</li></ul></section>
-<section aria-labelledby="h-faq"><h2 id="h-faq">Questions</h2>{"".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>" for q, a in faq)}</section>
-<section><h2>Keep reading</h2><ul class="links"><li><a href="/guides/is-my-bitaxe-normal/">Is my Bitaxe normal?</a></li><li><a href="/guides/bitcoin-mining-pools/">Which mining pool should I use?</a></li><li><a href="/guides/bitaxe-firmware/">Bitaxe firmware compared</a></li><li><a href="/guides/bitaxe-power-supply/">Which power supply?</a></li><li><a href="/guides/bitaxe-monitoring-apps/">Monitoring apps</a></li></ul>
-<p class="hint">Steps follow the official open-source <a href="{AXEOS_SRC}" rel="nofollow noopener" target="_blank">AxeOS firmware</a>, checked <time datetime="{SETUP_CHECKED}">Oct 29, 2026</time>. Menus can move between versions, and other boards (like NerdQaxe) run their own firmware with similar steps. General guidance only; follow your maker's instructions.</p></section>
+{G.hero("Bitaxe setup: your first-hour checklist", "Get it on Wi-Fi, point it at a pool that pays <em>your</em> Bitcoin address, and check it's running right.", g_chips(2, checked=f'AxeOS checked <time datetime="{SETUP_CHECKED}">Oct 29, 2026</time>'), hero_img("bitaxe-gamma"))}
+{G.tldr(["Join the miner's own setup Wi-Fi, then give it your home Wi-Fi (2.4 GHz only).",
+         "In Pool settings, replace the User field with <b>your own Bitcoin address</b>. Do the backup pool too.",
+         "After 10 minutes, check shares are going up and the hashrate looks normal."])}
+{G.section("h-0", "Have these ready", G.cards([
+        ("🔑", "Your Bitcoin address", "From a wallet you own.", "orange"),
+        ("📶", "Wi-Fi password", "2.4 GHz Wi-Fi only.", "blue"),
+        ("🔌", "Its own power supply", '5 V or 12 V. <a href="/guides/bitaxe-power-supply/">Which?</a>', "yellow"),
+        ("🌬️", "Airflow", "Fan side clear.", "green")]))}
+{G.section("h-1", "4 steps to mining", G.fig(G.bitaxe_screen_svg(), "When you first plug it in, the screen shows a setup Wi-Fi name and a QR code.") + G.steps([
+        ("📲", "Join its setup Wi-Fi", "Plug in. Scan the QR code or join <b>Bitaxe_XXXX</b> (no password)."),
+        ("📶", "Add your home Wi-Fi", "Pick your 2.4 GHz network and save. The screen shows its new IP address."),
+        ("🏊", "Set pool + your address", f"Type the IP in a browser → Pool. Default: Public Pool ({esc(pu)}, port {pp}), backup Solo CKPool ({esc(fu)}, port {fp}). Put your address in User on both."),
+        ("✅", "Check it's mining", "Shares climb within minutes. After 10 minutes a Gamma averages near 1.07 TH/s at stock.")]))}
+{G.section("h-4", "Is it healthy?", G.cards([
+        ("📈", "Hashrate", 'Compare with <a href="/guides/is-my-bitaxe-normal/">stock numbers</a>.', "green"),
+        ("🌡️", "Temperature", f"Fan aims for {AXEOS_TEMP_TARGET}°C; stops mining above {AXEOS_ASIC_STOP}°C.", "red"),
+        ("⚠️", "Factory address warning", "Means the User field still needs your address.", "yellow"),
+        ("🏆", "Best difficulty", '<a href="/solo-odds/#h-best">What it means</a>', "purple")]))}
+{G.section("h-5", "Nice to do in week one", G.cards([
+        ("💾", "Latest firmware", '<a href="/guides/bitaxe-firmware/">Update safely</a>.', "blue"),
+        ("💸", "Power cost", '<a href="/guides/is-home-mining-worth-it/">What it costs at your price</a>.', "orange"),
+        ("🎟", "Your odds", '<a href="/solo-odds/">Solo odds calculator</a>.', "green"),
+        ("📱", "Alerts", '<a href="/guides/bitaxe-monitoring-apps/">Monitoring apps</a>.', "purple")]))}
+{G.faq(faq, esc)}
+{G.more([("/guides/is-my-bitaxe-normal/", "Is my Bitaxe normal?"), ("/guides/bitcoin-mining-pools/", "Which mining pool?"), ("/guides/bitaxe-firmware/", "Bitaxe firmware compared"), ("/guides/bitaxe-power-supply/", "Which power supply?"), ("/guides/bitaxe-monitoring-apps/", "Monitoring apps")],
+        f'Based on the open-source {g_ext(AXEOS_SRC, "AxeOS firmware")}, checked <time datetime="{SETUP_CHECKED}">Oct 29, 2026</time>. Menus can move between versions.')}
 </article>"""
-    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Bitaxe setup: your first-hour checklist", desc), faq_ld(faq)], lastmod=SETUP_CHECKED, og_type="article")
+    layout(path, title, desc, body, crumbs=trail, jsonld=[guide_ld(path, "Bitaxe setup: your first-hour checklist", desc), faq_ld(faq)], lastmod=GUIDES_REFRESHED, og_type="article")
 
 
 # ---------------------------------------------------------------------------------------------
@@ -4364,33 +4364,44 @@ def build_indexes():
 <ul class="links">{"".join(f'<li><a href="{compare_url(a, b)}">{esc(compare_label(a, b))}</a></li>' for a, b in pairs)}</ul></article>"""
     layout("/compare/", "Compare home Bitcoin miners side by side | Bitaxe Radar", "Head-to-head comparisons of popular home Bitcoin miners: price, hashrate, power use and running cost.",
            body, crumbs=[("Home", "/"), ("Guides", "/guides/"), ("Compare", "/compare/")])
-    # /guides/
-    gl = [("/guides/is-home-mining-worth-it/", "Is home mining worth it?", "Check it at your electricity price."),
-          ("/solo-odds/", "Solo odds calculator", "Your real chance of finding a block."),
-          ("/solo-wins/", "Solo block wins", "Recent blocks won by solo miners."),
-          ("/heat-calculator/", "Room heat calculator", "Which heater miner fits your room."),
-          ("/price-per-th/", "Price per TH/s leaderboard", "Most hashrate per dollar, and is today's price good?"),
-          ("/guides/solar-bitcoin-mining/", "Can solar power a miner?", "Panels needed for each miner."),
-          ("/guides/bitcoin-mining-heat-your-home/", "Mining to heat your home", "Miner vs space heater vs heat pump."),
-          ("/guides/solo-vs-pool-mining/", "Solo vs pool mining", "Lottery shot or small steady payouts?"),
-          ("/guides/bitcoin-mining-pools/", "Which mining pool?", "Popular Bitcoin pools compared: fees and payouts."),
-          ("/guides/is-my-bitaxe-normal/", "Is my Bitaxe normal?", "Stock hashrate and temps, board by board."),
-          ("/guides/bitaxe-setup/", "First-hour setup checklist", "Wi-Fi, pool and your Bitcoin address."),
-          ("/guides/bitaxe-firmware/", "Bitaxe firmware compared", "AxeOS, NerdQAxe, AxeForge and NerdMiner."),
-          ("/guides/bitaxe-chips/", "Bitaxe chips compared", "BM1366 to BM1373: power per TH/s and today's prices."),
-          ("/guides/bitaxe-power-supply/", "Which power supply?", "5V or 12V, plug type and size, by model."),
-          ("/guides/bitaxe-monitoring-apps/", "Monitoring apps", "Five apps that watch your miner and alert you."),
-          ("/guides/bitaxe-noise/", "How loud is a home miner?", "Stated dB by model, quietest first, with buy links."),
-          ("/guides/how-heater-miners-work/", "How heater miners work", "A miner that warms the room."),
-          ("/where-to-buy-bitaxe/", "Where to buy a Bitaxe", "Every shop, ranked by today's price."),
-          ("/how-we-track/", "How we track prices", "Where the numbers come from.")]
-    body = f"""<article><header class="hero"><h1>Guides</h1>
-<p class="lede">Plain-words help for picking and running a home miner.</p></header>
-<ul class="glist">{"".join(f'<li><a href="{p}"><b>{esc(t)}</b><span>{esc(d)}</span></a></li>' for p, t, d in gl)}</ul>
-<h2>Best for</h2>{best_pills()}
+    # /guides/ hub: three "start here" cards, then every guide and tool as an icon tile, grouped by what you're doing.
+    feat = [("/guides/is-home-mining-worth-it/", "💸", "Is home mining worth it?", "Check it at your power price, with live numbers.", "orange", "2-min read"),
+            ("/guides/solo-vs-pool-mining/", "🎟", "Solo vs pool mining", "Lottery ticket or small, steady payouts?", "blue", "1-min read"),
+            ("/guides/how-heater-miners-work/", "🔥", "How heater miners work", "A space heater that mines. Safe in a bedroom?", "red", "2-min read")]
+    groups = [("h-heat", "🔥 Heat and solar", [
+                  ("/guides/bitcoin-mining-heat-your-home/", "♨️", "Mining to heat your home", "Miner vs space heater vs heat pump.", "red"),
+                  ("/guides/solar-bitcoin-mining/", "☀️", "Solar Bitcoin mining", "How many panels each miner needs.", "yellow"),
+                  ("/best/heating-a-room/", "🛋️", "Best for heating a room", "Ranked heater miners, live prices.", "orange"),
+                  ("/heat-calculator/", "📐", "Room heat calculator", "Which heater miner fits your room.", "purple")]),
+              ("h-own", "🛠️ Got a Bitaxe?", [
+                  ("/guides/bitaxe-setup/", "🚀", "First-hour setup", "Wi-Fi, pool and your Bitcoin address.", "green"),
+                  ("/guides/is-my-bitaxe-normal/", "🩺", "Is my Bitaxe normal?", "Stock hashrate and temps, board by board.", "blue"),
+                  ("/guides/bitcoin-mining-pools/", "🏊", "Which mining pool?", "Fees and payouts compared.", "blue"),
+                  ("/guides/bitaxe-power-supply/", "🔌", "Which power supply?", "5V or 12V, by model.", "yellow"),
+                  ("/guides/bitaxe-firmware/", "💾", "Firmware compared", "AxeOS, NerdQAxe, AxeForge, NerdMiner.", "purple"),
+                  ("/guides/bitaxe-monitoring-apps/", "📱", "Monitoring apps", "Five apps that watch your miner.", "green"),
+                  ("/guides/bitaxe-noise/", "🤫", "How loud is it?", "Stated dB by model, quietest first.", "orange"),
+                  ("/guides/bitaxe-chips/", "🧩", "Chips compared", "BM1366 to BM1373, power per TH/s.", "red")]),
+              ("h-tools", "🧮 Odds, prices and tools", [
+                  ("/solo-odds/", "🎲", "Solo odds calculator", "Your real chance of finding a block.", "purple"),
+                  ("/solo-wins/", "🏆", "Solo block wins", "Recent blocks won by small miners.", "yellow"),
+                  ("/price-per-th/", "📊", "Price per TH/s", "Most hashrate per dollar today.", "green"),
+                  ("/where-to-buy-bitaxe/", "🛒", "Where to buy a Bitaxe", "Every shop, ranked by today's price.", "orange"),
+                  ("/how-we-track/", "🔍", "How we track prices", "Where the numbers come from.", "blue")])]
+    feat_html = "".join(f'<a class="g-feat t-{tone}" href="{p}" data-reveal-item><span class="g-feat-ic" aria-hidden="true">{ic}</span><b>{esc(t)}</b><span>{esc(d)}</span><em>{rt} →</em></a>'
+                        for p, ic, t, d, tone, rt in feat)
+    group_html = "".join(f'<section class="g-sec" aria-labelledby="{gid}" data-reveal><h2 id="{gid}">{esc(gt)}</h2><ul class="g-tiles">'
+                         + "".join(f'<li data-reveal-item><a class="t-{tone}" href="{p}"><span class="g-ic" aria-hidden="true">{ic}</span><b>{esc(t)}</b><span>{esc(d)}</span></a></li>' for p, ic, t, d, tone in items)
+                         + "</ul></section>" for gid, gt, items in groups)
+    n_guides = sum(1 for _, _, items in groups for it in items if it[0].startswith("/guides/")) + len(feat)
+    art = "".join(model_img(m, lazy=False) for m in ("bitaxe-gamma", "avalon-mini-3", "nerdqaxe-pp") if m in MODEL_IMG)
+    body = f"""<article>{G.hero("Guides", "Short, visual answers about home Bitcoin mining. Most take a minute or two.", [f"📚 {n_guides} guides", "⏱ 1–2 min each", ("live", "Live prices inside")], f'<div class="g-hub-art">{art}</div>' if art else "")}
+<section class="g-sec" aria-labelledby="h-start" data-reveal><h2 id="h-start">⭐ Start here</h2><div class="g-hub-feat">{feat_html}</div></section>
+{group_html}
+<section class="g-sec" aria-labelledby="h-bestfor"><h2 id="h-bestfor">Best for…</h2>{best_pills()}
 <h2>Compare</h2><ul class="links">{"".join(f'<li><a href="{compare_url(a, b)}">{esc(compare_label(a, b))}</a></li>' for a, b in pairs[:6])}<li><a href="/compare/">All comparisons →</a></li></ul>
-<h2>Shops</h2><p><a href="/sellers/">All shops we check →</a></p></article>"""
-    layout("/guides/", "Home Bitcoin mining guides | Bitaxe Radar", "Guides to home Bitcoin mining: solo vs pool, how heater miners work, where to buy a Bitaxe, best-for lists and comparisons.",
+<p><a href="/sellers/">All shops we check →</a></p></section></article>"""
+    layout("/guides/", "Home Bitcoin mining guides: short, visual, plain English | Bitaxe Radar", "Short, visual guides to home Bitcoin mining: is it worth it, solo vs pool, heater miners, solar, Bitaxe setup, power supplies and more.",
            body, crumbs=[("Home", "/"), ("Guides", "/guides/")])
 
 
