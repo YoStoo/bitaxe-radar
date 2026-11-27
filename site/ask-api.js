@@ -14,7 +14,8 @@
     return id;
   }
 
-  function ask(question, history) {
+  // signal is optional (AbortSignal). It is not sent to the Worker; it only cancels the browser fetch.
+  function ask(question, history, signal) {
     var cfg = w.RADAR_ASK;
     if (!cfg || !cfg.url) return Promise.resolve({ ok: false, error: "Ask isn't set up on this page." });
     var q = String(question || "").replace(/\s+/g, " ").trim();
@@ -22,18 +23,21 @@
     if (q.length > MAX) return Promise.resolve({ ok: false, error: "Keep it under " + MAX + " characters." });
     var body = { question: q };
     if (Array.isArray(history) && history.length) body.history = history;
-    return fetch(cfg.url, {
+    var opts = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body)
-    }).then(function (r) {
+    };
+    if (signal) opts.signal = signal;
+    return fetch(cfg.url, opts).then(function (r) {
       return r.json().then(function (d) {
         if (!d || typeof d !== "object") return { ok: false, error: "Ask isn't reachable right now. Try again later." };
         return d;
       }, function () {
         return { ok: false, error: "Ask isn't reachable right now. Try again later." };
       });
-    }).catch(function () {
+    }).catch(function (err) {
+      if (err && err.name === "AbortError") return { ok: false, aborted: true };
       return { ok: false, error: "Ask isn't reachable right now. Try again later." };
     });
   }

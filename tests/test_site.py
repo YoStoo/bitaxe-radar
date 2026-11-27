@@ -289,7 +289,9 @@ class SiteTests(unittest.TestCase):
         # one menu on every page: All miners · Deals · Find my miner · Guides + Alerts, no sideways scroller
         want = ["/miners/", "/deals/", "/find-my-miner/", "/guides/", "/alerts/"]
         for f in list(SITE.rglob("*.html")):
-            if f.parent.name in ("home-miners", "about", "bitaxe-black-friday"):
+            # /ask/ is a full-page chat shell (no site header/nav) and stays out of the menu on purpose.
+            # /bitaxe-black-friday/ is a noindex redirect stub (no site header/nav).
+            if f.parent.name in ("home-miners", "about", "ask", "bitaxe-black-friday"):
                 continue
             nav = re.search(r'<nav aria-label="Main">(.*?)</nav>', f.read_text(), re.S)
             self.assertIsNotNone(nav, str(f))

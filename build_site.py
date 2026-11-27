@@ -938,7 +938,7 @@ def ask_widget_scripts():
 MOTION_SCRIPT = '<script src="/motion.js" defer></script>\n'
 
 
-def layout(path, title, desc, body, *, crumbs=None, jsonld=(), noindex=False, lastmod=None, scripts="", og_type="website", index_in_sitemap=True):
+def layout(path, title, desc, body, *, crumbs=None, jsonld=(), noindex=False, lastmod=None, scripts="", og_type="website", index_in_sitemap=True, app=False):
     url = BASE + (path if path != "/404.html" else "/")
     desc = shorten(desc, 158)
     title = shorten(title, 90)
@@ -947,11 +947,18 @@ def layout(path, title, desc, body, *, crumbs=None, jsonld=(), noindex=False, la
         ld.append(breadcrumb_ld(crumbs))
     robots = '<meta name="robots" content="noindex,follow">\n' if noindex else ""
     canon = f'<link rel="canonical" href="{esc(url)}">\n' if path != "/404.html" else ""
+    viewport = "width=device-width, initial-scale=1, viewport-fit=cover" if app else "width=device-width, initial-scale=1"
+    body_attrs = ' class="ask-app"' if app else ""
+    if app:
+        chrome = f'<a class="skip" href="#main">Skip to content</a>\n{body}'
+    else:
+        chrome = (f'{header_html(path)}\n<main class="wrap" id="main">\n'
+                  f'{crumbs_html(crumbs) if crumbs else ""}\n{body}\n</main>\n{footer_html()}')
     page = f"""<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="{viewport}">
 <meta name="theme-color" content="#0b1222">
 <title>{esc(title)}</title>
 <meta name="description" content="{esc(desc)}">
@@ -966,13 +973,8 @@ def layout(path, title, desc, body, *, crumbs=None, jsonld=(), noindex=False, la
 <link rel="stylesheet" href="/style.css">
 {"".join(jsonld_tag(x) for x in ld)}
 </head>
-<body>
-{header_html(path)}
-<main class="wrap" id="main">
-{crumbs_html(crumbs) if crumbs else ""}
-{body}
-</main>
-{footer_html()}
+<body{body_attrs}>
+{chrome}
 {ask_widget_scripts()}{scripts}{calc_scripts() if "data-calc=" in body else ""}{MOTION_SCRIPT if ("pchart" in body or "data-reveal" in body) else ""}{ANALYTICS}
 </body>
 </html>
@@ -4193,25 +4195,40 @@ def build_ask():
         f'<li><button type="button" class="ask-chip" data-q="{esc(q)}">{esc(label)}</button></li>'
         for q, label in chips
     )
-    body = f"""<article class="ask-page" id="ask-page">
-<header class="hero ask-hero ask-reveal">
-<h1>Ask Bitaxe Radar</h1>
-<p class="lede">Ask about home Bitcoin miners. An AI (Claude) answers using only today's prices and specs from this site.</p>
+    send_ico = ('<svg class="ask-ico-send" viewBox="0 0 24 24" aria-hidden="true" focusable="false">'
+                '<path fill="currentColor" d="M12 4.5 5.2 12h4.3v7.5h5V12h4.3L12 4.5z"/></svg>')
+    stop_ico = ('<svg class="ask-ico-stop" viewBox="0 0 24 24" aria-hidden="true" focusable="false">'
+                '<rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor"/></svg>')
+    new_ico = ('<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">'
+               '<path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" '
+               'd="M12 5v14M5 12h14"/></svg>')
+    body = f"""<div class="ask-page is-empty" id="ask-page">
+<header class="ask-topbar">
+<a class="brand" href="/" aria-label="Bitaxe Radar home">{WORDMARK}</a>
+<button type="button" class="ask-new" id="ask-new" disabled>{new_ico}<span class="ask-new-label">New chat</span></button>
 </header>
-<section class="ask-composer ask-reveal" aria-labelledby="ask-q-label">
+<main class="ask-shell" id="main">
+<div class="ask-col">
+<div class="ask-stage">
+<header class="hero ask-hero ask-reveal" id="ask-welcome">
+<h1>What can I help you find?</h1>
+<p class="lede">Ask about home Bitcoin miners. Answers use today&rsquo;s prices and our guides.</p>
+</header>
+<div id="ask-answer" class="ask-answer" aria-live="polite"></div>
+</div>
+<div class="ask-dock ask-reveal">
+<section class="ask-composer" aria-labelledby="ask-q-label">
 <form id="ask-form">
-<label id="ask-q-label" for="ask-q">Your question</label>
-<textarea id="ask-q" name="question" maxlength="300" rows="2" required autocomplete="off" enterkeyhint="send" placeholder="What's the cheapest miner with at least 1 TH/s in stock?"></textarea>
+<label id="ask-q-label" class="sr" for="ask-q">Your question</label>
+<textarea id="ask-q" name="question" maxlength="300" rows="1" required autocomplete="off" enterkeyhint="send" placeholder="Ask about miners or prices…"></textarea>
 <div class="ask-bar">
 <span class="ask-count" aria-live="polite"><span id="ask-count">0</span>/300</span>
-<button class="btn ask-submit" type="submit"><span class="ask-submit-label">Ask</span></button>
+<button class="btn ask-submit" type="submit" disabled aria-label="Ask"><span class="ask-submit-label">Ask</span>{send_ico}{stop_ico}</button>
 </div>
 </form>
-<ul class="ask-chips" aria-label="Example questions">{chip_html}</ul>
-<noscript><p class="ask-noscript">The answer box needs JavaScript to send your question to the chat.</p></noscript>
 </section>
-<div id="ask-answer" class="ask-answer" aria-live="polite"></div>
-<section class="ask-how ask-reveal" aria-labelledby="h-ask-how">
+<ul class="ask-chips" aria-label="Example questions">{chip_html}</ul>
+<section class="ask-how" aria-labelledby="h-ask-how">
 <h2 id="h-ask-how">How it works</h2>
 <ul class="ask-how-grid">
 <li><b>Live prices</b><span>Tools look up today's table, not a remembered number.</span></li>
@@ -4220,13 +4237,18 @@ def build_ask():
 <li><b>Checked by evals</b><span>Automatic quizzes grade the answers. <a href="/evals/">See the scores</a>.</span></li>
 </ul>
 </section>
+<noscript><p class="ask-noscript">The answer box needs JavaScript to send your question to the chat.</p></noscript>
 <p class="ask-disclaimer">Answers can be wrong. Prices change often; check the miner page before you buy. Questions are sent to Anthropic's API; don't type personal info.</p>
-</article>"""
+</div>
+</div>
+</main>
+</div>"""
     # ask-api.js + chat-widget.js come from ask_widget_scripts() in layout(); ask.js wires the page form.
+    # Full-height chat chrome (no site header/footer). Still noindex and left out of the nav and sitemap.
     scripts = '<script src="/ask.js" defer></script>'
     layout(path, "Ask Bitaxe Radar: AI answers from live miner prices | Bitaxe Radar",
            "Ask a question about home Bitcoin miners and get an AI answer based only on Bitaxe Radar's live prices and specs.",
-           body, crumbs=[("Home", "/"), ("Ask", path)], noindex=True, scripts=scripts)
+           body, noindex=True, scripts=scripts, app=True)
 
 
 # ---------------------------------------------------------------------------------------------

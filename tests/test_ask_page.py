@@ -35,7 +35,7 @@ class AskPage(unittest.TestCase):
         # The old page used class="signup" and an unstyled (white) textarea.
         form = re.search(r"<form[^>]*id=\"ask-form\"[^>]*>", self.html).group(0)
         self.assertNotIn("signup", form)
-        self.assertIn('class="ask-page"', self.html)
+        self.assertIn('class="ask-page is-empty"', self.html)
         self.assertIn("ask-composer", self.html)
         self.assertIn('id="ask-q"', self.html)
         self.assertIn("placeholder=", self.html)
@@ -87,6 +87,34 @@ class AskPage(unittest.TestCase):
         self.assertIn("requestSubmit", self.js)
         self.assertIn('!(box.value || "").trim()', self.js)
         self.assertIn("btn.disabled", self.js)
+
+    def test_chat_shell_and_greeting(self):
+        self.assertIn("What can I help you find?", self.html)
+        self.assertIn("New chat", self.html)
+        self.assertIn('id="ask-new"', self.html)
+        self.assertIn("ask-topbar", self.html)
+        self.assertIn("is-empty", self.html)
+        self.assertIn('class="ask-app"', self.html)
+        self.assertIn("viewport-fit=cover", self.html)
+        # Full-page chat chrome: no site header/footer/crumbs, still noindex.
+        self.assertNotIn('class="top"', self.html)
+        self.assertNotIn("<footer", self.html)
+        self.assertNotIn("Breadcrumb", self.html)
+
+    def test_js_conversation_features(self):
+        self.assertIn("visualViewport", self.js)
+        self.assertIn("has-chat", self.js)
+        self.assertIn("safeUrl", self.js)
+        self.assertIn("renderMarkdown", self.js)
+        self.assertIn("revealWords", self.js)
+        self.assertIn("Copy", self.js)
+        self.assertIn("abort", self.js)
+        self.assertIn("history", self.js)
+        self.assertIn("Not in our data", self.js)
+        self.assertIn("env(safe-area-inset-bottom)", self.css)
+        self.assertIn("ask-msg-user", self.css)
+        self.assertIn("ask-copy", self.css)
+
 
 if __name__ == "__main__":
     unittest.main()
