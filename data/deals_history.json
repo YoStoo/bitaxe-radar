@@ -1,5 +1,46 @@
 [
  {
+  "date": "2026-11-28",
+  "data_checked_at": "2026-11-28T07:48:34Z",
+  "written_at": "2026-11-28T07:48:56Z",
+  "source": "ai",
+  "model": "claude-haiku-5-5",
+  "no_standout": false,
+  "headline": "Canaan Avalon Nano 3S down 7% from its typical price",
+  "summary": "The Canaan Avalon Nano 3S is $271.66 at Power Mining, about 7.3% below its typical $293. It was cheaper at $189 on 2026-11-27, so today's price is not a low.",
+  "miner_id": "avalon-nano-3s",
+  "miner_name": "Canaan Avalon Nano 3S",
+  "offer_id": "powermining:avalon-nano-3s",
+  "retailer_id": "powermining",
+  "retailer_name": "Power Mining",
+  "price_usd": 271.66,
+  "price": 247.93,
+  "currency": "EUR",
+  "typical_usd": 293.0,
+  "drop_usd": 21.34,
+  "drop_pct": 7.3,
+  "lowest_ever": false,
+  "new_low": false,
+  "history_days": 14,
+  "window_days": 14,
+  "check": {
+   "passed": true,
+   "attempts": 1,
+   "first_try_problems": []
+  },
+  "run": {
+   "calls": 3,
+   "tools": [
+    "rank_price_drops",
+    "compare_to_average",
+    "get_price_history"
+   ],
+   "input_tokens": 10310,
+   "output_tokens": 635,
+   "cost_usd": 0.00135
+  }
+ },
+ {
   "date": "2026-11-27",
   "data_checked_at": "2026-11-27T08:33:32Z",
   "written_at": "2026-11-27T08:35:08Z",

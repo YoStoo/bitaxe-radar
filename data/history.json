@@ -7052,6 +7052,13 @@
    "currency": "USD",
    "in_stock": true,
    "status": "in_stock"
+  },
+  {
+   "t": "2026-11-28T07:48:34Z",
+   "price": 293.0,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
   }
  ],
  "altair:avalon-mini-3": [
@@ -7317,6 +7324,13 @@
   {
    "t": "2026-11-27T21:17:28Z",
    "price": 749.0,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  },
+  {
+   "t": "2026-11-28T07:48:34Z",
+   "price": 829.0,
    "currency": "USD",
    "in_stock": true,
    "status": "in_stock"
@@ -7592,6 +7606,13 @@
   {
    "t": "2026-11-27T21:17:28Z",
    "price": 1299.0,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  },
+  {
+   "t": "2026-11-28T07:48:34Z",
+   "price": 1599.0,
    "currency": "USD",
    "in_stock": true,
    "status": "in_stock"
@@ -12433,6 +12454,13 @@
    "currency": "USD",
    "in_stock": true,
    "status": "in_stock"
+  },
+  {
+   "t": "2026-11-28T07:48:34Z",
+   "price": 369.0,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
   }
  ],
  "altair:hammer-bc08": [
@@ -16951,6 +16979,13 @@
    "currency": "USD",
    "in_stock": true,
    "status": "in_stock"
+  },
+  {
+   "t": "2026-11-28T07:48:34Z",
+   "price": 219.0,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
   }
  ],
  "bitcoinmerch:hammer-bc01": [
@@ -17103,6 +17138,13 @@
   },
   {
    "t": "2026-11-27T08:33:32Z",
+   "price": 149.99,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  },
+  {
+   "t": "2026-11-28T07:48:34Z",
    "price": 149.99,
    "currency": "USD",
    "in_stock": true,
@@ -17267,6 +17309,13 @@
   {
    "t": "2026-11-27T21:17:28Z",
    "price": 79.0,
+   "currency": "USD",
+   "in_stock": true,
+   "status": "in_stock"
+  },
+  {
+   "t": "2026-11-28T07:48:34Z",
+   "price": 99.0,
    "currency": "USD",
    "in_stock": true,
    "status": "in_stock"
